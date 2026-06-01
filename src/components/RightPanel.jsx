@@ -31,7 +31,7 @@ export default function RightPanel() {
     ? { label:'No caminho', color:'#16a34a', bg:'rgba(22,163,74,0.1)' }
     : projPct>=70
     ? { label:'Em risco',   color:'#d97706', bg:'rgba(217,119,6,0.1)' }
-    : { label:'Abaixo',     color:'#dc2626', bg:'rgba(220,38,38,0.1)' }
+    : { label:'Abaixo',     color:'#64748B', bg:'rgba(100,116,139,0.1)' }
 
   const recentes = [...posts]
     .sort((a,b)=>{
@@ -134,14 +134,14 @@ export default function RightPanel() {
       {/* Botão novo post */}
       <button onClick={()=>setUploadOpen(true)}
         style={{
-          width:'100%', background:'#FF6200',
+          width:'100%', background:'#1C252E',
           border:'none',
           borderRadius:12, padding:'10px',
-          color:'#fff', fontSize:13, fontWeight:700, cursor:'pointer',
+          color:'#C3EBF7', fontSize:13, fontWeight:700, cursor:'pointer',
           display:'flex', alignItems:'center', justifyContent:'center', gap:7,
           transition:'opacity 0.15s',
         }}
-        onMouseEnter={e=>e.currentTarget.style.opacity='0.88'}
+        onMouseEnter={e=>e.currentTarget.style.opacity='0.85'}
         onMouseLeave={e=>e.currentTarget.style.opacity='1'}
       >
         <Plus size={15}/> Novo post

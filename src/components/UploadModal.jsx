@@ -33,7 +33,7 @@ function fileToName(filename) {
 }
 
 const EMPTY = {
-  nome: '', data_post: '', tipo: 'Reels', descricao: '',
+  nome: '', tema: '', data_post: '', tipo: 'Reels', descricao: '',
   contas_alcancadas: '', visualizacoes: '', interacoes: '',
   curtidas: '', comentarios: '', salvamentos: '', compartilhamentos: '',
   status: 'parcial',
@@ -99,7 +99,6 @@ export default function UploadModal({ mode = 'new', post = null, onClose, onSave
   function save() {
     const dados = {
       ...form,
-      tema: form.nome || form.tema || '',   // compatibilidade com componentes que usam "tema"
       ...Object.fromEntries(
         NUM_FIELDS.map(({ key }) => [key, Number(form[key]) || null])
       ),
@@ -191,6 +190,19 @@ export default function UploadModal({ mode = 'new', post = null, onClose, onSave
               placeholder="Ex: Caique Cardoso — ETFs Itaú Asset"
               style={{ ...input(false), fontSize: 14, padding: '10px 12px', border: '1.5px solid #1C252E30' }}
               autoFocus={mode === 'new'}
+            />
+          </div>
+
+          {/* Tema */}
+          <div>
+            <label style={{ color: '#8A9BB0', fontSize: 11, fontWeight: 600, display: 'block', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+              Tema
+            </label>
+            <input
+              value={form.tema || ''}
+              onChange={e => set('tema', e.target.value)}
+              placeholder="Ex: ETFs, Renda Fixa, Fundo Imobiliário…"
+              style={input(false)}
             />
           </div>
 
