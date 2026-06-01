@@ -2,11 +2,16 @@ import { useState } from 'react'
 import { Download, Key } from 'lucide-react'
 import { useStore } from '../store/useStore'
 
-const MESES = [
-  '01/2025','02/2025','03/2025','04/2025','05/2025','06/2025',
-  '07/2025','08/2025','09/2025','10/2025','11/2025','12/2025',
-  '01/2026','02/2026','03/2026','04/2026','05/2026','06/2026',
+const MESES_NOMES = [
+  'Janeiro','Fevereiro','Março','Abril','Maio','Junho',
+  'Julho','Agosto','Setembro','Outubro','Novembro','Dezembro',
 ]
+
+// valor interno: MM/YYYY | label: "Janeiro 2026"
+const MESES = Array.from({ length: 12 }, (_, i) => ({
+  value: `${String(i + 1).padStart(2, '0')}/2026`,
+  label: `${MESES_NOMES[i]} 2026`,
+}))
 
 const TITLES = {
   'visao-geral':  { title: 'Visão Mensal',   sub: 'Métricas de alcance do mês filtrado' },
@@ -54,7 +59,7 @@ export default function TopBar() {
         {/* Mês */}
         <select value={mesFiltro} onChange={e => setMesFiltro(e.target.value)}
           style={{ ...btn.base, background: '#fff', border: '1.5px solid #E8ECF0', color: '#1C252E', padding: '7px 12px' }}>
-          {MESES.map(m => <option key={m}>{m}</option>)}
+          {MESES.map(m => <option key={m.value} value={m.value}>{m.label}</option>)}
         </select>
 
         {/* API */}

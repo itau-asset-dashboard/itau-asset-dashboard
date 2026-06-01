@@ -3,6 +3,13 @@ import { Edit2, Check, Plus } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import UploadModal from './UploadModal'
 
+const MESES_NOMES = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro']
+function mesFiltroLabel(val) {
+  if (!val) return val
+  const [mm, yyyy] = val.split('/')
+  return `${MESES_NOMES[parseInt(mm,10)-1]} ${yyyy}`
+}
+
 function fmt(n) {
   if (n==null) return '—'
   if (n>=1000000) return (n/1000000).toFixed(1).replace('.',',')+'M'
@@ -123,7 +130,7 @@ export default function RightPanel() {
         <div style={{ background:'#fff', borderRadius:10, padding:'10px 12px', border:'1px solid #E8ECF0' }}>
           <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:6 }}>
             <p style={{ color:'#8A9BB0', fontSize:10, fontWeight:700, textTransform:'uppercase', letterSpacing:'0.06em' }}>
-              Mês {mesFiltro}
+              {mesFiltroLabel(mesFiltro)}
             </p>
             <p style={{ color:'#1C252E', fontSize:11, fontWeight:700 }}>{pctMensal.toFixed(0)}%</p>
           </div>
