@@ -41,6 +41,16 @@ const inp = (highlight) => ({
   background: highlight ? 'rgba(195,235,247,0.06)' : '#fff',
 })
 
+// Garante exibição no formato DD/MM/AAAA
+function formatDate(dateStr) {
+  if (!dateStr) return ''
+  const parts = dateStr.replace(/-/g, '/').split('/')
+  if (parts.length !== 3) return dateStr
+  // Se ano veio primeiro (YYYY/MM/DD), inverte
+  if (parts[0].length === 4) return `${parts[2]}/${parts[1]}/${parts[0]}`
+  return `${parts[0].padStart(2,'0')}/${parts[1].padStart(2,'0')}/${parts[2]}`
+}
+
 function fileToName(filename) {
   if (!filename) return ''
   return filename
@@ -140,10 +150,13 @@ const SinglePostModal = forwardRef(function SinglePostModal({ initialPost, initi
     if (saving) return
     setSaving(true)
     try {
+      // Versão comprimida para localStorage (thumbnail)
       const compressed = preview ? await compressImage(preview) : form.imageData
       const dados = {
         ...form,
         imageData: compressed,
+        // Passa o preview original para upload em alta qualidade no Storage
+        imagePreview: preview || null,
         ...Object.fromEntries(NUM_FIELDS.map(({ key }) => [key, Number(form[key]) || null])),
       }
       onSave(dados)
@@ -165,24 +178,37 @@ const SinglePostModal = forwardRef(function SinglePostModal({ initialPost, initi
     <div style={{ padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: 14 }}>
 
       {/* ── Lightbox ── */}
-      {lightbox && preview && (
+      {lightbox && (form.imageUrl || preview) && (
         <div
           onClick={() => setLightbox(false)}
           style={{
             position: 'fixed', inset: 0, zIndex: 2000,
-            background: 'rgba(0,0,0,0.85)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            background: 'rgba(0,0,0,0.9)',
+            display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
             padding: 24, cursor: 'zoom-out',
           }}
         >
-          <img src={preview} alt="Evidência"
-            style={{ maxWidth: '100%', maxHeight: '90vh', borderRadius: 12, boxShadow: '0 8px 40px rgba(0,0,0,0.5)', objectFit: 'contain' }}
+          {/* Usa imageUrl (alta qualidade, Storage) se disponível */}
+          <img
+            src={form.imageUrl || preview}
+            alt="Última evidência"
+            style={{
+              maxWidth: '100%', maxHeight: '85vh',
+              borderRadius: 12, boxShadow: '0 8px 48px rgba(0,0,0,0.6)',
+              objectFit: 'contain', cursor: 'default',
+            }}
             onClick={e => e.stopPropagation()}
           />
+          {form.data_post && (
+            <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: 12, marginTop: 12 }}>
+              📅 {formatDate(form.data_post)}
+            </p>
+          )}
           <button onClick={() => setLightbox(false)} style={{
-            position: 'absolute', top: 20, right: 20,
-            background: 'rgba(255,255,255,0.15)', border: 'none', borderRadius: '50%',
-            width: 36, height: 36, cursor: 'pointer', color: '#fff', fontSize: 18,
+            position: 'absolute', top: 16, right: 16,
+            background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.2)',
+            borderRadius: '50%', width: 38, height: 38, cursor: 'pointer',
+            color: '#fff', fontSize: 16,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
           }}>✕</button>
         </div>
@@ -220,7 +246,7 @@ const SinglePostModal = forwardRef(function SinglePostModal({ initialPost, initi
             <div style={{ flex: 1, minWidth: 0 }}>
               <p style={{ color: '#1C252E', fontWeight: 700, fontSize: 13, marginBottom: 2 }}>Última evidência</p>
               <p style={{ color: '#8A9BB0', fontSize: 11 }}>
-                {form.data_post ? `📅 ${form.data_post}` : 'Sem data definida'}
+                {form.data_post ? `📅 ${formatDate(form.data_post)}` : 'Sem data definida'}
                 {' · '}
                 <span style={{ color: '#0891B2', cursor: 'pointer' }} onClick={e => { e.stopPropagation(); setLightbox(true) }}>
                   ver imagem

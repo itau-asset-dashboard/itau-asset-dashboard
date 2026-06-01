@@ -63,12 +63,14 @@ export const useStore = create(
       // ── Posts ──────────────────────────────────────────
       addPost: async (post) => {
         const id = Date.now().toString()
-        const novo = { nome: '', interacoes: null, ...post, id, historico: [], atualizado_em: null }
+        const { imagePreview, ...rest } = post
+        const novo = { nome: '', interacoes: null, ...rest, id, historico: [], atualizado_em: null }
 
-        // Se tiver imagem local, faz upload para o Storage e guarda a URL
-        if (novo.imageData?.startsWith('data:')) {
+        // Usa imagePreview (original) para Storage; fallback para imageData comprimido
+        const srcForUpload = imagePreview || novo.imageData
+        if (srcForUpload?.startsWith('data:')) {
           try {
-            const imageUrl = await uploadImage(id, novo.imageData)
+            const imageUrl = await uploadImage(id, srcForUpload)
             if (imageUrl) novo.imageUrl = imageUrl
           } catch (_) {}
         }
@@ -78,11 +80,13 @@ export const useStore = create(
       },
 
       updatePost: async (id, newData) => {
-        // Se tiver nova imagem local, faz upload
-        let imageUrl = newData.imageUrl
-        if (newData.imageData?.startsWith('data:')) {
+        const { imagePreview, ...restData } = newData
+        // Usa imagePreview (original) para Storage; fallback para imageData comprimido
+        let imageUrl = restData.imageUrl
+        const srcForUpload = imagePreview || restData.imageData
+        if (srcForUpload?.startsWith('data:')) {
           try {
-            imageUrl = await uploadImage(id, newData.imageData)
+            imageUrl = await uploadImage(id, srcForUpload)
           } catch (_) {}
         }
 
@@ -102,7 +106,7 @@ export const useStore = create(
                 status: p.status,
               },
             }]
-            return { ...p, ...newData, imageUrl: imageUrl || p.imageUrl, historico, atualizado_em: new Date().toLocaleDateString('pt-BR') }
+            return { ...p, ...restData, imageUrl: imageUrl || p.imageUrl, historico, atualizado_em: new Date().toLocaleDateString('pt-BR') }
           })
           return { posts }
         })
