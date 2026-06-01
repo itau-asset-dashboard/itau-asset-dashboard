@@ -97,7 +97,6 @@ const SinglePostModal = forwardRef(function SinglePostModal({ initialPost, initi
   const [error,    setError]    = useState(null)
   const [saved,    setSaved]    = useState(false)
   const [saving,   setSaving]   = useState(false)
-  const [lightbox, setLightbox] = useState(false)
   const [dragging, setDragging] = useState(false)
   const [confirmDelete, setConfirmDelete] = useState(false)
   const [form, setForm] = useState(initialPost ? { ...EMPTY, ...initialPost } : { ...EMPTY })
@@ -177,66 +176,6 @@ const SinglePostModal = forwardRef(function SinglePostModal({ initialPost, initi
   return (
     <div style={{ padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: 14 }}>
 
-      {/* ── Lightbox ── */}
-      {lightbox && (form.imageUrl || preview) && (
-        <div
-          onClick={() => setLightbox(false)}
-          style={{
-            position: 'fixed', inset: 0, zIndex: 2000,
-            background: 'rgba(0,0,0,0.93)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            cursor: 'zoom-out',
-          }}
-        >
-          {/* Imagem ocupa quase toda a tela, scroll se necessário */}
-          <div
-            onClick={e => e.stopPropagation()}
-            style={{
-              position: 'relative',
-              maxWidth: 'calc(100vw - 48px)',
-              maxHeight: 'calc(100vh - 48px)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              cursor: 'default',
-              overflow: 'auto',
-            }}
-          >
-            <img
-              src={form.imageUrl || preview}
-              alt="Última evidência"
-              style={{
-                width: '100%',
-                maxWidth: '96vw',
-                maxHeight: '94vh',
-                objectFit: 'contain',
-                borderRadius: 10,
-                boxShadow: '0 12px 60px rgba(0,0,0,0.7)',
-                display: 'block',
-              }}
-            />
-            {/* Rodapé com data */}
-            {form.data_post && (
-              <div style={{
-                position: 'absolute', bottom: -32, left: 0, right: 0,
-                textAlign: 'center',
-              }}>
-                <span style={{ color: 'rgba(255,255,255,0.5)', fontSize: 12 }}>
-                  📅 {formatDate(form.data_post)}
-                </span>
-              </div>
-            )}
-          </div>
-
-          {/* Botão fechar */}
-          <button onClick={() => setLightbox(false)} style={{
-            position: 'fixed', top: 14, right: 14,
-            background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.18)',
-            borderRadius: '50%', width: 40, height: 40, cursor: 'pointer',
-            color: '#fff', fontSize: 18,
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            zIndex: 2001,
-          }}>✕</button>
-        </div>
-      )}
 
       {/* Contador se múltiplos */}
       {totalFiles > 1 && (
@@ -265,15 +204,15 @@ const SinglePostModal = forwardRef(function SinglePostModal({ initialPost, initi
           onChange={e => handleFile(e.target.files[0])} />
         {preview ? (
           <>
-            <img src={preview} alt="" style={{ width: 56, height: 56, objectFit: 'cover', borderRadius: 8, flexShrink: 0, cursor: 'zoom-in' }}
-              onClick={e => { e.stopPropagation(); setLightbox(true) }} />
+            <img src={form.imageUrl || preview} alt="" style={{ width: 56, height: 56, objectFit: 'cover', borderRadius: 8, flexShrink: 0, cursor: 'zoom-in' }}
+              onClick={e => { e.stopPropagation(); window.open(form.imageUrl || preview, '_blank') }} />
             <div style={{ flex: 1, minWidth: 0 }}>
               <p style={{ color: '#1C252E', fontWeight: 700, fontSize: 13, marginBottom: 2 }}>Última evidência</p>
               <p style={{ color: '#8A9BB0', fontSize: 11 }}>
                 {form.data_post ? `📅 ${formatDate(form.data_post)}` : 'Sem data definida'}
                 {' · '}
-                <span style={{ color: '#0891B2', cursor: 'pointer' }} onClick={e => { e.stopPropagation(); setLightbox(true) }}>
-                  ver imagem
+                <span style={{ color: '#0891B2', cursor: 'pointer' }} onClick={e => { e.stopPropagation(); window.open(form.imageUrl || preview, '_blank') }}>
+                  abrir imagem ↗
                 </span>
                 {' · clique para trocar'}
               </p>
