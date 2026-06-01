@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useStore } from '../store/useStore'
 import UploadModal from './UploadModal'
+import { temasLabel } from '../utils/temas'
 
 function fmt(n) {
   if (n == null) return '—'
@@ -72,7 +73,7 @@ export default function TopPostsMes() {
               {/* Info */}
               <div style={{ flex:1, minWidth:0 }}>
                 <p style={{ color:'#1C252E', fontSize:13, fontWeight:600, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap', marginBottom:5 }}>
-                  {p.nome || p.tema || '—'}
+                  {p.nome || temasLabel(p) || '—'}
                 </p>
                 <div style={{ background:'#F0F2F5', borderRadius:4, height:5, overflow:'hidden' }}>
                   <div style={{ height:'100%', borderRadius:4, background: i===0 ? '#FF6200' : color, width:`${pct}%`, transition:'width 0.5s ease' }}/>

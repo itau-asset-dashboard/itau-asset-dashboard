@@ -98,7 +98,7 @@ async function compressImage(dataUrl, maxPx = 800, quality = 0.72) {
 }
 
 const EMPTY = {
-  nome: '', tema: '', data_post: '', tipo: 'Reels', descricao: '',
+  nome: '', tema: [], data_post: '', tipo: 'Reels', descricao: '',
   contas_alcancadas: '', visualizacoes: '', interacoes: '',
   curtidas: '', comentarios: '', salvamentos: '', compartilhamentos: '',
   status: 'parcial', imageData: null,
@@ -114,7 +114,13 @@ const SinglePostModal = forwardRef(function SinglePostModal({ initialPost, initi
   const [saving,   setSaving]   = useState(false)
   const [dragging, setDragging] = useState(false)
   const [confirmDelete, setConfirmDelete] = useState(false)
-  const [form, setForm] = useState(initialPost ? { ...EMPTY, ...initialPost } : { ...EMPTY })
+  const [form, setForm] = useState(() => {
+    const base = initialPost ? { ...EMPTY, ...initialPost } : { ...EMPTY }
+    // Normaliza tema para sempre ser array
+    if (typeof base.tema === 'string') base.tema = base.tema ? [base.tema] : []
+    if (!Array.isArray(base.tema)) base.tema = []
+    return base
+  })
 
   const isUpdate = !!initialPost?.id
 
@@ -283,25 +289,38 @@ const SinglePostModal = forwardRef(function SinglePostModal({ initialPost, initi
           autoFocus={!isUpdate} />
       </div>
 
-      {/* Tema — pills */}
+      {/* Tema — pills multi-select */}
       <div>
-        <label style={{ color: '#8A9BB0', fontSize: 11, fontWeight: 600, display: 'block', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+        <label style={{ color: '#8A9BB0', fontSize: 11, fontWeight: 600, display: 'block', marginBottom: 2, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
           Tema
         </label>
+        {form.tema?.length > 0 && (
+          <p style={{ color: '#0891B2', fontSize: 11, marginBottom: 6 }}>
+            {form.tema.length} selecionado{form.tema.length > 1 ? 's' : ''}: {form.tema.join(' · ')}
+          </p>
+        )}
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-          {TEMAS.map(t => (
-            <button key={t} type="button" onClick={() => set('tema', form.tema === t ? '' : t)}
-              style={{
-                padding: '5px 12px', borderRadius: 20, fontSize: 12, cursor: 'pointer',
-                fontFamily: 'DM Sans, sans-serif', fontWeight: form.tema === t ? 700 : 400,
-                background: form.tema === t ? '#1C252E' : '#F0F4F8',
-                color: form.tema === t ? '#C3EBF7' : '#4A6272',
-                border: form.tema === t ? '1.5px solid #1C252E' : '1.5px solid #E0E7EF',
-                transition: 'all 0.12s',
-              }}>
-              {t}
-            </button>
-          ))}
+          {TEMAS.map(t => {
+            const sel = Array.isArray(form.tema) && form.tema.includes(t)
+            return (
+              <button key={t} type="button"
+                onClick={() => set('tema', sel
+                  ? form.tema.filter(x => x !== t)
+                  : [...(form.tema || []), t]
+                )}
+                style={{
+                  padding: '5px 12px', borderRadius: 20, fontSize: 12, cursor: 'pointer',
+                  fontFamily: 'DM Sans, sans-serif', fontWeight: sel ? 700 : 400,
+                  background: sel ? '#1C252E' : '#F0F4F8',
+                  color: sel ? '#C3EBF7' : '#4A6272',
+                  border: sel ? '1.5px solid #1C252E' : '1.5px solid #E0E7EF',
+                  transition: 'all 0.12s',
+                }}>
+                {sel && <span style={{ marginRight: 4, fontSize: 10 }}>✓</span>}
+                {t}
+              </button>
+            )
+          })}
         </div>
       </div>
 

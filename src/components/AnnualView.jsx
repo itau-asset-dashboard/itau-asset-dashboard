@@ -1,6 +1,7 @@
 import { useStore } from '../store/useStore'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, LabelList } from 'recharts'
 import { Users, TrendingUp, Award, LayoutGrid } from 'lucide-react'
+import { getTemas } from '../utils/temas'
 
 const MESES_LABEL  = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez']
 const MESES_FULL   = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro']
@@ -56,7 +57,7 @@ export default function AnnualView() {
 
   // Por tema
   const temaMap = {}
-  posts.forEach(p=>{ if(p.tema){ temaMap[p.tema]=(temaMap[p.tema]||0)+(p.contas_alcancadas||0) } })
+  posts.forEach(p=>{ getTemas(p).forEach(t=>{ temaMap[t]=(temaMap[t]||0)+(p.contas_alcancadas||0) }) })
   const porTema = Object.entries(temaMap).sort((a,b)=>b[1]-a[1]).slice(0,5)
 
   const CARDS = [

@@ -1,4 +1,5 @@
 import { useStore } from '../store/useStore'
+import { getTemas } from '../utils/temas'
 
 function fmt(n) {
   if (!n) return '—'
@@ -12,10 +13,13 @@ export default function ThemeAnalysis() {
 
   const temaMap = {}
   posts.forEach(p => {
-    const t = p.tema || 'Sem tema'
-    if (!temaMap[t]) temaMap[t] = { total: 0, count: 0 }
-    temaMap[t].total += p.contas_alcancadas || 0
-    temaMap[t].count++
+    const ts = getTemas(p)
+    const list = ts.length > 0 ? ts : ['Sem tema']
+    list.forEach(t => {
+      if (!temaMap[t]) temaMap[t] = { total: 0, count: 0 }
+      temaMap[t].total += p.contas_alcancadas || 0
+      temaMap[t].count++
+    })
   })
 
   const temas = Object.entries(temaMap)

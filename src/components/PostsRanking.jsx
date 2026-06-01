@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { ArrowUpDown, RefreshCw, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import UploadModal from './UploadModal'
+import { temasLabel } from '../utils/temas'
 
 function fmt(n) {
   if (n == null) return '—'
@@ -106,7 +107,7 @@ export default function PostsRanking() {
                       {isMelhor && <span style={{ marginRight: 4 }}>⭐</span>}
                       {p.nome || '—'}
                     </p>
-                    {p.tema && <p style={{ color: '#8A9BB0', fontSize: 11, marginTop: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.tema}</p>}
+                    {temasLabel(p) && <p style={{ color: '#8A9BB0', fontSize: 11, marginTop: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{temasLabel(p)}</p>}
                   </td>
                   <td style={{ padding: '12px 14px' }}>
                     <span style={{

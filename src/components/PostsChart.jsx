@@ -3,6 +3,7 @@ import {
   ResponsiveContainer, Cell
 } from 'recharts'
 import { useStore } from '../store/useStore'
+import { temasLabel } from '../utils/temas'
 
 function fmt(n) {
   if (n >= 1000000) return (n / 1000000).toFixed(1) + 'M'
@@ -24,7 +25,7 @@ const CustomTooltip = ({ active, payload }) => {
     }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
         <div style={{ width: 8, height: 8, borderRadius: 2, background: COLOR[d.tipo] || '#ccc', flexShrink: 0 }} />
-        <p style={{ fontWeight: 600, color: '#1C252E', margin: 0, fontSize: 13 }}>{d.tema}</p>
+        <p style={{ fontWeight: 600, color: '#1C252E', margin: 0, fontSize: 13 }}>{temasLabel(d) || d.nome || '—'}</p>
       </div>
       <p style={{ color: '#8A9BB0', margin: '0 0 6px', fontSize: 12 }}>{d.data_post} · {d.tipo}</p>
       <p style={{ color: '#FF6200', fontWeight: 700, fontSize: 18, margin: 0 }}>

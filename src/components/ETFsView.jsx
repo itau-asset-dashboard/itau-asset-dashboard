@@ -4,6 +4,7 @@ import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, Legend,
 } from 'recharts'
 import UploadModal from './UploadModal'
+import { hasAnyTheme, getTemas } from '../utils/temas'
 
 const MESES_LABEL = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez']
 const MESES_FULL  = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro']
@@ -38,7 +39,7 @@ export default function ETFsView() {
 
   // ── base: todos os posts do ano com tema ETF ───────
   const postsAno   = allPosts.filter(p => p.data_post?.split('/')?.[2] === ano)
-  const etfAno     = postsAno.filter(p => ETF_TEMAS.includes(p.tema))
+  const etfAno     = postsAno.filter(p => hasAnyTheme(p, ETF_TEMAS))
 
   // ── posts do período selecionado ───────────────────
   const etfPosts = viewMode === 'anual'
@@ -100,8 +101,9 @@ export default function ETFsView() {
   // ── Comparação temas ───────────────────────────────
   const temaMap = {}
   basePosts.forEach(p => {
-    if (!p.tema) return
-    temaMap[p.tema] = (temaMap[p.tema]||0) + (p.contas_alcancadas||0)
+    getTemas(p).forEach(t => {
+      temaMap[t] = (temaMap[t]||0) + (p.contas_alcancadas||0)
+    })
   })
   const temaRank = Object.entries(temaMap).sort((a,b)=>b[1]-a[1])
   const maxTema  = temaRank[0]?.[1] || 1
