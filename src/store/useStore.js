@@ -146,34 +146,28 @@ export const useStore = create(
         })
       },
 
-      // Meta mensal ajustada: (meta anual - total já alcançado) / meses restantes
-      // "Meses fechados" = meses anteriores ao mês real de hoje (independente do filtro)
+      // Meta mensal ajustada: cada mês tem sua meta "congelada" no momento em que começa.
+      // Fórmula: (meta anual − total dos meses anteriores ao mês visualizado) ÷ meses restantes
+      // Exemplo: ao ver Março → subtrai Jan+Fev → divide por 10 (Mar–Dez)
       getMetaMesAjustada: (mesFiltroParam) => {
         const { posts, metaAnual, mesFiltro } = get()
         const filtro = mesFiltroParam || mesFiltro
         if (!filtro) return Math.round(metaAnual / 12)
 
-        const yyyy = filtro.split('/')?.[1]
+        const [mmStr, yyyy] = filtro.split('/')
+        const mesVisto = parseInt(mmStr, 10) // 1-12
 
-        // Mês real atual (1-12) para determinar quais meses já fecharam
-        const hoje       = new Date()
-        const mesHoje    = hoje.getMonth() + 1   // 1-12
-        const anoHoje    = String(hoje.getFullYear())
-
-        // Se o ano do filtro é o ano atual, usa o mês real; senão usa Dezembro (ano fechado)
-        const mesCorte = yyyy === anoHoje ? mesHoje : 12
-
-        // Soma tudo que já foi alcançado nos meses ANTERIORES ao mês real de hoje
+        // Soma tudo alcançado nos meses ANTERIORES ao mês visualizado
         const totalFechado = posts.reduce((s, p) => {
           const pts = p.data_post?.split('/')
           if (!pts || pts[2] !== yyyy) return s
           const mes = parseInt(pts[1], 10)
-          if (mes < mesCorte) return s + (p.contas_alcancadas || 0)
+          if (mes < mesVisto) return s + (p.contas_alcancadas || 0)
           return s
         }, 0)
 
-        // Meses restantes = do mês atual até Dezembro (inclusive)
-        const mesesRestantes = 12 - mesCorte + 1
+        // Meses restantes incluindo o mês visualizado (ex: Mar = 10 meses)
+        const mesesRestantes = 12 - mesVisto + 1
         if (mesesRestantes <= 0) return 0
 
         const saldo = Math.max(metaAnual - totalFechado, 0)
