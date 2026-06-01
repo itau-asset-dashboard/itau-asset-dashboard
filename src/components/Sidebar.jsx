@@ -1,13 +1,26 @@
-import { BarChart2, Calendar, List, Lightbulb, Upload, Settings, TrendingUp } from 'lucide-react'
+import { BarChart2, Calendar, List, Lightbulb, Upload, Settings } from 'lucide-react'
 import { useStore } from '../store/useStore'
 
 const nav = [
-  { id: 'visao-anual',  icon: Calendar,   label: 'Visão Anual' },
-  { id: 'visao-geral',  icon: BarChart2,  label: 'Visão Mensal' },
-  { id: 'posts',        icon: List,       label: 'Todos os Posts' },
-  { id: 'insights',     icon: Lightbulb,  label: 'Insights' },
-  { id: 'upload',       icon: Upload,     label: 'Upload' },
+  { id: 'visao-anual',  icon: Calendar,  label: 'Visão Anual' },
+  { id: 'visao-geral',  icon: BarChart2, label: 'Visão Mensal' },
+  { id: 'posts',        icon: List,      label: 'Todos os Posts' },
+  { id: 'insights',     icon: Lightbulb, label: 'Insights' },
+  { id: 'upload',       icon: Upload,    label: 'Upload' },
 ]
+
+// Logo Itaú como SVG inline
+function ItauLogo({ size = 38 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="100" height="100" rx="22" fill="#1C252E"/>
+      <text x="50%" y="64" textAnchor="middle" fontFamily="Arial, sans-serif"
+        fontWeight="700" fontSize="36" fill="#C3EBF7" letterSpacing="-1">
+        itaú
+      </text>
+    </svg>
+  )
+}
 
 export default function Sidebar() {
   const { activeSection, setActiveSection } = useStore()
@@ -18,7 +31,8 @@ export default function Sidebar() {
       <aside className="sidebar-desktop" style={{
         width: 220,
         height: '100%',
-        background: '#1C252E',
+        background: '#C3EBF7',
+        borderRight: '1px solid #A8D8EF',
         display: 'flex',
         flexDirection: 'column',
         padding: '20px 12px',
@@ -26,22 +40,16 @@ export default function Sidebar() {
         overflow: 'hidden',
       }}>
         {/* Logo + nome */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 32, padding: '0 8px' }}>
-          <div style={{
-            width: 36, height: 36, background: '#FF6200', borderRadius: 10,
-            display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-            boxShadow: '0 4px 12px rgba(255,98,0,0.3)',
-          }}>
-            <TrendingUp size={18} color="#fff" strokeWidth={2.5} />
-          </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 32, padding: '0 6px' }}>
+          <ItauLogo size={38} />
           <div>
-            <p style={{ color: '#fff', fontWeight: 700, fontSize: 13, lineHeight: 1.2 }}>Itaú Asset</p>
-            <p style={{ color: '#4A6272', fontSize: 11 }}>Instagram Analytics</p>
+            <p style={{ color: '#1C252E', fontWeight: 700, fontSize: 13, lineHeight: 1.2 }}>Itaú Asset</p>
+            <p style={{ color: '#4A7A95', fontSize: 11 }}>Instagram Analytics</p>
           </div>
         </div>
 
         {/* Label menu */}
-        <p style={{ color: '#4A6272', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', padding: '0 8px', marginBottom: 6 }}>
+        <p style={{ color: '#4A7A95', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', padding: '0 8px', marginBottom: 6 }}>
           Menu
         </p>
 
@@ -53,13 +61,16 @@ export default function Sidebar() {
               <button key={id} onClick={() => setActiveSection(id)}
                 style={{
                   width: '100%', borderRadius: 10, padding: '9px 10px',
-                  background: active ? 'rgba(195,235,247,0.12)' : 'transparent',
-                  border: active ? '1px solid rgba(195,235,247,0.15)' : '1px solid transparent',
+                  background: active ? '#1C252E' : 'transparent',
+                  border: '1px solid transparent',
                   cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 10,
                   transition: 'all 0.15s', textAlign: 'left',
-                }}>
-                <Icon size={16} color={active ? '#C3EBF7' : '#4A6272'} strokeWidth={active ? 2.2 : 1.8} />
-                <span style={{ color: active ? '#C3EBF7' : '#7A8E9A', fontSize: 13, fontWeight: active ? 600 : 400 }}>
+                }}
+                onMouseEnter={e => { if (!active) e.currentTarget.style.background = 'rgba(28,37,46,0.07)' }}
+                onMouseLeave={e => { if (!active) e.currentTarget.style.background = 'transparent' }}
+              >
+                <Icon size={16} color={active ? '#C3EBF7' : '#1C252E'} strokeWidth={active ? 2.2 : 1.8} />
+                <span style={{ color: active ? '#C3EBF7' : '#1C252E', fontSize: 13, fontWeight: active ? 600 : 400 }}>
                   {label}
                 </span>
                 {active && (
@@ -75,9 +86,12 @@ export default function Sidebar() {
           width: '100%', borderRadius: 10, padding: '9px 10px',
           background: 'transparent', border: '1px solid transparent',
           cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 10,
-        }}>
-          <Settings size={16} color="#4A6272" strokeWidth={1.8} />
-          <span style={{ color: '#7A8E9A', fontSize: 13 }}>Configurações</span>
+        }}
+          onMouseEnter={e => e.currentTarget.style.background = 'rgba(28,37,46,0.07)'}
+          onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+        >
+          <Settings size={16} color="#1C252E" strokeWidth={1.8} />
+          <span style={{ color: '#1C252E', fontSize: 13 }}>Configurações</span>
         </button>
       </aside>
 
@@ -93,7 +107,7 @@ export default function Sidebar() {
                 cursor: 'pointer', padding: '6px 2px',
               }}>
               <Icon size={19} color={active ? '#C3EBF7' : '#4A6272'} strokeWidth={active ? 2.2 : 1.8} />
-              <span style={{ fontSize: 9, color: active ? '#C3EBF7' : '#4A6272', fontWeight: active ? 700 : 400, whiteSpace: 'nowrap' }}>
+              <span style={{ fontSize: 9, color: active ? '#C3EBF7' : '#8AAAB8', fontWeight: active ? 700 : 400, whiteSpace: 'nowrap' }}>
                 {label.split(' ')[0]}
               </span>
             </button>

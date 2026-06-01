@@ -107,6 +107,33 @@ export const useStore = create(
         })
       },
 
+      // Meta mensal ajustada: redistribui o saldo restante entre os meses que faltam
+      getMetaMesAjustada: (mesFiltroParam) => {
+        const { posts, metaAnual, mesFiltro } = get()
+        const filtro = mesFiltroParam || mesFiltro
+        if (!filtro) return Math.round(metaAnual / 12)
+
+        const [mmStr, yyyy] = filtro.split('/')
+        const mesAtual = parseInt(mmStr, 10) // 1-12
+
+        // Total já alcançado nos meses ANTERIORES ao mês filtrado (meses finalizados)
+        const totalAnterior = posts.reduce((s, p) => {
+          const pts = p.data_post?.split('/')
+          if (!pts || pts[2] !== yyyy) return s
+          const mes = parseInt(pts[1], 10)
+          if (mes < mesAtual) return s + (p.contas_alcancadas || 0)
+          return s
+        }, 0)
+
+        // Meses restantes (incluindo o mês atual)
+        const mesesRestantes = 12 - mesAtual + 1
+        if (mesesRestantes <= 0) return 0
+
+        // Meta ajustada = saldo restante / meses restantes
+        const saldo = Math.max(metaAnual - totalAnterior, 0)
+        return Math.round(saldo / mesesRestantes)
+      },
+
       getPostsDoAno: (ano) => {
         const { posts, mesFiltro } = get()
         const anoAlvo = ano || mesFiltro?.split('/')?.[1] || new Date().getFullYear().toString()

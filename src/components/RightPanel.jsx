@@ -46,7 +46,7 @@ function EditableValue({ value, color, onSave }) {
 }
 
 export default function RightPanel() {
-  const { metaMensal, setMetaMensal, metaAnual, setMetaAnual, getPostsDoMes, posts: allPosts, addPost, updatePost, deletePost, mesFiltro } = useStore()
+  const { metaMensal, setMetaMensal, metaAnual, setMetaAnual, getPostsDoMes, getMetaMesAjustada, posts: allPosts, addPost, updatePost, deletePost, mesFiltro } = useStore()
   const postsMes = getPostsDoMes()
   const [uploadOpen, setUploadOpen]   = useState(false)
   const [editTarget, setEditTarget]   = useState(null)
@@ -58,10 +58,12 @@ export default function RightPanel() {
     return parts?.[2] === anoFiltro
   })
 
-  const totalAnual  = postsAno.reduce((s,p)=>s+(p.contas_alcancadas||0),0)
-  const totalMensal = postsMes.reduce((s,p)=>s+(p.contas_alcancadas||0),0)
-  const pctAnual    = metaAnual>0 ? Math.min((totalAnual/metaAnual)*100,100) : 0
-  const pctMensal   = metaMensal>0 ? Math.min((totalMensal/metaMensal)*100,100) : 0
+  const totalAnual     = postsAno.reduce((s,p)=>s+(p.contas_alcancadas||0),0)
+  const totalMensal    = postsMes.reduce((s,p)=>s+(p.contas_alcancadas||0),0)
+  const metaAjustada   = getMetaMesAjustada(mesFiltro)
+  const pctAnual       = metaAnual>0 ? Math.min((totalAnual/metaAnual)*100,100) : 0
+  const pctMensal      = metaAjustada>0 ? Math.min((totalMensal/metaAjustada)*100,100) : 0
+  const metaMesOriginal = Math.round(metaAnual/12)
 
   const recentes = [...allPosts]
     .sort((a,b)=>{
@@ -126,9 +128,9 @@ export default function RightPanel() {
           </div>
         </div>
 
-        {/* Barra progresso mensal */}
+        {/* Barra progresso mensal ajustada */}
         <div style={{ background:'#fff', borderRadius:10, padding:'10px 12px', border:'1px solid #E8ECF0' }}>
-          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:6 }}>
+          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:5 }}>
             <p style={{ color:'#8A9BB0', fontSize:10, fontWeight:700, textTransform:'uppercase', letterSpacing:'0.06em' }}>
               {mesFiltroLabel(mesFiltro)}
             </p>
@@ -138,16 +140,19 @@ export default function RightPanel() {
             <div style={{
               height:'100%', borderRadius:4,
               background: pctMensal>=100 ? '#16a34a' : '#FF6200',
-              width:`${pctMensal}%`,
+              width:`${Math.min(pctMensal,100)}%`,
               transition:'width 0.6s ease',
             }}/>
           </div>
-          <div style={{ display:'flex', justifyContent:'space-between' }}>
-            <span style={{ color:'#FF6200', fontSize:11, fontWeight:700 }}>{fmt(totalMensal)}</span>
-            <div style={{ display:'flex', alignItems:'center', gap:3 }}>
-              <EditableValue value={metaMensal} color="#8A9BB0" onSave={setMetaMensal}/>
-            </div>
+          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center' }}>
+            <span style={{ color:'#FF6200', fontSize:12, fontWeight:700 }}>{fmt(totalMensal)}</span>
+            <span style={{ color:'#1C252E', fontSize:12, fontWeight:700 }}>{fmt(metaAjustada)}</span>
           </div>
+          {metaAjustada !== metaMesOriginal && (
+            <p style={{ color:'#8A9BB0', fontSize:10, marginTop:5, textAlign:'center', lineHeight:1.4 }}>
+              ↻ Meta ajustada (saldo acumulado)
+            </p>
+          )}
         </div>
       </div>
 

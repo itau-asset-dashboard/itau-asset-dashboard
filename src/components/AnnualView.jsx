@@ -15,7 +15,7 @@ function fmt(n) {
 const TIPO_COLOR = { Carrossel:'#FF6200', Reels:'#1C252E', 'Foto estática':'#C3EBF7' }
 
 export default function AnnualView() {
-  const { getPostsDoAno, metaAnual, mesFiltro } = useStore()
+  const { getPostsDoAno, getMetaMesAjustada, metaAnual, mesFiltro } = useStore()
   const ano   = mesFiltro?.split('/')?.[1] || '2026'
   const posts = getPostsDoAno(ano)
 
@@ -26,18 +26,22 @@ export default function AnnualView() {
   const metaMes = Math.round(metaAnual/12)
   const restante = Math.max(metaAnual - total, 0)
 
-  // Dados mensais
+  // Dados mensais com meta ajustada por mês
   const byMonth = Array.from({length:12},(_,i)=>{
     const mm = String(i+1).padStart(2,'0')
+    const mesVal = `${mm}/${ano}`
     const mPosts = posts.filter(p=>{
       const pts = p.data_post?.split('/')
       return pts?.[1]===mm && pts?.[2]===ano
     })
+    const total = mPosts.reduce((s,p)=>s+(p.contas_alcancadas||0),0)
+    const metaMes = getMetaMesAjustada(mesVal)
     return {
-      mes:   MESES_LABEL[i],
+      mes:     MESES_LABEL[i],
       mesFull: MESES_FULL[i],
-      total: mPosts.reduce((s,p)=>s+(p.contas_alcancadas||0),0),
-      count: mPosts.length,
+      total,
+      count:   mPosts.length,
+      meta:    metaMes,
     }
   })
 
@@ -155,15 +159,19 @@ export default function AnnualView() {
               <YAxis tick={{ fill:'#9AAAB8', fontSize:10 }} axisLine={false} tickLine={false}
                 tickFormatter={v=>v===0?'':fmt(v)} width={44}/>
               <Tooltip
-                formatter={(v,_,p)=>[fmt(v),`${p.payload.mesFull} · ${p.payload.count} posts`]}
+                formatter={(v,name,p)=> name==='total'
+                  ? [fmt(v), `${p.payload.mesFull} · ${p.payload.count} posts`]
+                  : [fmt(v), 'Meta ajustada']
+                }
                 contentStyle={{ borderRadius:10, border:'1px solid #EAECF0', fontSize:12, boxShadow:'0 4px 16px rgba(0,0,0,0.08)' }}
                 labelStyle={{ display:'none' }}
               />
-              <ReferenceLine y={metaMes} stroke="#FF6200" strokeDasharray="4 3" strokeOpacity={0.4}/>
+              <Bar dataKey="meta" fill="transparent" stroke="#FF6200" strokeDasharray="4 3"
+                strokeOpacity={0.5} radius={[4,4,0,0]} barSize={24}/>
               <Bar dataKey="total" radius={[6,6,0,0]}>
                 {byMonth.map((entry,i)=>(
-                  <Cell key={i} fill={entry.total >= metaMes ? '#FF6200' : '#C3EBF7'}
-                    opacity={entry.total === 0 ? 0.3 : 1}/>
+                  <Cell key={i} fill={entry.total >= entry.meta && entry.total > 0 ? '#FF6200' : '#C3EBF7'}
+                    opacity={entry.total === 0 ? 0.25 : 1}/>
                 ))}
               </Bar>
             </BarChart>
