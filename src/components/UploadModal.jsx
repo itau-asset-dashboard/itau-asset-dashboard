@@ -20,6 +20,7 @@ export const TEMAS = [
   'Dividendos',
   'Premiações',
   'Mind Asset',
+  'Eventos',
 ]
 
 const NUM_FIELDS = [
