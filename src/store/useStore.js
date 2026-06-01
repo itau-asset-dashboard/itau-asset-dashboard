@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { fetchPosts, upsertPost, removePost, fetchSetting, saveSetting, uploadImage, deleteImage } from '../lib/supabase'
+import { normalizeTema } from '../utils/temas'
 
 export const useStore = create(
   persist(
@@ -26,10 +27,12 @@ export const useStore = create(
             fetchSetting('meta_anual'),
           ])
           // Preserva imageData local — nunca é salvo no Supabase (muito pesado)
+          // Também normaliza o campo `tema` para array limpo
           const localPosts = get().posts
           const posts = cloudPosts.map(cp => {
             const local = localPosts.find(lp => lp.id === cp.id)
-            return local?.imageData ? { ...cp, imageData: local.imageData } : cp
+            const merged = local?.imageData ? { ...cp, imageData: local.imageData } : cp
+            return { ...merged, tema: normalizeTema(merged.tema) }
           })
           set({
             posts,
@@ -65,6 +68,7 @@ export const useStore = create(
         const id = Date.now().toString()
         const { imagePreview, ...rest } = post
         const novo = { nome: '', interacoes: null, ...rest, id, historico: [], atualizado_em: null }
+        novo.tema = normalizeTema(novo.tema)
 
         // Usa imagePreview (original) para Storage; fallback para imageData comprimido
         const srcForUpload = imagePreview || novo.imageData
@@ -106,7 +110,8 @@ export const useStore = create(
                 status: p.status,
               },
             }]
-            return { ...p, ...restData, imageUrl: imageUrl || p.imageUrl, historico, atualizado_em: new Date().toLocaleDateString('pt-BR') }
+            const tema = normalizeTema(restData.tema ?? p.tema)
+            return { ...p, ...restData, tema, imageUrl: imageUrl || p.imageUrl, historico, atualizado_em: new Date().toLocaleDateString('pt-BR') }
           })
           return { posts }
         })
