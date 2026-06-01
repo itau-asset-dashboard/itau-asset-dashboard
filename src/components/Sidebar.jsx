@@ -1,5 +1,15 @@
-import { BarChart2, Calendar, List, Lightbulb, Upload, Settings } from 'lucide-react'
+import { BarChart2, Calendar, List, Lightbulb, Upload } from 'lucide-react'
 import { useStore } from '../store/useStore'
+
+function InstagramIcon({ size = 14, color = '#1C252E' }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+      <circle cx="12" cy="12" r="4"/>
+      <circle cx="17.5" cy="6.5" r="0.8" fill={color} stroke="none"/>
+    </svg>
+  )
+}
 
 const nav = [
   { id: 'visao-anual',  icon: Calendar,  label: 'Visão Anual' },
@@ -39,12 +49,37 @@ export default function Sidebar() {
         flexShrink: 0,
         overflow: 'hidden',
       }}>
-        {/* Logo + nome */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 32, padding: '0 6px' }}>
-          <ItauLogo size={38} />
-          <div>
-            <p style={{ color: '#1C252E', fontWeight: 700, fontSize: 13, lineHeight: 1.2 }}>Itaú Asset</p>
-            <p style={{ color: '#4A7A95', fontSize: 11 }}>Instagram Analytics</p>
+        {/* Logo + perfil */}
+        <div style={{ marginBottom: 28, padding: '0 4px' }}>
+          {/* Logo */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
+            <ItauLogo size={40} />
+            <div>
+              <p style={{ color: '#1C252E', fontWeight: 800, fontSize: 14, lineHeight: 1.2 }}>Itaú Asset</p>
+              <p style={{ color: '#4A7A95', fontSize: 11, fontWeight: 500 }}>Management</p>
+            </div>
+          </div>
+
+          {/* Card perfil Instagram */}
+          <div style={{
+            background: 'rgba(28,37,46,0.07)', borderRadius: 12,
+            padding: '10px 12px', display: 'flex', alignItems: 'center', gap: 10,
+          }}>
+            {/* Avatar placeholder */}
+            <div style={{
+              width: 36, height: 36, borderRadius: '50%', flexShrink: 0,
+              background: 'linear-gradient(135deg, #f9a825, #e91e63, #9c27b0)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>
+              <span style={{ color: '#fff', fontSize: 13, fontWeight: 800 }}>IA</span>
+            </div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginBottom: 2 }}>
+                <InstagramIcon size={12} color="#1C252E" />
+                <span style={{ color: '#1C252E', fontSize: 12, fontWeight: 700 }}>@itauasset</span>
+              </div>
+              <p style={{ color: '#4A7A95', fontSize: 10 }}>Instagram Analytics</p>
+            </div>
           </div>
         </div>
 
@@ -81,18 +116,10 @@ export default function Sidebar() {
           })}
         </nav>
 
-        {/* Settings */}
-        <button style={{
-          width: '100%', borderRadius: 10, padding: '9px 10px',
-          background: 'transparent', border: '1px solid transparent',
-          cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 10,
-        }}
-          onMouseEnter={e => e.currentTarget.style.background = 'rgba(28,37,46,0.07)'}
-          onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
-        >
-          <Settings size={16} color="#1C252E" strokeWidth={1.8} />
-          <span style={{ color: '#1C252E', fontSize: 13 }}>Configurações</span>
-        </button>
+        {/* Versão */}
+        <p style={{ color: '#7AABB8', fontSize: 10, textAlign: 'center', padding: '8px 0 2px' }}>
+          v1.0 · Itaú Asset © 2026
+        </p>
       </aside>
 
       {/* ── Bottom nav mobile ── */}
