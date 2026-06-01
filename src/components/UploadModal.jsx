@@ -53,13 +53,18 @@ async function compressImage(dataUrl, maxPx = 800, quality = 0.72) {
   return new Promise(resolve => {
     const img = new Image()
     img.onload = () => {
-      const scale = Math.min(maxPx / img.width, maxPx / img.height, 1)
-      const canvas = document.createElement('canvas')
-      canvas.width  = Math.round(img.width  * scale)
-      canvas.height = Math.round(img.height * scale)
-      canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height)
-      resolve(canvas.toDataURL('image/jpeg', quality))
+      try {
+        const scale = Math.min(maxPx / img.width, maxPx / img.height, 1)
+        const canvas = document.createElement('canvas')
+        canvas.width  = Math.round(img.width  * scale)
+        canvas.height = Math.round(img.height * scale)
+        canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height)
+        resolve(canvas.toDataURL('image/jpeg', quality))
+      } catch (_) {
+        resolve(dataUrl) // fallback: usa original
+      }
     }
+    img.onerror = () => resolve(dataUrl) // fallback se imagem não carregar
     img.src = dataUrl
   })
 }
@@ -127,15 +132,19 @@ const SinglePostModal = forwardRef(function SinglePostModal({ initialPost, initi
   }
 
   async function save() {
-    const compressed = preview ? await compressImage(preview) : form.imageData
-    const dados = {
-      ...form,
-      imageData: compressed,
-      ...Object.fromEntries(NUM_FIELDS.map(({ key }) => [key, Number(form[key]) || null])),
+    try {
+      const compressed = preview ? await compressImage(preview) : form.imageData
+      const dados = {
+        ...form,
+        imageData: compressed,
+        ...Object.fromEntries(NUM_FIELDS.map(({ key }) => [key, Number(form[key]) || null])),
+      }
+      onSave(dados)
+      setSaved(true)
+      setTimeout(() => setSaved(false), 1200)
+    } catch (e) {
+      setError('Erro ao salvar. Tente novamente.')
     }
-    onSave(dados)
-    setSaved(true)
-    setTimeout(() => setSaved(false), 1200)
   }
 
   function handleDelete() {
