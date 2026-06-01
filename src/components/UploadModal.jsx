@@ -370,7 +370,7 @@ export default function UploadModal({ mode = 'new', post = null, onClose, onSave
           </div>
           <SinglePostModal
             initialPost={post}
-            initialPreview={post?.imageData || null}
+            initialPreview={post?.imageUrl || post?.imageData || null}
             onClose={onClose}
             onSave={dados => { onSave(dados); onClose() }}
             onDelete={onDelete ? () => { onDelete(); onClose() } : undefined}

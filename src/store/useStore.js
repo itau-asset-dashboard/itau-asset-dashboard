@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import { fetchPosts, upsertPost, removePost, fetchSetting, saveSetting } from '../lib/supabase'
+import { fetchPosts, upsertPost, removePost, fetchSetting, saveSetting, uploadImage, deleteImage } from '../lib/supabase'
 
 export const useStore = create(
   persist(
@@ -62,17 +62,30 @@ export const useStore = create(
 
       // ── Posts ──────────────────────────────────────────
       addPost: async (post) => {
-        const novo = {
-          nome: '', interacoes: null, ...post,
-          id: Date.now().toString(),
-          historico: [],
-          atualizado_em: null,
+        const id = Date.now().toString()
+        const novo = { nome: '', interacoes: null, ...post, id, historico: [], atualizado_em: null }
+
+        // Se tiver imagem local, faz upload para o Storage e guarda a URL
+        if (novo.imageData?.startsWith('data:')) {
+          try {
+            const imageUrl = await uploadImage(id, novo.imageData)
+            if (imageUrl) novo.imageUrl = imageUrl
+          } catch (_) {}
         }
+
         set((s) => ({ posts: [...s.posts, novo] }))
-        try { await upsertPost(novo) } catch (_) {}
+        try { await upsertPost({ ...novo, imageUrl: novo.imageUrl || null }) } catch (_) {}
       },
 
       updatePost: async (id, newData) => {
+        // Se tiver nova imagem local, faz upload
+        let imageUrl = newData.imageUrl
+        if (newData.imageData?.startsWith('data:')) {
+          try {
+            imageUrl = await uploadImage(id, newData.imageData)
+          } catch (_) {}
+        }
+
         set((state) => {
           const posts = state.posts.map((p) => {
             if (p.id !== id) return p
@@ -89,7 +102,7 @@ export const useStore = create(
                 status: p.status,
               },
             }]
-            return { ...p, ...newData, historico, atualizado_em: new Date().toLocaleDateString('pt-BR') }
+            return { ...p, ...newData, imageUrl: imageUrl || p.imageUrl, historico, atualizado_em: new Date().toLocaleDateString('pt-BR') }
           })
           return { posts }
         })
@@ -100,6 +113,7 @@ export const useStore = create(
       deletePost: async (id) => {
         set((s) => ({ posts: s.posts.filter((p) => p.id !== id) }))
         try { await removePost(id) } catch (_) {}
+        try { await deleteImage(id) } catch (_) {}
       },
 
       // ── Query ──────────────────────────────────────────
