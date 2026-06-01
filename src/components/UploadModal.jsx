@@ -87,6 +87,7 @@ const SinglePostModal = forwardRef(function SinglePostModal({ initialPost, initi
   const [error,    setError]    = useState(null)
   const [saved,    setSaved]    = useState(false)
   const [saving,   setSaving]   = useState(false)
+  const [lightbox, setLightbox] = useState(false)
   const [dragging, setDragging] = useState(false)
   const [confirmDelete, setConfirmDelete] = useState(false)
   const [form, setForm] = useState(initialPost ? { ...EMPTY, ...initialPost } : { ...EMPTY })
@@ -163,6 +164,30 @@ const SinglePostModal = forwardRef(function SinglePostModal({ initialPost, initi
   return (
     <div style={{ padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: 14 }}>
 
+      {/* ── Lightbox ── */}
+      {lightbox && preview && (
+        <div
+          onClick={() => setLightbox(false)}
+          style={{
+            position: 'fixed', inset: 0, zIndex: 2000,
+            background: 'rgba(0,0,0,0.85)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            padding: 24, cursor: 'zoom-out',
+          }}
+        >
+          <img src={preview} alt="Evidência"
+            style={{ maxWidth: '100%', maxHeight: '90vh', borderRadius: 12, boxShadow: '0 8px 40px rgba(0,0,0,0.5)', objectFit: 'contain' }}
+            onClick={e => e.stopPropagation()}
+          />
+          <button onClick={() => setLightbox(false)} style={{
+            position: 'absolute', top: 20, right: 20,
+            background: 'rgba(255,255,255,0.15)', border: 'none', borderRadius: '50%',
+            width: 36, height: 36, cursor: 'pointer', color: '#fff', fontSize: 18,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}>✕</button>
+        </div>
+      )}
+
       {/* Contador se múltiplos */}
       {totalFiles > 1 && (
         <div style={{ background: '#F5F8FA', borderRadius: 8, padding: '6px 12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -191,10 +216,17 @@ const SinglePostModal = forwardRef(function SinglePostModal({ initialPost, initi
         {preview ? (
           <>
             <img src={preview} alt="" style={{ width: 56, height: 56, objectFit: 'cover', borderRadius: 8, flexShrink: 0, cursor: 'zoom-in' }}
-              onClick={e => { e.stopPropagation(); window.open(preview, '_blank') }} />
-            <div>
-              <p style={{ color: '#1C252E', fontWeight: 600, fontSize: 13, marginBottom: 2 }}>Print carregado</p>
-              <p style={{ color: '#8A9BB0', fontSize: 12 }}>Clique para trocar · clique na imagem para ampliar</p>
+              onClick={e => { e.stopPropagation(); setLightbox(true) }} />
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <p style={{ color: '#1C252E', fontWeight: 700, fontSize: 13, marginBottom: 2 }}>Última evidência</p>
+              <p style={{ color: '#8A9BB0', fontSize: 11 }}>
+                {form.data_post ? `📅 ${form.data_post}` : 'Sem data definida'}
+                {' · '}
+                <span style={{ color: '#0891B2', cursor: 'pointer' }} onClick={e => { e.stopPropagation(); setLightbox(true) }}>
+                  ver imagem
+                </span>
+                {' · clique para trocar'}
+              </p>
             </div>
           </>
         ) : (
