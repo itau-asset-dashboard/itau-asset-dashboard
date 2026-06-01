@@ -1,8 +1,7 @@
 import { useState } from 'react'
 import { useStore } from '../store/useStore'
 import {
-  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell,
-  LineChart, Line, CartesianGrid, Legend,
+  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, Legend,
 } from 'recharts'
 import UploadModal from './UploadModal'
 
@@ -22,39 +21,56 @@ function pct(a, b) {
 }
 
 const TIPO_COLOR = { Carrossel:'#FF6200', Reels:'#1C252E', 'Foto estática':'#0EA5E9' }
-const TIPO_BG    = { Carrossel:'rgba(255,98,0,0.1)', Reels:'rgba(28,37,46,0.1)', 'Foto estática':'rgba(14,165,233,0.1)' }
-
-// Temas que fazem parte do universo ETFs
-const ETF_TEMAS = ['ETFs', 'ETFs em destaque', 'Educacionais ETFs']
+const ETF_TEMAS  = ['ETFs', 'ETFs em destaque', 'Educacionais ETFs']
 
 export default function ETFsView() {
   const { posts: allPosts, mesFiltro, updatePost, deletePost } = useStore()
   const ano = mesFiltro?.split('/')?.[1] || '2026'
+
+  // ── view mode ──────────────────────────────────────
+  const [viewMode, setViewMode]   = useState('anual')   // 'anual' | 'mensal'
+  const [mesSel, setMesSel]       = useState(() => {
+    // default: mês atual do filtro global
+    const m = mesFiltro?.split('/')?.[0]
+    return m ? parseInt(m, 10) - 1 : new Date().getMonth()
+  })
   const [editTarget, setEditTarget] = useState(null)
 
-  // Posts do ano
-  const postsAno = allPosts.filter(p => p.data_post?.split('/')?.[2] === ano)
+  // ── base: todos os posts do ano com tema ETF ───────
+  const postsAno   = allPosts.filter(p => p.data_post?.split('/')?.[2] === ano)
+  const etfAno     = postsAno.filter(p => ETF_TEMAS.includes(p.tema))
 
-  // Posts ETF (inclui sub-temas ETF)
-  const etfPosts = postsAno.filter(p => ETF_TEMAS.includes(p.tema))
+  // ── posts do período selecionado ───────────────────
+  const etfPosts = viewMode === 'anual'
+    ? etfAno
+    : etfAno.filter(p => {
+        const mm = p.data_post?.split('/')?.[1]
+        return mm === String(mesSel + 1).padStart(2, '0')
+      })
 
-  // KPIs
+  const basePosts = viewMode === 'anual' ? postsAno
+    : postsAno.filter(p => {
+        const mm = p.data_post?.split('/')?.[1]
+        return mm === String(mesSel + 1).padStart(2, '0')
+      })
+
+  // ── KPIs ───────────────────────────────────────────
   const totalEtf   = etfPosts.reduce((s,p) => s+(p.contas_alcancadas||0), 0)
-  const totalGeral = postsAno.reduce((s,p) => s+(p.contas_alcancadas||0), 0)
+  const totalGeral = basePosts.reduce((s,p) => s+(p.contas_alcancadas||0), 0)
   const mediaEtf   = etfPosts.length > 0 ? Math.round(totalEtf/etfPosts.length) : 0
   const melhor     = etfPosts.length > 0
     ? etfPosts.reduce((a,b) => (a.contas_alcancadas||0)>(b.contas_alcancadas||0)?a:b)
     : null
   const participacao = totalGeral > 0 ? (totalEtf/totalGeral)*100 : 0
 
-  // Top posts
+  // ── Top posts ──────────────────────────────────────
   const topPosts = [...etfPosts]
     .sort((a,b) => (b.contas_alcancadas||0)-(a.contas_alcancadas||0))
     .slice(0, 8)
   const maxAlc = topPosts[0]?.contas_alcancadas || 1
 
-  // Performance por formato
-  const tipos = ['Reels','Carrossel','Foto estática']
+  // ── Por formato ────────────────────────────────────
+  const tipos  = ['Reels','Carrossel','Foto estática']
   const porTipo = tipos.map(t => {
     const tp = etfPosts.filter(p => p.tipo === t)
     return {
@@ -66,10 +82,10 @@ export default function ETFsView() {
   }).sort((a,b) => b.total-a.total)
   const maxTipo = Math.max(...porTipo.map(t=>t.total), 1)
 
-  // Evolução mensal — alcance + volume de posts
+  // ── Evolução mensal (só no modo anual) ─────────────
   const byMonth = Array.from({length:12}, (_,i) => {
     const mm = String(i+1).padStart(2,'0')
-    const mp = etfPosts.filter(p => {
+    const mp = etfAno.filter(p => {
       const pts = p.data_post?.split('/')
       return pts?.[1]===mm && pts?.[2]===ano
     })
@@ -81,36 +97,85 @@ export default function ETFsView() {
     }
   })
 
-  // Comparação com outros temas
+  // ── Comparação temas ───────────────────────────────
   const temaMap = {}
-  postsAno.forEach(p => {
+  basePosts.forEach(p => {
     if (!p.tema) return
     temaMap[p.tema] = (temaMap[p.tema]||0) + (p.contas_alcancadas||0)
   })
   const temaRank = Object.entries(temaMap).sort((a,b)=>b[1]-a[1])
   const maxTema  = temaRank[0]?.[1] || 1
 
+  // ── KPI cards ──────────────────────────────────────
   const KPIS = [
-    { label:'Total alcançado', value:fmt(totalEtf), sub:`${participacao.toFixed(1)}% do total do ano`, color:'#FF6200', bg:'rgba(255,98,0,0.08)' },
-    { label:'Média por post',  value:fmt(mediaEtf),  sub:'contas / publicação',                        color:'#0891B2', bg:'rgba(8,145,178,0.08)' },
-    { label:'Melhor post',     value:fmt(melhor?.contas_alcancadas), sub:(melhor?.nome||'—').slice(0,22), color:'#7C3AED', bg:'rgba(124,58,237,0.08)' },
-    { label:'Posts ETF no ano',value:String(etfPosts.length), sub:`de ${postsAno.length} posts totais`, color:'#059669', bg:'rgba(5,150,105,0.08)' },
+    { label:'Total alcançado',  value:fmt(totalEtf),  sub:`${participacao.toFixed(1)}% do total${viewMode==='mensal'?' do mês':' do ano'}`, color:'#FF6200', bg:'rgba(255,98,0,0.08)' },
+    { label:'Média por post',   value:fmt(mediaEtf),  sub:'contas / publicação',                                                             color:'#0891B2', bg:'rgba(8,145,178,0.08)' },
+    { label:'Melhor post',      value:fmt(melhor?.contas_alcancadas), sub:(melhor?.nome||'—').slice(0,22),                                   color:'#7C3AED', bg:'rgba(124,58,237,0.08)' },
+    { label:'Posts ETF',        value:String(etfPosts.length),        sub:`de ${basePosts.length} posts${viewMode==='mensal'?' no mês':' no ano'}`, color:'#059669', bg:'rgba(5,150,105,0.08)' },
   ]
+
+  // ── Render ─────────────────────────────────────────
+  const periodoLabel = viewMode === 'anual'
+    ? ano
+    : `${MESES_FULL[mesSel]} ${ano}`
 
   return (
     <div style={{ display:'flex', flexDirection:'column', gap:16 }}>
 
       {/* Header */}
-      <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+      <div style={{ display:'flex', alignItems:'flex-start', justifyContent:'space-between', flexWrap:'wrap', gap:12 }}>
         <div>
           <h2 style={{ color:'#1C252E', fontSize:20, fontWeight:800 }}>ETFs</h2>
           <p style={{ color:'#9AAAB8', fontSize:13, marginTop:3 }}>
-            Análise de performance do tema ETFs em {ano} · inclui ETFs, ETFs em destaque e Educacionais ETFs
+            Performance do tema ETFs · {periodoLabel} · inclui ETFs, ETFs em destaque e Educacionais ETFs
           </p>
         </div>
-        <div style={{ background:'rgba(8,145,178,0.08)', borderRadius:12, padding:'8px 16px', textAlign:'center' }}>
-          <p style={{ color:'#0891B2', fontSize:22, fontWeight:800, lineHeight:1 }}>{participacao.toFixed(1)}%</p>
-          <p style={{ color:'#9AAAB8', fontSize:11, marginTop:2 }}>do alcance total</p>
+
+        {/* Controles: toggle + seletor de mês */}
+        <div style={{ display:'flex', alignItems:'center', gap:10, flexWrap:'wrap' }}>
+
+          {/* Toggle Anual / Mensal */}
+          <div style={{
+            display:'flex', background:'rgba(28,37,46,0.06)', borderRadius:12,
+            padding:3, gap:2,
+          }}>
+            {['anual','mensal'].map(mode => (
+              <button key={mode} onClick={() => setViewMode(mode)}
+                style={{
+                  padding:'6px 16px', borderRadius:10, border:'none', cursor:'pointer',
+                  fontSize:13, fontWeight: viewMode===mode ? 700 : 400,
+                  background: viewMode===mode ? '#1C252E' : 'transparent',
+                  color: viewMode===mode ? '#C3EBF7' : '#5A7080',
+                  transition:'all 0.15s',
+                }}>
+                {mode === 'anual' ? 'Anual' : 'Mensal'}
+              </button>
+            ))}
+          </div>
+
+          {/* Seletor de mês (só no modo mensal) */}
+          {viewMode === 'mensal' && (
+            <div style={{ display:'flex', gap:4, flexWrap:'wrap' }}>
+              {MESES_LABEL.map((m, i) => (
+                <button key={i} onClick={() => setMesSel(i)}
+                  style={{
+                    padding:'5px 10px', borderRadius:8, border:'none', cursor:'pointer',
+                    fontSize:11, fontWeight: mesSel===i ? 700 : 400,
+                    background: mesSel===i ? '#0891B2' : 'rgba(8,145,178,0.08)',
+                    color: mesSel===i ? '#fff' : '#0891B2',
+                    transition:'all 0.15s',
+                  }}>
+                  {m}
+                </button>
+              ))}
+            </div>
+          )}
+
+          {/* Pill participação */}
+          <div style={{ background:'rgba(8,145,178,0.08)', borderRadius:12, padding:'8px 16px', textAlign:'center' }}>
+            <p style={{ color:'#0891B2', fontSize:20, fontWeight:800, lineHeight:1 }}>{participacao.toFixed(1)}%</p>
+            <p style={{ color:'#9AAAB8', fontSize:11, marginTop:2 }}>do alcance total</p>
+          </div>
         </div>
       </div>
 
@@ -123,52 +188,85 @@ export default function ETFsView() {
               <p style={{ color:'#1C252E', fontSize:24, fontWeight:800, lineHeight:1.1, marginBottom:3 }}>{value}</p>
               <p style={{ color:'#9AAAB8', fontSize:12 }}>{sub}</p>
             </div>
-            <div style={{ width:42, height:42, borderRadius:12, background:bg, flexShrink:0, display:'flex', alignItems:'center', justifyContent:'center' }}>
+            <div style={{ width:42, height:42, borderRadius:12, background:bg, flexShrink:0,
+              display:'flex', alignItems:'center', justifyContent:'center' }}>
               <div style={{ width:16, height:16, borderRadius:4, background:color, opacity:0.8 }}/>
             </div>
           </div>
         ))}
       </div>
 
-      {/* Evolução mensal */}
-      <div className="card" style={{ padding:'22px' }}>
-        <p style={{ color:'#1C252E', fontSize:15, fontWeight:700, marginBottom:4 }}>Evolução mensal</p>
-        <p style={{ color:'#9AAAB8', fontSize:12, marginBottom:20 }}>Alcance e volume de posts ETF por mês</p>
-        <ResponsiveContainer width="100%" height={240}>
-          <BarChart data={byMonth} margin={{top:16,right:8,left:0,bottom:0}} barGap={4}>
-            <XAxis dataKey="mes" tick={{ fill:'#9AAAB8', fontSize:11 }} axisLine={false} tickLine={false}/>
-            <YAxis yAxisId="left" tick={{ fill:'#9AAAB8', fontSize:10 }} axisLine={false} tickLine={false}
-              tickFormatter={v=>v===0?'':fmt(v)} width={44}/>
-            <YAxis yAxisId="right" orientation="right" tick={{ fill:'#9AAAB8', fontSize:10 }}
-              axisLine={false} tickLine={false} width={24}
-              tickFormatter={v=>v===0?'':v} allowDecimals={false}/>
-            <Tooltip
-              formatter={(v,name) => name==='alcance' ? [fmt(v),'Alcance'] : [v,'Nº de posts']}
-              labelFormatter={(_,p) => p?.[0]?.payload?.mesFull || ''}
-              contentStyle={{ borderRadius:10, border:'1px solid #EAECF0', fontSize:12, boxShadow:'0 4px 16px rgba(0,0,0,0.08)' }}
-            />
-            <Legend formatter={v => v==='alcance'?'Alcance':'Nº de posts'} wrapperStyle={{ fontSize:12, color:'#9AAAB8' }}/>
-            <Bar yAxisId="left" dataKey="alcance" radius={[8,8,0,0]} barSize={22}>
-              {byMonth.map((e,i) => (
-                <Cell key={i} fill={e.alcance>0?'#0891B2':'#F0F2F5'}/>
-              ))}
-            </Bar>
-            <Bar yAxisId="right" dataKey="posts" radius={[6,6,0,0]} fill="rgba(8,145,178,0.18)" barSize={14}/>
-          </BarChart>
-        </ResponsiveContainer>
-      </div>
+      {/* Gráfico — anual mostra barras mensais; mensal mostra barras por formato */}
+      {viewMode === 'anual' ? (
+        <div className="card" style={{ padding:'22px' }}>
+          <p style={{ color:'#1C252E', fontSize:15, fontWeight:700, marginBottom:4 }}>Evolução mensal</p>
+          <p style={{ color:'#9AAAB8', fontSize:12, marginBottom:20 }}>Alcance e volume de posts ETF por mês em {ano}</p>
+          <ResponsiveContainer width="100%" height={240}>
+            <BarChart data={byMonth} margin={{top:16,right:8,left:0,bottom:0}} barGap={4}>
+              <XAxis dataKey="mes" tick={{ fill:'#9AAAB8', fontSize:11 }} axisLine={false} tickLine={false}/>
+              <YAxis yAxisId="left" tick={{ fill:'#9AAAB8', fontSize:10 }} axisLine={false} tickLine={false}
+                tickFormatter={v=>v===0?'':fmt(v)} width={44}/>
+              <YAxis yAxisId="right" orientation="right" tick={{ fill:'#9AAAB8', fontSize:10 }}
+                axisLine={false} tickLine={false} width={24}
+                tickFormatter={v=>v===0?'':v} allowDecimals={false}/>
+              <Tooltip
+                formatter={(v,name) => name==='alcance' ? [fmt(v),'Alcance'] : [v,'Nº de posts']}
+                labelFormatter={(_,p) => p?.[0]?.payload?.mesFull || ''}
+                contentStyle={{ borderRadius:10, border:'1px solid #EAECF0', fontSize:12, boxShadow:'0 4px 16px rgba(0,0,0,0.08)' }}
+              />
+              <Legend formatter={v => v==='alcance'?'Alcance':'Nº de posts'} wrapperStyle={{ fontSize:12, color:'#9AAAB8' }}/>
+              <Bar yAxisId="left" dataKey="alcance" radius={[8,8,0,0]} barSize={22}>
+                {byMonth.map((e,i) => (
+                  <Cell key={i} fill={e.alcance>0?'#0891B2':'#F0F2F5'}/>
+                ))}
+              </Bar>
+              <Bar yAxisId="right" dataKey="posts" radius={[6,6,0,0]} fill="rgba(8,145,178,0.18)" barSize={14}/>
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      ) : (
+        /* Modo mensal: gráfico de barras por formato */
+        <div className="card" style={{ padding:'22px' }}>
+          <p style={{ color:'#1C252E', fontSize:15, fontWeight:700, marginBottom:4 }}>Alcance por formato</p>
+          <p style={{ color:'#9AAAB8', fontSize:12, marginBottom:20 }}>Posts ETF em {MESES_FULL[mesSel]} {ano}</p>
+          {porTipo.every(t => t.total === 0) ? (
+            <p style={{ color:'#9AAAB8', fontSize:13, textAlign:'center', padding:'40px 0' }}>
+              Nenhum post ETF neste mês
+            </p>
+          ) : (
+            <ResponsiveContainer width="100%" height={200}>
+              <BarChart data={porTipo} margin={{top:8,right:8,left:0,bottom:0}}>
+                <XAxis dataKey="tipo" tick={{ fill:'#9AAAB8', fontSize:11 }} axisLine={false} tickLine={false}/>
+                <YAxis tick={{ fill:'#9AAAB8', fontSize:10 }} axisLine={false} tickLine={false}
+                  tickFormatter={v=>v===0?'':fmt(v)} width={44}/>
+                <Tooltip
+                  formatter={(v,_,props) => [fmt(v), `${props.payload.count} posts`]}
+                  contentStyle={{ borderRadius:10, border:'1px solid #EAECF0', fontSize:12, boxShadow:'0 4px 16px rgba(0,0,0,0.08)' }}
+                />
+                <Bar dataKey="total" radius={[8,8,0,0]} barSize={48}>
+                  {porTipo.map((t,i) => (
+                    <Cell key={i} fill={TIPO_COLOR[t.tipo]||'#0EA5E9'}/>
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          )}
+        </div>
+      )}
 
       {/* Top posts + Performance por formato */}
       <div style={{ display:'grid', gridTemplateColumns:'2fr 1fr', gap:16 }} className="annual-grid">
 
         {/* Top posts */}
         <div className="card" style={{ padding:'22px' }}>
-          <p style={{ color:'#1C252E', fontSize:15, fontWeight:700, marginBottom:4 }}>Top posts ETF</p>
+          <p style={{ color:'#1C252E', fontSize:15, fontWeight:700, marginBottom:4 }}>
+            Top posts ETF {viewMode === 'mensal' ? `· ${MESES_LABEL[mesSel]}` : ''}
+          </p>
           <p style={{ color:'#9AAAB8', fontSize:12, marginBottom:18 }}>Clique para editar</p>
           <div style={{ display:'flex', flexDirection:'column', gap:9 }}>
             {topPosts.length === 0 && (
               <p style={{ color:'#9AAAB8', fontSize:13, textAlign:'center', padding:'32px 0' }}>
-                Nenhum post com tema ETF encontrado
+                Nenhum post ETF encontrado
               </p>
             )}
             {topPosts.map((p,i) => {
@@ -215,7 +313,7 @@ export default function ETFsView() {
           </div>
         </div>
 
-        {/* Performance por formato */}
+        {/* Performance por formato + comparação temas */}
         <div className="card" style={{ padding:'22px' }}>
           <p style={{ color:'#1C252E', fontSize:15, fontWeight:700, marginBottom:4 }}>Por formato</p>
           <p style={{ color:'#9AAAB8', fontSize:12, marginBottom:18 }}>Dentro do tema ETFs</p>
@@ -249,7 +347,7 @@ export default function ETFsView() {
             ))}
           </div>
 
-          {/* Participação vs outros temas */}
+          {/* Comparação vs outros temas */}
           <div style={{ marginTop:24, paddingTop:20, borderTop:'1px solid #F0F4F8' }}>
             <p style={{ color:'#1C252E', fontSize:13, fontWeight:700, marginBottom:14 }}>ETFs vs outros temas</p>
             <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
