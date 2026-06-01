@@ -37,7 +37,7 @@ export default function UploadSection() {
 
       {open && (
         <UploadModal mode="new" onClose={()=>setOpen(false)}
-          onSave={dados=>{addPost(dados);setOpen(false)}}/>
+          onSave={dados=>addPost(dados)}/>
       )}
     </div>
   )

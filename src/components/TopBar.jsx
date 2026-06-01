@@ -106,7 +106,7 @@ export default function TopBar() {
 
       {uploadOpen && (
         <UploadModal mode="new" onClose={() => setUploadOpen(false)}
-          onSave={dados => { addPost(dados); setUploadOpen(false) }} />
+          onSave={dados => addPost(dados)} />
       )}
     </div>
   )
