@@ -39,9 +39,10 @@ function EditableValue({ value, color, onSave }) {
 }
 
 export default function RightPanel() {
-  const { metaMensal, setMetaMensal, metaAnual, setMetaAnual, getPostsDoMes, posts: allPosts, addPost, mesFiltro } = useStore()
+  const { metaMensal, setMetaMensal, metaAnual, setMetaAnual, getPostsDoMes, posts: allPosts, addPost, updatePost, deletePost, mesFiltro } = useStore()
   const postsMes = getPostsDoMes()
-  const [uploadOpen, setUploadOpen] = useState(false)
+  const [uploadOpen, setUploadOpen]   = useState(false)
+  const [editTarget, setEditTarget]   = useState(null)
 
   // Anual: todos os posts do ano do filtro
   const anoFiltro = mesFiltro?.split('/')?.[1] || new Date().getFullYear().toString()
@@ -66,7 +67,7 @@ export default function RightPanel() {
   const dash=(pctAnual/100)*CIRC
 
   return (
-    <aside style={{
+    <aside className="right-panel-desktop" style={{
       width: 272,
       height: '100%',
       background: '#FFFFFF',
@@ -170,11 +171,15 @@ export default function RightPanel() {
           {recentes.map(p=>{
             const color = TIPO_COLOR[p.tipo]||'#0891B2'
             return (
-              <div key={p.id} style={{
+              <div key={p.id} onClick={()=>setEditTarget(p)} style={{
                 background:'#F5F8FA', border:'1px solid #E8ECF0',
                 borderRadius:12, padding:'9px 11px',
                 display:'flex', alignItems:'center', gap:9, flexShrink:0,
-              }}>
+                cursor:'pointer', transition:'background 0.12s',
+              }}
+              onMouseEnter={e=>e.currentTarget.style.background='#EBF4FF'}
+              onMouseLeave={e=>e.currentTarget.style.background='#F5F8FA'}
+              >
                 <div style={{ width:34, height:34, borderRadius:9, background:'rgba(195,235,247,0.4)', flexShrink:0, display:'flex', alignItems:'center', justifyContent:'center', fontSize:15 }}>
                   {TIPO_ICON[p.tipo]||'📄'}
                 </div>
@@ -196,6 +201,13 @@ export default function RightPanel() {
       {uploadOpen && (
         <UploadModal mode="new" onClose={()=>setUploadOpen(false)}
           onSave={dados=>{addPost(dados);setUploadOpen(false)}}/>
+      )}
+
+      {editTarget && (
+        <UploadModal mode="update" post={editTarget}
+          onClose={()=>setEditTarget(null)}
+          onSave={dados=>{updatePost(editTarget.id,dados);setEditTarget(null)}}
+          onDelete={()=>{deletePost(editTarget.id);setEditTarget(null)}}/>
       )}
     </aside>
   )

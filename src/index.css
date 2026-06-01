@@ -30,3 +30,101 @@ html, body, #root {
 .scrollbar-thin::-webkit-scrollbar { width: 4px; height: 4px; }
 .scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
 .scrollbar-thin::-webkit-scrollbar-thumb { background: rgba(195,235,247,0.4); border-radius: 2px; }
+
+/* ── Layout ── */
+.app-layout {
+  display: flex;
+  width: 100%;
+  height: 100%;
+}
+
+.main-column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  min-width: 0;
+}
+
+/* ── Bottom nav (mobile only) ── */
+.bottom-nav {
+  display: none;
+}
+
+/* ── Mobile & Tablet ── */
+@media (max-width: 768px) {
+  html, body, #root {
+    overflow: auto;
+    height: auto;
+    min-height: 100%;
+  }
+
+  .app-layout {
+    flex-direction: column;
+    height: auto;
+    min-height: 100vh;
+    padding-bottom: 64px; /* espaço para bottom nav */
+  }
+
+  .main-column {
+    height: auto;
+    overflow: visible;
+    flex: 1;
+  }
+
+  /* Esconde sidebar lateral e right panel no mobile */
+  .sidebar-desktop {
+    display: none !important;
+  }
+
+  /* Right panel vira bloco abaixo do conteúdo */
+  aside.right-panel-aside {
+    width: 100% !important;
+    height: auto !important;
+    border-left: none !important;
+    border-top: 1px solid #E8ECF0;
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  /* Bottom nav aparece */
+  .bottom-nav {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #1C252E;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    height: 60px;
+    z-index: 100;
+    padding: 0 8px;
+  }
+
+  /* Cards 2 colunas no mobile */
+  .kpi-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  /* Tabela scroll horizontal */
+  .posts-table {
+    min-width: 600px;
+  }
+
+  /* Oculta right panel no mobile */
+  .right-panel-desktop {
+    display: none !important;
+  }
+
+  /* Padding menor */
+  .main-column > div:last-child {
+    padding: 4px 12px 20px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .card {
+    border-radius: 12px;
+  }
+}

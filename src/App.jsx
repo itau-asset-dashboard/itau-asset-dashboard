@@ -12,24 +12,25 @@ import Insights from './components/Insights'
 import UploadSection from './components/UploadSection'
 import RightPanel from './components/RightPanel'
 import SyncBadge from './components/SyncBadge'
+import AnnualView from './components/AnnualView'
 
 export default function App() {
   const { activeSection, syncFromCloud } = useStore()
 
-  // Carrega dados do Supabase ao abrir
   useEffect(() => { syncFromCloud() }, [])
 
   return (
-    <div style={{ display: 'flex', width: '100%', height: '100%' }}>
+    <div className="app-layout">
       <Sidebar />
 
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden', minWidth: 0 }}>
+      <div className="main-column">
         <TopBar />
         <div style={{ flex: 1, overflowY: 'auto', padding: '4px 20px 20px' }} className="scrollbar-thin">
-          {activeSection === 'upload'   && <UploadSection />}
-          {activeSection === 'insights' && <Insights />}
-          {activeSection === 'posts'    && <PostsRanking />}
-          {(activeSection === 'visao-geral' || activeSection === 'meta') && (
+          {activeSection === 'upload'      && <UploadSection />}
+          {activeSection === 'insights'    && <Insights />}
+          {activeSection === 'posts'       && <PostsRanking />}
+          {activeSection === 'visao-anual' && <AnnualView />}
+          {activeSection === 'visao-geral' && (
             <>
               <KPICards />
               <PostsChart />

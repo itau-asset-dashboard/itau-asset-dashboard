@@ -7,7 +7,7 @@ export const useStore = create(
     (set, get) => ({
       posts: [],
       metaMensal: 200000,
-      metaAnual: 2400000,
+      metaAnual: 1090000,
       mesFiltro: '01/2026',
       activeSection: 'visao-geral',
       insights: [],
@@ -104,6 +104,15 @@ export const useStore = create(
           const parts = p.data_post?.split('/')
           if (!parts || parts.length < 3) return false
           return `${parts[1]}/${parts[2]}` === mesFiltro
+        })
+      },
+
+      getPostsDoAno: (ano) => {
+        const { posts, mesFiltro } = get()
+        const anoAlvo = ano || mesFiltro?.split('/')?.[1] || new Date().getFullYear().toString()
+        return posts.filter((p) => {
+          const parts = p.data_post?.split('/')
+          return parts?.[2] === anoAlvo
         })
       },
     }),

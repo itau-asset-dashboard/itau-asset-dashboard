@@ -18,7 +18,7 @@ export async function fetchPosts() {
 
 export async function upsertPost(post) {
   // eslint-disable-next-line no-unused-vars
-  const { apiKey, ...clean } = post   // nunca salva a chave de API
+  const { apiKey, imageData, ...clean } = post   // nunca salva chave de API nem imagem
   const { error } = await supabase.from('posts').upsert(clean)
   if (error) throw error
 }

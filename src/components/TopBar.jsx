@@ -9,10 +9,11 @@ const MESES = [
 ]
 
 const TITLES = {
-  'visao-geral': { title: 'Visão Geral',  sub: 'Métricas de alcance do Instagram' },
-  'posts':       { title: 'Posts',        sub: 'Ranking e gestão de publicações' },
-  'insights':    { title: 'Insights',     sub: 'Análise inteligente de performance' },
-  'upload':      { title: 'Upload',       sub: 'Adicionar post com extração automática' },
+  'visao-geral':  { title: 'Visão Mensal',   sub: 'Métricas de alcance do mês filtrado' },
+  'visao-anual':  { title: 'Visão Anual',    sub: 'Performance consolidada do ano' },
+  'posts':        { title: 'Todos os Posts', sub: 'Clique em qualquer post para editar' },
+  'insights':     { title: 'Insights',       sub: 'Análise inteligente de performance' },
+  'upload':       { title: 'Upload',         sub: 'Adicionar post com extração automática' },
 }
 
 const btn = {

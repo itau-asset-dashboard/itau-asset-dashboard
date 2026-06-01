@@ -19,7 +19,7 @@ const BADGE = {
 const PAGE_SIZE = 10
 
 export default function PostsRanking() {
-  const { getPostsDoMes, updatePost } = useStore()
+  const { getPostsDoMes, updatePost, deletePost } = useStore()
   const posts = getPostsDoMes()
   const [sortKey, setSortKey] = useState('contas_alcancadas')
   const [sortDir, setSortDir] = useState(-1)
@@ -160,6 +160,7 @@ export default function PostsRanking() {
         <UploadModal mode="update" post={updateTarget}
           onClose={() => setUpdateTarget(null)}
           onSave={(dados) => { updatePost(updateTarget.id, dados); setUpdateTarget(null) }}
+          onDelete={() => { deletePost(updateTarget.id); setUpdateTarget(null) }}
         />
       )}
     </div>
