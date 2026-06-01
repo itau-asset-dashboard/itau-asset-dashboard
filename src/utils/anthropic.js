@@ -8,7 +8,7 @@ export async function extractPostFromImage(base64, mediaType, apiKey) {
       'anthropic-dangerous-direct-browser-access': 'true',
     },
     body: JSON.stringify({
-      model: 'claude-sonnet-4-6',
+      model: 'claude-3-5-sonnet-20241022',
       max_tokens: 1000,
       messages: [{
         role: 'user',
@@ -72,7 +72,7 @@ export async function generateInsights(posts, apiKey) {
       'anthropic-dangerous-direct-browser-access': 'true',
     },
     body: JSON.stringify({
-      model: 'claude-sonnet-4-6',
+      model: 'claude-3-5-sonnet-20241022',
       max_tokens: 1200,
       messages: [{
         role: 'user',
