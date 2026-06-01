@@ -27,30 +27,22 @@ export function getTemas(post) {
   // Se for string, tenta fazer parse de array serializado
   if (typeof t === 'string') {
     const trimmed = t.trim()
-    // Detecta strings que parecem array: começa com [ e termina com ]
     if (trimmed.startsWith('[')) {
-      try {
-        // Tenta JSON.parse direto
-        const parsed = JSON.parse(trimmed)
-        if (Array.isArray(parsed)) t = parsed
-        else t = [String(parsed)]
-      } catch {
-        // Tenta limpar notação JS: ['ETFs'] → ["ETFs"]
-        try {
-          const fixed = trimmed
-            .replace(/'/g, '"')            // aspas simples → duplas
-            .replace(/\\"/g, '"')          // escapes desnecessários
-            .replace(/"\s*,\s*"/g, '","') // normaliza espaços entre itens
-          const parsed = JSON.parse(fixed)
-          if (Array.isArray(parsed)) t = parsed
-          else t = [trimmed]
-        } catch {
-          // fallback: tira os colchetes e split por vírgula
-          t = trimmed
-            .replace(/^\[|\]$/g, '')
-            .split(',')
-            .map(s => s.trim().replace(/^['"]|['"]$/g, ''))
-        }
+      // Tenta JSON.parse; se falhar, normaliza aspas simples e tenta de novo
+      let parsed = null
+      for (const attempt of [trimmed, trimmed.replace(/'/g, '"')]) {
+        try { parsed = JSON.parse(attempt); break } catch { /* continua */ }
+      }
+      if (Array.isArray(parsed)) {
+        t = parsed
+      } else if (parsed != null) {
+        t = [String(parsed)]
+      } else {
+        // fallback: remove colchetes e divide por vírgula
+        t = trimmed
+          .replace(/^\[|\]$/g, '')
+          .split(',')
+          .map(s => s.trim().replace(/^['"\s]+|['"\s]+$/g, ''))
       }
     } else {
       t = [trimmed]
@@ -61,7 +53,7 @@ export function getTemas(post) {
 
   // Aplica migração de temas antigos + remove duplicatas + remove vazios
   const migrated = t
-    .map(x => String(x).trim())
+    .map(x => String(x).trim().replace(/^["']+|["']+$/g, '').trim()) // remove aspas residuais
     .filter(Boolean)
     .map(x => TEMA_MIGRATION[x] || x)
 

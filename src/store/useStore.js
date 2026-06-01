@@ -29,10 +29,16 @@ export const useStore = create(
           // Preserva imageData local — nunca é salvo no Supabase (muito pesado)
           // Também normaliza o campo `tema` para array limpo
           const localPosts = get().posts
+          const dirty = [] // posts com tema sujo que precisam ser re-salvos
           const posts = cloudPosts.map(cp => {
             const local = localPosts.find(lp => lp.id === cp.id)
             const merged = local?.imageData ? { ...cp, imageData: local.imageData } : cp
-            return { ...merged, tema: normalizeTema(merged.tema) }
+            const temaNorm = normalizeTema(merged.tema)
+            // Detecta se o tema estava sujo (string ≠ array limpo)
+            const temaOriginal = JSON.stringify(merged.tema)
+            const temaLimpo    = JSON.stringify(temaNorm)
+            if (temaOriginal !== temaLimpo) dirty.push({ ...merged, tema: temaNorm })
+            return { ...merged, tema: temaNorm }
           })
           set({
             posts,
@@ -40,6 +46,10 @@ export const useStore = create(
             metaAnual:  metaAnual  ? Number(metaAnual)  : get().metaAnual,
             syncing: false,
           })
+          // Grava de volta no Supabase os posts com tema corrigido
+          if (dirty.length > 0) {
+            dirty.forEach(p => { try { upsertPost(p) } catch (_) {} })
+          }
         } catch (e) {
           set({ syncing: false, syncError: e.message })
         }
