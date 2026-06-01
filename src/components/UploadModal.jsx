@@ -19,6 +19,7 @@ export const TEMAS = [
   'Live',
   'Dividendos',
   'Premiações',
+  'Mind Asset',
 ]
 
 const NUM_FIELDS = [
