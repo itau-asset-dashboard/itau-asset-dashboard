@@ -20,11 +20,17 @@ export const useStore = create(
       syncFromCloud: async () => {
         set({ syncing: true, syncError: null })
         try {
-          const [posts, metaMensal, metaAnual] = await Promise.all([
+          const [cloudPosts, metaMensal, metaAnual] = await Promise.all([
             fetchPosts(),
             fetchSetting('meta_mensal'),
             fetchSetting('meta_anual'),
           ])
+          // Preserva imageData local — nunca é salvo no Supabase (muito pesado)
+          const localPosts = get().posts
+          const posts = cloudPosts.map(cp => {
+            const local = localPosts.find(lp => lp.id === cp.id)
+            return local?.imageData ? { ...cp, imageData: local.imageData } : cp
+          })
           set({
             posts,
             metaMensal: metaMensal ? Number(metaMensal) : get().metaMensal,
