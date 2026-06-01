@@ -13,7 +13,11 @@ export async function fetchPosts() {
     .select('*')
     .order('created_at', { ascending: true })
   if (error) throw error
-  return data || []
+  // Normaliza image_url (coluna Supabase) → imageUrl (frontend)
+  return (data || []).map(({ image_url, ...rest }) => ({
+    ...rest,
+    imageUrl: image_url || null,
+  }))
 }
 
 // Faz upload de uma imagem (base64 dataUrl) para o Storage e retorna a URL pública
@@ -40,8 +44,9 @@ export async function uploadImage(postId, dataUrl) {
 
 export async function upsertPost(post) {
   // eslint-disable-next-line no-unused-vars
-  const { apiKey, imageData, ...clean } = post   // nunca salva base64 no banco
-  const { error } = await supabase.from('posts').upsert(clean)
+  const { apiKey, imageData, imageUrl, ...clean } = post   // nunca salva base64 no banco
+  // Salva imageUrl como image_url (nome real da coluna no Supabase)
+  const { error } = await supabase.from('posts').upsert({ ...clean, image_url: imageUrl || null })
   if (error) throw error
 }
 
