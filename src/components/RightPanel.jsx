@@ -13,40 +13,57 @@ function fmt(n) {
 const TIPO_ICON = { Carrossel:'🎠', Reels:'🎬', 'Foto estática':'📷' }
 const TIPO_COLOR = { Carrossel:'#FF6200', Reels:'#0891B2', 'Foto estática':'#0E7490' }
 
+function EditableValue({ value, color, onSave }) {
+  const [editing, setEditing] = useState(false)
+  const [input, setInput] = useState('')
+  if (editing) return (
+    <div style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:4 }}>
+      <input autoFocus value={input} onChange={e=>setInput(e.target.value)}
+        onKeyDown={e=>{if(e.key==='Enter'){const v=parseInt(input.replace(/\D/g,''));if(!isNaN(v)&&v>0){onSave(v)}setEditing(false)}if(e.key==='Escape')setEditing(false)}}
+        style={{ width:80, background:'#fff', border:'1.5px solid #C3EBF7', borderRadius:6, padding:'3px 6px', color:'#1C252E', fontSize:13, outline:'none', textAlign:'center' }}/>
+      <button onClick={()=>{const v=parseInt(input.replace(/\D/g,''));if(!isNaN(v)&&v>0)onSave(v);setEditing(false)}}
+        style={{ background:'#C3EBF7', border:'none', borderRadius:6, width:22, height:22, cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center' }}>
+        <Check size={11} color="#0E7490"/>
+      </button>
+    </div>
+  )
+  return (
+    <button onClick={()=>{setInput(String(value));setEditing(true)}}
+      style={{ background:'transparent', border:'none', cursor:'pointer', padding:0, display:'flex', flexDirection:'column', alignItems:'center', gap:2 }}>
+      <p style={{ color, fontSize:17, fontWeight:800, lineHeight:1 }}>{fmt(value)}</p>
+      <p style={{ color:'#8A9BB0', fontSize:10, display:'flex', alignItems:'center', gap:2 }}>
+        meta <Edit2 size={8} color="#8A9BB0"/>
+      </p>
+    </button>
+  )
+}
+
 export default function RightPanel() {
-  const { metaMensal, setMetaMensal, getPostsDoMes, addPost, mesFiltro } = useStore()
-  const posts = getPostsDoMes()
-  const [editingMeta, setEditingMeta] = useState(false)
-  const [metaInput, setMetaInput]     = useState('')
-  const [uploadOpen, setUploadOpen]   = useState(false)
+  const { metaMensal, setMetaMensal, metaAnual, setMetaAnual, getPostsDoMes, posts: allPosts, addPost, mesFiltro } = useStore()
+  const postsMes = getPostsDoMes()
+  const [uploadOpen, setUploadOpen] = useState(false)
 
-  const total    = posts.reduce((s,p)=>s+(p.contas_alcancadas||0),0)
-  const pct      = metaMensal>0 ? Math.min((total/metaMensal)*100,100) : 0
-  const restante = Math.max(metaMensal-total,0)
-  const finais   = posts.filter(p=>p.status==='final').length
-  const parciais = posts.filter(p=>p.status==='parcial').length
+  // Anual: todos os posts do ano do filtro
+  const anoFiltro = mesFiltro?.split('/')?.[1] || new Date().getFullYear().toString()
+  const postsAno = allPosts.filter(p => {
+    const parts = p.data_post?.split('/')
+    return parts?.[2] === anoFiltro
+  })
 
-  const projPct  = posts.length>0 ? ((total/posts.length)*30/metaMensal)*100 : 0
-  const proj     = projPct>=90
-    ? { label:'No caminho', color:'#16a34a', bg:'rgba(22,163,74,0.1)' }
-    : projPct>=70
-    ? { label:'Em risco',   color:'#d97706', bg:'rgba(217,119,6,0.1)' }
-    : { label:'Abaixo',     color:'#64748B', bg:'rgba(100,116,139,0.1)' }
+  const totalAnual  = postsAno.reduce((s,p)=>s+(p.contas_alcancadas||0),0)
+  const totalMensal = postsMes.reduce((s,p)=>s+(p.contas_alcancadas||0),0)
+  const pctAnual    = metaAnual>0 ? Math.min((totalAnual/metaAnual)*100,100) : 0
+  const pctMensal   = metaMensal>0 ? Math.min((totalMensal/metaMensal)*100,100) : 0
 
-  const recentes = [...posts]
+  const recentes = [...allPosts]
     .sort((a,b)=>{
       const p=(s)=>{const[d,m,y]=(s||'').split('/');return new Date(`${y}-${m}-${d}`)}
       return p(b.data_post)-p(a.data_post)
     }).slice(0,5)
 
+  // SVG anel anual
   const R=50, CIRC=2*Math.PI*R
-  const dash=(pct/100)*CIRC
-
-  function saveMeta(){
-    const v=parseInt(metaInput.replace(/\D/g,''))
-    if(!isNaN(v)&&v>0) setMetaMensal(v)
-    setEditingMeta(false)
-  }
+  const dash=(pctAnual/100)*CIRC
 
   return (
     <aside style={{
@@ -61,25 +78,19 @@ export default function RightPanel() {
       flexShrink: 0,
       overflow: 'hidden',
     }}>
-      {/* Cabeçalho */}
-      <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between' }}>
-        <div>
-          <p style={{ color:'#8A9BB0', fontSize:10, fontWeight:700, textTransform:'uppercase', letterSpacing:'0.08em' }}>Meta mensal</p>
-          <p style={{ color:'#1C252E', fontSize:14, fontWeight:700, marginTop:1 }}>{mesFiltro}</p>
-        </div>
-        <span style={{ background:proj.bg, color:proj.color, borderRadius:8, padding:'3px 10px', fontSize:11, fontWeight:700 }}>
-          {proj.label}
-        </span>
-      </div>
 
-      {/* Card progresso */}
-      <div style={{ background:'#F5F8FA', borderRadius:16, padding:'16px 14px', border:'1px solid #E8ECF0' }}>
-        {/* Anel SVG */}
-        <div style={{ display:'flex', justifyContent:'center', marginBottom:12 }}>
-          <div style={{ position:'relative', width:120, height:120 }}>
-            <svg width="120" height="120" viewBox="0 0 120 120">
+      {/* Card meta anual — principal */}
+      <div style={{ background:'#F5F8FA', borderRadius:16, padding:'14px', border:'1px solid #E8ECF0' }}>
+        <p style={{ color:'#8A9BB0', fontSize:10, fontWeight:700, textTransform:'uppercase', letterSpacing:'0.08em', marginBottom:10 }}>
+          Meta anual {anoFiltro}
+        </p>
+
+        {/* Anel */}
+        <div style={{ display:'flex', justifyContent:'center', marginBottom:10 }}>
+          <div style={{ position:'relative', width:110, height:110 }}>
+            <svg width="110" height="110" viewBox="0 0 120 120">
               <circle cx="60" cy="60" r={R} fill="none" stroke="#E8ECF0" strokeWidth="9"/>
-              <circle cx="60" cy="60" r={R} fill="none" stroke="rgba(195,235,247,0.6)" strokeWidth="9"
+              <circle cx="60" cy="60" r={R} fill="none" stroke="rgba(195,235,247,0.5)" strokeWidth="9"
                 strokeDasharray={`${CIRC} 0`} transform="rotate(-90 60 60)"/>
               <circle cx="60" cy="60" r={R} fill="none" stroke="#FF6200" strokeWidth="9"
                 strokeLinecap="round"
@@ -89,53 +100,53 @@ export default function RightPanel() {
               />
             </svg>
             <div style={{ position:'absolute', inset:0, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center' }}>
-              <span style={{ color:'#1C252E', fontSize:24, fontWeight:800, lineHeight:1 }}>{pct.toFixed(0)}%</span>
-              <span style={{ color:'#8A9BB0', fontSize:10, marginTop:1 }}>atingido</span>
+              <span style={{ color:'#1C252E', fontSize:22, fontWeight:800, lineHeight:1 }}>{pctAnual.toFixed(0)}%</span>
+              <span style={{ color:'#8A9BB0', fontSize:10, marginTop:1 }}>do ano</span>
             </div>
           </div>
         </div>
 
-        {/* Alcançado × Meta */}
-        <div style={{ display:'grid', gridTemplateColumns:'1fr 1px 1fr', gap:0, alignItems:'center', marginBottom:10 }}>
+        {/* Alcançado × Meta anual */}
+        <div style={{ display:'grid', gridTemplateColumns:'1fr 1px 1fr', alignItems:'center', marginBottom:8 }}>
           <div style={{ textAlign:'center' }}>
-            <p style={{ color:'#FF6200', fontSize:17, fontWeight:800, lineHeight:1 }}>{fmt(total)}</p>
+            <p style={{ color:'#FF6200', fontSize:16, fontWeight:800, lineHeight:1 }}>{fmt(totalAnual)}</p>
             <p style={{ color:'#8A9BB0', fontSize:10, marginTop:2 }}>alcançadas</p>
           </div>
-          <div style={{ background:'#E8ECF0', height:32, width:1, margin:'0 auto' }}/>
+          <div style={{ background:'#E8ECF0', height:28, width:1, margin:'0 auto' }}/>
           <div style={{ textAlign:'center' }}>
-            {editingMeta ? (
-              <div style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:4 }}>
-                <input autoFocus value={metaInput} onChange={e=>setMetaInput(e.target.value)}
-                  onKeyDown={e=>e.key==='Enter'&&saveMeta()}
-                  style={{ width:68, background:'#fff', border:'1.5px solid #C3EBF7', borderRadius:6, padding:'3px 6px', color:'#1C252E', fontSize:12, outline:'none' }}/>
-                <button onClick={saveMeta} style={{ background:'#C3EBF7', border:'none', borderRadius:6, width:22, height:22, cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center' }}>
-                  <Check size={11} color="#0E7490"/>
-                </button>
-              </div>
-            ) : (
-              <button onClick={()=>{setEditingMeta(true);setMetaInput(String(metaMensal))}}
-                style={{ background:'transparent', border:'none', cursor:'pointer', padding:0, display:'flex', flexDirection:'column', alignItems:'center', gap:2 }}>
-                <p style={{ color:'#0891B2', fontSize:17, fontWeight:800, lineHeight:1 }}>{fmt(metaMensal)}</p>
-                <p style={{ color:'#8A9BB0', fontSize:10, display:'flex', alignItems:'center', gap:2 }}>
-                  meta <Edit2 size={8} color="#8A9BB0"/>
-                </p>
-              </button>
-            )}
+            <EditableValue value={metaAnual} color="#0891B2" onSave={setMetaAnual}/>
           </div>
         </div>
 
-        <p style={{ color:'#8A9BB0', fontSize:11, textAlign:'center' }}>
-          <span style={{ color:'#0891B2', fontWeight:600 }}>{finais}</span> finais ·{' '}
-          <span style={{ color:'#d97706', fontWeight:600 }}>{parciais}</span> parciais
-          {restante>0 && <> · faltam <span style={{ color:'#FF6200', fontWeight:600 }}>{fmt(restante)}</span></>}
-        </p>
+        {/* Barra progresso mensal */}
+        <div style={{ background:'#fff', borderRadius:10, padding:'10px 12px', border:'1px solid #E8ECF0' }}>
+          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:6 }}>
+            <p style={{ color:'#8A9BB0', fontSize:10, fontWeight:700, textTransform:'uppercase', letterSpacing:'0.06em' }}>
+              Mês {mesFiltro}
+            </p>
+            <p style={{ color:'#1C252E', fontSize:11, fontWeight:700 }}>{pctMensal.toFixed(0)}%</p>
+          </div>
+          <div style={{ background:'#E8ECF0', borderRadius:4, height:6, overflow:'hidden', marginBottom:6 }}>
+            <div style={{
+              height:'100%', borderRadius:4,
+              background: pctMensal>=100 ? '#16a34a' : '#FF6200',
+              width:`${pctMensal}%`,
+              transition:'width 0.6s ease',
+            }}/>
+          </div>
+          <div style={{ display:'flex', justifyContent:'space-between' }}>
+            <span style={{ color:'#FF6200', fontSize:11, fontWeight:700 }}>{fmt(totalMensal)}</span>
+            <div style={{ display:'flex', alignItems:'center', gap:3 }}>
+              <EditableValue value={metaMensal} color="#8A9BB0" onSave={setMetaMensal}/>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Botão novo post */}
       <button onClick={()=>setUploadOpen(true)}
         style={{
-          width:'100%', background:'#1C252E',
-          border:'none',
+          width:'100%', background:'#1C252E', border:'none',
           borderRadius:12, padding:'10px',
           color:'#C3EBF7', fontSize:13, fontWeight:700, cursor:'pointer',
           display:'flex', alignItems:'center', justifyContent:'center', gap:7,
@@ -160,8 +171,7 @@ export default function RightPanel() {
             const color = TIPO_COLOR[p.tipo]||'#0891B2'
             return (
               <div key={p.id} style={{
-                background:'#F5F8FA',
-                border:'1px solid #E8ECF0',
+                background:'#F5F8FA', border:'1px solid #E8ECF0',
                 borderRadius:12, padding:'9px 11px',
                 display:'flex', alignItems:'center', gap:9, flexShrink:0,
               }}>

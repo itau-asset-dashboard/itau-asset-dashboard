@@ -7,6 +7,7 @@ export const useStore = create(
     (set, get) => ({
       posts: [],
       metaMensal: 200000,
+      metaAnual: 2400000,
       mesFiltro: '01/2026',
       activeSection: 'visao-geral',
       insights: [],
@@ -19,17 +20,18 @@ export const useStore = create(
       syncFromCloud: async () => {
         set({ syncing: true, syncError: null })
         try {
-          const [posts, meta] = await Promise.all([
+          const [posts, metaMensal, metaAnual] = await Promise.all([
             fetchPosts(),
             fetchSetting('meta_mensal'),
+            fetchSetting('meta_anual'),
           ])
           set({
             posts,
-            metaMensal: meta ? Number(meta) : get().metaMensal,
+            metaMensal: metaMensal ? Number(metaMensal) : get().metaMensal,
+            metaAnual:  metaAnual  ? Number(metaAnual)  : get().metaAnual,
             syncing: false,
           })
         } catch (e) {
-          // falha silenciosa — usa dados do localStorage
           set({ syncing: false, syncError: e.message })
         }
       },
@@ -43,6 +45,11 @@ export const useStore = create(
       setMetaMensal: async (meta) => {
         set({ metaMensal: meta })
         try { await saveSetting('meta_mensal', meta) } catch (_) {}
+      },
+
+      setMetaAnual: async (meta) => {
+        set({ metaAnual: meta })
+        try { await saveSetting('meta_anual', meta) } catch (_) {}
       },
 
       setMesFiltro: (mes) => set({ mesFiltro: mes }),
@@ -105,6 +112,7 @@ export const useStore = create(
       partialize: (s) => ({
         posts:      s.posts,
         metaMensal: s.metaMensal,
+        metaAnual:  s.metaAnual,
         mesFiltro:  s.mesFiltro,
         insights:   s.insights,
         apiKey:     s.apiKey,
