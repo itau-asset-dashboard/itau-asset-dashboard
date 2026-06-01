@@ -71,7 +71,7 @@ const EMPTY = {
 }
 
 // ─── Modal para um único post ────────────────────────────────────────────────
-const SinglePostModal = forwardRef(function SinglePostModal({ initialPost, initialPreview, onClose, onSave, onDelete, showNext, currentIdx, totalFiles }, ref) {
+const SinglePostModal = forwardRef(function SinglePostModal({ initialPost, initialPreview, onClose, onSave, onDelete, isLast, currentIdx, totalFiles }, ref) {
   const { apiKey } = useStore()
   const [preview,  setPreview]  = useState(initialPreview || initialPost?.imageData || null)
   const [loading,  setLoading]  = useState(false)
@@ -149,11 +149,9 @@ const SinglePostModal = forwardRef(function SinglePostModal({ initialPost, initi
       {totalFiles > 1 && (
         <div style={{ background: '#F5F8FA', borderRadius: 8, padding: '6px 12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <span style={{ color: '#8A9BB0', fontSize: 12 }}>Post {currentIdx + 1} de {totalFiles}</span>
-          {showNext && (
-            <button onClick={showNext} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#0891B2', fontSize: 12, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4 }}>
-              Próximo <ChevronRight size={13}/>
-            </button>
-          )}
+          <span style={{ color: isLast ? '#22c55e' : '#FF6200', fontSize: 11, fontWeight: 600 }}>
+            {isLast ? '✓ Último post' : `Faltam ${totalFiles - currentIdx - 1}`}
+          </span>
         </div>
       )}
 
@@ -316,7 +314,7 @@ const SinglePostModal = forwardRef(function SinglePostModal({ initialPost, initi
           display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
           transition: 'background 0.2s',
         }}>
-          {saved ? <><Check size={16} /> Salvo!</> : (isUpdate ? 'Atualizar post' : 'Salvar post')}
+          {saved ? <><Check size={16} /> Salvo!</> : isUpdate ? 'Atualizar post' : (totalFiles > 1 && !isLast) ? <>Salvar e continuar <ChevronRight size={15}/></> : 'Salvar post'}
         </button>
 
         {isUpdate && onDelete && (
@@ -484,11 +482,11 @@ function MultiUploadModal({ onClose, onSave }) {
           initialPreview={initialPreview}
           onClose={onClose}
           onSave={dados => {
-            onSave(dados)
-            if (!isLast) navigateTo(current + 1)
-            else onClose()
+            onSave(dados)          // addPost — não fecha o modal
+            if (isLast) onClose()  // fecha só no último
+            else navigateTo(current + 1)
           }}
-          showNext={!isLast ? () => navigateTo(current + 1) : null}
+          isLast={isLast}
           currentIdx={current}
           totalFiles={files.length}
         />

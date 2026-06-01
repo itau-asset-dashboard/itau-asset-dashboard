@@ -212,7 +212,7 @@ export default function RightPanel() {
 
       {uploadOpen && (
         <UploadModal mode="new" onClose={()=>setUploadOpen(false)}
-          onSave={dados=>{addPost(dados);setUploadOpen(false)}}/>
+          onSave={dados=>addPost(dados)}/>
       )}
 
       {editTarget && (
