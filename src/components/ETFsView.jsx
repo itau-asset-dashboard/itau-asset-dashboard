@@ -22,7 +22,7 @@ function pct(a, b) {
 }
 
 const TIPO_COLOR = { Carrossel:'#FF6200', Reels:'#1C252E', 'Foto estática':'#0EA5E9' }
-const ETF_TEMAS  = ['ETFs', 'ETFs em destaque', 'Educacionais ETFs']
+const ETF_TEMAS  = ['ETFs']
 
 export default function ETFsView() {
   const { posts: allPosts, mesFiltro, updatePost, deletePost } = useStore()

@@ -12,8 +12,6 @@ export const TEMAS = [
   'Trends',
   'Fundos',
   'Performance em destaque',
-  'ETFs em destaque',
-  'Educacionais ETFs',
   'Ring the bell',
   'Dump',
   'Live',
