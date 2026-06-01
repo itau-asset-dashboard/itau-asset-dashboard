@@ -51,6 +51,21 @@ function formatDate(dateStr) {
   return `${parts[0].padStart(2,'0')}/${parts[1].padStart(2,'0')}/${parts[2]}`
 }
 
+// Abre imagem em nova aba — converte base64 para Blob se necessário (Chrome bloqueia data URLs diretas)
+function openImage(src) {
+  if (!src) return
+  if (src.startsWith('http')) { window.open(src, '_blank'); return }
+  try {
+    const [header, base64] = src.split(',')
+    const mime = header.match(/:(.*?);/)?.[1] || 'image/jpeg'
+    const bytes = Uint8Array.from(atob(base64), c => c.charCodeAt(0))
+    const blob = new Blob([bytes], { type: mime })
+    const url = URL.createObjectURL(blob)
+    const win = window.open(url, '_blank')
+    if (win) win.onload = () => URL.revokeObjectURL(url)
+  } catch (_) { window.open(src, '_blank') }
+}
+
 function fileToName(filename) {
   if (!filename) return ''
   return filename
@@ -205,13 +220,13 @@ const SinglePostModal = forwardRef(function SinglePostModal({ initialPost, initi
         {preview ? (
           <>
             <img src={form.imageUrl || preview} alt="" style={{ width: 56, height: 56, objectFit: 'cover', borderRadius: 8, flexShrink: 0, cursor: 'zoom-in' }}
-              onClick={e => { e.stopPropagation(); window.open(form.imageUrl || preview, '_blank') }} />
+              onClick={e => { e.stopPropagation(); openImage(form.imageUrl || preview) }} />
             <div style={{ flex: 1, minWidth: 0 }}>
               <p style={{ color: '#1C252E', fontWeight: 700, fontSize: 13, marginBottom: 2 }}>Última evidência</p>
               <p style={{ color: '#8A9BB0', fontSize: 11 }}>
                 {form.data_post ? `📅 ${formatDate(form.data_post)}` : 'Sem data definida'}
                 {' · '}
-                <span style={{ color: '#0891B2', cursor: 'pointer' }} onClick={e => { e.stopPropagation(); window.open(form.imageUrl || preview, '_blank') }}>
+                <span style={{ color: '#0891B2', cursor: 'pointer' }} onClick={e => { e.stopPropagation(); openImage(form.imageUrl || preview) }}>
                   abrir imagem ↗
                 </span>
                 {' · clique para trocar'}
