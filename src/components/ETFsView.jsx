@@ -1,0 +1,287 @@
+import { useState } from 'react'
+import { useStore } from '../store/useStore'
+import {
+  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell,
+  LineChart, Line, CartesianGrid, Legend,
+} from 'recharts'
+import UploadModal from './UploadModal'
+
+const MESES_LABEL = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez']
+const MESES_FULL  = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro']
+
+function fmt(n) {
+  if (!n && n !== 0) return '—'
+  if (n >= 1000000) return (n/1000000).toFixed(1).replace('.',',')+'M'
+  if (n >= 1000)    return (n/1000).toFixed(1).replace('.',',')+'K'
+  return n.toLocaleString('pt-BR')
+}
+
+function pct(a, b) {
+  if (!b) return '0%'
+  return ((a/b)*100).toFixed(1)+'%'
+}
+
+const TIPO_COLOR = { Carrossel:'#FF6200', Reels:'#1C252E', 'Foto estática':'#0EA5E9' }
+const TIPO_BG    = { Carrossel:'rgba(255,98,0,0.1)', Reels:'rgba(28,37,46,0.1)', 'Foto estática':'rgba(14,165,233,0.1)' }
+
+// Temas que fazem parte do universo ETFs
+const ETF_TEMAS = ['ETFs', 'ETFs em destaque', 'Educacionais ETFs']
+
+export default function ETFsView() {
+  const { posts: allPosts, mesFiltro, updatePost, deletePost } = useStore()
+  const ano = mesFiltro?.split('/')?.[1] || '2026'
+  const [editTarget, setEditTarget] = useState(null)
+
+  // Posts do ano
+  const postsAno = allPosts.filter(p => p.data_post?.split('/')?.[2] === ano)
+
+  // Posts ETF (inclui sub-temas ETF)
+  const etfPosts = postsAno.filter(p => ETF_TEMAS.includes(p.tema))
+
+  // KPIs
+  const totalEtf   = etfPosts.reduce((s,p) => s+(p.contas_alcancadas||0), 0)
+  const totalGeral = postsAno.reduce((s,p) => s+(p.contas_alcancadas||0), 0)
+  const mediaEtf   = etfPosts.length > 0 ? Math.round(totalEtf/etfPosts.length) : 0
+  const melhor     = etfPosts.length > 0
+    ? etfPosts.reduce((a,b) => (a.contas_alcancadas||0)>(b.contas_alcancadas||0)?a:b)
+    : null
+  const participacao = totalGeral > 0 ? (totalEtf/totalGeral)*100 : 0
+
+  // Top posts
+  const topPosts = [...etfPosts]
+    .sort((a,b) => (b.contas_alcancadas||0)-(a.contas_alcancadas||0))
+    .slice(0, 8)
+  const maxAlc = topPosts[0]?.contas_alcancadas || 1
+
+  // Performance por formato
+  const tipos = ['Reels','Carrossel','Foto estática']
+  const porTipo = tipos.map(t => {
+    const tp = etfPosts.filter(p => p.tipo === t)
+    return {
+      tipo: t,
+      total: tp.reduce((s,p) => s+(p.contas_alcancadas||0), 0),
+      count: tp.length,
+      media: tp.length > 0 ? Math.round(tp.reduce((s,p) => s+(p.contas_alcancadas||0),0)/tp.length) : 0,
+    }
+  }).sort((a,b) => b.total-a.total)
+  const maxTipo = Math.max(...porTipo.map(t=>t.total), 1)
+
+  // Evolução mensal — alcance + volume de posts
+  const byMonth = Array.from({length:12}, (_,i) => {
+    const mm = String(i+1).padStart(2,'0')
+    const mp = etfPosts.filter(p => {
+      const pts = p.data_post?.split('/')
+      return pts?.[1]===mm && pts?.[2]===ano
+    })
+    return {
+      mes:     MESES_LABEL[i],
+      mesFull: MESES_FULL[i],
+      alcance: mp.reduce((s,p) => s+(p.contas_alcancadas||0), 0),
+      posts:   mp.length,
+    }
+  })
+
+  // Comparação com outros temas
+  const temaMap = {}
+  postsAno.forEach(p => {
+    if (!p.tema) return
+    temaMap[p.tema] = (temaMap[p.tema]||0) + (p.contas_alcancadas||0)
+  })
+  const temaRank = Object.entries(temaMap).sort((a,b)=>b[1]-a[1])
+  const maxTema  = temaRank[0]?.[1] || 1
+
+  const KPIS = [
+    { label:'Total alcançado', value:fmt(totalEtf), sub:`${participacao.toFixed(1)}% do total do ano`, color:'#FF6200', bg:'rgba(255,98,0,0.08)' },
+    { label:'Média por post',  value:fmt(mediaEtf),  sub:'contas / publicação',                        color:'#0891B2', bg:'rgba(8,145,178,0.08)' },
+    { label:'Melhor post',     value:fmt(melhor?.contas_alcancadas), sub:(melhor?.nome||'—').slice(0,22), color:'#7C3AED', bg:'rgba(124,58,237,0.08)' },
+    { label:'Posts ETF no ano',value:String(etfPosts.length), sub:`de ${postsAno.length} posts totais`, color:'#059669', bg:'rgba(5,150,105,0.08)' },
+  ]
+
+  return (
+    <div style={{ display:'flex', flexDirection:'column', gap:16 }}>
+
+      {/* Header */}
+      <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+        <div>
+          <h2 style={{ color:'#1C252E', fontSize:20, fontWeight:800 }}>ETFs</h2>
+          <p style={{ color:'#9AAAB8', fontSize:13, marginTop:3 }}>
+            Análise de performance do tema ETFs em {ano} · inclui ETFs, ETFs em destaque e Educacionais ETFs
+          </p>
+        </div>
+        <div style={{ background:'rgba(8,145,178,0.08)', borderRadius:12, padding:'8px 16px', textAlign:'center' }}>
+          <p style={{ color:'#0891B2', fontSize:22, fontWeight:800, lineHeight:1 }}>{participacao.toFixed(1)}%</p>
+          <p style={{ color:'#9AAAB8', fontSize:11, marginTop:2 }}>do alcance total</p>
+        </div>
+      </div>
+
+      {/* KPIs */}
+      <div className="kpi-grid">
+        {KPIS.map(({label,value,sub,color,bg}) => (
+          <div key={label} className="card" style={{ padding:'18px 20px', display:'flex', alignItems:'center', gap:14 }}>
+            <div style={{ flex:1, minWidth:0 }}>
+              <p style={{ color:'#9AAAB8', fontSize:11, fontWeight:600, textTransform:'uppercase', letterSpacing:'0.05em', marginBottom:5 }}>{label}</p>
+              <p style={{ color:'#1C252E', fontSize:24, fontWeight:800, lineHeight:1.1, marginBottom:3 }}>{value}</p>
+              <p style={{ color:'#9AAAB8', fontSize:12 }}>{sub}</p>
+            </div>
+            <div style={{ width:42, height:42, borderRadius:12, background:bg, flexShrink:0, display:'flex', alignItems:'center', justifyContent:'center' }}>
+              <div style={{ width:16, height:16, borderRadius:4, background:color, opacity:0.8 }}/>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Evolução mensal */}
+      <div className="card" style={{ padding:'22px' }}>
+        <p style={{ color:'#1C252E', fontSize:15, fontWeight:700, marginBottom:4 }}>Evolução mensal</p>
+        <p style={{ color:'#9AAAB8', fontSize:12, marginBottom:20 }}>Alcance e volume de posts ETF por mês</p>
+        <ResponsiveContainer width="100%" height={240}>
+          <BarChart data={byMonth} margin={{top:16,right:8,left:0,bottom:0}} barGap={4}>
+            <XAxis dataKey="mes" tick={{ fill:'#9AAAB8', fontSize:11 }} axisLine={false} tickLine={false}/>
+            <YAxis yAxisId="left" tick={{ fill:'#9AAAB8', fontSize:10 }} axisLine={false} tickLine={false}
+              tickFormatter={v=>v===0?'':fmt(v)} width={44}/>
+            <YAxis yAxisId="right" orientation="right" tick={{ fill:'#9AAAB8', fontSize:10 }}
+              axisLine={false} tickLine={false} width={24}
+              tickFormatter={v=>v===0?'':v} allowDecimals={false}/>
+            <Tooltip
+              formatter={(v,name) => name==='alcance' ? [fmt(v),'Alcance'] : [v,'Nº de posts']}
+              labelFormatter={(_,p) => p?.[0]?.payload?.mesFull || ''}
+              contentStyle={{ borderRadius:10, border:'1px solid #EAECF0', fontSize:12, boxShadow:'0 4px 16px rgba(0,0,0,0.08)' }}
+            />
+            <Legend formatter={v => v==='alcance'?'Alcance':'Nº de posts'} wrapperStyle={{ fontSize:12, color:'#9AAAB8' }}/>
+            <Bar yAxisId="left" dataKey="alcance" radius={[8,8,0,0]} barSize={22}>
+              {byMonth.map((e,i) => (
+                <Cell key={i} fill={e.alcance>0?'#0891B2':'#F0F2F5'}/>
+              ))}
+            </Bar>
+            <Bar yAxisId="right" dataKey="posts" radius={[6,6,0,0]} fill="rgba(8,145,178,0.18)" barSize={14}/>
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+
+      {/* Top posts + Performance por formato */}
+      <div style={{ display:'grid', gridTemplateColumns:'2fr 1fr', gap:16 }} className="annual-grid">
+
+        {/* Top posts */}
+        <div className="card" style={{ padding:'22px' }}>
+          <p style={{ color:'#1C252E', fontSize:15, fontWeight:700, marginBottom:4 }}>Top posts ETF</p>
+          <p style={{ color:'#9AAAB8', fontSize:12, marginBottom:18 }}>Clique para editar</p>
+          <div style={{ display:'flex', flexDirection:'column', gap:9 }}>
+            {topPosts.length === 0 && (
+              <p style={{ color:'#9AAAB8', fontSize:13, textAlign:'center', padding:'32px 0' }}>
+                Nenhum post com tema ETF encontrado
+              </p>
+            )}
+            {topPosts.map((p,i) => {
+              const barW = maxAlc > 0 ? ((p.contas_alcancadas||0)/maxAlc)*100 : 0
+              const medals = ['🥇','🥈','🥉']
+              return (
+                <div key={p.id} onClick={() => setEditTarget(p)}
+                  style={{ display:'flex', alignItems:'center', gap:10, cursor:'pointer',
+                    padding:'8px 10px', borderRadius:10, border:'1px solid #F0F4F8', transition:'background 0.12s' }}
+                  onMouseEnter={e => e.currentTarget.style.background='#F8FAFC'}
+                  onMouseLeave={e => e.currentTarget.style.background='transparent'}
+                >
+                  <span style={{ fontSize:14, width:22, textAlign:'center', flexShrink:0 }}>
+                    {i < 3 ? medals[i] : `${i+1}º`}
+                  </span>
+                  {(p.imageUrl||p.imageData) ? (
+                    <img src={p.imageUrl||p.imageData} alt=""
+                      style={{ width:38, height:38, objectFit:'cover', borderRadius:7, flexShrink:0 }}/>
+                  ) : (
+                    <div style={{ width:38, height:38, borderRadius:7, background:'rgba(8,145,178,0.1)',
+                      flexShrink:0, display:'flex', alignItems:'center', justifyContent:'center', fontSize:16 }}>
+                      📊
+                    </div>
+                  )}
+                  <div style={{ flex:1, minWidth:0 }}>
+                    <p style={{ color:'#1C252E', fontSize:12, fontWeight:600, overflow:'hidden',
+                      textOverflow:'ellipsis', whiteSpace:'nowrap', marginBottom:4 }}>
+                      {p.nome||p.tema||'—'}
+                    </p>
+                    <div style={{ background:'#F0F2F5', borderRadius:3, height:4, overflow:'hidden' }}>
+                      <div style={{ height:'100%', borderRadius:3,
+                        background: i===0?'#FF6200':'#0891B2', width:`${barW}%`, transition:'width 0.5s' }}/>
+                    </div>
+                  </div>
+                  <div style={{ textAlign:'right', flexShrink:0 }}>
+                    <p style={{ color: i===0?'#FF6200':'#1C252E', fontSize:13, fontWeight:800 }}>
+                      {fmt(p.contas_alcancadas)}
+                    </p>
+                    <p style={{ color:'#9AAAB8', fontSize:10 }}>{p.data_post}</p>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+
+        {/* Performance por formato */}
+        <div className="card" style={{ padding:'22px' }}>
+          <p style={{ color:'#1C252E', fontSize:15, fontWeight:700, marginBottom:4 }}>Por formato</p>
+          <p style={{ color:'#9AAAB8', fontSize:12, marginBottom:18 }}>Dentro do tema ETFs</p>
+          <div style={{ display:'flex', flexDirection:'column', gap:18 }}>
+            {porTipo.map((t,i) => (
+              <div key={t.tipo}>
+                <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:7 }}>
+                  <div style={{ display:'flex', alignItems:'center', gap:7 }}>
+                    <div style={{ width:9, height:9, borderRadius:3,
+                      background: TIPO_COLOR[t.tipo] || '#0EA5E9' }}/>
+                    <span style={{ color:'#1C252E', fontSize:13, fontWeight:500 }}>{t.tipo}</span>
+                    {i===0 && t.total>0 && (
+                      <span style={{ background:'rgba(255,98,0,0.1)', color:'#FF6200',
+                        borderRadius:6, padding:'1px 7px', fontSize:10, fontWeight:700 }}>Líder</span>
+                    )}
+                  </div>
+                  <div style={{ textAlign:'right' }}>
+                    <span style={{ color:'#1C252E', fontSize:13, fontWeight:700 }}>{fmt(t.total)}</span>
+                    <span style={{ color:'#9AAAB8', fontSize:11, marginLeft:5 }}>{t.count} posts</span>
+                  </div>
+                </div>
+                <div style={{ background:'#F0F2F5', borderRadius:4, height:6, overflow:'hidden', marginBottom:4 }}>
+                  <div style={{ height:'100%', borderRadius:4,
+                    background: TIPO_COLOR[t.tipo]||'#0EA5E9',
+                    width:`${maxTipo>0?(t.total/maxTipo)*100:0}%`, transition:'width 0.5s' }}/>
+                </div>
+                <p style={{ color:'#9AAAB8', fontSize:11 }}>
+                  Média: {fmt(t.media)} · {pct(t.total, totalEtf)} do total ETF
+                </p>
+              </div>
+            ))}
+          </div>
+
+          {/* Participação vs outros temas */}
+          <div style={{ marginTop:24, paddingTop:20, borderTop:'1px solid #F0F4F8' }}>
+            <p style={{ color:'#1C252E', fontSize:13, fontWeight:700, marginBottom:14 }}>ETFs vs outros temas</p>
+            <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
+              {temaRank.slice(0,5).map(([tema,val]) => {
+                const isEtf = ETF_TEMAS.includes(tema)
+                return (
+                  <div key={tema}>
+                    <div style={{ display:'flex', justifyContent:'space-between', marginBottom:4 }}>
+                      <span style={{ color: isEtf?'#0891B2':'#1C252E', fontSize:12,
+                        fontWeight: isEtf?700:400 }}>{tema}</span>
+                      <span style={{ color:'#9AAAB8', fontSize:11 }}>{fmt(val)}</span>
+                    </div>
+                    <div style={{ background:'#F0F2F5', borderRadius:3, height:4, overflow:'hidden' }}>
+                      <div style={{ height:'100%', borderRadius:3,
+                        background: isEtf?'#0891B2':'#D0D8E0',
+                        width:`${(val/maxTema)*100}%`, transition:'width 0.5s' }}/>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {editTarget && (
+        <UploadModal mode="update" post={editTarget}
+          onClose={() => setEditTarget(null)}
+          onSave={dados => { updatePost(editTarget.id, dados); setEditTarget(null) }}
+          onDelete={() => { deletePost(editTarget.id); setEditTarget(null) }}
+        />
+      )}
+    </div>
+  )
+}

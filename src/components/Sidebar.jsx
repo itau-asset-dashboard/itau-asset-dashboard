@@ -1,4 +1,4 @@
-import { BarChart2, Calendar, List, Lightbulb, Upload } from 'lucide-react'
+import { BarChart2, Calendar, List, Lightbulb, Upload, TrendingUp } from 'lucide-react'
 import { useStore } from '../store/useStore'
 
 const nav = [
@@ -6,6 +6,7 @@ const nav = [
   { id: 'visao-geral',  icon: BarChart2, label: 'Visão Mensal' },
   { id: 'posts',        icon: List,      label: 'Todos os Posts' },
   { id: 'insights',     icon: Lightbulb, label: 'Insights' },
+  { id: 'etfs',         icon: TrendingUp, label: 'ETFs' },
   { id: 'upload',       icon: Upload,    label: 'Upload' },
 ]
 

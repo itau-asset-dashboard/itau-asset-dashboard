@@ -14,6 +14,7 @@ import RightPanel from './components/RightPanel'
 import SyncBadge from './components/SyncBadge'
 import AnnualView from './components/AnnualView'
 import TopPostsMes from './components/TopPostsMes'
+import ETFsView from './components/ETFsView'
 
 export default function App() {
   const { activeSection, syncFromCloud } = useStore()
@@ -32,6 +33,7 @@ export default function App() {
           {activeSection === 'upload'      && <UploadSection />}
           {activeSection === 'insights'    && <Insights />}
           {activeSection === 'posts'       && <PostsRanking />}
+          {activeSection === 'etfs'        && <ETFsView />}
           {activeSection === 'visao-anual' && <AnnualView />}
           {activeSection === 'visao-geral' && (
             <>
