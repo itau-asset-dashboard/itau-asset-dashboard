@@ -1,5 +1,5 @@
 import { useStore } from '../store/useStore'
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine, Cell } from 'recharts'
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, LabelList } from 'recharts'
 import { Users, TrendingUp, Award, LayoutGrid } from 'lucide-react'
 
 const MESES_LABEL  = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez']
@@ -22,9 +22,9 @@ export default function AnnualView() {
   const total   = posts.reduce((s,p)=>s+(p.contas_alcancadas||0),0)
   const media   = posts.length > 0 ? Math.round(total/posts.length) : 0
   const melhor  = posts.length > 0 ? posts.reduce((a,b)=>(a.contas_alcancadas||0)>(b.contas_alcancadas||0)?a:b,posts[0]) : null
-  const pct     = metaAnual > 0 ? Math.min((total/metaAnual)*100,100) : 0
-  const metaMes = Math.round(metaAnual/12)
-  const restante = Math.max(metaAnual - total, 0)
+  const pct       = metaAnual > 0 ? Math.min((total/metaAnual)*100,100) : 0
+  const metaMesAtualizada = getMetaMesAjustada(mesFiltro) // meta dinâmica do mês atual
+  const restante  = Math.max(metaAnual - total, 0)
 
   // Dados mensais com meta ajustada por mês
   const byMonth = Array.from({length:12},(_,i)=>{
@@ -139,40 +139,45 @@ export default function AnnualView() {
             <p style={{ color:'#1C252E', fontSize:18, fontWeight:700 }}>{fmt(restante)}</p>
           </div>
 
-          <div style={{ marginTop:10, padding:'12px 14px', background:'#F8FAFC', borderRadius:10 }}>
-            <p style={{ color:'#9AAAB8', fontSize:11, marginBottom:4 }}>Meta mensal de referência</p>
-            <p style={{ color:'#1C252E', fontSize:18, fontWeight:700 }}>{fmt(metaMes)}</p>
+          <div style={{ marginTop:10, padding:'12px 14px', background:'#FFF7F0', borderRadius:10, border:'1px solid rgba(255,98,0,0.12)' }}>
+            <p style={{ color:'#9AAAB8', fontSize:11, marginBottom:4 }}>Meta mensal atualizada</p>
+            <p style={{ color:'#FF6200', fontSize:18, fontWeight:700 }}>{fmt(metaMesAtualizada)}</p>
+            <p style={{ color:'#9AAAB8', fontSize:10, marginTop:2 }}>↻ ajustada pelo saldo acumulado</p>
           </div>
         </div>
 
         {/* Gráfico mensal */}
         <div className="card" style={{ padding:'22px' }}>
-          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:20 }}>
+          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:20 }}>
             <div>
               <p style={{ color:'#1C252E', fontSize:15, fontWeight:700 }}>Contas alcançadas por mês</p>
-              <p style={{ color:'#9AAAB8', fontSize:12, marginTop:2 }}>Barras laranja = acima da meta mensal</p>
+              <p style={{ color:'#9AAAB8', fontSize:12, marginTop:2 }}>
+                <span style={{ display:'inline-block', width:10, height:10, borderRadius:3, background:'#FF6200', marginRight:5, verticalAlign:'middle' }}/>
+                Acima da meta
+                <span style={{ display:'inline-block', width:10, height:10, borderRadius:3, background:'#C3EBF7', marginLeft:12, marginRight:5, verticalAlign:'middle' }}/>
+                Abaixo da meta
+              </p>
             </div>
           </div>
-          <ResponsiveContainer width="100%" height={220}>
-            <BarChart data={byMonth} barSize={24} margin={{top:4,right:4,left:0,bottom:0}}>
+          <ResponsiveContainer width="100%" height={230}>
+            <BarChart data={byMonth} barSize={28} margin={{top:18,right:8,left:0,bottom:0}}>
               <XAxis dataKey="mes" tick={{ fill:'#9AAAB8', fontSize:11 }} axisLine={false} tickLine={false}/>
               <YAxis tick={{ fill:'#9AAAB8', fontSize:10 }} axisLine={false} tickLine={false}
                 tickFormatter={v=>v===0?'':fmt(v)} width={44}/>
               <Tooltip
-                formatter={(v,name,p)=> name==='total'
-                  ? [fmt(v), `${p.payload.mesFull} · ${p.payload.count} posts`]
-                  : [fmt(v), 'Meta ajustada']
-                }
+                formatter={(v,_,p)=>[fmt(v), `${p.payload.mesFull} · ${p.payload.count} posts · meta ${fmt(p.payload.meta)}`]}
                 contentStyle={{ borderRadius:10, border:'1px solid #EAECF0', fontSize:12, boxShadow:'0 4px 16px rgba(0,0,0,0.08)' }}
                 labelStyle={{ display:'none' }}
+                cursor={{ fill:'rgba(0,0,0,0.04)' }}
               />
-              <Bar dataKey="meta" fill="transparent" stroke="#FF6200" strokeDasharray="4 3"
-                strokeOpacity={0.5} radius={[4,4,0,0]} barSize={24}/>
-              <Bar dataKey="total" radius={[6,6,0,0]}>
+              <Bar dataKey="total" radius={[8,8,0,0]}>
                 {byMonth.map((entry,i)=>(
-                  <Cell key={i} fill={entry.total >= entry.meta && entry.total > 0 ? '#FF6200' : '#C3EBF7'}
-                    opacity={entry.total === 0 ? 0.25 : 1}/>
+                  <Cell key={i}
+                    fill={entry.total === 0 ? '#F0F2F5' : entry.total >= entry.meta ? '#FF6200' : '#C3EBF7'}
+                  />
                 ))}
+                <LabelList dataKey="total" position="top" formatter={v=>v>0?fmt(v):''}
+                  style={{ fill:'#9AAAB8', fontSize:9, fontWeight:600 }}/>
               </Bar>
             </BarChart>
           </ResponsiveContainer>

@@ -13,6 +13,7 @@ import UploadSection from './components/UploadSection'
 import RightPanel from './components/RightPanel'
 import SyncBadge from './components/SyncBadge'
 import AnnualView from './components/AnnualView'
+import TopPostsMes from './components/TopPostsMes'
 
 export default function App() {
   const { activeSection, syncFromCloud } = useStore()
@@ -35,6 +36,7 @@ export default function App() {
           {activeSection === 'visao-geral' && (
             <>
               <KPICards />
+              <TopPostsMes />
               <PostsChart />
               <TypeComparison />
               <ThemeAnalysis />
