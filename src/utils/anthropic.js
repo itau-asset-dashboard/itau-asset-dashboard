@@ -73,23 +73,26 @@ export async function generateInsights(posts, apiKey) {
     },
     body: JSON.stringify({
       model: 'claude-haiku-4-5-20251001',
-      max_tokens: 1200,
+      max_tokens: 2000,
       messages: [{
         role: 'user',
         content: `Você é um analista de redes sociais especializado em finanças e investimentos.
-Analise os dados de posts do Instagram abaixo e gere de 3 a 5 insights estratégicos em português brasileiro.
+Analise os dados de posts do Instagram abaixo e gere EXATAMENTE 8 insights estratégicos em português brasileiro.
 
 Dados dos posts:
 ${JSON.stringify(resumo, null, 2)}
 
-Foque em:
+Cubra obrigatoriamente esses 8 ângulos (um insight por ângulo):
 1. Qual tipo de post (Carrossel, Reels, Foto estática) performa melhor em contas alcançadas
 2. Qual tema tem maior alcance médio
 3. Tendência de contas alcançadas ao longo do tempo
-4. Posts com dados parciais que merecem atenção especial
-5. Recomendações para maximizar o alcance
+4. Melhor dia ou período de publicação identificado nos dados
+5. Relação entre engajamento (curtidas + comentários + salvamentos) e alcance
+6. Posts com dados parciais que merecem atenção especial
+7. Comparação entre os 3 posts de maior e menor alcance — o que os diferencia
+8. Recomendação prioritária para maximizar o alcance no próximo mês
 
-Retorne APENAS um JSON válido (sem markdown):
+Retorne APENAS um JSON válido com exatamente 8 objetos (sem markdown, sem texto fora do JSON):
 [
   { "icone": "📈", "titulo": "título curto", "texto": "insight detalhado em 2-3 frases" },
   ...

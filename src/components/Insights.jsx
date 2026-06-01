@@ -3,9 +3,14 @@ import { useStore } from '../store/useStore'
 import { generateInsights } from '../utils/anthropic'
 
 const DEFAULT = [
-  { icone:'📈', titulo:'Configure sua chave de API', texto:'Clique em "API ativa" na barra superior para inserir sua chave Anthropic e ativar insights automáticos.' },
-  { icone:'📊', titulo:'Dados prontos para análise',  texto:'Com pelo menos 2 posts cadastrados, você pode gerar análise completa de performance e recomendações estratégicas.' },
-  { icone:'💡', titulo:'Dica de upload',              texto:'Use o botão "Novo post" no painel lateral para adicionar prints de métricas diretamente do Instagram.' },
+  { icone:'🔑', titulo:'Configure sua chave de API',     texto:'Clique em "API ativa" na barra superior para inserir sua chave Anthropic e ativar insights automáticos.' },
+  { icone:'📊', titulo:'Dados prontos para análise',     texto:'Com pelo menos 2 posts cadastrados, você pode gerar análise completa de performance e recomendações estratégicas.' },
+  { icone:'💡', titulo:'Dica de upload',                 texto:'Use o botão "Novo post" para adicionar prints de métricas diretamente do Instagram com extração automática por IA.' },
+  { icone:'📈', titulo:'Acompanhe sua meta mensal',      texto:'Na Visão Anual você encontra a meta ajustada mês a mês com base no saldo acumulado do ano.' },
+  { icone:'🎯', titulo:'Top posts por mês',              texto:'Na Visão Mensal você vê o ranking dos 5 melhores posts do período com medalhas e barras de progresso.' },
+  { icone:'📂', titulo:'Múltiplos temas por post',       texto:'Ao cadastrar um post você pode selecionar mais de um tema, facilitando análises cruzadas.' },
+  { icone:'🔖', titulo:'Aba dedicada a ETFs',            texto:'A aba ETFs mostra KPIs, evolução mensal de alcance e volume de posts, top posts e performance por formato.' },
+  { icone:'☁️', titulo:'Sincronização automática',      texto:'Todos os dados ficam salvos na nuvem e são compartilhados entre dispositivos automaticamente ao abrir o app.' },
 ]
 
 export default function Insights() {
