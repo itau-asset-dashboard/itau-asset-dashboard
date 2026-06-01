@@ -1,0 +1,12 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "itau-asset-dashboard",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev", "--", "--port", "5175"],
+      "cwd": "/Users/isabellacarvalho/Desktop/itau-asset-dashboard",
+      "port": 5175
+    }
+  ]
+}

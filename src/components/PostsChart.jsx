@@ -1,0 +1,111 @@
+import {
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ReferenceLine,
+  ResponsiveContainer, Cell
+} from 'recharts'
+import { useStore } from '../store/useStore'
+
+function fmt(n) {
+  if (n >= 1000000) return (n / 1000000).toFixed(1) + 'M'
+  if (n >= 1000) return (n / 1000).toFixed(0) + 'K'
+  return n
+}
+
+const COLOR = { Carrossel: '#FF6200', Reels: '#1C252E', 'Foto estática': '#C3EBF7' }
+const BORDER_COLOR = { 'Foto estática': '#3a7a96' }
+
+const CustomTooltip = ({ active, payload }) => {
+  if (!active || !payload?.length) return null
+  const d = payload[0].payload
+  return (
+    <div style={{
+      background: '#fff', border: '1px solid #E8ECF0', borderRadius: 14,
+      padding: '12px 16px', boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
+      fontSize: 13, minWidth: 200
+    }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+        <div style={{ width: 8, height: 8, borderRadius: 2, background: COLOR[d.tipo] || '#ccc', flexShrink: 0 }} />
+        <p style={{ fontWeight: 600, color: '#1C252E', margin: 0, fontSize: 13 }}>{d.tema}</p>
+      </div>
+      <p style={{ color: '#8A9BB0', margin: '0 0 6px', fontSize: 12 }}>{d.data_post} · {d.tipo}</p>
+      <p style={{ color: '#FF6200', fontWeight: 700, fontSize: 18, margin: 0 }}>
+        {(d.contas_alcancadas || 0).toLocaleString('pt-BR')}
+        <span style={{ color: '#8A9BB0', fontSize: 12, fontWeight: 400 }}> contas</span>
+      </p>
+      {d.status === 'parcial' && (
+        <p style={{ color: '#f59e0b', fontSize: 11, marginTop: 6, margin: '6px 0 0' }}>🕐 Dados ainda parciais</p>
+      )}
+    </div>
+  )
+}
+
+export default function PostsChart() {
+  const { getPostsDoMes } = useStore()
+  const posts = getPostsDoMes()
+
+  const data = [...posts].sort((a, b) => {
+    const parse = (s) => { const [d,m,y] = (s||'').split('/'); return new Date(`${y}-${m}-${d}`) }
+    return parse(a.data_post) - parse(b.data_post)
+  }).map(p => ({ ...p, label: p.data_post?.slice(0, 5) || '—' }))
+
+  const media = data.length > 0
+    ? Math.round(data.reduce((s, p) => s + (p.contas_alcancadas || 0), 0) / data.length)
+    : 0
+
+  return (
+    <div className="card" style={{ padding: '20px 22px', marginBottom: 18 }}>
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 18 }}>
+        <div>
+          <h2 style={{ color: '#1C252E', fontSize: 15, fontWeight: 700, margin: 0 }}>
+            Contas alcançadas por post
+          </h2>
+          <p style={{ color: '#8A9BB0', fontSize: 12, marginTop: 2 }}>Ordenado por data de publicação</p>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+          {Object.entries(COLOR).map(([tipo, cor]) => (
+            <div key={tipo} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+              <div style={{
+                width: 9, height: 9, borderRadius: 3, background: cor,
+                border: BORDER_COLOR[tipo] ? `1.5px solid ${BORDER_COLOR[tipo]}` : 'none'
+              }} />
+              <span style={{ color: '#8A9BB0', fontSize: 12 }}>{tipo}</span>
+            </div>
+          ))}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+            <div style={{ width: 16, borderTop: '2px dashed #8A9BB0' }} />
+            <span style={{ color: '#8A9BB0', fontSize: 12 }}>Média</span>
+          </div>
+        </div>
+      </div>
+
+      {data.length === 0 ? (
+        <div style={{ height: 220, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <p style={{ color: '#8A9BB0', fontSize: 14 }}>Nenhum post no período</p>
+        </div>
+      ) : (
+        <ResponsiveContainer width="100%" height={220}>
+          <BarChart data={data} margin={{ top: 4, right: 16, left: 0, bottom: 0 }}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#F0F2F5" vertical={false} />
+            <XAxis dataKey="label" tick={{ fontSize: 11, fill: '#8A9BB0' }} axisLine={false} tickLine={false} />
+            <YAxis tickFormatter={fmt} tick={{ fontSize: 11, fill: '#8A9BB0' }} axisLine={false} tickLine={false} width={44} />
+            <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(0,0,0,0.03)', radius: 6 }} />
+            {media > 0 && (
+              <ReferenceLine y={media} stroke="#8A9BB0" strokeDasharray="5 3" strokeWidth={1.5}
+                label={{ value: `${fmt(media)}`, position: 'right', fill: '#8A9BB0', fontSize: 11 }} />
+            )}
+            <Bar dataKey="contas_alcancadas" radius={[6, 6, 0, 0]} maxBarSize={44}>
+              {data.map((entry) => (
+                <Cell
+                  key={entry.id}
+                  fill={COLOR[entry.tipo] || '#C3EBF7'}
+                  opacity={entry.status === 'parcial' ? 0.5 : 1}
+                  stroke={entry.tipo === 'Foto estática' ? '#3a7a96' : 'none'}
+                  strokeWidth={entry.tipo === 'Foto estática' ? 1.5 : 0}
+                />
+              ))}
+            </Bar>
+          </BarChart>
+        </ResponsiveContainer>
+      )}
+    </div>
+  )
+}
