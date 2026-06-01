@@ -183,33 +183,57 @@ const SinglePostModal = forwardRef(function SinglePostModal({ initialPost, initi
           onClick={() => setLightbox(false)}
           style={{
             position: 'fixed', inset: 0, zIndex: 2000,
-            background: 'rgba(0,0,0,0.9)',
-            display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-            padding: 24, cursor: 'zoom-out',
+            background: 'rgba(0,0,0,0.93)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            cursor: 'zoom-out',
           }}
         >
-          {/* Usa imageUrl (alta qualidade, Storage) se disponível */}
-          <img
-            src={form.imageUrl || preview}
-            alt="Última evidência"
-            style={{
-              maxWidth: '100%', maxHeight: '85vh',
-              borderRadius: 12, boxShadow: '0 8px 48px rgba(0,0,0,0.6)',
-              objectFit: 'contain', cursor: 'default',
-            }}
+          {/* Imagem ocupa quase toda a tela, scroll se necessário */}
+          <div
             onClick={e => e.stopPropagation()}
-          />
-          {form.data_post && (
-            <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: 12, marginTop: 12 }}>
-              📅 {formatDate(form.data_post)}
-            </p>
-          )}
+            style={{
+              position: 'relative',
+              maxWidth: 'calc(100vw - 48px)',
+              maxHeight: 'calc(100vh - 48px)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              cursor: 'default',
+              overflow: 'auto',
+            }}
+          >
+            <img
+              src={form.imageUrl || preview}
+              alt="Última evidência"
+              style={{
+                width: '100%',
+                maxWidth: '96vw',
+                maxHeight: '94vh',
+                objectFit: 'contain',
+                borderRadius: 10,
+                boxShadow: '0 12px 60px rgba(0,0,0,0.7)',
+                display: 'block',
+              }}
+            />
+            {/* Rodapé com data */}
+            {form.data_post && (
+              <div style={{
+                position: 'absolute', bottom: -32, left: 0, right: 0,
+                textAlign: 'center',
+              }}>
+                <span style={{ color: 'rgba(255,255,255,0.5)', fontSize: 12 }}>
+                  📅 {formatDate(form.data_post)}
+                </span>
+              </div>
+            )}
+          </div>
+
+          {/* Botão fechar */}
           <button onClick={() => setLightbox(false)} style={{
-            position: 'absolute', top: 16, right: 16,
-            background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.2)',
-            borderRadius: '50%', width: 38, height: 38, cursor: 'pointer',
-            color: '#fff', fontSize: 16,
+            position: 'fixed', top: 14, right: 14,
+            background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.18)',
+            borderRadius: '50%', width: 40, height: 40, cursor: 'pointer',
+            color: '#fff', fontSize: 18,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
+            zIndex: 2001,
           }}>✕</button>
         </div>
       )}
