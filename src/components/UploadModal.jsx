@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef, useImperativeHandle, forwardRef } from 'react'
 import { X, Upload, Check, Sparkles, Trash2, ChevronRight } from 'lucide-react'
 import { extractPostFromImage } from '../utils/anthropic'
 import { useStore } from '../store/useStore'
@@ -15,6 +15,10 @@ export const TEMAS = [
   'ETFs em destaque',
   'Educacionais ETFs',
   'Ring the bell',
+  'Dump',
+  'Live',
+  'Dividendos',
+  'Premiações',
 ]
 
 const NUM_FIELDS = [
@@ -67,7 +71,7 @@ const EMPTY = {
 }
 
 // ─── Modal para um único post ────────────────────────────────────────────────
-function SinglePostModal({ initialPost, initialPreview, onClose, onSave, onDelete, showNext, currentIdx, totalFiles }) {
+const SinglePostModal = forwardRef(function SinglePostModal({ initialPost, initialPreview, onClose, onSave, onDelete, showNext, currentIdx, totalFiles }, ref) {
   const { apiKey } = useStore()
   const [preview,  setPreview]  = useState(initialPreview || initialPost?.imageData || null)
   const [loading,  setLoading]  = useState(false)
@@ -78,6 +82,11 @@ function SinglePostModal({ initialPost, initialPreview, onClose, onSave, onDelet
   const [form, setForm] = useState(initialPost ? { ...EMPTY, ...initialPost } : { ...EMPTY })
 
   const isUpdate = !!initialPost?.id
+
+  // Expose snapshot so MultiUploadModal can save state before navigating
+  useImperativeHandle(ref, () => ({
+    getSnapshot: () => ({ form, preview }),
+  }))
 
   function handleFile(file) {
     if (!file) return
@@ -211,16 +220,26 @@ function SinglePostModal({ initialPost, initialPreview, onClose, onSave, onDelet
           autoFocus={!isUpdate} />
       </div>
 
-      {/* Tema — select */}
+      {/* Tema — pills */}
       <div>
-        <label style={{ color: '#8A9BB0', fontSize: 11, fontWeight: 600, display: 'block', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+        <label style={{ color: '#8A9BB0', fontSize: 11, fontWeight: 600, display: 'block', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
           Tema
         </label>
-        <select value={form.tema || ''} onChange={e => set('tema', e.target.value)}
-          style={{ ...inp(false), background: '#fff' }}>
-          <option value="">— Selecione um tema —</option>
-          {TEMAS.map(t => <option key={t} value={t}>{t}</option>)}
-        </select>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+          {TEMAS.map(t => (
+            <button key={t} type="button" onClick={() => set('tema', form.tema === t ? '' : t)}
+              style={{
+                padding: '5px 12px', borderRadius: 20, fontSize: 12, cursor: 'pointer',
+                fontFamily: 'DM Sans, sans-serif', fontWeight: form.tema === t ? 700 : 400,
+                background: form.tema === t ? '#1C252E' : '#F0F4F8',
+                color: form.tema === t ? '#C3EBF7' : '#4A6272',
+                border: form.tema === t ? '1.5px solid #1C252E' : '1.5px solid #E0E7EF',
+                transition: 'all 0.12s',
+              }}>
+              {t}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Descrição */}
@@ -316,7 +335,7 @@ function SinglePostModal({ initialPost, initialPreview, onClose, onSave, onDelet
       </div>
     </div>
   )
-}
+})
 
 // ─── Modal principal (suporta 1 ou vários arquivos) ──────────────────────────
 export default function UploadModal({ mode = 'new', post = null, onClose, onSave, onDelete }) {
@@ -351,9 +370,11 @@ export default function UploadModal({ mode = 'new', post = null, onClose, onSave
 
 // ─── Modal de múltiplos uploads ──────────────────────────────────────────────
 function MultiUploadModal({ onClose, onSave }) {
-  const [files, setFiles]     = useState([])  // Array de { name, dataUrl }
-  const [current, setCurrent] = useState(0)
-  const [dragging, setDragging] = useState(false)
+  const [files, setFiles]         = useState([])  // Array de { name, dataUrl }
+  const [current, setCurrent]     = useState(0)
+  const [dragging, setDragging]   = useState(false)
+  const [formStates, setFormStates] = useState([]) // saved { form, preview } per index
+  const singleRef = useRef(null)
 
   function loadFiles(fileList) {
     const arr = Array.from(fileList).filter(f => f.type.startsWith('image/'))
@@ -366,7 +387,21 @@ function MultiUploadModal({ onClose, onSave }) {
     Promise.all(readers).then(loaded => {
       setFiles(loaded)
       setCurrent(0)
+      setFormStates([])
     })
+  }
+
+  // Save current form state then navigate to idx
+  function navigateTo(idx) {
+    if (singleRef.current) {
+      const snapshot = singleRef.current.getSnapshot()
+      setFormStates(prev => {
+        const next = [...prev]
+        next[current] = snapshot
+        return next
+      })
+    }
+    setCurrent(idx)
   }
 
   if (files.length === 0) {
@@ -406,8 +441,15 @@ function MultiUploadModal({ onClose, onSave }) {
     )
   }
 
-  const currentFile = files[current]
   const isLast = current === files.length - 1
+
+  // Restored state for current index (if user navigated back)
+  const savedState = formStates[current]
+  const defaultName = files[current]
+    ? files[current].name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' ').replace(/\b\w/g, c => c.toUpperCase()).trim()
+    : ''
+  const initialPost    = savedState?.form    ?? { nome: defaultName }
+  const initialPreview = savedState?.preview ?? files[current]?.dataUrl ?? null
 
   return (
     <div style={{ position: 'fixed', inset: 0, background: 'rgba(28,37,46,0.65)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
@@ -426,9 +468,9 @@ function MultiUploadModal({ onClose, onSave }) {
         {files.length > 1 && (
           <div style={{ padding: '10px 20px 0', display: 'flex', gap: 6, overflowX: 'auto' }} className="scrollbar-thin">
             {files.map((f, i) => (
-              <div key={i} onClick={() => setCurrent(i)}
+              <div key={i} onClick={() => navigateTo(i)}
                 style={{ flexShrink: 0, width: 44, height: 44, borderRadius: 8, overflow: 'hidden', cursor: 'pointer',
-                  border: `2px solid ${i === current ? '#FF6200' : '#E8ECF0'}`, opacity: i < current ? 0.4 : 1 }}>
+                  border: `2px solid ${i === current ? '#FF6200' : '#E8ECF0'}` }}>
                 <img src={f.dataUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               </div>
             ))}
@@ -437,15 +479,16 @@ function MultiUploadModal({ onClose, onSave }) {
 
         <SinglePostModal
           key={current}
-          initialPost={{ nome: files[current] ? files[current].name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' ').replace(/\b\w/g, c => c.toUpperCase()).trim() : '' }}
-          initialPreview={currentFile?.dataUrl || null}
+          ref={singleRef}
+          initialPost={initialPost}
+          initialPreview={initialPreview}
           onClose={onClose}
           onSave={dados => {
             onSave(dados)
-            if (!isLast) setCurrent(c => c + 1)
+            if (!isLast) navigateTo(current + 1)
             else onClose()
           }}
-          showNext={!isLast ? () => setCurrent(c => c + 1) : null}
+          showNext={!isLast ? () => navigateTo(current + 1) : null}
           currentIdx={current}
           totalFiles={files.length}
         />
