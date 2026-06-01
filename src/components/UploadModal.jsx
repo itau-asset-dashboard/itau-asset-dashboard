@@ -51,8 +51,10 @@ function fileToName(filename) {
 
 async function compressImage(dataUrl, maxPx = 800, quality = 0.72) {
   return new Promise(resolve => {
+    const timer = setTimeout(() => resolve(dataUrl), 8000) // timeout 8s
     const img = new Image()
     img.onload = () => {
+      clearTimeout(timer)
       try {
         const scale = Math.min(maxPx / img.width, maxPx / img.height, 1)
         const canvas = document.createElement('canvas')
@@ -61,10 +63,10 @@ async function compressImage(dataUrl, maxPx = 800, quality = 0.72) {
         canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height)
         resolve(canvas.toDataURL('image/jpeg', quality))
       } catch (_) {
-        resolve(dataUrl) // fallback: usa original
+        resolve(dataUrl)
       }
     }
-    img.onerror = () => resolve(dataUrl) // fallback se imagem não carregar
+    img.onerror = () => { clearTimeout(timer); resolve(dataUrl) }
     img.src = dataUrl
   })
 }
@@ -83,6 +85,7 @@ const SinglePostModal = forwardRef(function SinglePostModal({ initialPost, initi
   const [loading,  setLoading]  = useState(false)
   const [error,    setError]    = useState(null)
   const [saved,    setSaved]    = useState(false)
+  const [saving,   setSaving]   = useState(false)
   const [dragging, setDragging] = useState(false)
   const [confirmDelete, setConfirmDelete] = useState(false)
   const [form, setForm] = useState(initialPost ? { ...EMPTY, ...initialPost } : { ...EMPTY })
@@ -132,6 +135,8 @@ const SinglePostModal = forwardRef(function SinglePostModal({ initialPost, initi
   }
 
   async function save() {
+    if (saving) return
+    setSaving(true)
     try {
       const compressed = preview ? await compressImage(preview) : form.imageData
       const dados = {
@@ -141,8 +146,10 @@ const SinglePostModal = forwardRef(function SinglePostModal({ initialPost, initi
       }
       onSave(dados)
       setSaved(true)
+      setSaving(false)
       setTimeout(() => setSaved(false), 1200)
     } catch (e) {
+      setSaving(false)
       setError('Erro ao salvar. Tente novamente.')
     }
   }
@@ -317,14 +324,14 @@ const SinglePostModal = forwardRef(function SinglePostModal({ initialPost, initi
 
       {/* Salvar + Excluir */}
       <div style={{ display: 'flex', gap: 8 }}>
-        <button onClick={save} style={{
-          flex: 1, background: saved ? '#22c55e' : '#1C252E',
-          color: saved ? '#fff' : '#C3EBF7', border: 'none', borderRadius: 12,
-          padding: '12px', fontSize: 14, fontWeight: 700, cursor: 'pointer',
+        <button onClick={save} disabled={saving} style={{
+          flex: 1, background: saved ? '#22c55e' : saving ? '#4A6272' : '#1C252E',
+          color: '#C3EBF7', border: 'none', borderRadius: 12,
+          padding: '12px', fontSize: 14, fontWeight: 700, cursor: saving ? 'wait' : 'pointer',
           display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-          transition: 'background 0.2s',
+          transition: 'background 0.2s', opacity: saving ? 0.8 : 1,
         }}>
-          {saved ? <><Check size={16} /> Salvo!</> : isUpdate ? 'Atualizar post' : (totalFiles > 1 && !isLast) ? <>Salvar e continuar <ChevronRight size={15}/></> : 'Salvar post'}
+          {saved ? <><Check size={16} /> Salvo!</> : saving ? 'Salvando...' : isUpdate ? 'Atualizar post' : (totalFiles > 1 && !isLast) ? <>Salvar e continuar <ChevronRight size={15}/></> : 'Salvar post'}
         </button>
 
         {isUpdate && onDelete && (
