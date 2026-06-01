@@ -20,14 +20,16 @@ function InstagramIcon({ size = 13, color = '#1C252E' }) {
   )
 }
 
-// Logo Itaú Asset — superellipse escura com "itaú" em azul claro
+// Logo Itaú Asset — fiel ao logo oficial
 function ItauLogo({ size = 44 }) {
   return (
     <svg width={size} height={size} viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <rect width="100" height="100" rx="28" fill="#1C252E"/>
-      <text x="50%" y="66" textAnchor="middle"
-        fontFamily="'DM Sans', Arial, sans-serif"
-        fontWeight="800" fontSize="34" fill="#C3EBF7" letterSpacing="-1.5">
+      {/* Superelipse com bordas bem arredondadas como no logo oficial */}
+      <path d="M50,4 C74,4 96,26 96,50 C96,74 74,96 50,96 C26,96 4,74 4,50 C4,26 26,4 50,4 Z" fill="none"/>
+      <rect width="100" height="100" rx="30" fill="#1C252E"/>
+      <text x="50" y="66" textAnchor="middle"
+        fontFamily="Arial Black, Arial, sans-serif"
+        fontWeight="900" fontSize="33" fill="#C3EBF7" letterSpacing="-1">
         itaú
       </text>
     </svg>
