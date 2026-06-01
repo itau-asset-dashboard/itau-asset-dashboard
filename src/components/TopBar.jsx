@@ -41,7 +41,8 @@ export default function TopBar() {
   return (
     <div style={{
       display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-      padding: '16px 20px 10px', gap: 12, flexShrink: 0,
+      padding: '16px 20px 12px', gap: 12, flexShrink: 0,
+      background: '#fff', borderBottom: '1px solid #E8ECF0',
     }}>
       <div>
         <h1 style={{ color: '#1C252E', fontSize: 19, fontWeight: 700, lineHeight: 1.2 }}>{section.title}</h1>

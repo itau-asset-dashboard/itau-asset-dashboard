@@ -6,8 +6,8 @@ export default function SyncBadge() {
 
   if (syncing) return (
     <div style={badge}>
-      <RefreshCw size={12} style={{ animation: 'spin 1s linear infinite' }} color="#C3EBF7" />
-      <span style={{ color: '#C3EBF7', fontSize: 11 }}>Sincronizando…</span>
+      <RefreshCw size={12} style={{ animation: 'spin 1s linear infinite' }} color="#8A9BB0" />
+      <span style={{ color: '#8A9BB0', fontSize: 11 }}>Sincronizando…</span>
       <style>{`@keyframes spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }`}</style>
     </div>
   )
@@ -21,18 +21,18 @@ export default function SyncBadge() {
   )
 
   return (
-    <div style={{ ...badge, background: 'rgba(74,222,128,0.1)', border: '1px solid rgba(74,222,128,0.2)' }}>
-      <Cloud size={12} color="#4ade80" />
-      <span style={{ color: '#4ade80', fontSize: 11 }}>Sincronizado</span>
+    <div style={badge}>
+      <Cloud size={12} color="#16a34a" />
+      <span style={{ color: '#16a34a', fontSize: 11 }}>Sincronizado</span>
     </div>
   )
 }
 
 const badge = {
   position: 'fixed', bottom: 16, left: 80,
-  background: 'rgba(28,37,46,0.85)',
-  backdropFilter: 'blur(8px)',
-  border: '1px solid rgba(255,255,255,0.1)',
+  background: '#fff',
+  boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+  border: '1px solid #E8ECF0',
   borderRadius: 20, padding: '5px 10px',
   display: 'flex', alignItems: 'center', gap: 5,
   zIndex: 50,
