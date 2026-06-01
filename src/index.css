@@ -1,5 +1,4 @@
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap');
-
 @import "tailwindcss";
 
 *, *::before, *::after {
@@ -12,119 +11,67 @@
 html, body, #root {
   width: 100%;
   height: 100%;
-  overflow: hidden;
-  background: #EEF2F7;
+  background: #F4F6FA;
   -webkit-font-smoothing: antialiased;
 }
 
-#root {
-  display: flex;
-}
+#root { display: flex; overflow: hidden; }
 
+/* ── Card base ── */
 .card {
   background: #fff;
-  border-radius: 18px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.06);
+  border-radius: 16px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.05);
 }
 
+/* ── Scrollbar ── */
 .scrollbar-thin::-webkit-scrollbar { width: 4px; height: 4px; }
 .scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
-.scrollbar-thin::-webkit-scrollbar-thumb { background: rgba(195,235,247,0.4); border-radius: 2px; }
+.scrollbar-thin::-webkit-scrollbar-thumb { background: rgba(28,37,46,0.12); border-radius: 4px; }
 
-/* ── Layout ── */
-.app-layout {
-  display: flex;
-  width: 100%;
-  height: 100%;
-}
+/* ── Layout desktop ── */
+.app-layout { display: flex; width: 100%; height: 100%; overflow: hidden; }
+.main-column { flex: 1; display: flex; flex-direction: column; height: 100%; overflow: hidden; min-width: 0; }
+.content-scroll { flex: 1; overflow-y: auto; padding: 20px 24px 32px; }
 
-.main-column {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  overflow: hidden;
-  min-width: 0;
-}
+/* ── Bottom nav (hidden on desktop) ── */
+.bottom-nav { display: none; }
+.sidebar-desktop { display: flex; }
 
-/* ── Bottom nav (mobile only) ── */
-.bottom-nav {
-  display: none;
-}
+/* ── KPI grid ── */
+.kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 16px; }
 
-/* ── Mobile & Tablet ── */
-@media (max-width: 768px) {
-  html, body, #root {
-    overflow: auto;
-    height: auto;
-    min-height: 100%;
-  }
+/* ── Mobile ── */
+@media (max-width: 900px) {
+  html, body, #root { height: auto; min-height: 100%; overflow: auto; }
 
-  .app-layout {
-    flex-direction: column;
-    height: auto;
-    min-height: 100vh;
-    padding-bottom: 64px; /* espaço para bottom nav */
-  }
+  .app-layout { flex-direction: column; height: auto; min-height: 100vh; padding-bottom: 64px; overflow: visible; }
+  .main-column { height: auto; overflow: visible; }
+  .content-scroll { padding: 14px 14px 24px; overflow: visible; }
 
-  .main-column {
-    height: auto;
-    overflow: visible;
-    flex: 1;
-  }
+  .sidebar-desktop { display: none !important; }
+  .right-panel-desktop { display: none !important; }
 
-  /* Esconde sidebar lateral e right panel no mobile */
-  .sidebar-desktop {
-    display: none !important;
-  }
-
-  /* Right panel vira bloco abaixo do conteúdo */
-  aside.right-panel-aside {
-    width: 100% !important;
-    height: auto !important;
-    border-left: none !important;
-    border-top: 1px solid #E8ECF0;
-    flex-direction: row;
-    flex-wrap: wrap;
-  }
-
-  /* Bottom nav aparece */
   .bottom-nav {
     display: flex;
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
+    position: fixed; bottom: 0; left: 0; right: 0;
     background: #1C252E;
-    border-top: 1px solid rgba(255,255,255,0.08);
-    height: 60px;
-    z-index: 100;
-    padding: 0 8px;
+    border-top: 1px solid rgba(255,255,255,0.07);
+    height: 62px; z-index: 200; padding: 0 4px;
   }
 
-  /* Cards 2 colunas no mobile */
-  .kpi-grid {
-    grid-template-columns: repeat(2, 1fr) !important;
-  }
+  .kpi-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 10px; }
+}
 
-  /* Tabela scroll horizontal */
-  .posts-table {
-    min-width: 600px;
-  }
+/* Grids do AnnualView */
+.annual-grid { display: grid; gap: 16px; }
 
-  /* Oculta right panel no mobile */
-  .right-panel-desktop {
-    display: none !important;
-  }
-
-  /* Padding menor */
-  .main-column > div:last-child {
-    padding: 4px 12px 20px !important;
-  }
+@media (max-width: 900px) {
+  .annual-grid { grid-template-columns: 1fr !important; }
 }
 
 @media (max-width: 480px) {
-  .card {
-    border-radius: 12px;
-  }
+  .card { border-radius: 12px; }
+  .kpi-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 8px; }
+  .annual-grid { grid-template-columns: 1fr !important; gap: 10px; }
 }

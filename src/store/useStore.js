@@ -9,7 +9,7 @@ export const useStore = create(
       metaMensal: 200000,
       metaAnual: 1090000,
       mesFiltro: '01/2026',
-      activeSection: 'visao-geral',
+      activeSection: 'visao-anual',
       insights: [],
       loadingInsights: false,
       syncing: false,

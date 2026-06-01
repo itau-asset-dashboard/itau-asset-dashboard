@@ -19,13 +19,15 @@ export default function App() {
 
   useEffect(() => { syncFromCloud() }, [])
 
+  const showRight = activeSection === 'visao-geral'
+
   return (
     <div className="app-layout">
       <Sidebar />
 
       <div className="main-column">
         <TopBar />
-        <div style={{ flex: 1, overflowY: 'auto', padding: '4px 20px 20px' }} className="scrollbar-thin">
+        <div className="content-scroll scrollbar-thin">
           {activeSection === 'upload'      && <UploadSection />}
           {activeSection === 'insights'    && <Insights />}
           {activeSection === 'posts'       && <PostsRanking />}
@@ -41,7 +43,7 @@ export default function App() {
         </div>
       </div>
 
-      <RightPanel />
+      {showRight && <RightPanel />}
       <SyncBadge />
     </div>
   )
