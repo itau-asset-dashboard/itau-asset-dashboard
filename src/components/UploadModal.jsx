@@ -227,11 +227,22 @@ const SinglePostModal = forwardRef(function SinglePostModal({ initialPost, initi
                 {form.data_post ? `📅 ${formatDate(form.data_post)}` : 'Sem data definida'}
                 {' · '}
                 <span style={{ color: '#0891B2', cursor: 'pointer' }} onClick={e => { e.stopPropagation(); openImage(form.imageUrl || preview) }}>
-                  abrir imagem ↗
+                  abrir ↗
                 </span>
-                {' · clique para trocar'}
               </p>
             </div>
+            {/* Botão remover imagem */}
+            <button
+              type="button"
+              onClick={e => { e.stopPropagation(); setPreview(null); set('imageData', null); set('imageUrl', null) }}
+              title="Remover evidência"
+              style={{
+                flexShrink: 0, background: '#FEF2F2', border: '1px solid #fecaca',
+                borderRadius: 8, width: 30, height: 30, cursor: 'pointer',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>
+              <Trash2 size={13} color="#ef4444" />
+            </button>
           </>
         ) : (
           <div style={{ width: '100%', textAlign: 'center' }}>
