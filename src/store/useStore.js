@@ -107,6 +107,7 @@ export const useStore = create(
         metaMensal: s.metaMensal,
         mesFiltro:  s.mesFiltro,
         insights:   s.insights,
+        apiKey:     s.apiKey,
       }),
     }
   )
