@@ -5,6 +5,7 @@ import {
 } from 'recharts'
 import UploadModal from './UploadModal'
 import { hasAnyTheme, getTemas } from '../utils/temas'
+import { PostRankRow } from './PostRankRow'
 
 const MESES_LABEL = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez']
 const MESES_FULL  = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro']
@@ -275,53 +276,21 @@ export default function ETFsView() {
             Top posts ETF {viewMode === 'mensal' ? `· ${MESES_LABEL[mesSel]}` : ''}
           </p>
           <p style={{ color:'#9AAAB8', fontSize:12, marginBottom:18 }}>Clique para editar</p>
-          <div style={{ display:'flex', flexDirection:'column', gap:9 }}>
+          <div style={{ display:'flex', flexDirection:'column', gap:2 }}>
             {topPosts.length === 0 && (
               <p style={{ color:'#9AAAB8', fontSize:13, textAlign:'center', padding:'32px 0' }}>
                 Nenhum post ETF encontrado
               </p>
             )}
-            {topPosts.map((p,i) => {
-              const barW = maxAlc > 0 ? ((p.contas_alcancadas||0)/maxAlc)*100 : 0
-              const medals = ['🥇','🥈','🥉']
-              return (
-                <div key={p.id} onClick={() => setEditTarget(p)}
-                  style={{ display:'flex', alignItems:'center', gap:10, cursor:'pointer',
-                    padding:'8px 10px', borderRadius:10, border:'1px solid #F0F4F8', transition:'background 0.12s' }}
-                  onMouseEnter={e => e.currentTarget.style.background='#F8FAFC'}
-                  onMouseLeave={e => e.currentTarget.style.background='transparent'}
-                >
-                  <span style={{ fontSize:14, width:22, textAlign:'center', flexShrink:0 }}>
-                    {i < 3 ? medals[i] : `${i+1}º`}
-                  </span>
-                  {(p.imageUrl||p.imageData) ? (
-                    <img src={p.imageUrl||p.imageData} alt=""
-                      style={{ width:38, height:38, objectFit:'cover', borderRadius:7, flexShrink:0 }}/>
-                  ) : (
-                    <div style={{ width:38, height:38, borderRadius:7, background:'rgba(8,145,178,0.1)',
-                      flexShrink:0, display:'flex', alignItems:'center', justifyContent:'center', fontSize:16 }}>
-                      📊
-                    </div>
-                  )}
-                  <div style={{ flex:1, minWidth:0 }}>
-                    <p style={{ color:'#1C252E', fontSize:12, fontWeight:600, overflow:'hidden',
-                      textOverflow:'ellipsis', whiteSpace:'nowrap', marginBottom:4 }}>
-                      {p.nome||p.tema||'—'}
-                    </p>
-                    <div style={{ background:'#F0F2F5', borderRadius:3, height:4, overflow:'hidden' }}>
-                      <div style={{ height:'100%', borderRadius:3,
-                        background: i===0?'#F97316':'#0891B2', width:`${barW}%`, transition:'width 0.5s' }}/>
-                    </div>
-                  </div>
-                  <div style={{ textAlign:'right', flexShrink:0 }}>
-                    <p style={{ color: i===0?'#F97316':'#1C252E', fontSize:13, fontWeight:800 }}>
-                      {fmt(p.contas_alcancadas)}
-                    </p>
-                    <p style={{ color:'#9AAAB8', fontSize:10 }}>{p.data_post}</p>
-                  </div>
-                </div>
-              )
-            })}
+            {topPosts.map((p, i) => (
+              <PostRankRow
+                key={p.id}
+                post={p}
+                i={i}
+                maxVal={maxAlc}
+                onClick={() => setEditTarget(p)}
+              />
+            ))}
           </div>
         </div>
 
