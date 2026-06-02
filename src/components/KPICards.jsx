@@ -48,50 +48,47 @@ export default function KPICards() {
   ]
 
   return (
-    <div style={{
+    <>
+    {/* CSS injetado — garante 2 colunas no mobile independente de qualquer cache */}
+    <style>{`
+      @media (max-width: 768px) {
+        .kpi-grid-js { grid-template-columns: repeat(2,1fr) !important; gap: 8px !important; }
+        .kpi-card-js { padding: 11px 11px !important; }
+        .kpi-label-js { font-size: 9px !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; margin-bottom: 7px !important; }
+        .kpi-number-js { font-size: 19px !important; margin-bottom: 3px !important; }
+        .kpi-sub-js { font-size: 9px !important; }
+        .kpi-icon-js { display: none !important; }
+      }
+    `}</style>
+    <div className="kpi-grid-js" style={{
       display: 'grid',
       gridTemplateColumns: mobile ? 'repeat(2,1fr)' : 'repeat(4,1fr)',
       gap: mobile ? 8 : 14,
       marginBottom: 14,
     }}>
       {cards.map(({ label, value, sub, accent, iconBg, icon: Icon, highlight }) => (
-        <div key={label} className="card kpi-card" style={{
+        <div key={label} className="card kpi-card kpi-card-js" style={{
           padding: mobile ? '12px 12px' : '18px 20px',
           borderTop: highlight ? `3px solid ${accent}` : '3px solid transparent',
           position: 'relative',
         }}>
-          {/* Label */}
-          <p style={{
-            color: '#8A9BB0',
-            fontSize: mobile ? 10 : 11,
-            fontWeight: 600,
-            textTransform: 'uppercase',
-            letterSpacing: '0.04em',
+          <p className="kpi-label-js" style={{
+            color: '#8A9BB0', fontSize: mobile ? 10 : 11, fontWeight: 600,
+            textTransform: 'uppercase', letterSpacing: '0.04em',
             marginBottom: mobile ? 8 : 14,
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
           }}>
             {label}
           </p>
-          {/* Número */}
-          <p style={{
-            color: '#182638',
-            fontSize: mobile ? 20 : 28,
-            fontWeight: 800,
-            lineHeight: 1,
-            letterSpacing: '-0.02em',
-            marginBottom: mobile ? 4 : 6,
+          <p className="kpi-number-js" style={{
+            color: '#182638', fontSize: mobile ? 20 : 28, fontWeight: 800,
+            lineHeight: 1, letterSpacing: '-0.02em', marginBottom: mobile ? 4 : 6,
           }}>
             {value}
           </p>
-          {/* Sub */}
-          <p style={{
-            color: '#A8B5C0',
-            fontSize: mobile ? 10 : 12,
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
+          <p className="kpi-sub-js" style={{
+            color: '#A8B5C0', fontSize: mobile ? 10 : 12,
+            overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
           }}>
             {sub}
           </p>
@@ -109,5 +106,6 @@ export default function KPICards() {
         </div>
       ))}
     </div>
+    </>
   )
 }

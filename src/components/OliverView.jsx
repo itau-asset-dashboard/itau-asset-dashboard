@@ -90,7 +90,8 @@ export default function OliverView() {
       </div>
 
       {/* KPIs */}
-      <div style={{ display:'grid', gridTemplateColumns: mobile ? 'repeat(2,1fr)' : 'repeat(4,1fr)', gap: mobile ? 8 : 14, marginBottom:14 }}>
+      <style>{`@media(max-width:768px){.kpi-grid-js{grid-template-columns:repeat(2,1fr)!important;gap:8px!important}.kpi-card-js{padding:11px 11px!important}.kpi-label-js{font-size:9px!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;margin-bottom:7px!important}.kpi-number-js{font-size:19px!important;margin-bottom:3px!important}.kpi-sub-js{font-size:9px!important}}`}</style>
+      <div className="kpi-grid-js" style={{ display:'grid', gridTemplateColumns: mobile ? 'repeat(2,1fr)' : 'repeat(4,1fr)', gap: mobile ? 8 : 14, marginBottom:14 }}>
         {[
           { label: 'Total Instagram (ano)', value: fmt(totalInsta),  color: '#1C252E', bg: 'rgba(28,37,46,0.06)',      desc: 'Soma das contas alcançadas via Instagram' },
           { label: 'Total Oliver (ano)',    value: fmtExato(totalOliver || null), color: '#F97316', bg: 'rgba(249,115,22,0.08)', desc: 'Soma dos dados da agência' },
@@ -101,10 +102,10 @@ export default function OliverView() {
           { label: 'Meses preenchidos',    value: String(meses.filter(m => m.alcance_oliver).length) + ' / 12',
             color: '#0891B2', bg: 'rgba(8,145,178,0.08)', desc: 'Meses com dado Oliver inserido' },
         ].map(({ label, value, color, bg, desc }) => (
-          <div key={label} className="card" style={{ padding: mobile ? '12px 14px' : '18px 20px' }}>
-            <p style={{ color: '#9AAAB8', fontSize: mobile ? 10 : 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: mobile ? 6 : 5, lineHeight: 1.3 }}>{label}</p>
-            <p style={{ color, fontSize: mobile ? 18 : 24, fontWeight: 800, lineHeight: 1.1, marginBottom: 3 }}>{value}</p>
-            {!mobile && <p style={{ color: '#9AAAB8', fontSize: 12 }}>{desc}</p>}
+          <div key={label} className="card kpi-card-js" style={{ padding: mobile ? '12px 12px' : '18px 20px' }}>
+            <p className="kpi-label-js" style={{ color: '#9AAAB8', fontSize: mobile ? 10 : 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: mobile ? 6 : 5, lineHeight: 1.3 }}>{label}</p>
+            <p className="kpi-number-js" style={{ color, fontSize: mobile ? 18 : 24, fontWeight: 800, lineHeight: 1.1, marginBottom: 3 }}>{value}</p>
+            <p className="kpi-sub-js" style={{ color: '#9AAAB8', fontSize: mobile ? 10 : 12 }}>{desc}</p>
           </div>
         ))}
       </div>
