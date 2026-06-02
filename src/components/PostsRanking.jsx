@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { ArrowUpDown, ChevronLeft, ChevronRight, ArrowUp, ArrowDown, Search, X } from 'lucide-react'
+import { ArrowUpDown, ChevronLeft, ChevronRight, ArrowUp, ArrowDown, Search, X, RefreshCw } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import UploadModal from './UploadModal'
 import { temasLabel, getTemas } from '../utils/temas'
