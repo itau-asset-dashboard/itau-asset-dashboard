@@ -43,7 +43,7 @@ export default function TopBar() {
     }}>
       <div style={{ minWidth: 0 }}>
         <h1 className="topbar-title" style={{ color: '#182638', fontSize: 18, fontWeight: 700, lineHeight: 1.2, letterSpacing: '-0.02em', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{section.title}</h1>
-        <p className="topbar-sub" style={{ color: '#A8B5C0', fontSize: 12, marginTop: 1 }}>{section.sub}</p>
+        <p className="topbar-sub" style={{ color: '#A8B5C0', fontSize: 12, marginTop: 1 }}>{section.sub} <span style={{ color: '#F97316', fontSize: 10, fontWeight: 700 }}>v3</span></p>
       </div>
 
       <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
