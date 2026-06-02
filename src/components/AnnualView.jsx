@@ -104,16 +104,19 @@ export default function AnnualView() {
 
       {/* ── KPI Cards ── */}
       <div className="kpi-grid">
-        {CARDS.map(({label,value,sub,icon:Icon,color,bg})=>(
-          <div key={label} className="card" style={{ padding:'20px', display:'flex', alignItems:'center', gap:14 }}>
-            <div style={{ flex:1, minWidth:0 }}>
-              <p style={{ color:'#9AAAB8', fontSize:11, fontWeight:600, textTransform:'uppercase', letterSpacing:'0.05em', marginBottom:6 }}>{label}</p>
-              <p style={{ color:'#1C252E', fontSize:26, fontWeight:800, lineHeight:1.1, marginBottom:4 }}>{value}</p>
-              <p style={{ color:'#9AAAB8', fontSize:12, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{sub}</p>
+        {CARDS.map(({label,value,sub,icon:Icon,color,bg},idx)=>(
+          <div key={label} className="card kpi-card" style={{
+            padding:'18px 20px',
+            borderTop: idx===0 ? `3px solid ${color}` : '3px solid transparent',
+          }}>
+            <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:14 }}>
+              <p style={{ color:'#8A9BB0', fontSize:11, fontWeight:600, textTransform:'uppercase', letterSpacing:'0.06em' }}>{label}</p>
+              <div style={{ width:30, height:30, borderRadius:8, background:bg, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+                <Icon size={14} color={color} strokeWidth={2.1}/>
+              </div>
             </div>
-            <div style={{ width:46, height:46, borderRadius:12, background:bg, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
-              <Icon size={22} color={color} strokeWidth={1.8}/>
-            </div>
+            <p style={{ color:'#182638', fontSize:28, fontWeight:800, lineHeight:1, letterSpacing:'-0.02em', marginBottom:6 }}>{value}</p>
+            <p style={{ color:'#A8B5C0', fontSize:12, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{sub}</p>
           </div>
         ))}
       </div>

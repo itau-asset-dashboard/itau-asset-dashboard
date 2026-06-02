@@ -38,12 +38,12 @@ export default function TopBar() {
   return (
     <div style={{
       display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-      padding: '12px 16px', gap: 8, flexShrink: 0,
+      padding: '10px 24px', gap: 8, flexShrink: 0,
       background: '#fff', borderBottom: '1px solid #EDEFF2',
     }}>
       <div style={{ minWidth: 0 }}>
-        <h1 className="topbar-title" style={{ color: '#1C252E', fontSize: 20, fontWeight: 700, lineHeight: 1.2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{section.title}</h1>
-        <p className="topbar-sub" style={{ color: '#9AAAB8', fontSize: 12, marginTop: 2 }}>{section.sub}</p>
+        <h1 className="topbar-title" style={{ color: '#182638', fontSize: 18, fontWeight: 700, lineHeight: 1.2, letterSpacing: '-0.02em', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{section.title}</h1>
+        <p className="topbar-sub" style={{ color: '#A8B5C0', fontSize: 12, marginTop: 1 }}>{section.sub}</p>
       </div>
 
       <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>

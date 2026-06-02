@@ -50,7 +50,6 @@ export default function App() {
       </div>
 
       {showRight && <RightPanel />}
-      <SyncBadge />
     </div>
   )
 }
