@@ -37,26 +37,41 @@ export const useStore = create(
           // Preserva imageData local — nunca é salvo no Supabase (muito pesado)
           // Também normaliza o campo `tema` para array limpo
           const localPosts = get().posts
-          const dirty = [] // posts com tema sujo que precisam ser re-salvos
+          const cloudIds = new Set(cloudPosts.map(p => p.id))
+
+          // Posts que existem só no localStorage (nunca chegaram ao Supabase) → reenviar
+          const orphans = localPosts.filter(lp => !cloudIds.has(lp.id))
+
+          const dirty = []
           const posts = cloudPosts.map(cp => {
             const local = localPosts.find(lp => lp.id === cp.id)
-            const merged    = local?.imageData ? { ...cp, imageData: local.imageData } : cp
-            const temaNorm  = normalizeTema(merged.tema)
-            const dateNorm  = normalizeDate(merged.data_post)
-            const wasDirty  = JSON.stringify(merged.tema) !== JSON.stringify(temaNorm)
-                           || dateNorm !== merged.data_post
+            const merged   = local?.imageData ? { ...cp, imageData: local.imageData } : cp
+            const temaNorm = normalizeTema(merged.tema)
+            const dateNorm = normalizeDate(merged.data_post)
+            const wasDirty = JSON.stringify(merged.tema) !== JSON.stringify(temaNorm)
+                          || dateNorm !== merged.data_post
             if (wasDirty) dirty.push({ ...merged, tema: temaNorm, data_post: dateNorm })
             return { ...merged, tema: temaNorm, data_post: dateNorm }
           })
+
+          // Inclui os órfãos normalizados no estado
+          const orphansNorm = orphans.map(p => ({
+            ...p,
+            tema:      normalizeTema(p.tema),
+            data_post: normalizeDate(p.data_post),
+          }))
+
           set({
-            posts,
+            posts: [...posts, ...orphansNorm],
             metaMensal: metaMensal ? Number(metaMensal) : get().metaMensal,
             metaAnual:  metaAnual  ? Number(metaAnual)  : get().metaAnual,
             syncing: false,
           })
-          // Grava de volta no Supabase os posts com tema corrigido
-          if (dirty.length > 0) {
-            dirty.forEach(p => { try { upsertPost(p) } catch (_) {} })
+
+          // Reenviar órfãos + posts com dados sujos para o Supabase
+          const toSave = [...orphansNorm, ...dirty]
+          if (toSave.length > 0) {
+            toSave.forEach(p => { try { upsertPost(p) } catch (_) {} })
           }
         } catch (e) {
           set({ syncing: false, syncError: e.message })
