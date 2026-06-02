@@ -4,6 +4,7 @@ import {
 } from 'recharts'
 import { useStore } from '../store/useStore'
 import { temasLabel } from '../utils/temas'
+import { useIsMobile } from '../utils/useIsMobile'
 
 function fmt(n) {
   if (n >= 1000000) return (n / 1000000).toFixed(1) + 'M'
@@ -48,32 +49,31 @@ export default function PostsChart() {
     return parse(a.data_post) - parse(b.data_post)
   }).map(p => ({ ...p, label: p.data_post?.slice(0, 5) || '—' }))
 
+  const mobile = useIsMobile()
   const media = data.length > 0
     ? Math.round(data.reduce((s, p) => s + (p.contas_alcancadas || 0), 0) / data.length)
     : 0
 
   return (
-    <div className="card" style={{ padding: '20px 22px', marginBottom: 18 }}>
-      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 18 }}>
-        <div>
-          <h2 style={{ color: '#1C252E', fontSize: 15, fontWeight: 700, margin: 0 }}>
-            Contas alcançadas por post
-          </h2>
-          <p style={{ color: '#8A9BB0', fontSize: 12, marginTop: 2 }}>Ordenado por data de publicação</p>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-          {Object.entries(COLOR).map(([tipo, cor]) => (
-            <div key={tipo} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-              <div style={{
-                width: 9, height: 9, borderRadius: 3, background: cor,
-                border: BORDER_COLOR[tipo] ? `1.5px solid ${BORDER_COLOR[tipo]}` : 'none'
-              }} />
-              <span style={{ color: '#8A9BB0', fontSize: 12 }}>{tipo}</span>
+    <div className="card" style={{ padding: mobile ? '14px 14px' : '20px 22px', marginBottom: 18 }}>
+      {/* Header */}
+      <div style={{ marginBottom: 14 }}>
+        <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+          <h2 style={{ color:'#1C252E', fontSize:15, fontWeight:700, margin:0 }}>Alcance por post</h2>
+          {/* Legenda compacta */}
+          <div style={{ display:'flex', alignItems:'center', gap: mobile ? 8 : 14, flexWrap:'wrap' }}>
+            {Object.entries(COLOR).map(([tipo, cor]) => (
+              <div key={tipo} style={{ display:'flex', alignItems:'center', gap:4 }}>
+                <div style={{ width:8, height:8, borderRadius:2, background:cor, border: BORDER_COLOR[tipo] ? `1.5px solid ${BORDER_COLOR[tipo]}` : 'none', flexShrink:0 }} />
+                <span style={{ color:'#8A9BB0', fontSize: mobile ? 10 : 12, whiteSpace:'nowrap' }}>
+                  {mobile ? tipo.replace(' estática','') : tipo}
+                </span>
+              </div>
+            ))}
+            <div style={{ display:'flex', alignItems:'center', gap:4 }}>
+              <div style={{ width:14, borderTop:'2px dashed #8A9BB0' }} />
+              <span style={{ color:'#8A9BB0', fontSize: mobile ? 10 : 12 }}>Média</span>
             </div>
-          ))}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-            <div style={{ width: 16, borderTop: '2px dashed #8A9BB0' }} />
-            <span style={{ color: '#8A9BB0', fontSize: 12 }}>Média</span>
           </div>
         </div>
       </div>

@@ -109,24 +109,33 @@ export default function AnnualView() {
     <div style={{ display:'flex', flexDirection:'column', gap:16 }}>
 
       {/* ── KPI Cards ── */}
-      <div className="kpi-grid">
-        {CARDS.map(({label,value,sub,icon:Icon,color,bg},idx)=>(
-          <div key={label} className="card kpi-card" style={{
-            padding: mobile ? '12px 14px' : '18px 20px',
-            borderTop: idx===0 ? `3px solid ${color}` : '3px solid transparent',
-          }}>
-            <div style={{ display:'flex', alignItems:'flex-start', justifyContent:'space-between', marginBottom: mobile ? 8 : 14 }}>
-              <p style={{ color:'#8A9BB0', fontSize: mobile ? 10 : 11, fontWeight:600, textTransform:'uppercase', letterSpacing:'0.04em', lineHeight:1.3, paddingRight: mobile ? 4 : 8 }}>{label}</p>
+      <div style={{
+        display:'grid',
+        gridTemplateColumns: mobile ? 'repeat(2,1fr)' : 'repeat(4,1fr)',
+        gap: mobile ? 8 : 14,
+        marginBottom: 14,
+      }}>
+        {CARDS.map(({label,value,sub,icon:Icon,color,bg},idx)=>{
+          const mLabel = mobile
+            ? ['Alcançado','Média/post','Melhor','Posts'][idx]
+            : label
+          return (
+            <div key={label} className="card kpi-card" style={{
+              padding: mobile ? '12px 12px' : '18px 20px',
+              borderTop: idx===0 ? `3px solid ${color}` : '3px solid transparent',
+              position: 'relative',
+            }}>
+              <p style={{ color:'#8A9BB0', fontSize: mobile ? 10 : 11, fontWeight:600, textTransform:'uppercase', letterSpacing:'0.04em', marginBottom: mobile ? 8 : 14, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>{mLabel}</p>
+              <p style={{ color:'#182638', fontSize: mobile ? 20 : 28, fontWeight:800, lineHeight:1, letterSpacing:'-0.02em', marginBottom: mobile ? 4 : 6 }}>{value}</p>
+              <p style={{ color:'#A8B5C0', fontSize: mobile ? 10 : 12, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{sub}</p>
               {!mobile && (
-                <div style={{ width:30, height:30, borderRadius:8, background:bg, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+                <div style={{ position:'absolute', top:18, right:18, width:30, height:30, borderRadius:8, background:bg, display:'flex', alignItems:'center', justifyContent:'center' }}>
                   <Icon size={14} color={color} strokeWidth={2.1}/>
                 </div>
               )}
             </div>
-            <p style={{ color:'#182638', fontSize: mobile ? 22 : 28, fontWeight:800, lineHeight:1, letterSpacing:'-0.02em', marginBottom: mobile ? 4 : 6 }}>{value}</p>
-            <p style={{ color:'#A8B5C0', fontSize: mobile ? 10 : 12, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{sub}</p>
-          </div>
-        ))}
+          )
+        })}
       </div>
 
       {/* ── Progresso meta + gráfico ── */}

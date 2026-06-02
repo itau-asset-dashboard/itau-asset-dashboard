@@ -90,7 +90,7 @@ export default function OliverView() {
       </div>
 
       {/* KPIs */}
-      <div className="kpi-grid">
+      <div style={{ display:'grid', gridTemplateColumns: mobile ? 'repeat(2,1fr)' : 'repeat(4,1fr)', gap: mobile ? 8 : 14, marginBottom:14 }}>
         {[
           { label: 'Total Instagram (ano)', value: fmt(totalInsta),  color: '#1C252E', bg: 'rgba(28,37,46,0.06)',      desc: 'Soma das contas alcançadas via Instagram' },
           { label: 'Total Oliver (ano)',    value: fmtExato(totalOliver || null), color: '#F97316', bg: 'rgba(249,115,22,0.08)', desc: 'Soma dos dados da agência' },
