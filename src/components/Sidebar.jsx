@@ -154,7 +154,7 @@ export default function Sidebar() {
 
         {/* ── Rodapé ── */}
         <p style={{ color: '#C8D2DA', fontSize: 10, textAlign: 'center', paddingTop: 10 }}>
-          Itaú Asset © 2026 · v3.0
+          Itaú Asset © 2026
         </p>
       </aside>
 
