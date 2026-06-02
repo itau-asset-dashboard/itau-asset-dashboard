@@ -169,7 +169,7 @@ export default function OliverView() {
                       {m.nPosts > 0 ? `${m.nPosts} posts` : '—'}
                     </td>
                     <td style={{ padding: '13px 16px', color: '#1C252E', fontSize: 13, fontWeight: 600 }}>
-                      {m.alcance_insta > 0 ? fmt(m.alcance_insta) : '—'}
+                      {m.alcance_insta > 0 ? fmtExato(m.alcance_insta) : '—'}
                     </td>
                     <td style={{ padding: '13px 16px' }}>
                       {isEditing ? (
