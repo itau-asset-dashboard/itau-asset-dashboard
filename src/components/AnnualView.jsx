@@ -2,6 +2,7 @@ import { useStore } from '../store/useStore'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, LabelList } from 'recharts'
 import { Users, TrendingUp, Award, LayoutGrid } from 'lucide-react'
 import { getTemas } from '../utils/temas'
+import { calcMetaMesAjustada } from '../utils/metaCalc'
 
 const MESES_LABEL  = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez']
 const MESES_FULL   = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro']
@@ -16,15 +17,16 @@ function fmt(n) {
 const TIPO_COLOR = { Carrossel:'#F97316', Reels:'#1C252E', 'Foto estática':'#C3EBF7' }
 
 export default function AnnualView() {
-  const { getPostsDoAno, getMetaMesAjustada, metaAnual, mesFiltro } = useStore()
+  const { getPostsDoAno, metaAnual, mesFiltro, posts: allPosts } = useStore()
   const ano   = mesFiltro?.split('/')?.[1] || '2026'
   const posts = getPostsDoAno(ano)
 
   const total   = posts.reduce((s,p)=>s+(p.contas_alcancadas||0),0)
   const media   = posts.length > 0 ? Math.round(total/posts.length) : 0
   const melhor  = posts.length > 0 ? posts.reduce((a,b)=>(a.contas_alcancadas||0)>(b.contas_alcancadas||0)?a:b,posts[0]) : null
-  const pct       = metaAnual > 0 ? Math.min((total/metaAnual)*100,100) : 0
-  const metaMesAtualizada = getMetaMesAjustada(mesFiltro) // meta dinâmica do mês atual
+  const pct     = metaAnual > 0 ? Math.min((total/metaAnual)*100,100) : 0
+  // calcMetaMesAjustada é função pura — reage a mudanças em posts e metaAnual
+  const metaMesAtualizada = calcMetaMesAjustada({ posts: allPosts, metaAnual, mesFiltroParam: mesFiltro })
   const restante  = Math.max(metaAnual - total, 0)
 
   // Dados mensais com meta ajustada por mês
@@ -36,7 +38,7 @@ export default function AnnualView() {
       return pts?.[1]===mm && pts?.[2]===ano
     })
     const total = mPosts.reduce((s,p)=>s+(p.contas_alcancadas||0),0)
-    const metaMes = getMetaMesAjustada(mesVal)
+    const metaMes = calcMetaMesAjustada({ posts: allPosts, metaAnual, mesFiltroParam: mesVal })
     return {
       mes:     MESES_LABEL[i],
       mesFull: MESES_FULL[i],

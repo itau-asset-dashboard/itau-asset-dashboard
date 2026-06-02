@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Edit2, Check, Plus, Film, LayoutPanelLeft, Image } from 'lucide-react'
+import { calcMetaMesAjustada } from '../utils/metaCalc'
 import { useStore } from '../store/useStore'
 import UploadModal from './UploadModal'
 
@@ -47,7 +48,7 @@ function EditableValue({ value, color, onSave }) {
 }
 
 export default function RightPanel() {
-  const { metaMensal, setMetaMensal, metaAnual, setMetaAnual, getPostsDoMes, getMetaMesAjustada, posts: allPosts, addPost, updatePost, deletePost, mesFiltro } = useStore()
+  const { metaMensal, setMetaMensal, metaAnual, setMetaAnual, getPostsDoMes, posts: allPosts, addPost, updatePost, deletePost, mesFiltro } = useStore()
   const postsMes = getPostsDoMes()
   const [uploadOpen, setUploadOpen]   = useState(false)
   const [editTarget, setEditTarget]   = useState(null)
@@ -61,7 +62,7 @@ export default function RightPanel() {
 
   const totalAnual     = postsAno.reduce((s,p)=>s+(p.contas_alcancadas||0),0)
   const totalMensal    = postsMes.reduce((s,p)=>s+(p.contas_alcancadas||0),0)
-  const metaAjustada   = getMetaMesAjustada(mesFiltro)
+  const metaAjustada   = calcMetaMesAjustada({ posts: allPosts, metaAnual, mesFiltroParam: mesFiltro })
   const pctAnual       = metaAnual>0 ? Math.min((totalAnual/metaAnual)*100,100) : 0
   const pctMensal      = metaAjustada>0 ? Math.min((totalMensal/metaAjustada)*100,100) : 0
   const metaMesOriginal = Math.round(metaAnual/12)
