@@ -36,26 +36,35 @@ export function calcMetaMesAjustada({ posts, metaAnual, mesFiltroParam }) {
 }
 
 /**
- * Meta progressiva por mês — para as barras do gráfico anual.
- * Cada mês MM recebe a meta calculada como se estivéssemos no início daquele mês:
- * - Janeiro:   metaAnual / 12
- * - Fevereiro: (metaAnual − totalJan) / 11
- * - Março:     (metaAnual − totalJan − totalFev) / 10
- * - …e assim por diante
+ * Meta progressiva por mês — para as barras do gráfico anual e painel direito.
+ *
+ * Regra:
+ * - Meses já encerrados (< mês real de hoje): meta calculada a partir daquele mês
+ *     → (metaAnual − total dos meses anteriores) ÷ meses restantes a partir dali
+ * - Mês atual e futuros (>= mês real de hoje): todos mostram a mesma meta
+ *     → (metaAnual − total acumulado até o mês anterior ao atual) ÷ meses restantes
+ *     O valor só muda quando o mês virar.
  */
 export function calcMetaMesProgressiva({ posts, metaAnual, mm, yyyy }) {
   if (!metaAnual) return 0
-  const mes = parseInt(mm, 10)
 
-  // Soma tudo que foi realizado nos meses anteriores a este
+  const mes     = parseInt(mm, 10)
+  const hoje    = new Date()
+  const mesHoje = hoje.getMonth() + 1
+  const anoHoje = String(hoje.getFullYear())
+
+  // Define o "corte": para meses passados usa o próprio mês, para atual/futuros usa hoje
+  const isPast  = yyyy < anoHoje || (yyyy === anoHoje && mes < mesHoje)
+  const mesCorte = isPast ? mes : mesHoje
+
   const totalAnteriores = posts.reduce((s, p) => {
     const pts = p.data_post?.split('/')
     if (!pts || pts[2] !== yyyy) return s
-    if (parseInt(pts[1], 10) < mes) return s + (p.contas_alcancadas || 0)
+    if (parseInt(pts[1], 10) < mesCorte) return s + (p.contas_alcancadas || 0)
     return s
   }, 0)
 
-  const mesesRestantes = 12 - mes + 1
+  const mesesRestantes = 12 - mesCorte + 1
   if (mesesRestantes <= 0) return 0
 
   return Math.round(Math.max(metaAnual - totalAnteriores, 0) / mesesRestantes)
