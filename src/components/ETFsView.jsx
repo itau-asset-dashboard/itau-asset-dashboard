@@ -134,7 +134,7 @@ export default function ETFsView() {
         </div>
 
         {/* Controles: toggle + seletor de mês */}
-        <div style={{ display:'flex', alignItems:'center', gap:10, flexWrap:'wrap' }}>
+        <div className="etf-header-controls" style={{ display:'flex', alignItems:'center', gap:10, flexWrap:'wrap' }}>
 
           {/* Toggle Anual / Mensal */}
           <div style={{
@@ -157,7 +157,7 @@ export default function ETFsView() {
 
           {/* Seletor de mês (só no modo mensal) */}
           {viewMode === 'mensal' && (
-            <div style={{ display:'flex', gap:4, flexWrap:'wrap' }}>
+            <div className="etf-month-pills" style={{ display:'flex', gap:4, flexWrap:'wrap' }}>
               {MESES_LABEL.map((m, i) => (
                 <button key={i} onClick={() => setMesSel(i)}
                   style={{

@@ -102,7 +102,7 @@ export default function Insights() {
           </button>
         </div>
 
-        <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(270px,1fr))', gap:12 }}>
+        <div className="insights-grid" style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(270px,1fr))', gap:12 }}>
           {list.map((ins,i) => (
             <div key={i} className="card" style={{ padding:'18px 20px' }}>
               <div style={{ display:'flex', alignItems:'flex-start', gap:12 }}>
@@ -139,7 +139,7 @@ export default function Insights() {
         </div>
 
         {/* Mensagens */}
-        <div style={{ minHeight:200, maxHeight:420, overflowY:'auto', padding:'16px 20px', display:'flex', flexDirection:'column', gap:12 }} className="scrollbar-thin">
+        <div className="chat-messages scrollbar-thin" style={{ minHeight:200, maxHeight:420, overflowY:'auto', padding:'16px 20px', display:'flex', flexDirection:'column', gap:12 }}>
 
           {chatMessages.length === 0 && (
             <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
