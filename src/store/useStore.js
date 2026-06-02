@@ -3,6 +3,14 @@ import { persist } from 'zustand/middleware'
 import { fetchPosts, upsertPost, removePost, fetchSetting, saveSetting, uploadImage, deleteImage } from '../lib/supabase'
 import { normalizeTema } from '../utils/temas'
 
+function normalizeDate(d) {
+  if (!d) return d
+  const parts = d.replace(/-/g, '/').split('/')
+  if (parts.length !== 3) return d
+  if (parts[0].length === 4) return `${parts[2].padStart(2,'0')}/${parts[1].padStart(2,'0')}/${parts[0]}`
+  return `${parts[0].padStart(2,'0')}/${parts[1].padStart(2,'0')}/${parts[2]}`
+}
+
 export const useStore = create(
   persist(
     (set, get) => ({
@@ -32,13 +40,13 @@ export const useStore = create(
           const dirty = [] // posts com tema sujo que precisam ser re-salvos
           const posts = cloudPosts.map(cp => {
             const local = localPosts.find(lp => lp.id === cp.id)
-            const merged = local?.imageData ? { ...cp, imageData: local.imageData } : cp
-            const temaNorm = normalizeTema(merged.tema)
-            // Detecta se o tema estava sujo (string ≠ array limpo)
-            const temaOriginal = JSON.stringify(merged.tema)
-            const temaLimpo    = JSON.stringify(temaNorm)
-            if (temaOriginal !== temaLimpo) dirty.push({ ...merged, tema: temaNorm })
-            return { ...merged, tema: temaNorm }
+            const merged    = local?.imageData ? { ...cp, imageData: local.imageData } : cp
+            const temaNorm  = normalizeTema(merged.tema)
+            const dateNorm  = normalizeDate(merged.data_post)
+            const wasDirty  = JSON.stringify(merged.tema) !== JSON.stringify(temaNorm)
+                           || dateNorm !== merged.data_post
+            if (wasDirty) dirty.push({ ...merged, tema: temaNorm, data_post: dateNorm })
+            return { ...merged, tema: temaNorm, data_post: dateNorm }
           })
           set({
             posts,

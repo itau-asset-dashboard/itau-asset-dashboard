@@ -178,6 +178,7 @@ const SinglePostModal = forwardRef(function SinglePostModal({ initialPost, initi
       const compressed = preview ? await compressImage(preview) : form.imageData
       const dados = {
         ...form,
+        data_post: formatDate(form.data_post),         // garante DD/MM/AAAA ao salvar
         imageData: compressed,
         // Passa o preview original para upload em alta qualidade no Storage
         imagePreview: preview || null,
