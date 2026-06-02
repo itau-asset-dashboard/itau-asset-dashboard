@@ -125,60 +125,70 @@ export default function ETFsView() {
     <div style={{ display:'flex', flexDirection:'column', gap:16 }}>
 
       {/* Header */}
-      <div style={{ display:'flex', alignItems:'flex-start', justifyContent:'space-between', flexWrap:'wrap', gap:12 }}>
-        <div>
-          <h2 style={{ color:'#1C252E', fontSize:20, fontWeight:800 }}>ETFs</h2>
-          <p style={{ color:'#9AAAB8', fontSize:13, marginTop:3 }}>
-            Performance do tema ETFs · {periodoLabel} · inclui ETFs, ETFs em destaque e Educacionais ETFs
-          </p>
-        </div>
+      <div style={{ display:'flex', flexDirection:'column', gap:12 }}>
 
-        {/* Controles: toggle + seletor de mês */}
-        <div className="etf-header-controls" style={{ display:'flex', alignItems:'center', gap:10, flexWrap:'wrap' }}>
-
-          {/* Toggle Anual / Mensal */}
-          <div style={{
-            display:'flex', background:'rgba(28,37,46,0.06)', borderRadius:12,
-            padding:3, gap:2,
-          }}>
-            {['anual','mensal'].map(mode => (
-              <button key={mode} onClick={() => setViewMode(mode)}
-                style={{
-                  padding:'6px 16px', borderRadius:10, border:'none', cursor:'pointer',
-                  fontSize:13, fontWeight: viewMode===mode ? 700 : 400,
-                  background: viewMode===mode ? '#1C252E' : 'transparent',
-                  color: viewMode===mode ? '#C3EBF7' : '#5A7080',
-                  transition:'all 0.15s',
-                }}>
-                {mode === 'anual' ? 'Anual' : 'Mensal'}
-              </button>
-            ))}
+        {/* Linha 1: título + toggle + participação */}
+        <div style={{ display:'flex', alignItems:'flex-start', justifyContent:'space-between', flexWrap:'wrap', gap:10 }}>
+          <div>
+            <h2 style={{ color:'#1C252E', fontSize:20, fontWeight:800 }}>ETFs</h2>
+            <p style={{ color:'#9AAAB8', fontSize:13, marginTop:3 }}>
+              Performance do tema ETFs · {periodoLabel}
+            </p>
           </div>
 
-          {/* Seletor de mês (só no modo mensal) */}
-          {viewMode === 'mensal' && (
-            <div className="etf-month-pills" style={{ display:'flex', gap:4, flexWrap:'wrap' }}>
-              {MESES_LABEL.map((m, i) => (
-                <button key={i} onClick={() => setMesSel(i)}
+          <div style={{ display:'flex', alignItems:'center', gap:10 }}>
+            {/* Toggle Anual / Mensal */}
+            <div style={{
+              display:'flex', background:'rgba(28,37,46,0.06)', borderRadius:12,
+              padding:3, gap:2,
+            }}>
+              {['anual','mensal'].map(mode => (
+                <button key={mode} onClick={() => setViewMode(mode)}
                   style={{
-                    padding:'5px 10px', borderRadius:8, border:'none', cursor:'pointer',
-                    fontSize:11, fontWeight: mesSel===i ? 700 : 400,
-                    background: mesSel===i ? '#0891B2' : 'rgba(8,145,178,0.08)',
-                    color: mesSel===i ? '#fff' : '#0891B2',
+                    padding:'6px 16px', borderRadius:10, border:'none', cursor:'pointer',
+                    fontSize:13, fontWeight: viewMode===mode ? 700 : 400,
+                    background: viewMode===mode ? '#1C252E' : 'transparent',
+                    color: viewMode===mode ? '#C3EBF7' : '#5A7080',
                     transition:'all 0.15s',
                   }}>
-                  {m}
+                  {mode === 'anual' ? 'Anual' : 'Mensal'}
                 </button>
               ))}
             </div>
-          )}
 
-          {/* Pill participação */}
-          <div style={{ background:'rgba(8,145,178,0.08)', borderRadius:12, padding:'8px 16px', textAlign:'center' }}>
-            <p style={{ color:'#0891B2', fontSize:20, fontWeight:800, lineHeight:1 }}>{participacao.toFixed(1)}%</p>
-            <p style={{ color:'#9AAAB8', fontSize:11, marginTop:2 }}>do alcance total</p>
+            {/* Pill participação */}
+            <div style={{ background:'rgba(8,145,178,0.08)', borderRadius:12, padding:'8px 16px', textAlign:'center' }}>
+              <p style={{ color:'#0891B2', fontSize:20, fontWeight:800, lineHeight:1 }}>{participacao.toFixed(1)}%</p>
+              <p style={{ color:'#9AAAB8', fontSize:11, marginTop:2 }}>do alcance total</p>
+            </div>
           </div>
         </div>
+
+        {/* Linha 2: seletor de mês full-width (só no modo mensal) */}
+        {viewMode === 'mensal' && (
+          <div style={{
+            display:'grid',
+            gridTemplateColumns:'repeat(12, 1fr)',
+            gap:6,
+            background:'rgba(8,145,178,0.05)',
+            borderRadius:14,
+            padding:6,
+          }}>
+            {MESES_LABEL.map((m, i) => (
+              <button key={i} onClick={() => setMesSel(i)}
+                style={{
+                  padding:'7px 4px', borderRadius:10, border:'none', cursor:'pointer',
+                  fontSize:12, fontWeight: mesSel===i ? 700 : 500,
+                  background: mesSel===i ? '#0891B2' : 'transparent',
+                  color: mesSel===i ? '#fff' : '#0891B2',
+                  transition:'all 0.15s',
+                  textAlign:'center',
+                }}>
+                {m}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* KPIs */}
