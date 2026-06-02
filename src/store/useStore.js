@@ -90,6 +90,12 @@ export const useStore = create(
           if (toSave.length > 0) {
             toSave.forEach(p => { try { upsertPost(p) } catch (_) {} })
           }
+
+          // Sempre garante que oliverData local está no Supabase
+          // (migração de dados existentes antes do sync automático)
+          if (Object.keys(newOliver).length > 0) {
+            try { saveSetting('oliver_data', JSON.stringify(newOliver)) } catch (_) {}
+          }
         } catch (e) {
           set({ syncing: false, syncError: e.message })
         }
