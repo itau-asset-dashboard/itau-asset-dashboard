@@ -76,17 +76,14 @@ export default function Sidebar() {
         overflow: 'hidden',
       }}>
 
-        {/* ── Topo: logo + badge ── */}
-        <div style={{ padding: '0 4px', marginBottom: 24 }}>
-          <div style={{ marginBottom: 12 }}>
-            <ItauLogo size={40} />
-          </div>
+        {/* ── Topo: só o badge @itauasset ── */}
+        <div style={{ padding: '0 4px', marginBottom: 20 }}>
           <div style={{
-            display: 'inline-flex', alignItems: 'center', gap: 6,
-            background: '#EDEFF2', borderRadius: 20, padding: '5px 11px',
+            display: 'inline-flex', alignItems: 'center', gap: 8,
+            background: '#EDEFF2', borderRadius: 24, padding: '8px 14px',
           }}>
-            <InstagramIcon size={11} color="#5A6A7A" />
-            <span style={{ color: '#3D4E5C', fontSize: 11, fontWeight: 600 }}>@itauasset</span>
+            <InstagramIcon size={14} color="#3D4E5C" />
+            <span style={{ color: '#1C252E', fontSize: 13, fontWeight: 700, letterSpacing: '-0.01em' }}>@itauasset</span>
           </div>
         </div>
 

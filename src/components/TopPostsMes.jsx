@@ -17,26 +17,31 @@ const TIPO_ICON  = { Reels: Film, Carrossel: LayoutPanelLeft, 'Foto estática': 
 
 const MESES_FULL = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro']
 
-// Medalhas: SVG discreto para top 3, número simples para 4º e 5º
+// Indicadores de posição — top 3 com pill colorido, restante com número simples
 function Position({ i }) {
   if (i >= 3) return (
-    <span style={{ width: 22, textAlign: 'center', color: '#A8B5C0', fontSize: 12, fontWeight: 700, flexShrink: 0 }}>
+    <span style={{
+      width: 24, textAlign: 'center', flexShrink: 0,
+      color: '#B0BEC5', fontSize: 11, fontWeight: 700,
+    }}>
       {i + 1}º
     </span>
   )
-  const colors = [
-    { fill: '#F59E0B', text: '#92400E' },  // ouro
-    { fill: '#94A3B8', text: '#475569' },  // prata
-    { fill: '#CD7C3A', text: '#7C2D12' },  // bronze
+  const styles = [
+    { bg: '#FEF3C7', color: '#B45309', label: '1º' },   // ouro
+    { bg: '#F1F5F9', color: '#64748B', label: '2º' },   // prata
+    { bg: '#FEF0E7', color: '#9A5C2E', label: '3º' },   // bronze
   ]
-  const { fill } = colors[i]
+  const { bg, color, label } = styles[i]
   return (
-    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" style={{ flexShrink: 0 }}>
-      <circle cx="10" cy="10" r="9" fill={fill} opacity="0.18"/>
-      <circle cx="10" cy="10" r="6" fill={fill} opacity="0.35"/>
-      <text x="10" y="14" textAnchor="middle" fontSize="8" fontWeight="800"
-        fill={fill} fontFamily="DM Sans, sans-serif">{i + 1}</text>
-    </svg>
+    <span style={{
+      width: 26, height: 22, borderRadius: 6,
+      background: bg, color, fontSize: 11, fontWeight: 800,
+      display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+      flexShrink: 0, letterSpacing: '-0.02em',
+    }}>
+      {label}
+    </span>
   )
 }
 

@@ -1,5 +1,58 @@
 import { useRef, useEffect, useState } from 'react'
 import { RefreshCw, Send, Trash2 } from 'lucide-react'
+
+// Renderer simples de markdown para respostas da IA
+function MarkdownText({ text }) {
+  const lines = text.split('\n')
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+      {lines.map((line, i) => {
+        if (!line.trim()) return <div key={i} style={{ height: 4 }} />
+
+        // Título ## ou ###
+        if (line.startsWith('## ') || line.startsWith('### ')) {
+          const t = line.replace(/^#{2,3}\s/, '')
+          return <p key={i} style={{ fontWeight: 700, fontSize: 13, color: '#182638', marginTop: 6 }}>{renderInline(t)}</p>
+        }
+
+        // Bullet — ou *
+        if (/^[-*•]\s/.test(line)) {
+          const t = line.replace(/^[-*•]\s/, '')
+          return (
+            <div key={i} style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
+              <span style={{ color: '#F97316', fontWeight: 800, fontSize: 14, lineHeight: 1.5, flexShrink: 0 }}>·</span>
+              <span style={{ fontSize: 13, lineHeight: 1.6 }}>{renderInline(t)}</span>
+            </div>
+          )
+        }
+
+        // Linha numerada 1.
+        if (/^\d+\.\s/.test(line)) {
+          const num = line.match(/^(\d+)\./)?.[1]
+          const t = line.replace(/^\d+\.\s/, '')
+          return (
+            <div key={i} style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
+              <span style={{ color: '#F97316', fontWeight: 700, fontSize: 12, lineHeight: 1.7, flexShrink: 0, minWidth: 16 }}>{num}.</span>
+              <span style={{ fontSize: 13, lineHeight: 1.6 }}>{renderInline(t)}</span>
+            </div>
+          )
+        }
+
+        return <p key={i} style={{ fontSize: 13, lineHeight: 1.65 }}>{renderInline(line)}</p>
+      })}
+    </div>
+  )
+}
+
+function renderInline(text) {
+  // **negrito**
+  const parts = text.split(/(\*\*[^*]+\*\*)/g)
+  return parts.map((p, i) =>
+    p.startsWith('**') && p.endsWith('**')
+      ? <strong key={i} style={{ fontWeight: 700, color: '#182638' }}>{p.slice(2, -2)}</strong>
+      : p
+  )
+}
 import { useStore } from '../store/useStore'
 import { generateInsights, chatWithData } from '../utils/anthropic'
 
@@ -169,14 +222,18 @@ export default function Insights() {
               justifyContent: m.role === 'user' ? 'flex-end' : 'flex-start',
             }}>
               <div style={{
-                maxWidth:'80%',
-                background: m.role === 'user' ? '#1C252E' : '#F4F8FB',
-                color: m.role === 'user' ? '#C3EBF7' : '#1C252E',
+                maxWidth: m.role === 'user' ? '75%' : '90%',
+                background: m.role === 'user' ? '#182638' : '#F4F8FB',
+                color: m.role === 'user' ? '#C3EBF7' : '#3D4E5C',
                 borderRadius: m.role === 'user' ? '16px 16px 4px 16px' : '16px 16px 16px 4px',
-                padding:'10px 14px', fontSize:13, lineHeight:1.6,
-                whiteSpace:'pre-wrap',
+                padding: m.role === 'user' ? '10px 14px' : '14px 16px',
+                fontSize:13, lineHeight:1.6,
+                border: m.role === 'assistant' ? '1px solid #E8EDF2' : 'none',
               }}>
-                {m.content}
+                {m.role === 'user'
+                  ? <span style={{ whiteSpace: 'pre-wrap' }}>{m.content}</span>
+                  : <MarkdownText text={m.content} />
+                }
               </div>
             </div>
           ))}
