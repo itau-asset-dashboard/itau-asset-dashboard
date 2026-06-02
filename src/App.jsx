@@ -20,7 +20,17 @@ import OliverView from './components/OliverView'
 export default function App() {
   const { activeSection, syncFromCloud } = useStore()
 
-  useEffect(() => { syncFromCloud() }, [])
+  useEffect(() => {
+    // Sync inicial
+    syncFromCloud()
+
+    // Re-sync quando o usuário volta para a aba/app (mobile ou desktop)
+    function onVisible() {
+      if (document.visibilityState === 'visible') syncFromCloud()
+    }
+    document.addEventListener('visibilitychange', onVisible)
+    return () => document.removeEventListener('visibilitychange', onVisible)
+  }, [])
 
   const showRight = activeSection === 'visao-geral'
 

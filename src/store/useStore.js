@@ -30,10 +30,11 @@ export const useStore = create(
       syncFromCloud: async () => {
         set({ syncing: true, syncError: null })
         try {
-          const [cloudPosts, metaMensal, metaAnual] = await Promise.all([
+          const [cloudPosts, metaMensal, metaAnual, oliverRaw] = await Promise.all([
             fetchPosts(),
             fetchSetting('meta_mensal'),
             fetchSetting('meta_anual'),
+            fetchSetting('oliver_data'),
           ])
           // Preserva imageData local — nunca é salvo no Supabase (muito pesado)
           // Também normaliza o campo `tema` para array limpo
@@ -67,10 +68,20 @@ export const useStore = create(
             data_post: normalizeDate(p.data_post),
           }))
 
+          // Merge oliverData: cloud tem prioridade, mas mantém entradas locais não presentes na nuvem
+          let newOliver = get().oliverData
+          if (oliverRaw) {
+            try {
+              const fromCloud = JSON.parse(oliverRaw)
+              newOliver = { ...newOliver, ...fromCloud }
+            } catch (_) {}
+          }
+
           set({
             posts: [...posts, ...orphansNorm],
             metaMensal: metaMensal ? Number(metaMensal) : get().metaMensal,
             metaAnual:  metaAnual  ? Number(metaAnual)  : get().metaAnual,
+            oliverData: newOliver,
             syncing: false,
           })
 
@@ -102,9 +113,15 @@ export const useStore = create(
 
       setMesFiltro: (mes) => set({ mesFiltro: mes }),
 
-      setOliverData: (mes, valores) => set(s => ({
-        oliverData: { ...s.oliverData, [mes]: { ...s.oliverData[mes], ...valores } }
-      })),
+      setOliverData: (mes, valores) => {
+        const updated = {
+          ...get().oliverData,
+          [mes]: { ...(get().oliverData[mes] || {}), ...valores },
+        }
+        set({ oliverData: updated })
+        // Persiste no Supabase para sincronizar entre dispositivos
+        try { saveSetting('oliver_data', JSON.stringify(updated)) } catch (_) {}
+      },
 
       // ── Posts ──────────────────────────────────────────
       addPost: async (post) => {

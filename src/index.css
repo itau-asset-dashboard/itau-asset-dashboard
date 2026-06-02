@@ -116,7 +116,8 @@ html, body, #root {
 
   /* Tabelas — scroll horizontal */
   .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-  table { font-size: 12px !important; min-width: 480px; }
+  .table-scroll table, [style*="overflowX"] table { min-width: 460px; }
+  table { font-size: 12px !important; }
   td, th { padding: 9px 10px !important; }
 
   /* Charts — altura reduzida */

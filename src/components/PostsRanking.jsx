@@ -80,7 +80,7 @@ export default function PostsRanking() {
         <p style={{ color: '#8A9BB0', fontSize: 12, marginTop: 2 }}>{posts.length} publicações</p>
       </div>
 
-      <div style={{ overflowX: 'auto' }} className="scrollbar-thin">
+      <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }} className="scrollbar-thin">
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
             <tr>

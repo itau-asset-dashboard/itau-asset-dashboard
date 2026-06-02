@@ -77,9 +77,10 @@ export default function TopBar() {
           </button>
           {showApi && (
             <div style={{
-              position: 'absolute', top: 'calc(100% + 8px)', right: 0,
+              position: 'fixed', top: 56, right: 12,
               background: '#fff', border: '1px solid #EAECF0', borderRadius: 14,
-              padding: 16, zIndex: 300, boxShadow: '0 8px 32px rgba(0,0,0,0.12)', width: 290,
+              padding: 16, zIndex: 300, boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
+              width: 'min(290px, calc(100vw - 24px))',
             }}>
               <p style={{ color: '#1C252E', fontSize: 13, fontWeight: 600, marginBottom: 8 }}>Chave da API Anthropic</p>
               <input type="password" value={keyInput} onChange={e => setKeyInput(e.target.value)}
