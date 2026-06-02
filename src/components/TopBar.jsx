@@ -65,15 +65,16 @@ export default function TopBar() {
 
         {/* API */}
         <div style={{ position: 'relative' }}>
-          <button onClick={() => setShowApi(v => !v)} style={{
-            background: '#fff',
-            border: `1.5px solid ${apiKey ? '#EDEFF2' : 'rgba(239,68,68,0.3)'}`,
-            borderRadius: 10, padding: '7px 12px', fontSize: 13, fontWeight: 500,
-            color: apiKey ? '#4A5568' : '#ef4444', cursor: 'pointer',
-            display: 'flex', alignItems: 'center', gap: 6, fontFamily: 'DM Sans, sans-serif',
-          }}>
-            <Key size={13} />
-            <span className="hide-mobile">{apiKey ? 'API ativa' : 'Sem API'}</span>
+          <button onClick={() => setShowApi(v => !v)}
+            title={apiKey ? 'API ativa' : 'Sem API — clique para configurar'}
+            style={{
+              background: '#fff',
+              border: `1.5px solid ${apiKey ? '#EDEFF2' : 'rgba(239,68,68,0.3)'}`,
+              borderRadius: 10, padding: '7px 9px', cursor: 'pointer',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              color: apiKey ? '#4A5568' : '#ef4444',
+            }}>
+            <Key size={14} />
           </button>
           {showApi && (
             <div style={{
@@ -95,13 +96,13 @@ export default function TopBar() {
         </div>
 
         {/* CSV */}
-        <button onClick={exportCSV} style={{
-          background: '#fff', border: '1.5px solid #EDEFF2', borderRadius: 10,
-          padding: '7px 12px', fontSize: 13, color: '#4A5568', cursor: 'pointer',
-          display: 'flex', alignItems: 'center', gap: 6, fontFamily: 'DM Sans, sans-serif',
-        }}>
-          <Download size={13} />
-          <span className="hide-mobile">CSV</span>
+        <button onClick={exportCSV} title="Exportar CSV"
+          style={{
+            background: '#fff', border: '1.5px solid #EDEFF2', borderRadius: 10,
+            padding: '7px 9px', color: '#4A5568', cursor: 'pointer',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}>
+          <Download size={14} />
         </button>
       </div>
 

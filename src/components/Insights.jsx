@@ -58,12 +58,10 @@ import { useStore } from '../store/useStore'
 import { generateInsights, chatWithData } from '../utils/anthropic'
 
 const DEFAULT = [
-  { icone:'🔑', titulo:'Configure sua chave de API',     texto:'Clique em "API ativa" na barra superior para inserir sua chave Anthropic e ativar insights automáticos.' },
+  { icone:'🔑', titulo:'Configure sua chave de API',     texto:'Clique no ícone de chave na barra superior para inserir sua chave Anthropic e ativar insights automáticos.' },
   { icone:'📊', titulo:'Dados prontos para análise',     texto:'Com pelo menos 2 posts cadastrados, você pode gerar análise completa de performance e recomendações estratégicas.' },
-  { icone:'💡', titulo:'Dica de upload',                 texto:'Use o botão "Novo post" para adicionar prints de métricas diretamente do Instagram com extração automática por IA.' },
   { icone:'📈', titulo:'Acompanhe sua meta mensal',      texto:'Na Visão Anual você encontra a meta ajustada mês a mês com base no saldo acumulado do ano.' },
   { icone:'🎯', titulo:'Top posts por mês',              texto:'Na Visão Mensal você vê o ranking dos 5 melhores posts do período com medalhas e barras de progresso.' },
-  { icone:'📂', titulo:'Múltiplos temas por post',       texto:'Ao cadastrar um post você pode selecionar mais de um tema, facilitando análises cruzadas.' },
   { icone:'🔖', titulo:'Aba dedicada a ETFs',            texto:'A aba ETFs mostra KPIs, evolução mensal de alcance e volume de posts, top posts e performance por formato.' },
   { icone:'☁️', titulo:'Sincronização automática',      texto:'Todos os dados ficam salvos na nuvem e são compartilhados entre dispositivos automaticamente ao abrir o app.' },
 ]
@@ -180,8 +178,11 @@ export default function Insights() {
         {/* Header do chat */}
         <div style={{ padding:'16px 20px', borderBottom:'1px solid #F0F4F8', display:'flex', alignItems:'center', justifyContent:'space-between' }}>
           <div>
-            <h2 style={{ color:'#1C252E', fontSize:15, fontWeight:700, margin:0 }}>Converse com seus dados</h2>
-            <p style={{ color:'#8A9BB0', fontSize:12, marginTop:2 }}>Faça perguntas sobre performance, posts e tendências</p>
+            <div style={{ display:'flex', alignItems:'center', gap:8 }}>
+              <div style={{ width:28, height:28, borderRadius:8, background:'rgba(249,115,22,0.10)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:14 }}>🤖</div>
+              <h2 style={{ color:'#182638', fontSize:15, fontWeight:700, margin:0 }}>Converse com a IAsset</h2>
+            </div>
+            <p style={{ color:'#8A9BB0', fontSize:12, marginTop:4 }}>Pergunte sobre performance, posts e tendências</p>
           </div>
           {chatMessages.length > 0 && (
             <button onClick={clearChat}
@@ -270,7 +271,7 @@ export default function Insights() {
             value={input}
             onChange={e => setInput(e.target.value)}
             onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage() } }}
-            placeholder="Pergunte algo sobre os dados..."
+            placeholder="Pergunte algo para a IAsset..."
             style={{
               flex:1, border:'1.5px solid #E8ECF0', borderRadius:10,
               padding:'9px 13px', fontSize:13, outline:'none',

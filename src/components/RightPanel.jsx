@@ -160,21 +160,6 @@ export default function RightPanel() {
         </div>
       </div>
 
-      {/* Botão novo post */}
-      <button onClick={()=>setUploadOpen(true)}
-        style={{
-          width:'100%', background:'#1C252E', border:'none',
-          borderRadius:12, padding:'10px',
-          color:'#C3EBF7', fontSize:13, fontWeight:700, cursor:'pointer',
-          display:'flex', alignItems:'center', justifyContent:'center', gap:7,
-          transition:'opacity 0.15s',
-        }}
-        onMouseEnter={e=>e.currentTarget.style.opacity='0.85'}
-        onMouseLeave={e=>e.currentTarget.style.opacity='1'}
-      >
-        <Plus size={15}/> Novo post
-      </button>
-
       {/* Posts recentes */}
       <div style={{ flex:1, display:'flex', flexDirection:'column', overflow:'hidden', minHeight:0 }}>
         <p style={{ color:'#8A9BB0', fontSize:10, fontWeight:700, textTransform:'uppercase', letterSpacing:'0.08em', marginBottom:8 }}>

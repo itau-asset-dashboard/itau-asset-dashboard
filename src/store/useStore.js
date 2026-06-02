@@ -30,11 +30,12 @@ export const useStore = create(
       syncFromCloud: async () => {
         set({ syncing: true, syncError: null })
         try {
-          const [cloudPosts, metaMensal, metaAnual, oliverRaw] = await Promise.all([
+          const [cloudPosts, metaMensal, metaAnual, oliverRaw, evidenciasRaw] = await Promise.all([
             fetchPosts(),
             fetchSetting('meta_mensal'),
             fetchSetting('meta_anual'),
             fetchSetting('oliver_data'),
+            fetchSetting('data_evidencias'),   // mapa { postId: "DD/MM/YYYY" }
           ])
           // Preserva imageData local — nunca é salvo no Supabase (muito pesado)
           // Também normaliza o campo `tema` para array limpo
@@ -45,13 +46,24 @@ export const useStore = create(
           const orphans = localPosts.filter(lp => !cloudIds.has(lp.id))
 
           const dirty = []
+          // Mapa de datas de evidência salvo no Supabase
+          let evidencias = {}
+          if (evidenciasRaw) {
+            try { evidencias = JSON.parse(evidenciasRaw) } catch (_) {}
+          }
+          // Merge com dados locais (local tem prioridade se mais recente)
+          localPosts.forEach(lp => {
+            if (lp.data_evidencia) evidencias[lp.id] = lp.data_evidencia
+          })
+
           const posts = cloudPosts.map(cp => {
             const local = localPosts.find(lp => lp.id === cp.id)
             // Preserva campos que existem só no localStorage (não estão no Supabase)
             const merged   = {
               ...cp,
-              ...(local?.imageData     && { imageData:     local.imageData }),
-              ...(local?.data_evidencia && { data_evidencia: local.data_evidencia }),
+              ...(local?.imageData && { imageData: local.imageData }),
+              // data_evidencia: prioridade para o mapa do Supabase, fallback para local
+              data_evidencia: evidencias[cp.id] || local?.data_evidencia || cp.data_evidencia || '',
             }
             const temaNorm = normalizeTema(merged.tema)
             const dateNorm = normalizeDate(merged.data_post)
@@ -92,9 +104,12 @@ export const useStore = create(
           }
 
           // Sempre garante que oliverData local está no Supabase
-          // (migração de dados existentes antes do sync automático)
           if (Object.keys(newOliver).length > 0) {
             try { saveSetting('oliver_data', JSON.stringify(newOliver)) } catch (_) {}
+          }
+          // Persiste mapa de evidências mesclado
+          if (Object.keys(evidencias).length > 0) {
+            try { saveSetting('data_evidencias', JSON.stringify(evidencias)) } catch (_) {}
           }
         } catch (e) {
           set({ syncing: false, syncError: e.message })
@@ -147,6 +162,15 @@ export const useStore = create(
 
         set((s) => ({ posts: [...s.posts, novo] }))
         try { await upsertPost({ ...novo, imageUrl: novo.imageUrl || null }) } catch (_) {}
+        // Persiste data_evidencia no Supabase
+        if (novo.data_evidencia) {
+          try {
+            const raw = await fetchSetting('data_evidencias').catch(() => null)
+            const map = raw ? JSON.parse(raw) : {}
+            map[id] = novo.data_evidencia
+            await saveSetting('data_evidencias', JSON.stringify(map))
+          } catch (_) {}
+        }
       },
 
       updatePost: async (id, newData) => {
@@ -183,6 +207,17 @@ export const useStore = create(
         })
         const updated = get().posts.find((p) => p.id === id)
         if (updated) try { await upsertPost(updated) } catch (_) {}
+        // Persiste data_evidencia no Supabase quando alterada
+        const newEvidencia = restData.data_evidencia
+        if (newEvidencia !== undefined) {
+          try {
+            const raw = await fetchSetting('data_evidencias').catch(() => null)
+            const map = raw ? JSON.parse(raw) : {}
+            if (newEvidencia) map[id] = newEvidencia
+            else delete map[id]
+            await saveSetting('data_evidencias', JSON.stringify(map))
+          } catch (_) {}
+        }
       },
 
       deletePost: async (id) => {
