@@ -20,19 +20,32 @@ export async function extractPostFromImage(base64, mediaType, apiKey) {
           {
             type: 'text',
             text: `Você é um assistente que extrai dados de prints de métricas do Instagram.
+A imagem pode estar em dois formatos:
+
+FORMATO DESKTOP (painel web): métricas com rótulos de texto como "Contas alcançadas", "Visualizações", "Curtidas", etc.
+
+FORMATO MOBILE (app do Instagram): ícones em linha abaixo do post, da esquerda para direita:
+  - Coração (♡) = curtidas
+  - Balão de fala = comentários
+  - Seta circular / repost = compartilhamentos (reposts)
+  - Avião de papel / encaminhar = também pode ser compartilhamentos
+  - Marcador/bookmark = salvamentos
+  Abaixo dos ícones aparecem cards com "Visualizações" e "Contas alcançadas" em destaque.
+  Pode haver também "Tempo médio de visualização" e "Seguidores" — ignore esses dois.
+
 Leia a imagem e retorne APENAS um JSON válido (sem markdown, sem explicação, sem bloco de código):
 {
-  "data_post": "DD/MM/AAAA ou texto visível na tela, ou null se não encontrar",
-  "tipo": "Carrossel | Reels | Foto estática — inferir pelo visual (vídeo vertical = Reels, múltiplos slides = Carrossel, imagem única = Foto estática)",
+  "data_post": "DD/MM/AAAA ou null — procure datas no print ou no conteúdo do post",
+  "tipo": "Carrossel | Reels | Foto estática — Reels se for vídeo/reel, Carrossel se múltiplos slides, Foto estática se imagem única",
   "contas_alcancadas": número inteiro ou null,
   "visualizacoes": número inteiro ou null,
-  "interacoes": número inteiro (total de interações) ou null,
+  "interacoes": número inteiro (total de interações, se explícito) ou null,
   "curtidas": número inteiro ou null,
   "comentarios": número inteiro ou null,
   "salvamentos": número inteiro ou null,
   "compartilhamentos": número inteiro ou null
 }
-Importante: extraia apenas números que estejam explicitamente visíveis no print. Não some nem calcule — use null se não encontrar o campo.`
+Importante: extraia apenas números explicitamente visíveis. Não some nem calcule — use null se não encontrar.`
           }
         ]
       }]

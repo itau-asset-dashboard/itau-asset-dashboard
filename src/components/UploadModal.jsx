@@ -22,13 +22,20 @@ export const TEMAS = [
 ]
 
 const NUM_FIELDS = [
-  { key: 'contas_alcancadas', label: 'Contas alcançadas', highlight: true },
-  { key: 'visualizacoes',     label: 'Visualizações' },
-  { key: 'interacoes',        label: 'Interações (total)' },
-  { key: 'curtidas',          label: 'Curtidas' },
-  { key: 'comentarios',       label: 'Comentários' },
-  { key: 'salvamentos',       label: 'Salvamentos' },
-  { key: 'compartilhamentos', label: 'Compartilhamentos' },
+  { key: 'contas_alcancadas', label: 'Contas alcançadas', highlight: true,
+    tooltip: 'Número de contas únicas do Instagram que viram este post pelo menos uma vez. Essa métrica é estimada.' },
+  { key: 'visualizacoes',     label: 'Visualizações',
+    tooltip: 'Quantas vezes o post foi exibido no total (inclui a mesma conta ver mais de uma vez).' },
+  { key: 'interacoes',        label: 'Interações (total)',
+    tooltip: 'Soma de todas as interações: curtidas + comentários + salvamentos + compartilhamentos.' },
+  { key: 'curtidas',          label: 'Curtidas',
+    tooltip: 'Ícone de coração (♡) no app mobile. Número de contas que curtiram o post.' },
+  { key: 'comentarios',       label: 'Comentários',
+    tooltip: 'Ícone de balão de fala no app mobile. Número de comentários no post.' },
+  { key: 'salvamentos',       label: 'Salvamentos',
+    tooltip: 'Ícone de marcador/bookmark no app mobile. Contas que salvaram o post para ver depois.' },
+  { key: 'compartilhamentos', label: 'Compartilhamentos',
+    tooltip: 'Ícone de avião de papel ou seta circular no app mobile. Inclui encaminhamentos e reposts.' },
 ]
 
 const inp = (highlight) => ({
@@ -354,13 +361,25 @@ const SinglePostModal = forwardRef(function SinglePostModal({ initialPost, initi
           Métricas
         </p>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-          {NUM_FIELDS.map(({ key, label, highlight }) => (
+          {NUM_FIELDS.map(({ key, label, highlight, tooltip }) => (
             <div key={key} style={highlight ? { gridColumn: '1 / -1' } : {}}>
               <label style={{
                 color: highlight ? '#1a7a96' : '#8A9BB0',
                 fontSize: 11, fontWeight: highlight ? 700 : 600,
-                display: 'block', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.04em',
-              }}>{label}</label>
+                display: 'flex', alignItems: 'center', gap: 5,
+                marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.04em',
+              }}>
+                {label}
+                {tooltip && (
+                  <span title={tooltip} style={{
+                    display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                    width: 14, height: 14, borderRadius: '50%',
+                    background: 'rgba(138,155,176,0.2)', color: '#8A9BB0',
+                    fontSize: 9, fontWeight: 700, cursor: 'help', flexShrink: 0,
+                    lineHeight: 1, letterSpacing: 0,
+                  }}>?</span>
+                )}
+              </label>
               <input type="number"
                 value={form[key] === null || form[key] === undefined ? '' : form[key]}
                 onChange={e => set(key, e.target.value)}
