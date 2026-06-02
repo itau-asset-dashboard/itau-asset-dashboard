@@ -13,6 +13,12 @@ function fmt(n) {
   return Number(n).toLocaleString('pt-BR')
 }
 
+// Números Oliver sempre exatos, sem abreviação
+function fmtExato(n) {
+  if (n == null || n === '' || isNaN(n)) return '—'
+  return Number(n).toLocaleString('pt-BR')
+}
+
 function pctDiff(a, b) {
   if (!a || !b) return null
   return ((a - b) / b * 100).toFixed(1)
@@ -85,7 +91,7 @@ export default function OliverView() {
       <div className="kpi-grid">
         {[
           { label: 'Total Instagram (ano)', value: fmt(totalInsta),  color: '#1C252E', bg: 'rgba(28,37,46,0.06)',      desc: 'Soma das contas alcançadas via Instagram' },
-          { label: 'Total Oliver (ano)',    value: fmt(totalOliver || null), color: '#F97316', bg: 'rgba(249,115,22,0.08)', desc: 'Soma dos dados da agência' },
+          { label: 'Total Oliver (ano)',    value: fmtExato(totalOliver || null), color: '#F97316', bg: 'rgba(249,115,22,0.08)', desc: 'Soma dos dados da agência' },
           { label: 'Diferença acumulada',  value: diff ? `${diff > 0 ? '+' : ''}${diff}%` : '—',
             color: diff == null ? '#9AAAB8' : diff > 0 ? '#16a34a' : '#ef4444',
             bg: diff == null ? '#F4F6F8' : diff > 0 ? 'rgba(22,163,74,0.08)' : 'rgba(239,68,68,0.08)',
@@ -112,7 +118,7 @@ export default function OliverView() {
               <YAxis tick={{ fill: '#9AAAB8', fontSize: 10 }} axisLine={false} tickLine={false}
                 tickFormatter={v => v === 0 ? '' : fmt(v)} width={48} />
               <Tooltip
-                formatter={(v, name) => [fmt(v), name === 'alcance_insta' ? 'Instagram' : 'Oliver']}
+                formatter={(v, name) => [name === 'alcance_oliver' ? fmtExato(v) : fmt(v), name === 'alcance_insta' ? 'Instagram' : 'Oliver']}
                 labelFormatter={(_, p) => p?.[0]?.payload?.mesFull || ''}
                 contentStyle={{ borderRadius: 10, border: '1px solid #EAECF0', fontSize: 12, boxShadow: '0 4px 16px rgba(0,0,0,0.08)' }}
               />
@@ -137,7 +143,7 @@ export default function OliverView() {
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
               <tr style={{ background: '#FAFBFC' }}>
-                {['Mês','Posts','Alcance Instagram','Alcance Oliver','Meta Oliver','Diferença',''].map(h => (
+                {['Mês','Posts','Alcance Instagram','Alcance Oliver','Diferença',''].map(h => (
                   <th key={h} style={{ padding: '10px 16px', color: '#8A9BB0', fontSize: 11, fontWeight: 600,
                     textTransform: 'uppercase', letterSpacing: '0.05em', textAlign: 'left', whiteSpace: 'nowrap' }}>
                     {h}
@@ -170,26 +176,12 @@ export default function OliverView() {
                         <input type="number" value={inputVal.alcance_oliver}
                           onChange={e => setInputVal(v => ({ ...v, alcance_oliver: e.target.value }))}
                           placeholder="ex: 185000"
-                          style={{ width: 110, border: '1.5px solid #C3EBF7', borderRadius: 8,
+                          style={{ width: 120, border: '1.5px solid #C3EBF7', borderRadius: 8,
                             padding: '5px 9px', fontSize: 13, outline: 'none', fontFamily: 'DM Sans, sans-serif' }}
                           autoFocus />
                       ) : (
                         <span style={{ color: '#F97316', fontSize: 13, fontWeight: 600 }}>
-                          {fmt(m.alcance_oliver)}
-                        </span>
-                      )}
-                    </td>
-                    <td style={{ padding: '13px 16px' }}>
-                      {isEditing ? (
-                        <input type="number" value={inputVal.meta_oliver}
-                          onChange={e => setInputVal(v => ({ ...v, meta_oliver: e.target.value }))}
-                          placeholder="ex: 180000"
-                          style={{ width: 110, border: '1.5px solid #E8ECF0', borderRadius: 8,
-                            padding: '5px 9px', fontSize: 13, outline: 'none', fontFamily: 'DM Sans, sans-serif' }}
-                        />
-                      ) : (
-                        <span style={{ color: '#9AAAB8', fontSize: 13 }}>
-                          {fmt(m.meta_oliver)}
+                          {fmtExato(m.alcance_oliver)}
                         </span>
                       )}
                     </td>
