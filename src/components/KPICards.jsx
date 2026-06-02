@@ -71,6 +71,8 @@ export default function KPICards() {
           padding: mobile ? '12px 12px' : '18px 20px',
           borderTop: highlight ? `3px solid ${accent}` : '3px solid transparent',
           position: 'relative',
+          minWidth: 0,       /* CRÍTICO: impede o card de estouro o grid */
+          overflow: 'hidden',
         }}>
           <p className="kpi-label-js" style={{
             color: '#8A9BB0', fontSize: mobile ? 10 : 11, fontWeight: 600,

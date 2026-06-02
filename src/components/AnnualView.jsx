@@ -125,6 +125,8 @@ export default function AnnualView() {
               padding: mobile ? '12px 12px' : '18px 20px',
               borderTop: idx===0 ? `3px solid ${color}` : '3px solid transparent',
               position: 'relative',
+              minWidth: 0,
+              overflow: 'hidden',
             }}>
               <p className="kpi-label-js" style={{ color:'#8A9BB0', fontSize: mobile ? 10 : 11, fontWeight:600, textTransform:'uppercase', letterSpacing:'0.04em', marginBottom: mobile ? 8 : 14, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>{mLabel}</p>
               <p className="kpi-number-js" style={{ color:'#182638', fontSize: mobile ? 20 : 28, fontWeight:800, lineHeight:1, letterSpacing:'-0.02em', marginBottom: mobile ? 4 : 6 }}>{value}</p>

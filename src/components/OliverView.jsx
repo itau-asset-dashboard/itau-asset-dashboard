@@ -102,7 +102,7 @@ export default function OliverView() {
           { label: 'Meses preenchidos',    value: String(meses.filter(m => m.alcance_oliver).length) + ' / 12',
             color: '#0891B2', bg: 'rgba(8,145,178,0.08)', desc: 'Meses com dado Oliver inserido' },
         ].map(({ label, value, color, bg, desc }) => (
-          <div key={label} className="card kpi-card-js" style={{ padding: mobile ? '12px 12px' : '18px 20px' }}>
+          <div key={label} className="card kpi-card-js" style={{ padding: mobile ? '12px 12px' : '18px 20px', minWidth: 0, overflow: 'hidden' }}>
             <p className="kpi-label-js" style={{ color: '#9AAAB8', fontSize: mobile ? 10 : 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: mobile ? 6 : 5, lineHeight: 1.3 }}>{label}</p>
             <p className="kpi-number-js" style={{ color, fontSize: mobile ? 18 : 24, fontWeight: 800, lineHeight: 1.1, marginBottom: 3 }}>{value}</p>
             <p className="kpi-sub-js" style={{ color: '#9AAAB8', fontSize: mobile ? 10 : 12 }}>{desc}</p>
