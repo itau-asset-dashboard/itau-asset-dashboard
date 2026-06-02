@@ -1,3 +1,20 @@
+// ── Helper: extrai JSON de uma resposta livre do modelo ────────────────────
+function parseJsonResponse(text) {
+  const cleaned = text.replace(/```json|```/g, '').trim()
+
+  // 1ª tentativa: parse direto
+  try { return JSON.parse(cleaned) } catch (_) {}
+
+  // 2ª tentativa: pega o primeiro bloco { ... } ou [ ... ]
+  const match = cleaned.match(/(\{[\s\S]*\}|\[[\s\S]*\])/)
+  if (match) {
+    try { return JSON.parse(match[0]) } catch (_) {}
+  }
+
+  console.error('[anthropic] resposta inesperada:', text)
+  throw new Error('O modelo não retornou um JSON válido. Veja o console para detalhes.')
+}
+
 export async function extractPostFromImage(base64, mediaType, apiKey) {
   const response = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
@@ -20,32 +37,39 @@ export async function extractPostFromImage(base64, mediaType, apiKey) {
           {
             type: 'text',
             text: `Você é um assistente que extrai dados de prints de métricas do Instagram.
-A imagem pode estar em dois formatos:
+A imagem pode estar em diferentes formatos:
 
-FORMATO DESKTOP (painel web): métricas com rótulos de texto como "Contas alcançadas", "Visualizações", "Curtidas", etc.
+FORMATO DESKTOP (painel web do Instagram/Meta Business Suite):
+  Métricas com rótulos de texto visíveis: "Contas alcançadas", "Visualizações", "Curtidas", "Comentários", "Compartilhamentos", "Salvamentos".
 
-FORMATO MOBILE (app do Instagram): ícones em linha abaixo do post, da esquerda para direita:
-  - Coração (♡) = curtidas
-  - Balão de fala = comentários
-  - Seta circular / repost = compartilhamentos (reposts)
-  - Avião de papel / encaminhar = também pode ser compartilhamentos
-  - Marcador/bookmark = salvamentos
-  Abaixo dos ícones aparecem cards com "Visualizações" e "Contas alcançadas" em destaque.
-  Pode haver também "Tempo médio de visualização" e "Seguidores" — ignore esses dois.
+FORMATO MOBILE — TELA DE INSIGHTS DO POST (app Instagram):
+  Há duas sub-variações:
+  a) Tela de insights detalhados: mostra cards/blocos com os valores de "Contas alcançadas", "Impressões" ou "Visualizações", e seções de engajamento com os números de curtidas, comentários, salvamentos e compartilhamentos escritos por extenso ou com ícone + número.
+  b) Tela resumida abaixo do post: ícones em linha — coração (♡/❤) = curtidas, balão de fala = comentários, avião de papel ou seta = compartilhamentos, marcador/bookmark = salvamentos. Abaixo aparecem cards "Visualizações" e "Contas alcançadas".
 
-Leia a imagem e retorne APENAS um JSON válido (sem markdown, sem explicação, sem bloco de código):
+FORMATO MOBILE — FEED/PERFIL:
+  Pode mostrar apenas o número de curtidas abaixo da imagem. Extraia o que estiver visível.
+
+Independente do formato, procure qualquer número associado a:
+  - alcance / contas alcançadas / accounts reached
+  - impressões / visualizações / views / impressions
+  - curtidas / likes / ❤
+  - comentários / comments
+  - salvamentos / saves / bookmarks
+  - compartilhamentos / shares / reposts
+
+Retorne APENAS um JSON válido (sem markdown, sem texto fora do JSON):
 {
-  "data_post": "DD/MM/AAAA ou null — procure datas no print ou no conteúdo do post",
-  "tipo": "Carrossel | Reels | Foto estática — Reels se for vídeo/reel, Carrossel se múltiplos slides, Foto estática se imagem única",
+  "data_post": "DD/MM/AAAA ou null",
+  "tipo": "Carrossel | Reels | Foto estática",
   "contas_alcancadas": número inteiro ou null,
   "visualizacoes": número inteiro ou null,
-  "interacoes": número inteiro (total de interações, se explícito) ou null,
   "curtidas": número inteiro ou null,
   "comentarios": número inteiro ou null,
   "salvamentos": número inteiro ou null,
   "compartilhamentos": número inteiro ou null
 }
-Importante: extraia apenas números explicitamente visíveis. Não some nem calcule — use null se não encontrar.`
+Use null para qualquer campo não encontrado. Não invente valores.`
           }
         ]
       }]
@@ -58,9 +82,7 @@ Importante: extraia apenas números explicitamente visíveis. Não some nem calc
   }
 
   const data = await response.json()
-  const text = data.content?.[0]?.text || ''
-  const cleaned = text.replace(/```json|```/g, '').trim()
-  return JSON.parse(cleaned)
+  return parseJsonResponse(data.content?.[0]?.text || '')
 }
 
 export async function generateInsights(posts, apiKey) {
@@ -120,9 +142,7 @@ Retorne APENAS um JSON válido com exatamente 8 objetos (sem markdown, sem texto
   }
 
   const data = await response.json()
-  const text = data.content?.[0]?.text || ''
-  const cleaned = text.replace(/```json|```/g, '').trim()
-  return JSON.parse(cleaned)
+  return parseJsonResponse(data.content?.[0]?.text || '')
 }
 
 export async function chatWithData(messages, posts, metaMensal, metaAnual, mesFiltro, apiKey) {

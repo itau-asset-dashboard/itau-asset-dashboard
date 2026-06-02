@@ -164,7 +164,7 @@ const SinglePostModal = forwardRef(function SinglePostModal({ initialPost, initi
         compartilhamentos: data.compartilhamentos ?? f.compartilhamentos,
       }))
     } catch (e) {
-      setError('Não foi possível extrair os dados. Tente novamente.')
+      setError('Não foi possível extrair os dados: ' + (e.message || 'erro desconhecido'))
     } finally {
       setLoading(false)
     }
