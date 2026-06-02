@@ -207,6 +207,24 @@ export const useStore = create(
         return Math.round(saldo / mesesRestantes)
       },
 
+      // Força o reenvio de TODOS os posts locais para o Supabase
+      recoverLocalPosts: async () => {
+        const { posts } = get()
+        if (!posts.length) return 0
+        let saved = 0
+        for (const p of posts) {
+          try {
+            await upsertPost({
+              ...p,
+              tema: normalizeTema(p.tema),
+              data_post: normalizeDate(p.data_post),
+            })
+            saved++
+          } catch (_) {}
+        }
+        return saved
+      },
+
       getPostsDoAno: (ano) => {
         const { posts, mesFiltro } = get()
         const anoAlvo = ano || mesFiltro?.split('/')?.[1] || new Date().getFullYear().toString()
