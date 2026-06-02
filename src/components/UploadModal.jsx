@@ -26,8 +26,6 @@ const NUM_FIELDS = [
     tooltip: 'Número de contas únicas do Instagram que viram este post pelo menos uma vez. Essa métrica é estimada.' },
   { key: 'visualizacoes',     label: 'Visualizações',
     tooltip: 'Quantas vezes o post foi exibido no total (inclui a mesma conta ver mais de uma vez).' },
-  { key: 'interacoes',        label: 'Interações (total)',
-    tooltip: 'Soma de todas as interações: curtidas + comentários + salvamentos + compartilhamentos.' },
   { key: 'curtidas',          label: 'Curtidas',
     tooltip: 'Ícone de coração (♡) no app mobile. Número de contas que curtiram o post.' },
   { key: 'comentarios',       label: 'Comentários',
@@ -103,8 +101,8 @@ async function compressImage(dataUrl, maxPx = 800, quality = 0.72) {
 }
 
 const EMPTY = {
-  nome: '', tema: [], data_post: '', tipo: 'Reels', descricao: '',
-  contas_alcancadas: '', visualizacoes: '', interacoes: '',
+  nome: '', tema: [], data_post: '', data_evidencia: '', tipo: 'Reels', descricao: '',
+  contas_alcancadas: '', visualizacoes: '',
   curtidas: '', comentarios: '', salvamentos: '', compartilhamentos: '',
   status: 'parcial', imageData: null,
 }
@@ -232,15 +230,27 @@ const SinglePostModal = forwardRef(function SinglePostModal({ initialPost, initi
           <>
             <img src={form.imageUrl || preview} alt="" style={{ width: 56, height: 56, objectFit: 'cover', borderRadius: 8, flexShrink: 0, cursor: 'zoom-in' }}
               onClick={e => { e.stopPropagation(); openImage(form.imageUrl || preview) }} />
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <p style={{ color: '#1C252E', fontWeight: 700, fontSize: 13, marginBottom: 2 }}>Última evidência</p>
-              <p style={{ color: '#8A9BB0', fontSize: 11 }}>
-                {form.data_post ? `📅 ${formatDate(form.data_post)}` : 'Sem data definida'}
-                {' · '}
-                <span style={{ color: '#0891B2', cursor: 'pointer' }} onClick={e => { e.stopPropagation(); openImage(form.imageUrl || preview) }}>
+            <div style={{ flex: 1, minWidth: 0 }} onClick={e => e.stopPropagation()}>
+              <p style={{ color: '#1C252E', fontWeight: 700, fontSize: 13, marginBottom: 4 }}>Última evidência</p>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                <span style={{ color: '#8A9BB0', fontSize: 11 }}>📅</span>
+                <input
+                  value={form.data_evidencia || ''}
+                  onChange={e => set('data_evidencia', e.target.value)}
+                  placeholder={form.data_post ? formatDate(form.data_post) : 'DD/MM/AAAA'}
+                  style={{
+                    border: 'none', borderBottom: '1px dashed #C3D8E4',
+                    background: 'transparent', fontSize: 11, color: '#1C252E',
+                    outline: 'none', width: 90, padding: '1px 2px',
+                    fontFamily: 'DM Sans, sans-serif',
+                  }}
+                />
+                <span style={{ color: '#8A9BB0', fontSize: 11 }}>·</span>
+                <span style={{ color: '#0891B2', fontSize: 11, cursor: 'pointer' }}
+                  onClick={e => { e.stopPropagation(); openImage(form.imageUrl || preview) }}>
                   abrir ↗
                 </span>
-              </p>
+              </div>
             </div>
             {/* Botão remover imagem */}
             <button
