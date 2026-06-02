@@ -12,6 +12,7 @@ export const TEMAS = [
   'Trends',
   'Fundos',
   'Performance em destaque',
+  'ESG',
   'Ring the bell',
   'Dump',
   'Live',

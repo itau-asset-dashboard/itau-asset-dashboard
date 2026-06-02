@@ -124,3 +124,57 @@ Retorne APENAS um JSON válido com exatamente 8 objetos (sem markdown, sem texto
   const cleaned = text.replace(/```json|```/g, '').trim()
   return JSON.parse(cleaned)
 }
+
+export async function chatWithData(messages, posts, metaMensal, metaAnual, mesFiltro, apiKey) {
+  const resumo = posts.map(p => ({
+    nome: p.nome,
+    data: p.data_post,
+    tipo: p.tipo,
+    tema: Array.isArray(p.tema) ? p.tema.join(', ') : p.tema,
+    contas_alcancadas: p.contas_alcancadas,
+    visualizacoes: p.visualizacoes,
+    curtidas: p.curtidas,
+    comentarios: p.comentarios,
+    salvamentos: p.salvamentos,
+    compartilhamentos: p.compartilhamentos,
+    status: p.status,
+  }))
+
+  const systemPrompt = `Você é um analista de redes sociais especializado em finanças e investimentos, assistente do time de Instagram da Itaú Asset Management.
+Você tem acesso aos dados completos do dashboard de performance do Instagram @itauasset.
+
+CONTEXTO:
+- Mês/filtro atual: ${mesFiltro}
+- Meta mensal: ${metaMensal?.toLocaleString('pt-BR')} contas alcançadas
+- Meta anual: ${metaAnual?.toLocaleString('pt-BR')} contas alcançadas
+- Total de posts na base: ${posts.length}
+
+DADOS DOS POSTS:
+${JSON.stringify(resumo, null, 2)}
+
+Responda em português brasileiro, de forma clara e analítica. Cite posts e dados reais quando relevante. Use formatação brasileira para números.`
+
+  const response = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': apiKey,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true',
+    },
+    body: JSON.stringify({
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: 1024,
+      system: systemPrompt,
+      messages: messages.map(m => ({ role: m.role, content: m.content })),
+    })
+  })
+
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({}))
+    throw new Error(err?.error?.message || `Erro ${response.status}`)
+  }
+
+  const data = await response.json()
+  return data.content?.[0]?.text || ''
+}

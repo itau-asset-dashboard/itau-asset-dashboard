@@ -1,6 +1,7 @@
-import { RefreshCw } from 'lucide-react'
+import { useRef, useEffect, useState } from 'react'
+import { RefreshCw, Send, Trash2 } from 'lucide-react'
 import { useStore } from '../store/useStore'
-import { generateInsights } from '../utils/anthropic'
+import { generateInsights, chatWithData } from '../utils/anthropic'
 
 const DEFAULT = [
   { icone:'🔑', titulo:'Configure sua chave de API',     texto:'Clique em "API ativa" na barra superior para inserir sua chave Anthropic e ativar insights automáticos.' },
@@ -13,56 +14,232 @@ const DEFAULT = [
   { icone:'☁️', titulo:'Sincronização automática',      texto:'Todos os dados ficam salvos na nuvem e são compartilhados entre dispositivos automaticamente ao abrir o app.' },
 ]
 
+const SUGESTOES = [
+  'Qual foi o post com mais alcance?',
+  'Como estamos em relação à meta mensal?',
+  'Qual tipo de post performa melhor?',
+  'Quais temas têm mais engajamento?',
+  'Que dia da semana costuma ir melhor?',
+]
+
 export default function Insights() {
-  const { insights, loadingInsights, setInsights, setLoadingInsights, apiKey, getPostsDoMes } = useStore()
-  const posts = getPostsDoMes()
+  const { insights, loadingInsights, setInsights, setLoadingInsights, apiKey, posts, metaMensal, metaAnual, mesFiltro } = useStore()
+
+  // ── Insights automáticos ──────────────────────────────
+  const allPosts = posts
 
   async function generate() {
     if (!apiKey) { alert('Configure sua chave da API Anthropic primeiro.'); return }
-    if (posts.length<2) { alert('Adicione pelo menos 2 posts para gerar insights.'); return }
+    if (allPosts.length < 2) { alert('Adicione pelo menos 2 posts para gerar insights.'); return }
     setLoadingInsights(true)
-    try { setInsights(await generateInsights(posts, apiKey)) }
-    catch(e) { alert('Não foi possível gerar insights: '+e.message) }
+    try { setInsights(await generateInsights(allPosts, apiKey)) }
+    catch(e) { alert('Não foi possível gerar insights: ' + e.message) }
     finally { setLoadingInsights(false) }
   }
 
-  const list = insights.length>0 ? insights : DEFAULT
+  const list = insights.length > 0 ? insights : DEFAULT
+
+  // ── Chat ──────────────────────────────────────────────
+  const [chatMessages, setChatMessages] = useState([]) // { role: 'user'|'assistant', content: string }
+  const [input, setInput]               = useState('')
+  const [chatLoading, setChatLoading]   = useState(false)
+  const [chatError, setChatError]       = useState(null)
+  const bottomRef = useRef(null)
+  const inputRef  = useRef(null)
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [chatMessages, chatLoading])
+
+  async function sendMessage(text) {
+    const msg = (text || input).trim()
+    if (!msg) return
+    if (!apiKey) { setChatError('Configure a chave de API Anthropic primeiro.'); return }
+
+    const updated = [...chatMessages, { role: 'user', content: msg }]
+    setChatMessages(updated)
+    setInput('')
+    setChatLoading(true)
+    setChatError(null)
+
+    try {
+      const reply = await chatWithData(updated, allPosts, metaMensal, metaAnual, mesFiltro, apiKey)
+      setChatMessages(prev => [...prev, { role: 'assistant', content: reply }])
+    } catch(e) {
+      setChatError('Erro ao obter resposta: ' + e.message)
+    } finally {
+      setChatLoading(false)
+      setTimeout(() => inputRef.current?.focus(), 100)
+    }
+  }
+
+  function clearChat() {
+    setChatMessages([])
+    setChatError(null)
+    setInput('')
+  }
 
   return (
-    <div style={{ paddingTop:4 }}>
-      <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:16 }}>
-        <div>
-          <h2 style={{ color:'#1C252E', fontSize:15, fontWeight:700 }}>Insights automáticos</h2>
-          <p style={{ color:'#8A9BB0', fontSize:12, marginTop:2 }}>Análise inteligente via IA</p>
-        </div>
-        <button onClick={generate} disabled={loadingInsights}
-          style={{
-            background:'#1C252E', color:'#C3EBF7',
-            border:'1.5px solid rgba(195,235,247,0.2)',
-            borderRadius:10, padding:'8px 16px', cursor:loadingInsights?'not-allowed':'pointer',
-            fontSize:13, fontWeight:600, display:'flex', alignItems:'center', gap:6,
-            opacity:loadingInsights?0.7:1,
-          }}>
-          <RefreshCw size={13} style={{ animation:loadingInsights?'spin 1s linear infinite':undefined }}/>
-          {loadingInsights?'Gerando...':'Gerar insights'}
-        </button>
-      </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
 
-      <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(270px,1fr))', gap:12 }}>
-        {list.map((ins,i)=>(
-          <div key={i} className="card" style={{ padding:'18px 20px' }}>
-            <div style={{ display:'flex', alignItems:'flex-start', gap:12 }}>
-              <div style={{ width:38, height:38, borderRadius:11, flexShrink:0, background:'rgba(195,235,247,0.25)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:17 }}>
-                {ins.icone}
-              </div>
-              <div>
-                <p style={{ color:'#1C252E', fontWeight:600, fontSize:13, marginBottom:5 }}>{ins.titulo}</p>
-                <p style={{ color:'#8A9BB0', fontSize:12, lineHeight:1.65 }}>{ins.texto}</p>
+      {/* ── Insights automáticos ── */}
+      <div>
+        <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:16 }}>
+          <div>
+            <h2 style={{ color:'#1C252E', fontSize:15, fontWeight:700 }}>Insights automáticos</h2>
+            <p style={{ color:'#8A9BB0', fontSize:12, marginTop:2 }}>Análise inteligente via IA · baseada em todos os posts</p>
+          </div>
+          <button onClick={generate} disabled={loadingInsights}
+            style={{
+              background:'#1C252E', color:'#C3EBF7',
+              border:'1.5px solid rgba(195,235,247,0.2)',
+              borderRadius:10, padding:'8px 16px', cursor:loadingInsights?'not-allowed':'pointer',
+              fontSize:13, fontWeight:600, display:'flex', alignItems:'center', gap:6,
+              opacity:loadingInsights?0.7:1,
+            }}>
+            <RefreshCw size={13} style={{ animation:loadingInsights?'spin 1s linear infinite':undefined }}/>
+            {loadingInsights ? 'Gerando...' : 'Gerar insights'}
+          </button>
+        </div>
+
+        <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(270px,1fr))', gap:12 }}>
+          {list.map((ins,i) => (
+            <div key={i} className="card" style={{ padding:'18px 20px' }}>
+              <div style={{ display:'flex', alignItems:'flex-start', gap:12 }}>
+                <div style={{ width:38, height:38, borderRadius:11, flexShrink:0, background:'rgba(195,235,247,0.25)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:17 }}>
+                  {ins.icone}
+                </div>
+                <div>
+                  <p style={{ color:'#1C252E', fontWeight:600, fontSize:13, marginBottom:5 }}>{ins.titulo}</p>
+                  <p style={{ color:'#8A9BB0', fontSize:12, lineHeight:1.65 }}>{ins.texto}</p>
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
+
+      {/* ── Chat ── */}
+      <div className="card" style={{ padding:0, overflow:'hidden' }}>
+
+        {/* Header do chat */}
+        <div style={{ padding:'16px 20px', borderBottom:'1px solid #F0F4F8', display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+          <div>
+            <h2 style={{ color:'#1C252E', fontSize:15, fontWeight:700, margin:0 }}>Converse com seus dados</h2>
+            <p style={{ color:'#8A9BB0', fontSize:12, marginTop:2 }}>Faça perguntas sobre performance, posts e tendências</p>
+          </div>
+          {chatMessages.length > 0 && (
+            <button onClick={clearChat}
+              style={{ background:'#F4F6F8', border:'none', borderRadius:8, padding:'6px 10px',
+                cursor:'pointer', display:'flex', alignItems:'center', gap:5,
+                color:'#8A9BB0', fontSize:12 }}>
+              <Trash2 size={12}/> Limpar
+            </button>
+          )}
+        </div>
+
+        {/* Mensagens */}
+        <div style={{ minHeight:200, maxHeight:420, overflowY:'auto', padding:'16px 20px', display:'flex', flexDirection:'column', gap:12 }} className="scrollbar-thin">
+
+          {chatMessages.length === 0 && (
+            <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
+              <p style={{ color:'#9AAAB8', fontSize:13, marginBottom:4 }}>Sugestões de perguntas:</p>
+              <div style={{ display:'flex', flexWrap:'wrap', gap:8 }}>
+                {SUGESTOES.map((s,i) => (
+                  <button key={i} onClick={() => sendMessage(s)}
+                    style={{
+                      background:'rgba(195,235,247,0.2)', border:'1px solid rgba(195,235,247,0.6)',
+                      borderRadius:20, padding:'6px 14px', cursor:'pointer',
+                      color:'#1a7a96', fontSize:12, fontFamily:'DM Sans, sans-serif',
+                      transition:'all 0.15s',
+                    }}
+                    onMouseEnter={e => e.currentTarget.style.background='rgba(195,235,247,0.4)'}
+                    onMouseLeave={e => e.currentTarget.style.background='rgba(195,235,247,0.2)'}
+                  >
+                    {s}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {chatMessages.map((m, i) => (
+            <div key={i} style={{
+              display:'flex',
+              justifyContent: m.role === 'user' ? 'flex-end' : 'flex-start',
+            }}>
+              <div style={{
+                maxWidth:'80%',
+                background: m.role === 'user' ? '#1C252E' : '#F4F8FB',
+                color: m.role === 'user' ? '#C3EBF7' : '#1C252E',
+                borderRadius: m.role === 'user' ? '16px 16px 4px 16px' : '16px 16px 16px 4px',
+                padding:'10px 14px', fontSize:13, lineHeight:1.6,
+                whiteSpace:'pre-wrap',
+              }}>
+                {m.content}
+              </div>
+            </div>
+          ))}
+
+          {chatLoading && (
+            <div style={{ display:'flex', justifyContent:'flex-start' }}>
+              <div style={{ background:'#F4F8FB', borderRadius:'16px 16px 16px 4px', padding:'10px 16px' }}>
+                <div style={{ display:'flex', gap:4, alignItems:'center' }}>
+                  {[0,1,2].map(j => (
+                    <div key={j} style={{
+                      width:6, height:6, borderRadius:'50%', background:'#9AAAB8',
+                      animation:'bounce 1.2s ease-in-out infinite',
+                      animationDelay:`${j * 0.2}s`,
+                    }}/>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {chatError && (
+            <p style={{ color:'#ef4444', fontSize:12, textAlign:'center' }}>{chatError}</p>
+          )}
+
+          <div ref={bottomRef}/>
+        </div>
+
+        {/* Input */}
+        <div style={{ padding:'12px 16px', borderTop:'1px solid #F0F4F8', display:'flex', gap:8 }}>
+          <input
+            ref={inputRef}
+            value={input}
+            onChange={e => setInput(e.target.value)}
+            onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage() } }}
+            placeholder="Pergunte algo sobre os dados..."
+            style={{
+              flex:1, border:'1.5px solid #E8ECF0', borderRadius:10,
+              padding:'9px 13px', fontSize:13, outline:'none',
+              color:'#1C252E', fontFamily:'DM Sans, sans-serif',
+              background:'#FAFCFE',
+            }}
+            onFocus={e => e.target.style.borderColor='#C3EBF7'}
+            onBlur={e => e.target.style.borderColor='#E8ECF0'}
+          />
+          <button onClick={() => sendMessage()} disabled={chatLoading || !input.trim()}
+            style={{
+              background: chatLoading || !input.trim() ? '#E8ECF0' : '#1C252E',
+              border:'none', borderRadius:10, padding:'9px 14px',
+              cursor: chatLoading || !input.trim() ? 'not-allowed' : 'pointer',
+              display:'flex', alignItems:'center', justifyContent:'center',
+              transition:'background 0.15s',
+            }}>
+            <Send size={15} color={chatLoading || !input.trim() ? '#9AAAB8' : '#C3EBF7'}/>
+          </button>
+        </div>
+      </div>
+
+      <style>{`
+        @keyframes bounce {
+          0%, 80%, 100% { transform: translateY(0); opacity: 0.4; }
+          40% { transform: translateY(-5px); opacity: 1; }
+        }
+      `}</style>
     </div>
   )
 }
