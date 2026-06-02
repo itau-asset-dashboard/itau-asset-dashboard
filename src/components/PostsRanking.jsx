@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { ArrowUpDown, RefreshCw, ChevronLeft, ChevronRight } from 'lucide-react'
+import { ArrowUpDown, RefreshCw, ChevronLeft, ChevronRight, ArrowUp, ArrowDown } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import UploadModal from './UploadModal'
 import { temasLabel } from '../utils/temas'
@@ -19,19 +19,21 @@ const BADGE = {
 
 const PAGE_SIZE = 10
 
+function parseDate(d) {
+  if (!d) return 0
+  const [dd, mm, yyyy] = d.split('/')
+  return new Date(`${yyyy}-${mm}-${dd}`).getTime() || 0
+}
+
 export default function PostsRanking() {
-  const { posts: allPosts, mesFiltro, getPostsDoMes, updatePost, deletePost } = useStore()
-  const [verAnual, setVerAnual] = useState(false)
-  const [sortKey, setSortKey]   = useState('contas_alcancadas')
-  const [sortDir, setSortDir]   = useState(-1)
-  const [page, setPage]         = useState(0)
+  const { getPostsDoMes, updatePost, deletePost } = useStore()
+  const posts = getPostsDoMes()
+
+  // Padrão: data decrescente (mais recente primeiro)
+  const [sortKey, setSortKey] = useState('data_post')
+  const [sortDir, setSortDir] = useState(-1)
+  const [page, setPage]       = useState(0)
   const [updateTarget, setUpdateTarget] = useState(null)
-
-  const ano = mesFiltro?.split('/')?.[1] || String(new Date().getFullYear())
-
-  const posts = verAnual
-    ? allPosts.filter(p => p.data_post?.split('/')?.[2] === ano)
-    : getPostsDoMes()
 
   const melhorId = posts.length > 0
     ? posts.reduce((a, b) => (a.contas_alcancadas || 0) > (b.contas_alcancadas || 0) ? a : b, posts[0]).id
@@ -43,60 +45,39 @@ export default function PostsRanking() {
     setPage(0)
   }
 
-  function toggleVer(anual) { setVerAnual(anual); setPage(0) }
-
-  function parseDate(d) {
-    if (!d) return 0
-    const [dd, mm, yyyy] = d.split('/')
-    return new Date(`${yyyy}-${mm}-${dd}`).getTime() || 0
-  }
-
   const sorted = [...posts].sort((a, b) => {
     if (sortKey === 'data_post') return sortDir * (parseDate(a.data_post) - parseDate(b.data_post))
-    const va = a[sortKey] ?? 0, vb = b[sortKey] ?? 0
-    return sortDir * ((vb) - (va))
+    return sortDir * ((a[sortKey] ?? 0) - (b[sortKey] ?? 0))
   })
 
   const pages = Math.ceil(sorted.length / PAGE_SIZE)
   const visible = sorted.slice(page * PAGE_SIZE, page * PAGE_SIZE + PAGE_SIZE)
   const eng = (p) => ((p.curtidas || 0) + (p.comentarios || 0) + (p.salvamentos || 0) + (p.compartilhamentos || 0))
 
+  const SortIcon = ({ k }) => {
+    if (sortKey !== k) return <ArrowUpDown size={11} color="#D0D8E0" />
+    return sortDir === -1 ? <ArrowDown size={11} color="#FF6200" /> : <ArrowUp size={11} color="#FF6200" />
+  }
+
   const Th = ({ k, children }) => (
     <th onClick={() => toggleSort(k)} style={{
-      padding: '11px 14px', color: '#8A9BB0', fontSize: 11, fontWeight: 600,
-      textTransform: 'uppercase', letterSpacing: '0.05em', cursor: 'pointer',
-      whiteSpace: 'nowrap', textAlign: 'left', userSelect: 'none', background: '#FAFBFC',
+      padding: '11px 14px', color: sortKey === k ? '#FF6200' : '#8A9BB0',
+      fontSize: 11, fontWeight: 600, textTransform: 'uppercase',
+      letterSpacing: '0.05em', cursor: 'pointer', whiteSpace: 'nowrap',
+      textAlign: 'left', userSelect: 'none', background: '#FAFBFC',
     }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
         {children}
-        {sortKey === k && <ArrowUpDown size={11} color="#FF6200" />}
+        <SortIcon k={k} />
       </div>
     </th>
   )
 
   return (
     <div className="card" style={{ overflow: 'hidden', marginBottom: 18 }}>
-      <div style={{ padding: '18px 20px 14px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 10 }}>
-        <div>
-          <h2 style={{ color: '#1C252E', fontSize: 15, fontWeight: 700, margin: 0 }}>Ranking de posts</h2>
-          <p style={{ color: '#8A9BB0', fontSize: 12, marginTop: 2 }}>{posts.length} publicações</p>
-        </div>
-
-        {/* Toggle mês / ano */}
-        <div style={{ display: 'flex', background: 'rgba(28,37,46,0.06)', borderRadius: 12, padding: 3, gap: 2 }}>
-          {[false, true].map(isAnual => (
-            <button key={String(isAnual)} onClick={() => toggleVer(isAnual)}
-              style={{
-                padding: '6px 16px', borderRadius: 10, border: 'none', cursor: 'pointer',
-                fontSize: 13, fontWeight: verAnual === isAnual ? 700 : 400,
-                background: verAnual === isAnual ? '#1C252E' : 'transparent',
-                color: verAnual === isAnual ? '#C3EBF7' : '#5A7080',
-                transition: 'all 0.15s',
-              }}>
-              {isAnual ? ano : mesFiltro ? mesFiltro.replace('/', '/') : 'Mês atual'}
-            </button>
-          ))}
-        </div>
+      <div style={{ padding: '18px 20px 14px' }}>
+        <h2 style={{ color: '#1C252E', fontSize: 15, fontWeight: 700, margin: 0 }}>Ranking de posts</h2>
+        <p style={{ color: '#8A9BB0', fontSize: 12, marginTop: 2 }}>{posts.length} publicações</p>
       </div>
 
       <div style={{ overflowX: 'auto' }} className="scrollbar-thin">
@@ -109,7 +90,7 @@ export default function PostsRanking() {
               <Th k="contas_alcancadas">Contas alc.</Th>
               <Th k="visualizacoes">Visualiz.</Th>
               <th style={{ padding: '11px 14px', color: '#8A9BB0', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', textAlign: 'left', background: '#FAFBFC' }}>Engaj.</th>
-              <th style={{ padding: '11px 14px', color: '#8A9BB0', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', background: '#FAFBFC' }}></th>
+              <th style={{ padding: '11px 14px', color: '#8A9BB0', fontSize: 11, background: '#FAFBFC' }}></th>
               <th style={{ padding: '11px 14px', background: '#FAFBFC' }}></th>
             </tr>
           </thead>
@@ -156,7 +137,7 @@ export default function PostsRanking() {
                   </td>
                   <td style={{ padding: '12px 14px' }} onClick={e => e.stopPropagation()}>
                     <button onClick={() => setUpdateTarget(p)}
-                      style={{ background: '#F4F6F8', border: 'none', borderRadius: 8, padding: '5px 10px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4, color: '#8A9BB0', fontSize: 12 }}>
+                      style={{ background: '#F4F6F8', border: 'none', borderRadius: 8, padding: '5px 10px', cursor: 'pointer', display: 'flex', alignItems: 'center', color: '#8A9BB0', fontSize: 12 }}>
                       <RefreshCw size={12} />
                     </button>
                   </td>
