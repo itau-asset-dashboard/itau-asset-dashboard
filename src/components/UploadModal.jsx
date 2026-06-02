@@ -456,7 +456,7 @@ const SinglePostModal = forwardRef(function SinglePostModal({ initialPost, initi
       </div>
     </div>
 
-    {/* Lightbox de imagem em alta qualidade */}
+    {/* Lightbox — prioriza imageUrl (Supabase, sem compressão) sobre preview local */}
     {lightboxOpen && (form.imageUrl || preview) && (
       <ImageLightbox
         src={form.imageUrl || preview}

@@ -1,12 +1,7 @@
 import { useEffect } from 'react'
-import { X, ZoomIn, ZoomOut, Download } from 'lucide-react'
+import { X, Download } from 'lucide-react'
 
-/**
- * Lightbox lateral — desliza pela direita, empurra o conteúdo.
- * Props: src (string), onClose (fn), title (string, opcional)
- */
 export default function ImageLightbox({ src, onClose, title }) {
-  // Fecha com Escape
   useEffect(() => {
     function onKey(e) { if (e.key === 'Escape') onClose() }
     window.addEventListener('keydown', onKey)
@@ -16,11 +11,7 @@ export default function ImageLightbox({ src, onClose, title }) {
   if (!src) return null
 
   function handleDownload() {
-    if (src.startsWith('http')) {
-      window.open(src, '_blank')
-      return
-    }
-    // base64 → download
+    if (src.startsWith('http')) { window.open(src, '_blank'); return }
     const a = document.createElement('a')
     a.href = src
     a.download = title ? `${title}.jpg` : 'evidencia.jpg'
@@ -29,83 +20,101 @@ export default function ImageLightbox({ src, onClose, title }) {
 
   return (
     <>
-      {/* Overlay escuro atrás */}
+      {/* Overlay — clica fora para fechar */}
       <div
         onClick={onClose}
         style={{
           position: 'fixed', inset: 0,
-          background: 'rgba(15,23,36,0.45)',
-          backdropFilter: 'blur(3px)',
-          zIndex: 400,
-          animation: 'fadeIn 0.15s ease',
+          background: 'rgba(10,15,25,0.82)',
+          backdropFilter: 'blur(6px)',
+          WebkitBackdropFilter: 'blur(6px)',
+          zIndex: 500,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '32px 24px',
+          animation: 'lbFadeIn 0.18s ease',
         }}
-      />
-
-      {/* Painel lateral */}
-      <div style={{
-        position: 'fixed', top: 0, right: 0, bottom: 0,
-        width: 'min(560px, 90vw)',
-        background: '#111827',
-        zIndex: 401,
-        display: 'flex',
-        flexDirection: 'column',
-        boxShadow: '-8px 0 40px rgba(0,0,0,0.35)',
-        animation: 'slideInRight 0.22s cubic-bezier(0.16,1,0.3,1)',
-      }}>
-
-        {/* Header */}
-        <div style={{
-          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          padding: '14px 18px',
-          borderBottom: '1px solid rgba(255,255,255,0.08)',
-          flexShrink: 0,
-        }}>
-          <div>
-            <p style={{ color: '#F1F5F9', fontSize: 13, fontWeight: 600 }}>
-              {title || 'Evidência'}
-            </p>
-            <p style={{ color: '#64748B', fontSize: 11, marginTop: 2 }}>Imagem original sem compressão</p>
+      >
+        {/* Container da imagem — impede propagação do clique */}
+        <div
+          onClick={e => e.stopPropagation()}
+          style={{
+            position: 'relative',
+            maxWidth: '92vw',
+            maxHeight: '88vh',
+            display: 'flex',
+            flexDirection: 'column',
+            animation: 'lbScaleIn 0.2s cubic-bezier(0.16,1,0.3,1)',
+          }}
+        >
+          {/* Barra de ações */}
+          <div style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            padding: '10px 14px',
+            background: 'rgba(255,255,255,0.06)',
+            backdropFilter: 'blur(8px)',
+            borderRadius: '12px 12px 0 0',
+            borderBottom: '1px solid rgba(255,255,255,0.08)',
+            flexShrink: 0,
+          }}>
+            <div>
+              <p style={{ color: '#F1F5F9', fontSize: 13, fontWeight: 600 }}>
+                {title || 'Evidência'}
+              </p>
+              <p style={{ color: '#64748B', fontSize: 11, marginTop: 1 }}>
+                Imagem original · clique fora ou Esc para fechar
+              </p>
+            </div>
+            <div style={{ display: 'flex', gap: 6 }}>
+              <button onClick={handleDownload} title="Baixar"
+                style={{
+                  background: 'rgba(255,255,255,0.08)', border: 'none', borderRadius: 8,
+                  width: 32, height: 32, cursor: 'pointer',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  transition: 'background 0.1s',
+                }}
+                onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.16)'}
+                onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.08)'}
+              >
+                <Download size={14} color="#94A3B8" />
+              </button>
+              <button onClick={onClose} title="Fechar (Esc)"
+                style={{
+                  background: 'rgba(255,255,255,0.08)', border: 'none', borderRadius: 8,
+                  width: 32, height: 32, cursor: 'pointer',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  transition: 'background 0.1s',
+                }}
+                onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.16)'}
+                onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.08)'}
+              >
+                <X size={14} color="#94A3B8" />
+              </button>
+            </div>
           </div>
-          <div style={{ display: 'flex', gap: 8 }}>
-            <button onClick={handleDownload} title="Abrir / baixar"
-              style={{
-                background: 'rgba(255,255,255,0.07)', border: 'none', borderRadius: 8,
-                width: 32, height: 32, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
-              }}>
-              <Download size={14} color="#94A3B8" />
-            </button>
-            <button onClick={onClose} title="Fechar (Esc)"
-              style={{
-                background: 'rgba(255,255,255,0.07)', border: 'none', borderRadius: 8,
-                width: 32, height: 32, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
-              }}>
-              <X size={14} color="#94A3B8" />
-            </button>
-          </div>
-        </div>
 
-        {/* Imagem — scroll vertical se for muito alta */}
-        <div style={{
-          flex: 1, overflow: 'auto', display: 'flex',
-          alignItems: 'flex-start', justifyContent: 'center',
-          padding: '20px 16px',
-        }}>
+          {/* Imagem — respeita qualquer aspect ratio */}
           <img
             src={src}
             alt={title || 'Evidência'}
             style={{
-              maxWidth: '100%',
-              borderRadius: 10,
-              boxShadow: '0 8px 40px rgba(0,0,0,0.5)',
               display: 'block',
+              maxWidth: '92vw',
+              maxHeight: 'calc(88vh - 60px)',
+              width: 'auto',
+              height: 'auto',
+              objectFit: 'contain',
+              borderRadius: '0 0 12px 12px',
+              boxShadow: '0 24px 80px rgba(0,0,0,0.6)',
             }}
           />
         </div>
       </div>
 
       <style>{`
-        @keyframes fadeIn { from { opacity:0 } to { opacity:1 } }
-        @keyframes slideInRight { from { transform:translateX(100%) } to { transform:translateX(0) } }
+        @keyframes lbFadeIn  { from { opacity:0 } to { opacity:1 } }
+        @keyframes lbScaleIn { from { opacity:0; transform:scale(0.96) } to { opacity:1; transform:scale(1) } }
       `}</style>
     </>
   )
