@@ -1,20 +1,21 @@
-import { BarChart2, Calendar, List, Lightbulb, Upload, TrendingUp, LineChart, RefreshCw } from 'lucide-react'
+import { BarChart2, Calendar, List, Lightbulb, Upload, TrendingUp, LineChart } from 'lucide-react'
 import { useStore } from '../store/useStore'
 
+// ANÁLISE primeiro, depois CONTEÚDO, depois PRODUTOS
 const NAV_GROUPS = [
-  {
-    label: 'CONTEÚDO',
-    items: [
-      { id: 'posts',  icon: List,    label: 'Todos os Posts' },
-      { id: 'upload', icon: Upload,  label: 'Upload' },
-    ],
-  },
   {
     label: 'ANÁLISE',
     items: [
       { id: 'visao-anual', icon: Calendar,  label: 'Visão Anual' },
       { id: 'visao-geral', icon: BarChart2, label: 'Visão Mensal' },
       { id: 'insights',    icon: Lightbulb, label: 'Insights' },
+    ],
+  },
+  {
+    label: 'CONTEÚDO',
+    items: [
+      { id: 'posts',  icon: List,    label: 'Todos os Posts' },
+      { id: 'upload', icon: Upload,  label: 'Upload' },
     ],
   },
   {
@@ -28,7 +29,7 @@ const NAV_GROUPS = [
 
 const NAV_FLAT = NAV_GROUPS.flatMap(g => g.items)
 
-function InstagramIcon({ size = 12, color = '#4A5568' }) {
+function InstagramIcon({ size = 12, color = '#5A6A7A' }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none"
       stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -39,58 +40,25 @@ function InstagramIcon({ size = 12, color = '#4A5568' }) {
   )
 }
 
+// Logo fiel ao Itaú — superelipse escura, tipografia rounded
 function ItauLogo({ size = 38 }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <rect width="100" height="100" rx="22" fill="#182638"/>
-      <text x="50" y="66" textAnchor="middle"
-        fontFamily="Arial Black, Arial, sans-serif"
-        fontWeight="900" fontSize="33" fill="#C3EBF7" letterSpacing="-1">
+    <svg width={size} height={size} viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+      {/* Superelipse com cantos muito arredondados */}
+      <rect width="200" height="200" rx="52" fill="#182638"/>
+      {/* "itaú" com fonte arredondada aproximada */}
+      <text x="100" y="132" textAnchor="middle"
+        fontFamily="'DM Sans', Arial Rounded MT Bold, Arial, sans-serif"
+        fontWeight="700" fontSize="72" fill="#C3EBF7" letterSpacing="-2">
         itaú
       </text>
     </svg>
   )
 }
 
-function SyncWidget() {
-  const { syncing, syncError, syncFromCloud } = useStore()
-
-  const dot = syncError
-    ? { color: '#ef4444', label: 'Erro de conexão' }
-    : syncing
-    ? { color: '#F59E0B', label: 'Sincronizando…' }
-    : { color: '#22C55E', label: 'Sincronizado' }
-
-  return (
-    <div style={{
-      background: '#fff',
-      border: '1px solid #EDEFF2',
-      borderRadius: 12,
-      padding: '12px 14px',
-      marginTop: 12,
-    }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-        <span style={{ color: '#1C252E', fontSize: 12, fontWeight: 600 }}>Instagram API</span>
-        <button onClick={syncFromCloud} title="Atualizar"
-          style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 2, color: '#8A9BB0', display: 'flex', alignItems: 'center' }}>
-          <RefreshCw size={11} color="#C0CAD4" />
-        </button>
-      </div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-        <div style={{
-          width: 7, height: 7, borderRadius: '50%', background: dot.color, flexShrink: 0,
-          boxShadow: `0 0 0 2px ${dot.color}22`,
-        }} />
-        <span style={{ color: dot.color === '#22C55E' ? '#16A34A' : dot.color, fontSize: 12, fontWeight: 500 }}>
-          {dot.label}
-        </span>
-      </div>
-      {!syncError && !syncing && (
-        <p style={{ color: '#B0BEC5', fontSize: 11, marginTop: 5 }}>Última atualização: agora</p>
-      )}
-    </div>
-  )
-}
+// Laranja Itaú suavizado — menos vermelho, mais âmbar
+const ORANGE = '#F97316'
+const ORANGE_BG = '#FFF7F0'
 
 export default function Sidebar() {
   const { activeSection, setActiveSection } = useStore()
@@ -105,34 +73,27 @@ export default function Sidebar() {
         borderRight: '1px solid #EDEFF2',
         display: 'flex',
         flexDirection: 'column',
-        padding: '18px 10px 14px',
+        padding: '20px 10px 16px',
         flexShrink: 0,
         overflow: 'hidden',
       }}>
 
-        {/* ── Brand card ── */}
-        <div style={{
-          background: '#fff',
-          border: '1px solid #EDEFF2',
-          borderRadius: 14,
-          padding: '14px 14px 12px',
-          marginBottom: 20,
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
-            <ItauLogo size={36} />
-            <div>
-              <p style={{ color: '#182638', fontWeight: 800, fontSize: 14, lineHeight: 1.2 }}>Itaú Asset</p>
-              <p style={{ color: '#8A9BB0', fontSize: 11, fontWeight: 400, marginTop: 1 }}>Instagram Analytics</p>
-            </div>
+        {/* ── Topo: logo + badge ── */}
+        <div style={{ padding: '0 4px', marginBottom: 24 }}>
+          <div style={{ marginBottom: 12 }}>
+            <ItauLogo size={40} />
           </div>
           <div style={{
             display: 'inline-flex', alignItems: 'center', gap: 6,
-            background: '#F0F4F8', borderRadius: 20, padding: '4px 10px',
+            background: '#EDEFF2', borderRadius: 20, padding: '5px 11px',
           }}>
             <InstagramIcon size={11} color="#5A6A7A" />
-            <span style={{ color: '#5A6A7A', fontSize: 11, fontWeight: 600 }}>@itauasset</span>
+            <span style={{ color: '#3D4E5C', fontSize: 11, fontWeight: 600 }}>@itauasset</span>
           </div>
         </div>
+
+        {/* ── Divisor ── */}
+        <div style={{ height: 1, background: '#EDEFF2', marginBottom: 18, marginLeft: 4, marginRight: 4 }} />
 
         {/* ── Nav por grupos ── */}
         <nav style={{ display: 'flex', flexDirection: 'column', gap: 22, flex: 1 }}>
@@ -152,9 +113,9 @@ export default function Sidebar() {
                     <button key={id} onClick={() => setActiveSection(id)}
                       style={{
                         width: '100%', borderRadius: 9, padding: '7px 8px 7px 10px',
-                        background: active ? '#FFF4EE' : 'transparent',
+                        background: active ? ORANGE_BG : 'transparent',
                         border: 'none',
-                        borderLeft: `2.5px solid ${active ? '#FF6B00' : 'transparent'}`,
+                        borderLeft: `2.5px solid ${active ? ORANGE : 'transparent'}`,
                         cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8,
                         transition: 'background 0.1s', textAlign: 'left',
                       }}
@@ -163,11 +124,11 @@ export default function Sidebar() {
                     >
                       <Icon
                         size={14}
-                        color={active ? '#FF6B00' : '#5A6A7A'}
+                        color={active ? ORANGE : '#5A6A7A'}
                         strokeWidth={active ? 2.3 : 1.8}
                       />
                       <span style={{
-                        color: active ? '#FF6B00' : '#3D4E5C',
+                        color: active ? ORANGE : '#3D4E5C',
                         fontSize: 13, fontWeight: active ? 600 : 400,
                         letterSpacing: '-0.01em',
                       }}>
@@ -181,8 +142,10 @@ export default function Sidebar() {
           ))}
         </nav>
 
-        {/* ── Sync widget ── */}
-        <SyncWidget />
+        {/* ── Rodapé ── */}
+        <p style={{ color: '#C8D2DA', fontSize: 10, textAlign: 'center', paddingTop: 10 }}>
+          Itaú Asset © 2026
+        </p>
       </aside>
 
       {/* ── Bottom nav mobile ── */}
@@ -196,8 +159,8 @@ export default function Sidebar() {
                 justifyContent: 'center', gap: 3, background: 'none', border: 'none',
                 cursor: 'pointer', padding: '6px 2px',
               }}>
-              <Icon size={19} color={active ? '#FF6B00' : '#4A6272'} strokeWidth={active ? 2.2 : 1.8} />
-              <span style={{ fontSize: 9, color: active ? '#FF6B00' : '#8AAAB8', fontWeight: active ? 700 : 400, whiteSpace: 'nowrap' }}>
+              <Icon size={19} color={active ? ORANGE : '#4A6272'} strokeWidth={active ? 2.2 : 1.8} />
+              <span style={{ fontSize: 9, color: active ? ORANGE : '#8AAAB8', fontWeight: active ? 700 : 400, whiteSpace: 'nowrap' }}>
                 {label.split(' ')[0]}
               </span>
             </button>

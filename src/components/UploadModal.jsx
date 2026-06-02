@@ -207,7 +207,7 @@ const SinglePostModal = forwardRef(function SinglePostModal({ initialPost, initi
       {totalFiles > 1 && (
         <div style={{ background: '#F5F8FA', borderRadius: 8, padding: '6px 12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <span style={{ color: '#8A9BB0', fontSize: 12 }}>Post {currentIdx + 1} de {totalFiles}</span>
-          <span style={{ color: isLast ? '#22c55e' : '#FF6200', fontSize: 11, fontWeight: 600 }}>
+          <span style={{ color: isLast ? '#22c55e' : '#F97316', fontSize: 11, fontWeight: 600 }}>
             {isLast ? '✓ Último post' : `Faltam ${totalFiles - currentIdx - 1}`}
           </span>
         </div>
@@ -581,7 +581,7 @@ function MultiUploadModal({ onClose, onSave }) {
             {files.map((f, i) => (
               <div key={i} onClick={() => navigateTo(i)}
                 style={{ flexShrink: 0, width: 44, height: 44, borderRadius: 8, overflow: 'hidden', cursor: 'pointer',
-                  border: `2px solid ${i === current ? '#FF6200' : '#E8ECF0'}` }}>
+                  border: `2px solid ${i === current ? '#F97316' : '#E8ECF0'}` }}>
                 <img src={f.dataUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               </div>
             ))}

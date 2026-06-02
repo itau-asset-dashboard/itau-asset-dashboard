@@ -85,7 +85,7 @@ export default function OliverView() {
       <div className="kpi-grid">
         {[
           { label: 'Total Instagram (ano)', value: fmt(totalInsta),  color: '#1C252E', bg: 'rgba(28,37,46,0.06)',      desc: 'Soma das contas alcançadas via Instagram' },
-          { label: 'Total Oliver (ano)',    value: fmt(totalOliver || null), color: '#FF6200', bg: 'rgba(255,98,0,0.08)', desc: 'Soma dos dados da agência' },
+          { label: 'Total Oliver (ano)',    value: fmt(totalOliver || null), color: '#F97316', bg: 'rgba(249,115,22,0.08)', desc: 'Soma dos dados da agência' },
           { label: 'Diferença acumulada',  value: diff ? `${diff > 0 ? '+' : ''}${diff}%` : '—',
             color: diff == null ? '#9AAAB8' : diff > 0 ? '#16a34a' : '#ef4444',
             bg: diff == null ? '#F4F6F8' : diff > 0 ? 'rgba(22,163,74,0.08)' : 'rgba(239,68,68,0.08)',
@@ -118,7 +118,7 @@ export default function OliverView() {
               />
               <Legend formatter={v => v === 'alcance_insta' ? 'Instagram' : 'Oliver'} wrapperStyle={{ fontSize: 12 }} />
               <Bar dataKey="alcance_insta"  name="alcance_insta"  radius={[6,6,0,0]} barSize={20} fill="#1C252E" />
-              <Bar dataKey="alcance_oliver" name="alcance_oliver" radius={[6,6,0,0]} barSize={20} fill="#FF6200" />
+              <Bar dataKey="alcance_oliver" name="alcance_oliver" radius={[6,6,0,0]} barSize={20} fill="#F97316" />
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -174,7 +174,7 @@ export default function OliverView() {
                             padding: '5px 9px', fontSize: 13, outline: 'none', fontFamily: 'DM Sans, sans-serif' }}
                           autoFocus />
                       ) : (
-                        <span style={{ color: '#FF6200', fontSize: 13, fontWeight: 600 }}>
+                        <span style={{ color: '#F97316', fontSize: 13, fontWeight: 600 }}>
                           {fmt(m.alcance_oliver)}
                         </span>
                       )}

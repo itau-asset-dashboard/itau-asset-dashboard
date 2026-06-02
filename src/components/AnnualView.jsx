@@ -13,7 +13,7 @@ function fmt(n) {
   return n.toLocaleString('pt-BR')
 }
 
-const TIPO_COLOR = { Carrossel:'#FF6200', Reels:'#1C252E', 'Foto estática':'#C3EBF7' }
+const TIPO_COLOR = { Carrossel:'#F97316', Reels:'#1C252E', 'Foto estática':'#C3EBF7' }
 
 export default function AnnualView() {
   const { getPostsDoAno, getMetaMesAjustada, metaAnual, mesFiltro } = useStore()
@@ -66,8 +66,8 @@ export default function AnnualView() {
       value: fmt(total),
       sub: `${pct.toFixed(0)}% da meta anual`,
       icon: Users,
-      color: '#FF6200',
-      bg: 'rgba(255,98,0,0.08)',
+      color: '#F97316',
+      bg: 'rgba(249,115,22,0.08)',
       trend: pct >= 50 ? 'up' : 'neutral',
     },
     {
@@ -127,13 +127,13 @@ export default function AnnualView() {
         {/* Card meta */}
         <div className="card" style={{ padding:'22px' }}>
           <p style={{ color:'#9AAAB8', fontSize:11, fontWeight:600, textTransform:'uppercase', letterSpacing:'0.05em', marginBottom:4 }}>Meta anual {ano}</p>
-          <p style={{ color:'#FF6200', fontSize:32, fontWeight:800, lineHeight:1, marginBottom:2 }}>{fmt(total)}</p>
+          <p style={{ color:'#F97316', fontSize:32, fontWeight:800, lineHeight:1, marginBottom:2 }}>{fmt(total)}</p>
           <p style={{ color:'#9AAAB8', fontSize:13, marginBottom:16 }}>de {fmt(metaAnual)}</p>
 
           {/* Barra progresso */}
           <div style={{ background:'#F0F2F5', borderRadius:8, height:10, overflow:'hidden', marginBottom:10 }}>
-            <div style={{ height:'100%', borderRadius:8, background:'#FF6200', width:`${pct}%`, transition:'width 0.6s ease',
-              backgroundImage:'linear-gradient(90deg,#FF6200,#ff8533)' }}/>
+            <div style={{ height:'100%', borderRadius:8, background:'#F97316', width:`${pct}%`, transition:'width 0.6s ease',
+              backgroundImage:'linear-gradient(90deg,#F97316,#ff8533)' }}/>
           </div>
           <p style={{ color:'#1C252E', fontSize:22, fontWeight:800, marginBottom:2 }}>{pct.toFixed(1)}%</p>
           <p style={{ color:'#9AAAB8', fontSize:12 }}>atingido</p>
@@ -143,9 +143,9 @@ export default function AnnualView() {
             <p style={{ color:'#1C252E', fontSize:18, fontWeight:700 }}>{fmt(restante)}</p>
           </div>
 
-          <div style={{ marginTop:10, padding:'12px 14px', background:'#FFF7F0', borderRadius:10, border:'1px solid rgba(255,98,0,0.12)' }}>
+          <div style={{ marginTop:10, padding:'12px 14px', background:'#FFF7F0', borderRadius:10, border:'1px solid rgba(249,115,22,0.12)' }}>
             <p style={{ color:'#9AAAB8', fontSize:11, marginBottom:4 }}>Meta mensal atualizada</p>
-            <p style={{ color:'#FF6200', fontSize:18, fontWeight:700 }}>{fmt(metaMesAtualizada)}</p>
+            <p style={{ color:'#F97316', fontSize:18, fontWeight:700 }}>{fmt(metaMesAtualizada)}</p>
             <p style={{ color:'#9AAAB8', fontSize:10, marginTop:2 }}>↻ ajustada pelo saldo acumulado</p>
           </div>
         </div>
@@ -156,7 +156,7 @@ export default function AnnualView() {
             <div>
               <p style={{ color:'#1C252E', fontSize:15, fontWeight:700 }}>Contas alcançadas por mês</p>
               <p style={{ color:'#9AAAB8', fontSize:12, marginTop:2 }}>
-                <span style={{ display:'inline-block', width:10, height:10, borderRadius:3, background:'#FF6200', marginRight:5, verticalAlign:'middle' }}/>
+                <span style={{ display:'inline-block', width:10, height:10, borderRadius:3, background:'#F97316', marginRight:5, verticalAlign:'middle' }}/>
                 Acima da meta
                 <span style={{ display:'inline-block', width:10, height:10, borderRadius:3, background:'#C3EBF7', marginLeft:12, marginRight:5, verticalAlign:'middle' }}/>
                 Abaixo da meta
@@ -177,7 +177,7 @@ export default function AnnualView() {
               <Bar dataKey="total" radius={[8,8,0,0]}>
                 {byMonth.map((entry,i)=>(
                   <Cell key={i}
-                    fill={entry.total === 0 ? '#F0F2F5' : entry.total >= entry.meta ? '#FF6200' : '#C3EBF7'}
+                    fill={entry.total === 0 ? '#F0F2F5' : entry.total >= entry.meta ? '#F97316' : '#C3EBF7'}
                   />
                 ))}
                 <LabelList dataKey="total" position="top" formatter={v=>v>0?fmt(v):''}
@@ -202,7 +202,7 @@ export default function AnnualView() {
                     <div style={{ width:10, height:10, borderRadius:3, background:TIPO_COLOR[t.tipo]==='#C3EBF7'?'#7ecde8':TIPO_COLOR[t.tipo] }}/>
                     <span style={{ color:'#1C252E', fontSize:13, fontWeight:500 }}>{t.tipo}</span>
                     {i===0&&t.total>0&&(
-                      <span style={{ background:'rgba(255,98,0,0.1)', color:'#FF6200', borderRadius:6, padding:'1px 7px', fontSize:10, fontWeight:700 }}>Líder</span>
+                      <span style={{ background:'rgba(249,115,22,0.1)', color:'#F97316', borderRadius:6, padding:'1px 7px', fontSize:10, fontWeight:700 }}>Líder</span>
                     )}
                   </div>
                   <div style={{ textAlign:'right' }}>

@@ -10,8 +10,8 @@ function fmt(n) {
   return n.toLocaleString('pt-BR')
 }
 
-const TIPO_COLOR = { Carrossel:'#FF6200', Reels:'#1C252E', 'Foto estática':'#0EA5E9' }
-const TIPO_BG    = { Carrossel:'rgba(255,98,0,0.08)', Reels:'rgba(28,37,46,0.08)', 'Foto estática':'rgba(14,165,233,0.08)' }
+const TIPO_COLOR = { Carrossel:'#F97316', Reels:'#1C252E', 'Foto estática':'#0EA5E9' }
+const TIPO_BG    = { Carrossel:'rgba(249,115,22,0.08)', Reels:'rgba(28,37,46,0.08)', 'Foto estática':'rgba(14,165,233,0.08)' }
 
 const MESES_FULL = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro']
 
@@ -38,7 +38,7 @@ export default function TopPostsMes() {
           <p style={{ color:'#1C252E', fontSize:15, fontWeight:700 }}>Top 5 posts</p>
           <p style={{ color:'#9AAAB8', fontSize:12, marginTop:2 }}>{mesNome} · por contas alcançadas</p>
         </div>
-        <span style={{ background:'rgba(255,98,0,0.08)', color:'#FF6200', fontSize:11, fontWeight:700, padding:'4px 10px', borderRadius:20 }}>
+        <span style={{ background:'rgba(249,115,22,0.08)', color:'#F97316', fontSize:11, fontWeight:700, padding:'4px 10px', borderRadius:20 }}>
           {posts.length} posts no mês
         </span>
       </div>
@@ -76,13 +76,13 @@ export default function TopPostsMes() {
                   {p.nome || temasLabel(p) || '—'}
                 </p>
                 <div style={{ background:'#F0F2F5', borderRadius:4, height:5, overflow:'hidden' }}>
-                  <div style={{ height:'100%', borderRadius:4, background: i===0 ? '#FF6200' : color, width:`${pct}%`, transition:'width 0.5s ease' }}/>
+                  <div style={{ height:'100%', borderRadius:4, background: i===0 ? '#F97316' : color, width:`${pct}%`, transition:'width 0.5s ease' }}/>
                 </div>
               </div>
 
               {/* Valor */}
               <div style={{ textAlign:'right', flexShrink:0 }}>
-                <p style={{ color: i===0 ? '#FF6200' : '#1C252E', fontSize:15, fontWeight:800 }}>{fmt(p.contas_alcancadas)}</p>
+                <p style={{ color: i===0 ? '#F97316' : '#1C252E', fontSize:15, fontWeight:800 }}>{fmt(p.contas_alcancadas)}</p>
                 <p style={{ color:'#9AAAB8', fontSize:10, marginTop:1 }}>{p.data_post}</p>
               </div>
             </div>

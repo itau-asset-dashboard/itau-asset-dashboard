@@ -56,7 +56,7 @@ export default function TopBar() {
 
         {/* Novo post */}
         <button onClick={() => setUploadOpen(true)} style={{
-          background: '#FF6200', color: '#fff', border: 'none', borderRadius: 10,
+          background: '#F97316', color: '#fff', border: 'none', borderRadius: 10,
           padding: '8px 12px', fontSize: 13, fontWeight: 600, cursor: 'pointer',
           display: 'flex', alignItems: 'center', gap: 5, fontFamily: 'DM Sans, sans-serif', whiteSpace: 'nowrap',
         }}>

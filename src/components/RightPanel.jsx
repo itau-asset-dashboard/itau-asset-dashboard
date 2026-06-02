@@ -18,7 +18,7 @@ function fmt(n) {
 }
 
 const TIPO_ICON = { Carrossel:'🎠', Reels:'🎬', 'Foto estática':'📷' }
-const TIPO_COLOR = { Carrossel:'#FF6200', Reels:'#0891B2', 'Foto estática':'#0E7490' }
+const TIPO_COLOR = { Carrossel:'#F97316', Reels:'#0891B2', 'Foto estática':'#0E7490' }
 
 function EditableValue({ value, color, onSave }) {
   const [editing, setEditing] = useState(false)
@@ -102,7 +102,7 @@ export default function RightPanel() {
               <circle cx="60" cy="60" r={R} fill="none" stroke="#E8ECF0" strokeWidth="9"/>
               <circle cx="60" cy="60" r={R} fill="none" stroke="rgba(195,235,247,0.5)" strokeWidth="9"
                 strokeDasharray={`${CIRC} 0`} transform="rotate(-90 60 60)"/>
-              <circle cx="60" cy="60" r={R} fill="none" stroke="#FF6200" strokeWidth="9"
+              <circle cx="60" cy="60" r={R} fill="none" stroke="#F97316" strokeWidth="9"
                 strokeLinecap="round"
                 strokeDasharray={`${dash} ${CIRC-dash}`}
                 transform="rotate(-90 60 60)"
@@ -119,7 +119,7 @@ export default function RightPanel() {
         {/* Alcançado × Meta anual */}
         <div style={{ display:'grid', gridTemplateColumns:'1fr 1px 1fr', alignItems:'center', marginBottom:8 }}>
           <div style={{ textAlign:'center' }}>
-            <p style={{ color:'#FF6200', fontSize:16, fontWeight:800, lineHeight:1 }}>{fmt(totalAnual)}</p>
+            <p style={{ color:'#F97316', fontSize:16, fontWeight:800, lineHeight:1 }}>{fmt(totalAnual)}</p>
             <p style={{ color:'#8A9BB0', fontSize:10, marginTop:2 }}>alcançadas</p>
           </div>
           <div style={{ background:'#E8ECF0', height:28, width:1, margin:'0 auto' }}/>
@@ -139,13 +139,13 @@ export default function RightPanel() {
           <div style={{ background:'#E8ECF0', borderRadius:4, height:6, overflow:'hidden', marginBottom:6 }}>
             <div style={{
               height:'100%', borderRadius:4,
-              background: pctMensal>=100 ? '#16a34a' : '#FF6200',
+              background: pctMensal>=100 ? '#16a34a' : '#F97316',
               width:`${Math.min(pctMensal,100)}%`,
               transition:'width 0.6s ease',
             }}/>
           </div>
           <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center' }}>
-            <span style={{ color:'#FF6200', fontSize:12, fontWeight:700 }}>{fmt(totalMensal)}</span>
+            <span style={{ color:'#F97316', fontSize:12, fontWeight:700 }}>{fmt(totalMensal)}</span>
             <span style={{ color:'#1C252E', fontSize:12, fontWeight:700 }}>{fmt(metaAjustada)}</span>
           </div>
           {metaAjustada !== metaMesOriginal && (

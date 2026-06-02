@@ -21,7 +21,7 @@ function pct(a, b) {
   return ((a/b)*100).toFixed(1)+'%'
 }
 
-const TIPO_COLOR = { Carrossel:'#FF6200', Reels:'#1C252E', 'Foto estática':'#0EA5E9' }
+const TIPO_COLOR = { Carrossel:'#F97316', Reels:'#1C252E', 'Foto estática':'#0EA5E9' }
 const ETF_TEMAS  = ['ETFs']
 
 export default function ETFsView() {
@@ -110,7 +110,7 @@ export default function ETFsView() {
 
   // ── KPI cards ──────────────────────────────────────
   const KPIS = [
-    { label:'Total alcançado',  value:fmt(totalEtf),  sub:`${participacao.toFixed(1)}% do total${viewMode==='mensal'?' do mês':' do ano'}`, color:'#FF6200', bg:'rgba(255,98,0,0.08)' },
+    { label:'Total alcançado',  value:fmt(totalEtf),  sub:`${participacao.toFixed(1)}% do total${viewMode==='mensal'?' do mês':' do ano'}`, color:'#F97316', bg:'rgba(249,115,22,0.08)' },
     { label:'Média por post',   value:fmt(mediaEtf),  sub:'contas / publicação',                                                             color:'#0891B2', bg:'rgba(8,145,178,0.08)' },
     { label:'Melhor post',      value:fmt(melhor?.contas_alcancadas), sub:(melhor?.nome||'—').slice(0,22),                                   color:'#7C3AED', bg:'rgba(124,58,237,0.08)' },
     { label:'Posts ETF',        value:String(etfPosts.length),        sub:`de ${basePosts.length} posts${viewMode==='mensal'?' no mês':' no ano'}`, color:'#059669', bg:'rgba(5,150,105,0.08)' },
@@ -310,11 +310,11 @@ export default function ETFsView() {
                     </p>
                     <div style={{ background:'#F0F2F5', borderRadius:3, height:4, overflow:'hidden' }}>
                       <div style={{ height:'100%', borderRadius:3,
-                        background: i===0?'#FF6200':'#0891B2', width:`${barW}%`, transition:'width 0.5s' }}/>
+                        background: i===0?'#F97316':'#0891B2', width:`${barW}%`, transition:'width 0.5s' }}/>
                     </div>
                   </div>
                   <div style={{ textAlign:'right', flexShrink:0 }}>
-                    <p style={{ color: i===0?'#FF6200':'#1C252E', fontSize:13, fontWeight:800 }}>
+                    <p style={{ color: i===0?'#F97316':'#1C252E', fontSize:13, fontWeight:800 }}>
                       {fmt(p.contas_alcancadas)}
                     </p>
                     <p style={{ color:'#9AAAB8', fontSize:10 }}>{p.data_post}</p>
@@ -338,7 +338,7 @@ export default function ETFsView() {
                       background: TIPO_COLOR[t.tipo] || '#0EA5E9' }}/>
                     <span style={{ color:'#1C252E', fontSize:13, fontWeight:500 }}>{t.tipo}</span>
                     {i===0 && t.total>0 && (
-                      <span style={{ background:'rgba(255,98,0,0.1)', color:'#FF6200',
+                      <span style={{ background:'rgba(249,115,22,0.1)', color:'#F97316',
                         borderRadius:6, padding:'1px 7px', fontSize:10, fontWeight:700 }}>Líder</span>
                     )}
                   </div>

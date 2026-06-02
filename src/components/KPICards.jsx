@@ -13,8 +13,8 @@ const CARDS = [
     key: 'total',
     label: 'Total alcançado',
     icon: Users,
-    accent: '#FF6B00',
-    iconBg: 'rgba(255,107,0,0.10)',
+    accent: '#F97316',
+    iconBg: 'rgba(249,115,22,0.10)',
     highlight: true,
   },
   {

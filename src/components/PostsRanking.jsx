@@ -12,7 +12,7 @@ function fmt(n) {
 }
 
 const BADGE = {
-  Carrossel: { bg: 'rgba(255,98,0,0.1)', color: '#FF6200' },
+  Carrossel: { bg: 'rgba(249,115,22,0.1)', color: '#F97316' },
   Reels: { bg: 'rgba(28,37,46,0.1)', color: '#1C252E' },
   'Foto estática': { bg: 'rgba(14,165,233,0.1)', color: '#0EA5E9' },
 }
@@ -56,12 +56,12 @@ export default function PostsRanking() {
 
   const SortIcon = ({ k }) => {
     if (sortKey !== k) return <ArrowUpDown size={11} color="#D0D8E0" />
-    return sortDir === -1 ? <ArrowDown size={11} color="#FF6200" /> : <ArrowUp size={11} color="#FF6200" />
+    return sortDir === -1 ? <ArrowDown size={11} color="#F97316" /> : <ArrowUp size={11} color="#F97316" />
   }
 
   const Th = ({ k, children }) => (
     <th onClick={() => toggleSort(k)} style={{
-      padding: '11px 14px', color: sortKey === k ? '#FF6200' : '#8A9BB0',
+      padding: '11px 14px', color: sortKey === k ? '#F97316' : '#8A9BB0',
       fontSize: 11, fontWeight: 600, textTransform: 'uppercase',
       letterSpacing: '0.05em', cursor: 'pointer', whiteSpace: 'nowrap',
       textAlign: 'left', userSelect: 'none', background: '#FAFBFC',
@@ -125,7 +125,7 @@ export default function PostsRanking() {
                     {temasLabel(p) && <p style={{ color: '#8A9BB0', fontSize: 11, marginTop: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{temasLabel(p)}</p>}
                   </td>
                   <td style={{ padding: '12px 14px' }}>
-                    <span style={{ color: '#FF6200', fontWeight: 700, fontSize: 14, opacity: isParcial ? 0.7 : 1 }}>{fmt(p.contas_alcancadas)}</span>
+                    <span style={{ color: '#F97316', fontWeight: 700, fontSize: 14, opacity: isParcial ? 0.7 : 1 }}>{fmt(p.contas_alcancadas)}</span>
                   </td>
                   <td style={{ padding: '12px 14px', color: '#1C252E', fontSize: 13, opacity: isParcial ? 0.7 : 1 }}>{fmt(p.visualizacoes)}</td>
                   <td style={{ padding: '12px 14px', color: '#1C252E', fontSize: 13 }}>{fmt(eng(p))}</td>
