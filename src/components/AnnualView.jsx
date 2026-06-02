@@ -2,7 +2,7 @@ import { useStore } from '../store/useStore'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, LabelList } from 'recharts'
 import { Users, TrendingUp, Award, LayoutGrid } from 'lucide-react'
 import { getTemas } from '../utils/temas'
-import { calcMetaMesAjustada } from '../utils/metaCalc'
+import { calcMetaMesAjustada, calcMetaMesProgressiva } from '../utils/metaCalc'
 
 const MESES_LABEL  = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez']
 const MESES_FULL   = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro']
@@ -40,7 +40,7 @@ export default function AnnualView() {
       return pts?.[1]===mm && pts?.[2]===ano
     })
     const total = mPosts.reduce((s,p)=>s+(p.contas_alcancadas||0),0)
-    const metaMes = calcMetaMesAjustada({ posts: allPosts, metaAnual, mesFiltroParam: mesVal })
+    const metaMes = calcMetaMesProgressiva({ posts: allPosts, metaAnual, mm, yyyy: ano })
     return {
       mes:     MESES_LABEL[i],
       mesFull: MESES_FULL[i],
