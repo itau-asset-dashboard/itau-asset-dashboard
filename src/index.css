@@ -41,37 +41,72 @@ html, body, #root {
 /* ── KPI grid ── */
 .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 16px; }
 
-/* ── Mobile ── */
-@media (max-width: 900px) {
+/* ── Grids do AnnualView ── */
+.annual-grid { display: grid; gap: 16px; }
+
+/* ── hide-mobile ── */
+.hide-mobile { display: inline; }
+
+/* ════════════════════════════════════════
+   MOBILE  ≤ 768px
+   ════════════════════════════════════════ */
+@media (max-width: 768px) {
   html, body, #root { height: auto; min-height: 100%; overflow: auto; }
 
-  .app-layout { flex-direction: column; height: auto; min-height: 100vh; padding-bottom: 64px; overflow: visible; }
-  .main-column { height: auto; overflow: visible; }
-  .content-scroll { padding: 14px 14px 24px; overflow: visible; }
+  /* Layout */
+  .app-layout    { flex-direction: column; height: auto; min-height: 100dvh; padding-bottom: 68px; overflow: visible; }
+  .main-column   { height: auto; overflow: visible; }
+  .content-scroll { padding: 12px 12px 28px; overflow: visible; }
 
-  .sidebar-desktop { display: none !important; }
-  .right-panel-desktop { display: none !important; }
+  /* Sidebar desktop → oculto */
+  .sidebar-desktop       { display: none !important; }
+  .right-panel-desktop   { display: none !important; }
 
+  /* Bottom nav com scroll horizontal quando itens não cabem */
   .bottom-nav {
     display: flex;
     position: fixed; bottom: 0; left: 0; right: 0;
     background: #1C252E;
     border-top: 1px solid rgba(255,255,255,0.07);
-    height: 62px; z-index: 200; padding: 0 4px;
+    height: 60px; z-index: 200;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding: 0 2px;
   }
+  .bottom-nav::-webkit-scrollbar { display: none; }
+  .bottom-nav button { flex-shrink: 0; min-width: 60px; }
 
-  .kpi-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 10px; }
-}
-
-/* Grids do AnnualView */
-.annual-grid { display: grid; gap: 16px; }
-
-@media (max-width: 900px) {
+  /* Grids */
+  .kpi-grid    { grid-template-columns: repeat(2, 1fr) !important; gap: 10px; }
   .annual-grid { grid-template-columns: 1fr !important; }
+
+  /* Cards */
+  .card { border-radius: 12px; }
+
+  /* Texto auxiliar sumido no mobile */
+  .hide-mobile { display: none; }
+
+  /* TopBar compacta */
+  .topbar-title { font-size: 16px !important; }
+  .topbar-sub   { display: none; }
+
+  /* Tabelas — scroll horizontal */
+  table { font-size: 12px !important; }
+  td, th { padding: 9px 10px !important; }
+
+  /* Charts — altura reduzida */
+  .chart-wrapper { height: 180px !important; }
 }
 
-@media (max-width: 480px) {
-  .card { border-radius: 12px; }
-  .kpi-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 8px; }
-  .annual-grid { grid-template-columns: 1fr !important; gap: 10px; }
+/* ════════════════════════════════════════
+   MOBILE PEQUENO  ≤ 390px
+   ════════════════════════════════════════ */
+@media (max-width: 390px) {
+  .content-scroll { padding: 10px 10px 24px; }
+  .kpi-grid { gap: 8px; }
+  .kpi-grid .card { padding: 14px 12px !important; }
+  .kpi-grid .card p:first-child { font-size: 10px !important; }
+  .kpi-grid .card p:nth-child(2) { font-size: 20px !important; }
 }

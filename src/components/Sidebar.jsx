@@ -7,7 +7,7 @@ const nav = [
   { id: 'posts',        icon: List,       label: 'Todos os Posts' },
   { id: 'etfs',         icon: TrendingUp, label: 'ETFs' },
   { id: 'insights',     icon: Lightbulb,  label: 'Insights' },
-  { id: 'oliver',       icon: LineChart,  label: 'Acomp. Oliver' },
+  { id: 'oliver',       icon: LineChart,  label: 'Dados Oliver' },
   { id: 'upload',       icon: Upload,     label: 'Upload' },
 ]
 

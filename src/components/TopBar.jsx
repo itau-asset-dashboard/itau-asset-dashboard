@@ -38,29 +38,29 @@ export default function TopBar() {
   return (
     <div style={{
       display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-      padding: '14px 24px', gap: 12, flexShrink: 0,
+      padding: '12px 16px', gap: 8, flexShrink: 0,
       background: '#fff', borderBottom: '1px solid #EAECF0',
     }}>
-      <div>
-        <h1 style={{ color: '#1C252E', fontSize: 20, fontWeight: 700, lineHeight: 1.2 }}>{section.title}</h1>
-        <p style={{ color: '#9AAAB8', fontSize: 12, marginTop: 2 }}>{section.sub}</p>
+      <div style={{ minWidth: 0 }}>
+        <h1 className="topbar-title" style={{ color: '#1C252E', fontSize: 20, fontWeight: 700, lineHeight: 1.2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{section.title}</h1>
+        <p className="topbar-sub" style={{ color: '#9AAAB8', fontSize: 12, marginTop: 2 }}>{section.sub}</p>
       </div>
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
         {showMesFiltro && (
           <select value={mesFiltro} onChange={e => setMesFiltro(e.target.value)}
-            style={{ background: '#fff', border: '1.5px solid #EAECF0', borderRadius: 10, padding: '7px 12px', fontSize: 13, color: '#1C252E', cursor: 'pointer', outline: 'none', fontFamily: 'DM Sans, sans-serif' }}>
+            style={{ background: '#fff', border: '1.5px solid #EAECF0', borderRadius: 10, padding: '7px 10px', fontSize: 13, color: '#1C252E', cursor: 'pointer', outline: 'none', fontFamily: 'DM Sans, sans-serif', maxWidth: 140 }}>
             {MESES.map(m => <option key={m.value} value={m.value}>{m.label}</option>)}
           </select>
         )}
 
-        {/* Novo post — botão principal */}
+        {/* Novo post */}
         <button onClick={() => setUploadOpen(true)} style={{
           background: '#FF6200', color: '#fff', border: 'none', borderRadius: 10,
-          padding: '8px 14px', fontSize: 13, fontWeight: 600, cursor: 'pointer',
-          display: 'flex', alignItems: 'center', gap: 6, fontFamily: 'DM Sans, sans-serif',
+          padding: '8px 12px', fontSize: 13, fontWeight: 600, cursor: 'pointer',
+          display: 'flex', alignItems: 'center', gap: 5, fontFamily: 'DM Sans, sans-serif', whiteSpace: 'nowrap',
         }}>
-          <Plus size={15} /> Novo post
+          <Plus size={15} /> <span className="hide-mobile">Novo post</span>
         </button>
 
         {/* API */}
