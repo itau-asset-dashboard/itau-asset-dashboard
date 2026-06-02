@@ -18,6 +18,7 @@ export const useStore = create(
       metaMensal: 200000,
       metaAnual: 1090000,
       mesFiltro: '01/2026',
+      oliverData: {}, // { 'MM/YYYY': { alcance_oliver: number, meta_oliver: number } }
       activeSection: 'visao-anual',
       insights: [],
       loadingInsights: false,
@@ -95,6 +96,10 @@ export const useStore = create(
       },
 
       setMesFiltro: (mes) => set({ mesFiltro: mes }),
+
+      setOliverData: (mes, valores) => set(s => ({
+        oliverData: { ...s.oliverData, [mes]: { ...s.oliverData[mes], ...valores } }
+      })),
 
       // ── Posts ──────────────────────────────────────────
       addPost: async (post) => {
@@ -237,12 +242,13 @@ export const useStore = create(
     {
       name: 'itau-asset-instagram',
       partialize: (s) => ({
-        posts:      s.posts,
-        metaMensal: s.metaMensal,
-        metaAnual:  s.metaAnual,
-        mesFiltro:  s.mesFiltro,
-        insights:   s.insights,
-        apiKey:     s.apiKey,
+        posts:       s.posts,
+        metaMensal:  s.metaMensal,
+        metaAnual:   s.metaAnual,
+        mesFiltro:   s.mesFiltro,
+        insights:    s.insights,
+        apiKey:      s.apiKey,
+        oliverData:  s.oliverData,
       }),
     }
   )

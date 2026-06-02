@@ -15,6 +15,7 @@ import SyncBadge from './components/SyncBadge'
 import AnnualView from './components/AnnualView'
 import TopPostsMes from './components/TopPostsMes'
 import ETFsView from './components/ETFsView'
+import OliverView from './components/OliverView'
 
 export default function App() {
   const { activeSection, syncFromCloud } = useStore()
@@ -32,6 +33,7 @@ export default function App() {
         <div className="content-scroll scrollbar-thin">
           {activeSection === 'upload'      && <UploadSection />}
           {activeSection === 'insights'    && <Insights />}
+          {activeSection === 'oliver'      && <OliverView />}
           {activeSection === 'posts'       && <PostsRanking />}
           {activeSection === 'etfs'        && <ETFsView />}
           {activeSection === 'visao-anual' && <AnnualView />}

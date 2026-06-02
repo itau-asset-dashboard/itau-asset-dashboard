@@ -1,13 +1,14 @@
-import { BarChart2, Calendar, List, Lightbulb, Upload, TrendingUp } from 'lucide-react'
+import { BarChart2, Calendar, List, Lightbulb, Upload, TrendingUp, LineChart } from 'lucide-react'
 import { useStore } from '../store/useStore'
 
 const nav = [
-  { id: 'visao-anual',  icon: Calendar,  label: 'Visão Anual' },
-  { id: 'visao-geral',  icon: BarChart2, label: 'Visão Mensal' },
-  { id: 'posts',        icon: List,      label: 'Todos os Posts' },
-  { id: 'insights',     icon: Lightbulb, label: 'Insights' },
+  { id: 'visao-anual',  icon: Calendar,   label: 'Visão Anual' },
+  { id: 'visao-geral',  icon: BarChart2,  label: 'Visão Mensal' },
+  { id: 'posts',        icon: List,       label: 'Todos os Posts' },
   { id: 'etfs',         icon: TrendingUp, label: 'ETFs' },
-  { id: 'upload',       icon: Upload,    label: 'Upload' },
+  { id: 'insights',     icon: Lightbulb,  label: 'Insights' },
+  { id: 'oliver',       icon: LineChart,  label: 'Acomp. Oliver' },
+  { id: 'upload',       icon: Upload,     label: 'Upload' },
 ]
 
 function InstagramIcon({ size = 13, color = '#1C252E' }) {
