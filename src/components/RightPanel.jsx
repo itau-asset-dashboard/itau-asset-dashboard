@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Edit2, Check, Plus } from 'lucide-react'
+import { Edit2, Check, Plus, Film, LayoutPanelLeft, Image } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import UploadModal from './UploadModal'
 
@@ -17,8 +17,9 @@ function fmt(n) {
   return n.toLocaleString('pt-BR')
 }
 
-const TIPO_ICON = { Carrossel:'🎠', Reels:'🎬', 'Foto estática':'📷' }
+const TIPO_ICON  = { Carrossel: LayoutPanelLeft, Reels: Film, 'Foto estática': Image }
 const TIPO_COLOR = { Carrossel:'#F97316', Reels:'#0891B2', 'Foto estática':'#0E7490' }
+const TIPO_BG    = { Carrossel:'rgba(249,115,22,0.08)', Reels:'rgba(8,145,178,0.08)', 'Foto estática':'rgba(14,116,144,0.08)' }
 
 function EditableValue({ value, color, onSave }) {
   const [editing, setEditing] = useState(false)
@@ -181,29 +182,31 @@ export default function RightPanel() {
             <p style={{ color:'#8A9BB0', fontSize:12, textAlign:'center', marginTop:16 }}>Nenhum post ainda</p>
           )}
           {recentes.map(p=>{
-            const color = TIPO_COLOR[p.tipo]||'#0891B2'
+            const color   = TIPO_COLOR[p.tipo] || '#0891B2'
+            const bg      = TIPO_BG[p.tipo]    || 'rgba(8,145,178,0.08)'
+            const TipoIcon = TIPO_ICON[p.tipo]  || Image
             return (
               <div key={p.id} onClick={()=>setEditTarget(p)} style={{
-                background:'#F5F8FA', border:'1px solid #E8ECF0',
-                borderRadius:12, padding:'9px 11px',
+                background:'transparent', border:'1px solid #EDEFF2',
+                borderRadius:10, padding:'8px 10px',
                 display:'flex', alignItems:'center', gap:9, flexShrink:0,
-                cursor:'pointer', transition:'background 0.12s',
+                cursor:'pointer', transition:'background 0.1s',
               }}
-              onMouseEnter={e=>e.currentTarget.style.background='#EBF4FF'}
-              onMouseLeave={e=>e.currentTarget.style.background='#F5F8FA'}
+              onMouseEnter={e=>e.currentTarget.style.background='#F8FAFC'}
+              onMouseLeave={e=>e.currentTarget.style.background='transparent'}
               >
-                <div style={{ width:34, height:34, borderRadius:9, background:'rgba(195,235,247,0.4)', flexShrink:0, display:'flex', alignItems:'center', justifyContent:'center', fontSize:15 }}>
-                  {TIPO_ICON[p.tipo]||'📄'}
+                <div style={{ width:30, height:30, borderRadius:8, background:bg, flexShrink:0, display:'flex', alignItems:'center', justifyContent:'center' }}>
+                  <TipoIcon size={13} color={color} strokeWidth={1.8} />
                 </div>
                 <div style={{ flex:1, minWidth:0 }}>
-                  <p style={{ color:'#1C252E', fontSize:12, fontWeight:600, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
+                  <p style={{ color:'#182638', fontSize:12, fontWeight:600, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
                     {p.nome||p.tema||p.descricao||'—'}
                   </p>
-                  <p style={{ color:'#8A9BB0', fontSize:10, marginTop:2 }}>
-                    {p.data_post}{p.status==='parcial'&&<span style={{ color:'#d97706', marginLeft:4 }}>🕐</span>}
+                  <p style={{ color:'#A8B5C0', fontSize:10, marginTop:2 }}>
+                    {p.data_post}{p.status==='parcial'&&<span style={{ color:'#d97706', marginLeft:4, fontSize:9 }}>parcial</span>}
                   </p>
                 </div>
-                <span style={{ color, fontSize:13, fontWeight:700, flexShrink:0 }}>{fmt(p.contas_alcancadas)}</span>
+                <span style={{ color, fontSize:12, fontWeight:700, flexShrink:0 }}>{fmt(p.contas_alcancadas)}</span>
               </div>
             )
           })}

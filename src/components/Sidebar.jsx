@@ -9,6 +9,7 @@ const NAV_GROUPS = [
       { id: 'visao-anual', icon: Calendar,  label: 'Visão Anual' },
       { id: 'visao-geral', icon: BarChart2, label: 'Visão Mensal' },
       { id: 'insights',    icon: Lightbulb, label: 'Insights' },
+      { id: 'oliver',      icon: LineChart,  label: 'Dados Oliver' },
     ],
   },
   {
@@ -21,8 +22,7 @@ const NAV_GROUPS = [
   {
     label: 'PRODUTOS',
     items: [
-      { id: 'etfs',   icon: TrendingUp, label: 'ETFs' },
-      { id: 'oliver', icon: LineChart,  label: 'Dados Oliver' },
+      { id: 'etfs', icon: TrendingUp, label: 'ETFs' },
     ],
   },
 ]
@@ -40,16 +40,14 @@ function InstagramIcon({ size = 12, color = '#5A6A7A' }) {
   )
 }
 
-// Logo fiel ao Itaú — superelipse escura, tipografia rounded
+// Logo Itaú — superelipse, Nunito ExtraBold aproxima o rounded typeface oficial
 function ItauLogo({ size = 38 }) {
   return (
     <svg width={size} height={size} viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-      {/* Superelipse com cantos muito arredondados */}
-      <rect width="200" height="200" rx="52" fill="#182638"/>
-      {/* "itaú" com fonte arredondada aproximada */}
-      <text x="100" y="132" textAnchor="middle"
-        fontFamily="'DM Sans', Arial Rounded MT Bold, Arial, sans-serif"
-        fontWeight="700" fontSize="72" fill="#C3EBF7" letterSpacing="-2">
+      <rect width="200" height="200" rx="56" fill="#182638"/>
+      <text x="100" y="136" textAnchor="middle"
+        fontFamily="'Nunito', 'DM Sans', sans-serif"
+        fontWeight="900" fontSize="76" fill="#C3EBF7" letterSpacing="-3">
         itaú
       </text>
     </svg>
