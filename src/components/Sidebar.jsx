@@ -76,13 +76,28 @@ export default function Sidebar() {
         overflow: 'hidden',
       }}>
 
-        {/* ── Topo: só o badge @itauasset ── */}
+        {/* ── Topo: logo Itaú + @itauasset ── */}
         <div style={{ padding: '0 4px', marginBottom: 20 }}>
           <div style={{
-            display: 'inline-flex', alignItems: 'center', gap: 8,
-            background: '#EDEFF2', borderRadius: 24, padding: '8px 14px',
+            display: 'inline-flex', alignItems: 'center', gap: 9,
+            background: '#EDEFF2', borderRadius: 24, padding: '6px 14px 6px 6px',
           }}>
-            <InstagramIcon size={14} color="#3D4E5C" />
+            {/* Logo Itaú em miniatura */}
+            <div style={{
+              width: 28, height: 28, borderRadius: '50%',
+              background: '#C3EBF7',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              flexShrink: 0,
+            }}>
+              <svg width={20} height={20} viewBox="0 0 100 100" fill="none">
+                <rect width="100" height="100" rx="26" fill="#182638"/>
+                <text x="50" y="68" textAnchor="middle"
+                  fontFamily="'Nunito','DM Sans',sans-serif"
+                  fontWeight="900" fontSize="38" fill="#C3EBF7" letterSpacing="-1">
+                  itaú
+                </text>
+              </svg>
+            </div>
             <span style={{ color: '#1C252E', fontSize: 13, fontWeight: 700, letterSpacing: '-0.01em' }}>@itauasset</span>
           </div>
         </div>
