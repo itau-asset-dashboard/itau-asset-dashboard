@@ -2,6 +2,7 @@ import { useState, useRef, useImperativeHandle, forwardRef } from 'react'
 import { X, Upload, Check, Sparkles, Trash2, ChevronRight } from 'lucide-react'
 import { extractPostFromImage } from '../utils/anthropic'
 import { useStore } from '../store/useStore'
+import ImageLightbox from './ImageLightbox'
 
 const TIPOS = ['Reels', 'Carrossel', 'Foto estática']
 
@@ -118,6 +119,7 @@ const SinglePostModal = forwardRef(function SinglePostModal({ initialPost, initi
   const [saving,   setSaving]   = useState(false)
   const [dragging, setDragging] = useState(false)
   const [confirmDelete, setConfirmDelete] = useState(false)
+  const [lightboxOpen, setLightboxOpen]   = useState(false)
   const [form, setForm] = useState(() => {
     const base = initialPost ? { ...EMPTY, ...initialPost } : { ...EMPTY }
     // Normaliza tema para sempre ser array
@@ -230,27 +232,34 @@ const SinglePostModal = forwardRef(function SinglePostModal({ initialPost, initi
           onChange={e => handleFile(e.target.files[0])} />
         {preview ? (
           <>
-            <img src={form.imageUrl || preview} alt="" style={{ width: 56, height: 56, objectFit: 'cover', borderRadius: 8, flexShrink: 0, cursor: 'zoom-in' }}
-              onClick={e => { e.stopPropagation(); openImage(form.imageUrl || preview) }} />
+            <img
+              src={form.imageUrl || preview}
+              alt=""
+              style={{ width: 56, height: 56, objectFit: 'cover', borderRadius: 8, flexShrink: 0, cursor: 'zoom-in', border: '1.5px solid #E8ECF0' }}
+              onClick={e => { e.stopPropagation(); setLightboxOpen(true) }}
+            />
             <div style={{ flex: 1, minWidth: 0 }} onClick={e => e.stopPropagation()}>
-              <p style={{ color: '#1C252E', fontWeight: 700, fontSize: 13, marginBottom: 4 }}>Última evidência</p>
+              <p style={{ color: '#1C252E', fontWeight: 700, fontSize: 13, marginBottom: 6 }}>Última evidência</p>
               <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                 <span style={{ color: '#8A9BB0', fontSize: 11 }}>📅</span>
                 <input
                   value={form.data_evidencia || ''}
                   onChange={e => set('data_evidencia', e.target.value)}
+                  onBlur={e => set('data_evidencia', e.target.value.trim())}
                   placeholder={form.data_post ? formatDate(form.data_post) : 'DD/MM/AAAA'}
                   style={{
-                    border: 'none', borderBottom: '1px dashed #C3D8E4',
-                    background: 'transparent', fontSize: 11, color: '#1C252E',
-                    outline: 'none', width: 90, padding: '1px 2px',
-                    fontFamily: 'DM Sans, sans-serif',
+                    border: 'none', borderBottom: '1.5px solid #C3D8E4',
+                    background: 'transparent', fontSize: 12, color: '#1C252E',
+                    outline: 'none', width: 96, padding: '2px 4px',
+                    fontFamily: 'DM Sans, sans-serif', fontWeight: 500,
                   }}
                 />
-                <span style={{ color: '#8A9BB0', fontSize: 11 }}>·</span>
-                <span style={{ color: '#0891B2', fontSize: 11, cursor: 'pointer' }}
-                  onClick={e => { e.stopPropagation(); openImage(form.imageUrl || preview) }}>
-                  abrir ↗
+                <span style={{ color: '#C0CAD4', fontSize: 11 }}>·</span>
+                <span
+                  style={{ color: '#0891B2', fontSize: 11, cursor: 'pointer', fontWeight: 600 }}
+                  onClick={e => { e.stopPropagation(); setLightboxOpen(true) }}
+                >
+                  ver imagem ↗
                 </span>
               </div>
             </div>
@@ -445,6 +454,15 @@ const SinglePostModal = forwardRef(function SinglePostModal({ initialPost, initi
         )}
       </div>
     </div>
+
+    {/* Lightbox de imagem em alta qualidade */}
+    {lightboxOpen && (form.imageUrl || preview) && (
+      <ImageLightbox
+        src={form.imageUrl || preview}
+        title={form.nome || 'Evidência'}
+        onClose={() => setLightboxOpen(false)}
+      />
+    )}
   )
 })
 

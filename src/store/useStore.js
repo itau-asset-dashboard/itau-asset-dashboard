@@ -46,7 +46,12 @@ export const useStore = create(
           const dirty = []
           const posts = cloudPosts.map(cp => {
             const local = localPosts.find(lp => lp.id === cp.id)
-            const merged   = local?.imageData ? { ...cp, imageData: local.imageData } : cp
+            // Preserva campos que existem só no localStorage (não estão no Supabase)
+            const merged   = {
+              ...cp,
+              ...(local?.imageData     && { imageData:     local.imageData }),
+              ...(local?.data_evidencia && { data_evidencia: local.data_evidencia }),
+            }
             const temaNorm = normalizeTema(merged.tema)
             const dateNorm = normalizeDate(merged.data_post)
             const wasDirty = JSON.stringify(merged.tema) !== JSON.stringify(temaNorm)
