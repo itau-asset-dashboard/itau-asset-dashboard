@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useStore } from '../store/useStore'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend, Cell } from 'recharts'
 import { Edit2, Check } from 'lucide-react'
+import { useIsMobile } from '../utils/useIsMobile'
 
 const MESES_LABEL = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez']
 const MESES_FULL  = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro']
@@ -27,6 +28,7 @@ function pctDiff(a, b) {
 export default function OliverView() {
   const { posts, mesFiltro, oliverData, setOliverData } = useStore()
   const ano = mesFiltro?.split('/')?.[1] || '2026'
+  const mobile = useIsMobile()
 
   const [editingMes, setEditingMes] = useState(null)
   const [inputVal, setInputVal]     = useState({ alcance_oliver: '', meta_oliver: '' })
@@ -99,10 +101,10 @@ export default function OliverView() {
           { label: 'Meses preenchidos',    value: String(meses.filter(m => m.alcance_oliver).length) + ' / 12',
             color: '#0891B2', bg: 'rgba(8,145,178,0.08)', desc: 'Meses com dado Oliver inserido' },
         ].map(({ label, value, color, bg, desc }) => (
-          <div key={label} className="card" style={{ padding: '18px 20px' }}>
-            <p style={{ color: '#9AAAB8', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 5 }}>{label}</p>
-            <p style={{ color, fontSize: 24, fontWeight: 800, lineHeight: 1.1, marginBottom: 3 }}>{value}</p>
-            <p style={{ color: '#9AAAB8', fontSize: 12 }}>{desc}</p>
+          <div key={label} className="card" style={{ padding: mobile ? '12px 14px' : '18px 20px' }}>
+            <p style={{ color: '#9AAAB8', fontSize: mobile ? 10 : 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: mobile ? 6 : 5, lineHeight: 1.3 }}>{label}</p>
+            <p style={{ color, fontSize: mobile ? 18 : 24, fontWeight: 800, lineHeight: 1.1, marginBottom: 3 }}>{value}</p>
+            {!mobile && <p style={{ color: '#9AAAB8', fontSize: 12 }}>{desc}</p>}
           </div>
         ))}
       </div>

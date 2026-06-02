@@ -1,5 +1,6 @@
 import { useRef, useEffect, useState } from 'react'
 import { RefreshCw, Send, Trash2 } from 'lucide-react'
+import { useIsMobile } from '../utils/useIsMobile'
 
 // Renderer simples de markdown para respostas da IA
 function MarkdownText({ text }) {
@@ -91,6 +92,7 @@ export default function Insights() {
   }
 
   const list = insights.length > 0 ? insights : DEFAULT
+  const mobile = useIsMobile()
 
   // ── Chat ──────────────────────────────────────────────
   const [chatMessages, setChatMessages] = useState([]) // { role: 'user'|'assistant', content: string }
@@ -137,7 +139,7 @@ export default function Insights() {
 
       {/* ── Insights automáticos ── */}
       <div>
-        <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:16 }}>
+        <div style={{ display:'flex', flexDirection: mobile ? 'column' : 'row', alignItems: mobile ? 'flex-start' : 'center', justifyContent:'space-between', gap: mobile ? 10 : 0, marginBottom:16 }}>
           <div>
             <h2 style={{ color:'#1C252E', fontSize:15, fontWeight:700 }}>Insights automáticos</h2>
             <p style={{ color:'#8A9BB0', fontSize:12, marginTop:2 }}>Análise inteligente via IA · baseada em todos os posts</p>

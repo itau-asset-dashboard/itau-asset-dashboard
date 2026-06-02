@@ -3,6 +3,7 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, LabelL
 import { Users, TrendingUp, Award, LayoutGrid } from 'lucide-react'
 import { getTemas } from '../utils/temas'
 import { calcMetaMesAjustada, calcMetaMesProgressiva } from '../utils/metaCalc'
+import { useIsMobile } from '../utils/useIsMobile'
 
 const MESES_LABEL  = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez']
 const MESES_FULL   = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro']
@@ -18,6 +19,7 @@ const TIPO_COLOR = { Carrossel:'#F97316', Reels:'#1C252E', 'Foto estática':'#C3
 
 export default function AnnualView() {
   const { getPostsDoAno, metaAnual, mesFiltro, posts: allPosts } = useStore()
+  const mobile = useIsMobile()
   const ano   = mesFiltro?.split('/')?.[1] || '2026'
   const posts = getPostsDoAno(ano)
 
@@ -110,17 +112,19 @@ export default function AnnualView() {
       <div className="kpi-grid">
         {CARDS.map(({label,value,sub,icon:Icon,color,bg},idx)=>(
           <div key={label} className="card kpi-card" style={{
-            padding:'18px 20px',
+            padding: mobile ? '12px 14px' : '18px 20px',
             borderTop: idx===0 ? `3px solid ${color}` : '3px solid transparent',
           }}>
-            <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:14 }}>
-              <p style={{ color:'#8A9BB0', fontSize:11, fontWeight:600, textTransform:'uppercase', letterSpacing:'0.06em' }}>{label}</p>
-              <div style={{ width:30, height:30, borderRadius:8, background:bg, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
-                <Icon size={14} color={color} strokeWidth={2.1}/>
-              </div>
+            <div style={{ display:'flex', alignItems:'flex-start', justifyContent:'space-between', marginBottom: mobile ? 8 : 14 }}>
+              <p style={{ color:'#8A9BB0', fontSize: mobile ? 10 : 11, fontWeight:600, textTransform:'uppercase', letterSpacing:'0.04em', lineHeight:1.3, paddingRight: mobile ? 4 : 8 }}>{label}</p>
+              {!mobile && (
+                <div style={{ width:30, height:30, borderRadius:8, background:bg, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+                  <Icon size={14} color={color} strokeWidth={2.1}/>
+                </div>
+              )}
             </div>
-            <p style={{ color:'#182638', fontSize:28, fontWeight:800, lineHeight:1, letterSpacing:'-0.02em', marginBottom:6 }}>{value}</p>
-            <p style={{ color:'#A8B5C0', fontSize:12, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{sub}</p>
+            <p style={{ color:'#182638', fontSize: mobile ? 22 : 28, fontWeight:800, lineHeight:1, letterSpacing:'-0.02em', marginBottom: mobile ? 4 : 6 }}>{value}</p>
+            <p style={{ color:'#A8B5C0', fontSize: mobile ? 10 : 12, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{sub}</p>
           </div>
         ))}
       </div>

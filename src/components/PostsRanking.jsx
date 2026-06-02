@@ -3,6 +3,7 @@ import { ArrowUpDown, RefreshCw, ChevronLeft, ChevronRight, ArrowUp, ArrowDown }
 import { useStore } from '../store/useStore'
 import UploadModal from './UploadModal'
 import { temasLabel } from '../utils/temas'
+import { useIsMobile } from '../utils/useIsMobile'
 
 function fmt(n) {
   if (n == null) return '—'
@@ -28,6 +29,7 @@ function parseDate(d) {
 export default function PostsRanking() {
   const { getPostsDoMes, updatePost, deletePost } = useStore()
   const posts = getPostsDoMes()
+  const mobile = useIsMobile()
 
   // Padrão: data decrescente (mais recente primeiro)
   const [sortKey, setSortKey] = useState('data_post')
@@ -85,11 +87,11 @@ export default function PostsRanking() {
           <thead>
             <tr>
               <Th k="data_post">Data</Th>
-              <Th k="tipo">Tipo</Th>
+              {!mobile && <Th k="tipo">Tipo</Th>}
               <th style={{ padding: '11px 14px', color: '#8A9BB0', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', textAlign: 'left', background: '#FAFBFC' }}>Post / Tema</th>
-              <Th k="contas_alcancadas">Contas alc.</Th>
-              <Th k="visualizacoes">Visualiz.</Th>
-              <th style={{ padding: '11px 14px', color: '#8A9BB0', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', textAlign: 'left', background: '#FAFBFC' }}>Engaj.</th>
+              <Th k="contas_alcancadas">Alcance</Th>
+              {!mobile && <Th k="visualizacoes">Visual.</Th>}
+              {!mobile && <th style={{ padding: '11px 14px', color: '#8A9BB0', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', textAlign: 'left', background: '#FAFBFC' }}>Engaj.</th>}
               <th style={{ padding: '11px 14px', color: '#8A9BB0', fontSize: 11, background: '#FAFBFC' }}></th>
               <th style={{ padding: '11px 14px', background: '#FAFBFC' }}></th>
             </tr>
@@ -97,7 +99,7 @@ export default function PostsRanking() {
           <tbody>
             {visible.length === 0 && (
               <tr>
-                <td colSpan={8} style={{ padding: '40px 20px', textAlign: 'center', color: '#9AAAB8', fontSize: 13 }}>
+                <td colSpan={mobile ? 5 : 8} style={{ padding: '40px 20px', textAlign: 'center', color: '#9AAAB8', fontSize: 13 }}>
                   Nenhum post encontrado para este período
                 </td>
               </tr>
@@ -106,6 +108,9 @@ export default function PostsRanking() {
               const isMelhor = p.id === melhorId
               const isParcial = p.status === 'parcial'
               const badge = BADGE[p.tipo] || BADGE['Foto estática']
+              const tipoAbrev = mobile
+                ? (p.tipo === 'Foto estática' ? 'Foto' : p.tipo)
+                : p.tipo
               return (
                 <tr key={p.id}
                   style={{ borderTop: '1px solid #F5F7FA', cursor: 'pointer' }}
@@ -113,22 +118,27 @@ export default function PostsRanking() {
                   onMouseEnter={e => e.currentTarget.style.background = '#FAFBFC'}
                   onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
                 >
-                  <td style={{ padding: '12px 14px', color: '#8A9BB0', fontSize: 12, whiteSpace: 'nowrap' }}>{p.data_post}</td>
-                  <td style={{ padding: '12px 14px' }}>
-                    <span style={{ background: badge.bg, color: badge.color, borderRadius: 7, padding: '3px 9px', fontSize: 11, fontWeight: 700 }}>{p.tipo}</span>
-                  </td>
-                  <td style={{ padding: '12px 14px', maxWidth: 180, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                    <p style={{ color: '#1C252E', fontSize: 13, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  <td style={{ padding: mobile ? '10px 10px' : '12px 14px', color: '#8A9BB0', fontSize: 11, whiteSpace: 'nowrap' }}>{p.data_post}</td>
+                  {!mobile && (
+                    <td style={{ padding: '12px 14px' }}>
+                      <span style={{ background: badge.bg, color: badge.color, borderRadius: 7, padding: '3px 9px', fontSize: 11, fontWeight: 700, whiteSpace: 'nowrap' }}>{tipoAbrev}</span>
+                    </td>
+                  )}
+                  <td style={{ padding: mobile ? '10px 10px' : '12px 14px', maxWidth: mobile ? 140 : 180, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    <p style={{ color: '#1C252E', fontSize: mobile ? 12 : 13, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {isMelhor && <span style={{ marginRight: 4 }}>⭐</span>}
                       {p.nome || '—'}
                     </p>
-                    {temasLabel(p) && <p style={{ color: '#8A9BB0', fontSize: 11, marginTop: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{temasLabel(p)}</p>}
+                    {!mobile && temasLabel(p) && <p style={{ color: '#8A9BB0', fontSize: 11, marginTop: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{temasLabel(p)}</p>}
+                    {mobile && (
+                      <span style={{ background: badge.bg, color: badge.color, borderRadius: 5, padding: '1px 6px', fontSize: 10, fontWeight: 600, whiteSpace: 'nowrap' }}>{tipoAbrev}</span>
+                    )}
                   </td>
-                  <td style={{ padding: '12px 14px' }}>
-                    <span style={{ color: '#F97316', fontWeight: 700, fontSize: 14, opacity: isParcial ? 0.7 : 1 }}>{fmt(p.contas_alcancadas)}</span>
+                  <td style={{ padding: mobile ? '10px 10px' : '12px 14px' }}>
+                    <span style={{ color: '#F97316', fontWeight: 700, fontSize: mobile ? 13 : 14, opacity: isParcial ? 0.7 : 1 }}>{fmt(p.contas_alcancadas)}</span>
                   </td>
-                  <td style={{ padding: '12px 14px', color: '#1C252E', fontSize: 13, opacity: isParcial ? 0.7 : 1 }}>{fmt(p.visualizacoes)}</td>
-                  <td style={{ padding: '12px 14px', color: '#1C252E', fontSize: 13 }}>{fmt(eng(p))}</td>
+                  {!mobile && <td style={{ padding: '12px 14px', color: '#1C252E', fontSize: 13, opacity: isParcial ? 0.7 : 1 }}>{fmt(p.visualizacoes)}</td>}
+                  {!mobile && <td style={{ padding: '12px 14px', color: '#1C252E', fontSize: 13 }}>{fmt(eng(p))}</td>}
                   <td style={{ padding: '12px 14px' }}>
                     {isParcial
                       ? <span style={{ background: 'rgba(245,158,11,0.12)', color: '#f59e0b', borderRadius: 6, padding: '2px 7px', fontSize: 11, fontWeight: 600 }}>🕐 Parcial</span>
