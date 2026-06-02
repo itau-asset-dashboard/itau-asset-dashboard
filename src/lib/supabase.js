@@ -42,10 +42,19 @@ export async function uploadImage(postId, dataUrl) {
   return data.publicUrl
 }
 
+// Colunas que existem na tabela posts do Supabase
+const POST_COLUMNS = [
+  'id','nome','tema','data_post','tipo','descricao',
+  'contas_alcancadas','visualizacoes','curtidas','comentarios','salvamentos','compartilhamentos',
+  'status','historico','atualizado_em','image_url',
+]
+
 export async function upsertPost(post) {
-  // eslint-disable-next-line no-unused-vars
-  const { apiKey, imageData, imageUrl, ...clean } = post   // nunca salva base64 no banco
-  // Salva imageUrl como image_url (nome real da coluna no Supabase)
+  const { apiKey, imageData, imageUrl, imagePreview, data_evidencia, ...rest } = post
+  // Mantém só as colunas conhecidas para não quebrar se houver campos novos no frontend
+  const clean = Object.fromEntries(
+    Object.entries(rest).filter(([k]) => POST_COLUMNS.includes(k))
+  )
   const { error } = await supabase.from('posts').upsert({ ...clean, image_url: imageUrl || null })
   if (error) throw error
 }
