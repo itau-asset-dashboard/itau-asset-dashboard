@@ -202,6 +202,7 @@ const SinglePostModal = forwardRef(function SinglePostModal({ initialPost, initi
   }
 
   return (
+    <>
     <div style={{ padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: 14 }}>
 
 
@@ -463,6 +464,7 @@ const SinglePostModal = forwardRef(function SinglePostModal({ initialPost, initi
         onClose={() => setLightboxOpen(false)}
       />
     )}
+    </>
   )
 })
 
