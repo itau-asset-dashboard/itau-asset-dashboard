@@ -45,10 +45,16 @@ export default function PostsRanking() {
 
   function toggleVer(anual) { setVerAnual(anual); setPage(0) }
 
+  function parseDate(d) {
+    if (!d) return 0
+    const [dd, mm, yyyy] = d.split('/')
+    return new Date(`${yyyy}-${mm}-${dd}`).getTime() || 0
+  }
+
   const sorted = [...posts].sort((a, b) => {
+    if (sortKey === 'data_post') return sortDir * (parseDate(a.data_post) - parseDate(b.data_post))
     const va = a[sortKey] ?? 0, vb = b[sortKey] ?? 0
-    if (typeof va === 'string') return sortDir * va.localeCompare(vb)
-    return sortDir * (vb - va)
+    return sortDir * ((vb) - (va))
   })
 
   const pages = Math.ceil(sorted.length / PAGE_SIZE)
@@ -87,7 +93,7 @@ export default function PostsRanking() {
                 color: verAnual === isAnual ? '#C3EBF7' : '#5A7080',
                 transition: 'all 0.15s',
               }}>
-              {isAnual ? `${ano} completo` : mesFiltro ? mesFiltro.replace('/', '/') : 'Mês atual'}
+              {isAnual ? ano : mesFiltro ? mesFiltro.replace('/', '/') : 'Mês atual'}
             </button>
           ))}
         </div>
