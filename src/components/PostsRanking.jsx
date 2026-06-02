@@ -127,7 +127,6 @@ export default function PostsRanking() {
           )}
         </div>
       </div>
-      </div>
 
       <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }} className="scrollbar-thin">
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
