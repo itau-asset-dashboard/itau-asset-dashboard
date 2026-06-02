@@ -62,7 +62,10 @@ export default function RightPanel() {
 
   const totalAnual     = postsAno.reduce((s,p)=>s+(p.contas_alcancadas||0),0)
   const totalMensal    = postsMes.reduce((s,p)=>s+(p.contas_alcancadas||0),0)
-  const metaAjustada   = calcMetaMesAjustada({ posts: allPosts, metaAnual, mesFiltroParam: mesFiltro })
+  // Sempre usa o mês real de hoje — não depende do filtro de outra aba
+  const hoje = new Date()
+  const mesHojeParam = `${String(hoje.getMonth()+1).padStart(2,'0')}/${hoje.getFullYear()}`
+  const metaAjustada   = calcMetaMesAjustada({ posts: allPosts, metaAnual, mesFiltroParam: mesHojeParam })
   const pctAnual       = metaAnual>0 ? Math.min((totalAnual/metaAnual)*100,100) : 0
   const pctMensal      = metaAjustada>0 ? Math.min((totalMensal/metaAjustada)*100,100) : 0
   const metaMesOriginal = Math.round(metaAnual/12)

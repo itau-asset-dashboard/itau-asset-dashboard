@@ -25,8 +25,10 @@ export default function AnnualView() {
   const media   = posts.length > 0 ? Math.round(total/posts.length) : 0
   const melhor  = posts.length > 0 ? posts.reduce((a,b)=>(a.contas_alcancadas||0)>(b.contas_alcancadas||0)?a:b,posts[0]) : null
   const pct     = metaAnual > 0 ? Math.min((total/metaAnual)*100,100) : 0
-  // calcMetaMesAjustada é função pura — reage a mudanças em posts e metaAnual
-  const metaMesAtualizada = calcMetaMesAjustada({ posts: allPosts, metaAnual, mesFiltroParam: mesFiltro })
+  // Sempre usa o mês real de hoje — independente do filtro selecionado em outras abas
+  const hoje = new Date()
+  const mesHojeParam = `${String(hoje.getMonth()+1).padStart(2,'0')}/${hoje.getFullYear()}`
+  const metaMesAtualizada = calcMetaMesAjustada({ posts: allPosts, metaAnual, mesFiltroParam: mesHojeParam })
   const restante  = Math.max(metaAnual - total, 0)
 
   // Dados mensais com meta ajustada por mês
