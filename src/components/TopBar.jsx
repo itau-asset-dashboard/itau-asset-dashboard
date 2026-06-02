@@ -39,7 +39,7 @@ export default function TopBar() {
     <div style={{
       display: 'flex', alignItems: 'center', justifyContent: 'space-between',
       padding: '12px 16px', gap: 8, flexShrink: 0,
-      background: '#fff', borderBottom: '1px solid #EAECF0',
+      background: '#fff', borderBottom: '1px solid #EDEFF2',
     }}>
       <div style={{ minWidth: 0 }}>
         <h1 className="topbar-title" style={{ color: '#1C252E', fontSize: 20, fontWeight: 700, lineHeight: 1.2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{section.title}</h1>
@@ -49,7 +49,7 @@ export default function TopBar() {
       <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
         {showMesFiltro && (
           <select value={mesFiltro} onChange={e => setMesFiltro(e.target.value)}
-            style={{ background: '#fff', border: '1.5px solid #EAECF0', borderRadius: 10, padding: '7px 10px', fontSize: 13, color: '#1C252E', cursor: 'pointer', outline: 'none', fontFamily: 'DM Sans, sans-serif', maxWidth: 140 }}>
+            style={{ background: '#fff', border: '1.5px solid #EDEFF2', borderRadius: 10, padding: '7px 10px', fontSize: 13, color: '#1C252E', cursor: 'pointer', outline: 'none', fontFamily: 'DM Sans, sans-serif', maxWidth: 140 }}>
             {MESES.map(m => <option key={m.value} value={m.value}>{m.label}</option>)}
           </select>
         )}
@@ -66,10 +66,10 @@ export default function TopBar() {
         {/* API */}
         <div style={{ position: 'relative' }}>
           <button onClick={() => setShowApi(v => !v)} style={{
-            background: apiKey ? 'rgba(195,235,247,0.3)' : 'rgba(239,68,68,0.07)',
-            border: `1.5px solid ${apiKey ? 'rgba(195,235,247,0.8)' : 'rgba(239,68,68,0.25)'}`,
+            background: '#fff',
+            border: `1.5px solid ${apiKey ? '#EDEFF2' : 'rgba(239,68,68,0.3)'}`,
             borderRadius: 10, padding: '7px 12px', fontSize: 13, fontWeight: 500,
-            color: apiKey ? '#0E7490' : '#ef4444', cursor: 'pointer',
+            color: apiKey ? '#4A5568' : '#ef4444', cursor: 'pointer',
             display: 'flex', alignItems: 'center', gap: 6, fontFamily: 'DM Sans, sans-serif',
           }}>
             <Key size={13} />
@@ -95,8 +95,8 @@ export default function TopBar() {
 
         {/* CSV */}
         <button onClick={exportCSV} style={{
-          background: '#fff', border: '1.5px solid #EAECF0', borderRadius: 10,
-          padding: '7px 12px', fontSize: 13, color: '#9AAAB8', cursor: 'pointer',
+          background: '#fff', border: '1.5px solid #EDEFF2', borderRadius: 10,
+          padding: '7px 12px', fontSize: 13, color: '#4A5568', cursor: 'pointer',
           display: 'flex', alignItems: 'center', gap: 6, fontFamily: 'DM Sans, sans-serif',
         }}>
           <Download size={13} />
