@@ -158,15 +158,8 @@ export default function Insights() {
         <div className="insights-grid" style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(270px,1fr))', gap:12 }}>
           {list.map((ins,i) => (
             <div key={i} className="card" style={{ padding:'18px 20px' }}>
-              <div style={{ display:'flex', alignItems:'flex-start', gap:12 }}>
-                <div style={{ width:38, height:38, borderRadius:11, flexShrink:0, background:'rgba(195,235,247,0.25)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:17 }}>
-                  {ins.icone}
-                </div>
-                <div>
-                  <p style={{ color:'#1C252E', fontWeight:600, fontSize:13, marginBottom:5 }}>{ins.titulo}</p>
-                  <p style={{ color:'#8A9BB0', fontSize:12, lineHeight:1.65 }}>{ins.texto}</p>
-                </div>
-              </div>
+              <p style={{ color:'#182638', fontWeight:600, fontSize:13, marginBottom:6 }}>{ins.titulo}</p>
+              <p style={{ color:'#8A9BB0', fontSize:12, lineHeight:1.65 }}>{ins.texto}</p>
             </div>
           ))}
         </div>
@@ -178,8 +171,23 @@ export default function Insights() {
         {/* Header do chat */}
         <div style={{ padding:'16px 20px', borderBottom:'1px solid #F0F4F8', display:'flex', alignItems:'center', justifyContent:'space-between' }}>
           <div>
-            <div style={{ display:'flex', alignItems:'center', gap:8 }}>
-              <div style={{ width:28, height:28, borderRadius:8, background:'rgba(249,115,22,0.10)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:14 }}>🤖</div>
+            <div style={{ display:'flex', alignItems:'center', gap:10 }}>
+              {/* Logo Itaú — bolinha azul claro com superelipse escura */}
+              <div style={{
+                width:34, height:34, borderRadius:'50%',
+                background:'#C3EBF7',
+                display:'flex', alignItems:'center', justifyContent:'center',
+                flexShrink:0,
+              }}>
+                <svg width={22} height={22} viewBox="0 0 100 100" fill="none">
+                  <rect width="100" height="100" rx="26" fill="#182638"/>
+                  <text x="50" y="68" textAnchor="middle"
+                    fontFamily="'Nunito','DM Sans',sans-serif"
+                    fontWeight="900" fontSize="38" fill="#C3EBF7" letterSpacing="-1">
+                    itaú
+                  </text>
+                </svg>
+              </div>
               <h2 style={{ color:'#182638', fontSize:15, fontWeight:700, margin:0 }}>Converse com a IAsset</h2>
             </div>
             <p style={{ color:'#8A9BB0', fontSize:12, marginTop:4 }}>Pergunte sobre performance, posts e tendências</p>
