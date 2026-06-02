@@ -475,8 +475,8 @@ export default function UploadModal({ mode = 'new', post = null, onClose, onSave
   // Modo atualização: sempre single
   if (mode === 'update') {
     return (
-      <div style={{ position: 'fixed', inset: 0, background: 'rgba(28,37,46,0.65)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
-        <div style={{ background: '#fff', borderRadius: 20, width: '100%', maxWidth: 560, maxHeight: '92vh', overflow: 'auto', boxShadow: '0 16px 56px rgba(0,0,0,0.22)' }} className="scrollbar-thin">
+      <div style={{ position: 'fixed', inset: 0, background: 'rgba(28,37,46,0.65)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }} className="modal-overlay-bottom">
+        <div style={{ background: '#fff', borderRadius: 20, width: '100%', maxWidth: 560, maxHeight: '92vh', overflow: 'auto', boxShadow: '0 16px 56px rgba(0,0,0,0.22)' }} className="scrollbar-thin modal-inner">
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px', borderBottom: '1px solid #F0F4F8' }}>
             <h2 style={{ color: '#1C252E', fontSize: 15, fontWeight: 700 }}>Editar post</h2>
             <button onClick={onClose} style={{ background: '#F4F6F8', border: 'none', borderRadius: 8, padding: 7, cursor: 'pointer', display: 'flex' }}>
@@ -537,7 +537,7 @@ function MultiUploadModal({ onClose, onSave }) {
 
   if (files.length === 0) {
     return (
-      <div style={{ position: 'fixed', inset: 0, background: 'rgba(28,37,46,0.65)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
+      <div style={{ position: 'fixed', inset: 0, background: 'rgba(28,37,46,0.65)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }} className="modal-overlay-bottom">
         <div style={{ background: '#fff', borderRadius: 20, width: '100%', maxWidth: 480, boxShadow: '0 16px 56px rgba(0,0,0,0.22)' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px', borderBottom: '1px solid #F0F4F8' }}>
             <h2 style={{ color: '#1C252E', fontSize: 15, fontWeight: 700 }}>Novo post</h2>
@@ -583,8 +583,8 @@ function MultiUploadModal({ onClose, onSave }) {
   const initialPreview = savedState?.preview ?? files[current]?.dataUrl ?? null
 
   return (
-    <div style={{ position: 'fixed', inset: 0, background: 'rgba(28,37,46,0.65)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
-      <div style={{ background: '#fff', borderRadius: 20, width: '100%', maxWidth: 560, maxHeight: '92vh', overflow: 'auto', boxShadow: '0 16px 56px rgba(0,0,0,0.22)' }} className="scrollbar-thin">
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(28,37,46,0.65)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }} className="modal-overlay-bottom">
+      <div style={{ background: '#fff', borderRadius: 20, width: '100%', maxWidth: 560, maxHeight: '92vh', overflow: 'auto', boxShadow: '0 16px 56px rgba(0,0,0,0.22)' }} className="scrollbar-thin modal-inner">
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px', borderBottom: '1px solid #F0F4F8' }}>
           <div>
             <h2 style={{ color: '#1C252E', fontSize: 15, fontWeight: 700 }}>Novo post</h2>

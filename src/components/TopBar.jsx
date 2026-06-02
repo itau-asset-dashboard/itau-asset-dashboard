@@ -36,7 +36,7 @@ export default function TopBar() {
   }
 
   return (
-    <div style={{
+    <div className="topbar-root" style={{
       display: 'flex', alignItems: 'center', justifyContent: 'space-between',
       padding: '10px 24px', gap: 8, flexShrink: 0,
       background: '#fff', borderBottom: '1px solid #EDEFF2',

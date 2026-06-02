@@ -83,7 +83,7 @@ export default function PostsChart() {
           <p style={{ color: '#8A9BB0', fontSize: 14 }}>Nenhum post no período</p>
         </div>
       ) : (
-        <ResponsiveContainer width="100%" height={220}>
+        <div className="chart-wrapper"><ResponsiveContainer width="100%" height={220}>
           <BarChart data={data} margin={{ top: 4, right: 16, left: 0, bottom: 0 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#F0F2F5" vertical={false} />
             <XAxis dataKey="label" tick={{ fontSize: 11, fill: '#8A9BB0' }} axisLine={false} tickLine={false} />
@@ -105,7 +105,7 @@ export default function PostsChart() {
               ))}
             </Bar>
           </BarChart>
-        </ResponsiveContainer>
+        </ResponsiveContainer></div>
       )}
     </div>
   )

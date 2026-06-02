@@ -112,7 +112,7 @@ export default function OliverView() {
         <div className="card" style={{ padding: '22px' }}>
           <p style={{ color: '#1C252E', fontSize: 15, fontWeight: 700, marginBottom: 4 }}>Comparativo mensal</p>
           <p style={{ color: '#9AAAB8', fontSize: 12, marginBottom: 20 }}>Alcance Instagram vs dados Oliver</p>
-          <ResponsiveContainer width="100%" height={240}>
+          <div className="chart-wrapper"><ResponsiveContainer width="100%" height={240}>
             <BarChart data={chartData} margin={{ top: 8, right: 8, left: 0, bottom: 0 }} barGap={4}>
               <XAxis dataKey="mes" tick={{ fill: '#9AAAB8', fontSize: 11 }} axisLine={false} tickLine={false} />
               <YAxis tick={{ fill: '#9AAAB8', fontSize: 10 }} axisLine={false} tickLine={false}
@@ -126,7 +126,7 @@ export default function OliverView() {
               <Bar dataKey="alcance_insta"  name="alcance_insta"  radius={[6,6,0,0]} barSize={20} fill="#1C252E" />
               <Bar dataKey="alcance_oliver" name="alcance_oliver" radius={[6,6,0,0]} barSize={20} fill="#F97316" />
             </BarChart>
-          </ResponsiveContainer>
+          </ResponsiveContainer></div>
         </div>
       )}
 

@@ -167,7 +167,7 @@ export default function ETFsView() {
 
         {/* Linha 2: seletor de mês full-width (só no modo mensal) */}
         {viewMode === 'mensal' && (
-          <div style={{
+          <div className="etf-month-grid" style={{
             display:'grid',
             gridTemplateColumns:'repeat(12, 1fr)',
             gap:6,
@@ -214,7 +214,7 @@ export default function ETFsView() {
         <div className="card" style={{ padding:'22px' }}>
           <p style={{ color:'#1C252E', fontSize:15, fontWeight:700, marginBottom:4 }}>Evolução mensal</p>
           <p style={{ color:'#9AAAB8', fontSize:12, marginBottom:20 }}>Alcance e volume de posts ETF por mês em {ano}</p>
-          <ResponsiveContainer width="100%" height={240}>
+          <div className="chart-wrapper"><ResponsiveContainer width="100%" height={240}>
             <BarChart data={byMonth} margin={{top:16,right:8,left:0,bottom:0}} barGap={4}>
               <XAxis dataKey="mes" tick={{ fill:'#9AAAB8', fontSize:11 }} axisLine={false} tickLine={false}/>
               <YAxis yAxisId="left" tick={{ fill:'#9AAAB8', fontSize:10 }} axisLine={false} tickLine={false}
@@ -235,7 +235,7 @@ export default function ETFsView() {
               </Bar>
               <Bar yAxisId="right" dataKey="posts" radius={[6,6,0,0]} fill="rgba(8,145,178,0.18)" barSize={14}/>
             </BarChart>
-          </ResponsiveContainer>
+          </ResponsiveContainer></div>
         </div>
       ) : (
         /* Modo mensal: gráfico de barras por formato */
@@ -247,7 +247,7 @@ export default function ETFsView() {
               Nenhum post ETF neste mês
             </p>
           ) : (
-            <ResponsiveContainer width="100%" height={200}>
+            <div className="chart-wrapper"><ResponsiveContainer width="100%" height={200}>
               <BarChart data={porTipo} margin={{top:8,right:8,left:0,bottom:0}}>
                 <XAxis dataKey="tipo" tick={{ fill:'#9AAAB8', fontSize:11 }} axisLine={false} tickLine={false}/>
                 <YAxis tick={{ fill:'#9AAAB8', fontSize:10 }} axisLine={false} tickLine={false}
@@ -262,7 +262,7 @@ export default function ETFsView() {
                   ))}
                 </Bar>
               </BarChart>
-            </ResponsiveContainer>
+            </ResponsiveContainer></div>
           )}
         </div>
       )}

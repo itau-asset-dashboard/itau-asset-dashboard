@@ -167,7 +167,7 @@ export default function AnnualView() {
               </p>
             </div>
           </div>
-          <ResponsiveContainer width="100%" height={230}>
+          <div className="chart-wrapper"><ResponsiveContainer width="100%" height={230}>
             <BarChart data={byMonth} barSize={28} margin={{top:18,right:8,left:0,bottom:0}}>
               <XAxis dataKey="mes" tick={{ fill:'#9AAAB8', fontSize:11 }} axisLine={false} tickLine={false}/>
               <YAxis tick={{ fill:'#9AAAB8', fontSize:10 }} axisLine={false} tickLine={false}
@@ -188,7 +188,7 @@ export default function AnnualView() {
                   style={{ fill:'#9AAAB8', fontSize:9, fontWeight:600 }}/>
               </Bar>
             </BarChart>
-          </ResponsiveContainer>
+          </ResponsiveContainer></div>
         </div>
       </div>
 
