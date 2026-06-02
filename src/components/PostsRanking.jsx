@@ -1,8 +1,8 @@
 import { useState } from 'react'
-import { ArrowUpDown, RefreshCw, ChevronLeft, ChevronRight, ArrowUp, ArrowDown } from 'lucide-react'
+import { ArrowUpDown, ChevronLeft, ChevronRight, ArrowUp, ArrowDown, Search, X } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import UploadModal from './UploadModal'
-import { temasLabel } from '../utils/temas'
+import { temasLabel, getTemas } from '../utils/temas'
 import { useIsMobile } from '../utils/useIsMobile'
 
 function fmt(n) {
@@ -27,15 +27,29 @@ function parseDate(d) {
 }
 
 export default function PostsRanking() {
-  const { getPostsDoMes, updatePost, deletePost } = useStore()
-  const posts = getPostsDoMes()
+  const { getPostsDoMes, posts: allPosts, updatePost, deletePost } = useStore()
   const mobile = useIsMobile()
 
-  // Padrão: data decrescente (mais recente primeiro)
-  const [sortKey, setSortKey] = useState('data_post')
-  const [sortDir, setSortDir] = useState(-1)
-  const [page, setPage]       = useState(0)
+  const [search, setSearch]     = useState('')
+  const [sortKey, setSortKey]   = useState('data_post')
+  const [sortDir, setSortDir]   = useState(-1)
+  const [page, setPage]         = useState(0)
   const [updateTarget, setUpdateTarget] = useState(null)
+
+  const q = search.trim().toLowerCase()
+
+  // Com busca: todos os posts. Sem busca: filtro de mês normal
+  const basePosts = q
+    ? allPosts.filter(p => {
+        const nome  = (p.nome || '').toLowerCase()
+        const data  = (p.data_post || '').toLowerCase()
+        const tipo  = (p.tipo || '').toLowerCase()
+        const temas = temasLabel(p).toLowerCase()
+        return nome.includes(q) || data.includes(q) || tipo.includes(q) || temas.includes(q)
+      })
+    : getPostsDoMes()
+
+  const posts = basePosts
 
   const melhorId = posts.length > 0
     ? posts.reduce((a, b) => (a.contas_alcancadas || 0) > (b.contas_alcancadas || 0) ? a : b, posts[0]).id
@@ -77,9 +91,42 @@ export default function PostsRanking() {
 
   return (
     <div className="card" style={{ overflow: 'hidden', marginBottom: 18 }}>
-      <div style={{ padding: '18px 20px 14px' }}>
-        <h2 style={{ color: '#1C252E', fontSize: 15, fontWeight: 700, margin: 0 }}>Ranking de posts</h2>
-        <p style={{ color: '#8A9BB0', fontSize: 12, marginTop: 2 }}>{posts.length} publicações</p>
+      <div style={{ padding: '16px 20px 12px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
+        <div>
+          <h2 style={{ color: '#1C252E', fontSize: 15, fontWeight: 700, margin: 0 }}>Ranking de posts</h2>
+          <p style={{ color: '#8A9BB0', fontSize: 12, marginTop: 2 }}>
+            {q ? `${posts.length} resultado${posts.length !== 1 ? 's' : ''} em todos os posts` : `${posts.length} publicações`}
+          </p>
+        </div>
+        {/* Campo de busca */}
+        <div style={{
+          display: 'flex', alignItems: 'center', gap: 8,
+          background: '#F5F7FA', borderRadius: 10,
+          border: `1.5px solid ${q ? '#F97316' : '#EDEFF2'}`,
+          padding: '7px 12px',
+          transition: 'border-color 0.15s',
+          flex: mobile ? '1 1 100%' : '0 0 auto',
+          minWidth: mobile ? 0 : 220,
+        }}>
+          <Search size={14} color={q ? '#F97316' : '#A8B5C0'} style={{ flexShrink: 0 }} />
+          <input
+            value={search}
+            onChange={e => { setSearch(e.target.value); setPage(0) }}
+            placeholder="Buscar por nome, data, tema..."
+            style={{
+              border: 'none', background: 'transparent', outline: 'none',
+              fontSize: 13, color: '#182638', width: '100%',
+              fontFamily: 'DM Sans, sans-serif',
+            }}
+          />
+          {q && (
+            <button onClick={() => { setSearch(''); setPage(0) }}
+              style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex' }}>
+              <X size={13} color="#A8B5C0" />
+            </button>
+          )}
+        </div>
+      </div>
       </div>
 
       <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }} className="scrollbar-thin">
