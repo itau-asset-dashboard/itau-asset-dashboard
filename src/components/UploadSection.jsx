@@ -1,14 +1,42 @@
 import { useState } from 'react'
-import { Upload, Sparkles, Trash2, AlertTriangle } from 'lucide-react'
+import { Upload, Sparkles, Trash2, AlertTriangle, CloudUpload } from 'lucide-react'
 import { useStore } from '../store/useStore'
+import { uploadImage } from '../lib/supabase'
 import UploadModal from './UploadModal'
 
 export default function UploadSection() {
-  const { addPost, posts, deletePostsAntigos } = useStore()
+  const { addPost, posts, deletePostsAntigos, updatePost } = useStore()
   const [open, setOpen] = useState(false)
   const [confirmando, setConfirmando] = useState(false)
   const [deletados, setDeletados] = useState(null)
   const [loading, setLoading] = useState(false)
+  const [syncing, setSyncing] = useState(false)
+  const [syncResult, setSyncResult] = useState(null)
+
+  // Posts que têm imagem local mas ainda não têm URL no Storage
+  const postsParaSincronizar = posts.filter(p => p.imageData && !p.imageUrl)
+
+  async function handleSyncImages() {
+    if (syncing) return
+    setSyncing(true)
+    setSyncResult(null)
+    let ok = 0, fail = 0
+    for (const p of postsParaSincronizar) {
+      try {
+        const url = await uploadImage(p.id, p.imageData)
+        if (url) {
+          await updatePost(p.id, { imageUrl: url })
+          ok++
+        } else {
+          fail++
+        }
+      } catch (_) {
+        fail++
+      }
+    }
+    setSyncing(false)
+    setSyncResult({ ok, fail })
+  }
 
   const antigos = posts.filter(p => {
     const ano = p.data_post?.split('/')?.[2]
@@ -51,6 +79,56 @@ export default function UploadSection() {
           <span style={{ color: '#1a7a96', fontSize: 12, fontWeight: 600 }}>Extração automática via Claude IA</span>
         </div>
       </div>
+
+      {/* Painel de sincronização de imagens */}
+      {postsParaSincronizar.length > 0 && !syncResult && (
+        <div className="card" style={{ padding: '16px 20px', border: '1px solid rgba(195,235,247,0.8)', background: 'rgba(195,235,247,0.08)' }}>
+          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 16 }}>
+            <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
+              <CloudUpload size={16} color="#1a7a96" style={{ flexShrink: 0, marginTop: 1 }} />
+              <div>
+                <p style={{ color: '#182638', fontSize: 13, fontWeight: 600 }}>
+                  {postsParaSincronizar.length} evidência{postsParaSincronizar.length > 1 ? 's' : ''} só no seu dispositivo
+                </p>
+                <p style={{ color: '#9AAAB8', fontSize: 12, marginTop: 3 }}>
+                  Clique para subir todas para a nuvem e aparecerem em qualquer dispositivo.
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={handleSyncImages}
+              disabled={syncing}
+              style={{
+                flexShrink: 0,
+                background: '#1a7a96', color: '#fff',
+                border: 'none', borderRadius: 8, padding: '7px 14px',
+                fontSize: 12, fontWeight: 600,
+                cursor: syncing ? 'wait' : 'pointer',
+                display: 'flex', alignItems: 'center', gap: 6,
+                opacity: syncing ? 0.7 : 1,
+                whiteSpace: 'nowrap',
+              }}>
+              <CloudUpload size={12} />
+              {syncing ? `Sincronizando…` : 'Sincronizar tudo'}
+            </button>
+          </div>
+          {syncing && (
+            <p style={{ color: '#1a7a96', fontSize: 11, marginTop: 10, marginLeft: 26 }}>
+              Isso pode levar alguns segundos dependendo da quantidade de imagens…
+            </p>
+          )}
+        </div>
+      )}
+
+      {syncResult && (
+        <div className="card" style={{ padding: '14px 20px', border: `1px solid ${syncResult.fail > 0 ? '#FEE2E2' : '#DCFCE7'}`, background: syncResult.fail > 0 ? '#FFFBFB' : '#F0FDF4', display: 'flex', alignItems: 'center', gap: 8 }}>
+          <span style={{ fontSize: 14 }}>{syncResult.fail > 0 ? '⚠️' : '✓'}</span>
+          <p style={{ color: syncResult.fail > 0 ? '#EF4444' : '#16A34A', fontSize: 13, fontWeight: 600 }}>
+            {syncResult.ok} imagem{syncResult.ok !== 1 ? 's' : ''} sincronizada{syncResult.ok !== 1 ? 's' : ''} com sucesso
+            {syncResult.fail > 0 ? ` · ${syncResult.fail} falharam` : ''}
+          </p>
+        </div>
+      )}
 
       {/* Painel de limpeza — só aparece se houver posts fora de 2026 */}
       {antigos.length > 0 && deletados === null && (
