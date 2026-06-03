@@ -1,18 +1,18 @@
-import { useState } from 'react'
-import { X, Upload, Sparkles, Check, Trash2 } from 'lucide-react'
+import { useState, useRef, useImperativeHandle, forwardRef } from 'react'
+import { X, Upload, Sparkles, Check, Trash2, ChevronRight } from 'lucide-react'
 import { extractStoryFromImage } from '../utils/anthropic'
 import { useStore } from '../store/useStore'
 import ImageLightbox from './ImageLightbox'
 
 const NUM_FIELDS = [
-  { key: 'visualizacoes',     label: 'Visualizações',           highlight: true },
-  { key: 'contas_alcancadas', label: 'Contas alcançadas',        highlight: false },
-  { key: 'interacoes',        label: 'Interações',               highlight: false },
-  { key: 'atividade_perfil',  label: 'Atividade do perfil',      highlight: false },
-  { key: 'respostas',         label: 'Respostas',                highlight: false },
-  { key: 'toques_avancar',    label: 'Toques para avançar',      highlight: false },
-  { key: 'toques_retroceder', label: 'Toques para retroceder',   highlight: false },
-  { key: 'saidas',            label: 'Saídas',                   highlight: false },
+  { key: 'visualizacoes',     label: 'Visualizações',         highlight: true },
+  { key: 'contas_alcancadas', label: 'Contas alcançadas',      highlight: false },
+  { key: 'interacoes',        label: 'Interações',             highlight: false },
+  { key: 'atividade_perfil',  label: 'Atividade do perfil',    highlight: false },
+  { key: 'respostas',         label: 'Respostas',              highlight: false },
+  { key: 'toques_avancar',    label: 'Toques para avançar',    highlight: false },
+  { key: 'toques_retroceder', label: 'Toques para retroceder', highlight: false },
+  { key: 'saidas',            label: 'Saídas',                 highlight: false },
 ]
 
 const EMPTY = {
@@ -51,24 +51,22 @@ const inp = (highlight) => ({
   background: highlight ? 'rgba(195,235,247,0.06)' : '#fff',
 })
 
-export default function StoryUploadModal({ mode = 'new', story = null, grupos = [], onClose, onSave, onDelete }) {
+// ─── Formulário de um story ──────────────────────────────────────────────────
+const SingleStoryForm = forwardRef(function SingleStoryForm(
+  { initialPost, initialPreview, grupos, onClose, onSave, isLast, currentIdx, totalFiles }, ref
+) {
   const { apiKey } = useStore()
-  const [preview, setPreview]   = useState(story?.imageUrl || story?.imageData || null)
-  const [loading, setLoading]   = useState(false)
-  const [saving, setSaving]     = useState(false)
-  const [saved, setSaved]       = useState(false)
-  const [error, setError]       = useState(null)
-  const [dragging, setDragging] = useState(false)
-  const [lightbox, setLightbox] = useState(false)
-  const [confirmDelete, setConfirmDelete] = useState(false)
+  const [preview, setPreview]     = useState(initialPreview || initialPost?.imageData || null)
+  const [loading, setLoading]     = useState(false)
+  const [saving, setSaving]       = useState(false)
+  const [saved, setSaved]         = useState(false)
+  const [error, setError]         = useState(null)
+  const [dragging, setDragging]   = useState(false)
+  const [lightbox, setLightbox]   = useState(false)
   const [novoGrupo, setNovoGrupo] = useState(false)
+  const [form, setFormState]      = useState(() => ({ ...EMPTY, ...initialPost }))
 
-  const [form, setFormState] = useState(() => {
-    if (story) return { ...EMPTY, ...story }
-    return { ...EMPTY }
-  })
-
-  const isUpdate = !!story?.id
+  useImperativeHandle(ref, () => ({ getSnapshot: () => ({ form, preview }) }))
 
   function set(k, v) { setFormState(f => ({ ...f, [k]: v })) }
 
@@ -80,8 +78,7 @@ export default function StoryUploadModal({ mode = 'new', story = null, grupos = 
   }
 
   async function extract() {
-    if (!preview) return
-    if (!apiKey) { setError('Configure a chave da API Anthropic.'); return }
+    if (!preview || !apiKey) { setError('Configure a chave da API Anthropic.'); return }
     setLoading(true); setError(null)
     try {
       const [hdr, b64] = preview.split(',')
@@ -99,11 +96,8 @@ export default function StoryUploadModal({ mode = 'new', story = null, grupos = 
         toques_retroceder: data.toques_retroceder ?? f.toques_retroceder,
         saidas:            data.saidas            ?? f.saidas,
       }))
-    } catch (e) {
-      setError('Não foi possível extrair: ' + e.message)
-    } finally {
-      setLoading(false)
-    }
+    } catch (e) { setError('Não foi possível extrair: ' + e.message) }
+    finally { setLoading(false) }
   }
 
   async function save() {
@@ -120,185 +114,314 @@ export default function StoryUploadModal({ mode = 'new', story = null, grupos = 
       onSave(dados)
       setSaved(true)
       setSaving(false)
-      setTimeout(() => { setSaved(false); onClose() }, 900)
-    } catch (_) {
-      setSaving(false)
-      setError('Erro ao salvar.')
-    }
+      setTimeout(() => setSaved(false), 1000)
+    } catch (_) { setSaving(false); setError('Erro ao salvar.') }
   }
 
   return (
-    <div
-      style={{ position: 'fixed', inset: 0, background: 'rgba(28,37,46,0.65)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}
-      className="modal-overlay-bottom"
-      onClick={onClose}
-    >
-      <div
-        style={{ background: '#fff', borderRadius: 20, width: '100%', maxWidth: 520, maxHeight: '92vh', overflow: 'auto', boxShadow: '0 16px 56px rgba(0,0,0,0.22)' }}
-        className="scrollbar-thin modal-inner"
-        onClick={e => e.stopPropagation()}
-      >
-        {/* Header */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px', borderBottom: '1px solid #F0F4F8', position: 'sticky', top: 0, background: '#fff', zIndex: 1 }}>
-          <h2 style={{ color: '#1C252E', fontSize: 15, fontWeight: 700 }}>{isUpdate ? 'Editar story' : 'Novo story'}</h2>
-          <button onClick={onClose} style={{ background: '#F4F6F8', border: 'none', borderRadius: 8, padding: 7, cursor: 'pointer', display: 'flex' }}>
-            <X size={16} color="#8A9BB0" />
-          </button>
+    <div style={{ padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: 14 }}>
+
+      {/* Contador */}
+      {totalFiles > 1 && (
+        <div style={{ background: '#F5F8FA', borderRadius: 8, padding: '6px 12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <span style={{ color: '#8A9BB0', fontSize: 12 }}>Story {currentIdx + 1} de {totalFiles}</span>
+          <span style={{ color: isLast ? '#22c55e' : '#F97316', fontSize: 11, fontWeight: 600 }}>
+            {isLast ? '✓ Último' : `Faltam ${totalFiles - currentIdx - 1}`}
+          </span>
         </div>
+      )}
 
-        <div style={{ padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: 14 }}>
-
-          {/* Drop zone */}
-          <div
-            onDragOver={e => { e.preventDefault(); setDragging(true) }}
-            onDragLeave={() => setDragging(false)}
-            onDrop={e => { e.preventDefault(); setDragging(false); handleFile(e.dataTransfer.files[0]) }}
-            onClick={() => document.getElementById('_story_inp').click()}
-            style={{
-              border: `2px dashed ${dragging ? '#C3EBF7' : '#D8EEF6'}`,
-              borderRadius: 12, padding: preview ? '10px 14px' : '20px 14px',
-              cursor: 'pointer', background: dragging ? '#F0F8FF' : '#FAFCFE',
-              transition: 'all 0.15s', display: 'flex', alignItems: 'center', gap: 12,
-            }}
-          >
-            <input id="_story_inp" type="file" accept="image/*" style={{ display: 'none' }}
-              onChange={e => handleFile(e.target.files[0])} />
-            {preview ? (
-              <>
-                <img
-                  src={form.imageUrl || preview}
-                  alt=""
-                  style={{ width: 56, height: 56, objectFit: 'cover', borderRadius: 8, flexShrink: 0, cursor: 'zoom-in', border: '1.5px solid #E8ECF0' }}
-                  onClick={e => { e.stopPropagation(); setLightbox(true) }}
-                />
-                <div style={{ flex: 1 }} onClick={e => e.stopPropagation()}>
-                  <p style={{ color: '#1C252E', fontWeight: 700, fontSize: 13 }}>Print do story</p>
-                  <span style={{ color: '#0891B2', fontSize: 11, fontWeight: 600, cursor: 'pointer' }}
-                    onClick={e => { e.stopPropagation(); setLightbox(true) }}>ver imagem ↗</span>
-                </div>
-                <button type="button"
-                  onClick={e => { e.stopPropagation(); setPreview(null); set('imageData', null); set('imageUrl', null) }}
-                  style={{ flexShrink: 0, background: '#FEF2F2', border: '1px solid #fecaca', borderRadius: 8, width: 30, height: 30, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <Trash2 size={13} color="#ef4444" />
-                </button>
-              </>
-            ) : (
-              <div style={{ width: '100%', textAlign: 'center' }}>
-                <Upload size={22} color="#C3EBF7" style={{ margin: '0 auto 6px' }} />
-                <p style={{ color: '#8A9BB0', fontSize: 13 }}>Arraste o print do story ou clique para selecionar</p>
-              </div>
-            )}
-          </div>
-
-          {/* Extrair */}
-          {preview && (
-            <button onClick={extract} disabled={loading} style={{
-              background: '#1C252E', color: '#C3EBF7', border: 'none', borderRadius: 10,
-              padding: '10px', fontSize: 13, fontWeight: 700, cursor: loading ? 'wait' : 'pointer',
-              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7,
-              opacity: loading ? 0.75 : 1, width: '100%',
-            }}>
-              <Sparkles size={14} />
-              {loading ? 'Extraindo...' : 'Extrair métricas automaticamente'}
+      {/* Drop zone */}
+      <div
+        onDragOver={e => { e.preventDefault(); setDragging(true) }}
+        onDragLeave={() => setDragging(false)}
+        onDrop={e => { e.preventDefault(); setDragging(false); handleFile(e.dataTransfer.files[0]) }}
+        onClick={() => document.getElementById('_story_inp_single').click()}
+        style={{ border: `2px dashed ${dragging ? '#C3EBF7' : '#D8EEF6'}`, borderRadius: 12, padding: preview ? '10px 14px' : '20px 14px', cursor: 'pointer', background: dragging ? '#F0F8FF' : '#FAFCFE', transition: 'all 0.15s', display: 'flex', alignItems: 'center', gap: 12 }}
+      >
+        <input id="_story_inp_single" type="file" accept="image/*" style={{ display: 'none' }} onChange={e => handleFile(e.target.files[0])} />
+        {preview ? (
+          <>
+            <img src={preview} alt="" style={{ width: 56, height: 56, objectFit: 'cover', borderRadius: 8, flexShrink: 0, cursor: 'zoom-in', border: '1.5px solid #E8ECF0' }} onClick={e => { e.stopPropagation(); setLightbox(true) }} />
+            <div style={{ flex: 1 }} onClick={e => e.stopPropagation()}>
+              <p style={{ color: '#1C252E', fontWeight: 700, fontSize: 13 }}>Print do story</p>
+              <span style={{ color: '#0891B2', fontSize: 11, fontWeight: 600, cursor: 'pointer' }} onClick={e => { e.stopPropagation(); setLightbox(true) }}>ver imagem ↗</span>
+            </div>
+            <button type="button" onClick={e => { e.stopPropagation(); setPreview(null) }} style={{ flexShrink: 0, background: '#FEF2F2', border: '1px solid #fecaca', borderRadius: 8, width: 30, height: 30, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <Trash2 size={13} color="#ef4444" />
             </button>
-          )}
-
-          {error && (
-            <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 9, padding: '8px 12px' }}>
-              <p style={{ color: '#ef4444', fontSize: 12 }}>{error}</p>
-            </div>
-          )}
-
-          {/* Nome */}
-          <div>
-            <label style={{ color: '#8A9BB0', fontSize: 11, fontWeight: 600, display: 'block', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Nome / descrição</label>
-            <input value={form.nome || ''} onChange={e => set('nome', e.target.value)}
-              placeholder="Ex: Story de cobertura do ETF Day" style={inp(false)} autoFocus={!isUpdate} />
+          </>
+        ) : (
+          <div style={{ width: '100%', textAlign: 'center' }}>
+            <Upload size={22} color="#C3EBF7" style={{ margin: '0 auto 6px' }} />
+            <p style={{ color: '#8A9BB0', fontSize: 13 }}>Arraste o print ou clique para selecionar</p>
           </div>
+        )}
+      </div>
 
-          {/* Data */}
-          <div>
-            <label style={{ color: '#8A9BB0', fontSize: 11, fontWeight: 600, display: 'block', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Data</label>
-            <input value={form.data || ''} onChange={e => set('data', e.target.value)}
-              placeholder="DD/MM/AAAA" style={inp(false)} />
-          </div>
+      {/* Extrair */}
+      {preview && (
+        <button onClick={extract} disabled={loading} style={{ background: '#1C252E', color: '#C3EBF7', border: 'none', borderRadius: 10, padding: '10px', fontSize: 13, fontWeight: 700, cursor: loading ? 'wait' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7, opacity: loading ? 0.75 : 1, width: '100%' }}>
+          <Sparkles size={14} />{loading ? 'Extraindo...' : 'Extrair métricas automaticamente'}
+        </button>
+      )}
 
-          {/* Grupo */}
-          <div>
-            <label style={{ color: '#8A9BB0', fontSize: 11, fontWeight: 600, display: 'block', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Grupo <span style={{ color: '#B0BEC5', fontWeight: 400, textTransform: 'none' }}>(opcional)</span></label>
-            {novoGrupo ? (
-              <div style={{ display: 'flex', gap: 8 }}>
-                <input value={form.grupo || ''} onChange={e => set('grupo', e.target.value)}
-                  placeholder="Nome do novo grupo" style={{ ...inp(false), flex: 1 }} autoFocus />
-                <button onClick={() => setNovoGrupo(false)}
-                  style={{ background: '#F4F6F8', border: 'none', borderRadius: 9, padding: '8px 12px', cursor: 'pointer', fontSize: 12, color: '#8A9BB0' }}>
-                  Cancelar
-                </button>
-              </div>
-            ) : (
-              <div style={{ display: 'flex', gap: 8 }}>
-                <select value={form.grupo || ''} onChange={e => set('grupo', e.target.value)}
-                  style={{ ...inp(false), flex: 1, background: '#fff' }}>
-                  <option value="">Sem grupo (story solto)</option>
-                  {grupos.map(g => <option key={g} value={g}>{g}</option>)}
-                </select>
-                <button onClick={() => { setNovoGrupo(true); set('grupo', '') }}
-                  style={{ background: '#F4F6F8', border: 'none', borderRadius: 9, padding: '8px 12px', cursor: 'pointer', fontSize: 12, color: '#1C252E', whiteSpace: 'nowrap' }}>
-                  + Novo grupo
-                </button>
-              </div>
-            )}
-          </div>
+      {error && <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 9, padding: '8px 12px' }}><p style={{ color: '#ef4444', fontSize: 12 }}>{error}</p></div>}
 
-          {/* Métricas */}
-          <div>
-            <p style={{ color: '#8A9BB0', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 10 }}>Métricas</p>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-              {NUM_FIELDS.map(({ key, label, highlight }) => (
-                <div key={key} style={highlight ? { gridColumn: '1 / -1' } : {}}>
-                  <label style={{ color: highlight ? '#1a7a96' : '#8A9BB0', fontSize: 11, fontWeight: highlight ? 700 : 600, display: 'block', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.04em' }}>{label}</label>
-                  <input type="number"
-                    value={form[key] === null || form[key] === undefined ? '' : form[key]}
-                    onChange={e => set(key, e.target.value)}
-                    placeholder="—"
-                    style={{ ...inp(!!highlight), fontSize: highlight ? 15 : 13, fontWeight: highlight ? 700 : 400 }} />
-                </div>
-              ))}
-            </div>
-          </div>
+      {/* Nome */}
+      <div>
+        <label style={{ color: '#8A9BB0', fontSize: 11, fontWeight: 600, display: 'block', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Nome / descrição</label>
+        <input value={form.nome || ''} onChange={e => set('nome', e.target.value)} placeholder="Ex: Cobertura ETF Day — dia 1" style={inp(false)} />
+      </div>
 
-          {/* Salvar / Excluir */}
+      {/* Data */}
+      <div>
+        <label style={{ color: '#8A9BB0', fontSize: 11, fontWeight: 600, display: 'block', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Data</label>
+        <input value={form.data || ''} onChange={e => set('data', e.target.value)} placeholder="DD/MM/AAAA" style={inp(false)} />
+      </div>
+
+      {/* Grupo */}
+      <div>
+        <label style={{ color: '#8A9BB0', fontSize: 11, fontWeight: 600, display: 'block', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Grupo <span style={{ color: '#B0BEC5', fontWeight: 400, textTransform: 'none' }}>(opcional)</span></label>
+        {novoGrupo ? (
           <div style={{ display: 'flex', gap: 8 }}>
-            <button onClick={save} disabled={saving} style={{
-              flex: 1, background: saved ? '#22c55e' : saving ? '#4A6272' : '#1C252E',
-              color: '#C3EBF7', border: 'none', borderRadius: 12,
-              padding: '12px', fontSize: 14, fontWeight: 700, cursor: saving ? 'wait' : 'pointer',
-              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-              transition: 'background 0.2s',
-            }}>
-              {saved ? <><Check size={16} /> Salvo!</> : saving ? 'Salvando...' : isUpdate ? 'Atualizar story' : 'Salvar story'}
-            </button>
-            {isUpdate && onDelete && (
-              <button onClick={() => { if (!confirmDelete) { setConfirmDelete(true); return } onDelete() }}
-                style={{
-                  background: confirmDelete ? '#ef4444' : '#FEF2F2',
-                  color: confirmDelete ? '#fff' : '#ef4444',
-                  border: `1px solid ${confirmDelete ? '#ef4444' : '#fecaca'}`,
-                  borderRadius: 12, padding: '12px 14px', cursor: 'pointer',
-                  display: 'flex', alignItems: 'center', gap: 6,
-                  fontSize: 13, fontWeight: 600, flexShrink: 0,
-                }}>
-                <Trash2 size={15} />
-                {confirmDelete ? 'Confirmar?' : 'Excluir'}
-              </button>
-            )}
+            <input value={form.grupo || ''} onChange={e => set('grupo', e.target.value)} placeholder="Nome do novo grupo" style={{ ...inp(false), flex: 1 }} autoFocus />
+            <button onClick={() => setNovoGrupo(false)} style={{ background: '#F4F6F8', border: 'none', borderRadius: 9, padding: '8px 12px', cursor: 'pointer', fontSize: 12, color: '#8A9BB0' }}>Cancelar</button>
           </div>
+        ) : (
+          <div style={{ display: 'flex', gap: 8 }}>
+            <select value={form.grupo || ''} onChange={e => set('grupo', e.target.value)} style={{ ...inp(false), flex: 1, background: '#fff' }}>
+              <option value="">Sem grupo (story solto)</option>
+              {grupos.map(g => <option key={g} value={g}>{g}</option>)}
+            </select>
+            <button onClick={() => { setNovoGrupo(true); set('grupo', '') }} style={{ background: '#F4F6F8', border: 'none', borderRadius: 9, padding: '8px 12px', cursor: 'pointer', fontSize: 12, color: '#1C252E', whiteSpace: 'nowrap' }}>+ Novo grupo</button>
+          </div>
+        )}
+      </div>
+
+      {/* Métricas */}
+      <div>
+        <p style={{ color: '#8A9BB0', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 10 }}>Métricas</p>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+          {NUM_FIELDS.map(({ key, label, highlight }) => (
+            <div key={key} style={highlight ? { gridColumn: '1 / -1' } : {}}>
+              <label style={{ color: highlight ? '#1a7a96' : '#8A9BB0', fontSize: 11, fontWeight: highlight ? 700 : 600, display: 'block', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.04em' }}>{label}</label>
+              <input type="number" value={form[key] === null || form[key] === undefined ? '' : form[key]} onChange={e => set(key, e.target.value)} placeholder="—" style={{ ...inp(!!highlight), fontSize: highlight ? 15 : 13, fontWeight: highlight ? 700 : 400 }} />
+            </div>
+          ))}
         </div>
       </div>
 
-      {lightbox && (form.imageUrl || preview) && (
-        <ImageLightbox src={form.imageUrl || preview} title={form.nome || 'Story'} onClose={() => setLightbox(false)} />
-      )}
+      {/* Salvar */}
+      <button onClick={save} disabled={saving} style={{ background: saved ? '#22c55e' : saving ? '#4A6272' : '#1C252E', color: '#C3EBF7', border: 'none', borderRadius: 12, padding: '12px', fontSize: 14, fontWeight: 700, cursor: saving ? 'wait' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, transition: 'background 0.2s' }}>
+        {saved ? <><Check size={16} /> Salvo!</> : saving ? 'Salvando...' : (totalFiles > 1 && !isLast) ? <>Salvar e continuar <ChevronRight size={15} /></> : 'Salvar story'}
+      </button>
+
+      {lightbox && preview && <ImageLightbox src={preview} title={form.nome || 'Story'} onClose={() => setLightbox(false)} />}
+    </div>
+  )
+})
+
+// ─── Modal de edição (single) ────────────────────────────────────────────────
+function EditStoryModal({ story, grupos, onClose, onSave, onDelete }) {
+  const [confirmDelete, setConfirmDelete] = useState(false)
+  const { apiKey } = useStore()
+  const [preview, setPreview]   = useState(story?.imageUrl || story?.imageData || null)
+  const [loading, setLoading]   = useState(false)
+  const [saving, setSaving]     = useState(false)
+  const [saved, setSaved]       = useState(false)
+  const [error, setError]       = useState(null)
+  const [dragging, setDragging] = useState(false)
+  const [lightbox, setLightbox] = useState(false)
+  const [novoGrupo, setNovoGrupo] = useState(false)
+  const [form, setFormState]    = useState({ ...EMPTY, ...story })
+
+  function set(k, v) { setFormState(f => ({ ...f, [k]: v })) }
+  function handleFile(file) { if (!file) return; const r = new FileReader(); r.onload = e => setPreview(e.target.result); r.readAsDataURL(file) }
+
+  async function extract() {
+    if (!preview || !apiKey) { setError('Configure a chave da API Anthropic.'); return }
+    setLoading(true); setError(null)
+    try {
+      const [hdr, b64] = preview.split(',')
+      const mt = hdr.match(/:(.*?);/)?.[1] || 'image/jpeg'
+      const data = await extractStoryFromImage(b64, mt, apiKey)
+      setFormState(f => ({ ...f, ...Object.fromEntries(Object.entries(data).filter(([,v]) => v != null)) }))
+    } catch (e) { setError('Não foi possível extrair: ' + e.message) }
+    finally { setLoading(false) }
+  }
+
+  async function save() {
+    if (saving) return; setSaving(true)
+    try {
+      const compressed = preview?.startsWith('data:') ? await compressImage(preview) : form.imageData
+      onSave({ ...form, imageData: compressed, imagePreview: preview?.startsWith('data:') ? preview : null, ...Object.fromEntries(NUM_FIELDS.map(({ key }) => [key, Number(form[key]) || null])) })
+      setSaved(true); setSaving(false)
+      setTimeout(() => { setSaved(false); onClose() }, 900)
+    } catch (_) { setSaving(false) }
+  }
+
+  return (
+    <div style={{ padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: 14 }}>
+      <div onDragOver={e => { e.preventDefault(); setDragging(true) }} onDragLeave={() => setDragging(false)}
+        onDrop={e => { e.preventDefault(); setDragging(false); handleFile(e.dataTransfer.files[0]) }}
+        onClick={() => document.getElementById('_story_edit_inp').click()}
+        style={{ border: `2px dashed ${dragging ? '#C3EBF7' : '#D8EEF6'}`, borderRadius: 12, padding: preview ? '10px 14px' : '20px 14px', cursor: 'pointer', background: '#FAFCFE', display: 'flex', alignItems: 'center', gap: 12 }}>
+        <input id="_story_edit_inp" type="file" accept="image/*" style={{ display: 'none' }} onChange={e => handleFile(e.target.files[0])} />
+        {preview ? (
+          <>
+            <img src={preview} alt="" style={{ width: 56, height: 56, objectFit: 'cover', borderRadius: 8, flexShrink: 0, cursor: 'zoom-in', border: '1.5px solid #E8ECF0' }} onClick={e => { e.stopPropagation(); setLightbox(true) }} />
+            <div style={{ flex: 1 }} onClick={e => e.stopPropagation()}><p style={{ color: '#1C252E', fontWeight: 700, fontSize: 13 }}>Print do story</p><span style={{ color: '#0891B2', fontSize: 11, fontWeight: 600, cursor: 'pointer' }} onClick={e => { e.stopPropagation(); setLightbox(true) }}>ver imagem ↗</span></div>
+            <button type="button" onClick={e => { e.stopPropagation(); setPreview(null) }} style={{ flexShrink: 0, background: '#FEF2F2', border: '1px solid #fecaca', borderRadius: 8, width: 30, height: 30, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Trash2 size={13} color="#ef4444" /></button>
+          </>
+        ) : (
+          <div style={{ width: '100%', textAlign: 'center' }}><Upload size={22} color="#C3EBF7" style={{ margin: '0 auto 6px' }} /><p style={{ color: '#8A9BB0', fontSize: 13 }}>Substituir print</p></div>
+        )}
+      </div>
+      {preview && <button onClick={extract} disabled={loading} style={{ background: '#1C252E', color: '#C3EBF7', border: 'none', borderRadius: 10, padding: '10px', fontSize: 13, fontWeight: 700, cursor: loading ? 'wait' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7, opacity: loading ? 0.75 : 1 }}><Sparkles size={14} />{loading ? 'Extraindo...' : 'Extrair métricas'}</button>}
+      {error && <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 9, padding: '8px 12px' }}><p style={{ color: '#ef4444', fontSize: 12 }}>{error}</p></div>}
+      <div><label style={{ color: '#8A9BB0', fontSize: 11, fontWeight: 600, display: 'block', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Nome</label><input value={form.nome || ''} onChange={e => set('nome', e.target.value)} style={inp(false)} /></div>
+      <div><label style={{ color: '#8A9BB0', fontSize: 11, fontWeight: 600, display: 'block', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Data</label><input value={form.data || ''} onChange={e => set('data', e.target.value)} placeholder="DD/MM/AAAA" style={inp(false)} /></div>
+      <div>
+        <label style={{ color: '#8A9BB0', fontSize: 11, fontWeight: 600, display: 'block', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Grupo</label>
+        {novoGrupo ? (
+          <div style={{ display: 'flex', gap: 8 }}><input value={form.grupo || ''} onChange={e => set('grupo', e.target.value)} placeholder="Nome do grupo" style={{ ...inp(false), flex: 1 }} autoFocus /><button onClick={() => setNovoGrupo(false)} style={{ background: '#F4F6F8', border: 'none', borderRadius: 9, padding: '8px 12px', cursor: 'pointer', fontSize: 12, color: '#8A9BB0' }}>Cancelar</button></div>
+        ) : (
+          <div style={{ display: 'flex', gap: 8 }}><select value={form.grupo || ''} onChange={e => set('grupo', e.target.value)} style={{ ...inp(false), flex: 1, background: '#fff' }}><option value="">Sem grupo</option>{grupos.map(g => <option key={g} value={g}>{g}</option>)}</select><button onClick={() => { setNovoGrupo(true); set('grupo', '') }} style={{ background: '#F4F6F8', border: 'none', borderRadius: 9, padding: '8px 12px', cursor: 'pointer', fontSize: 12, color: '#1C252E', whiteSpace: 'nowrap' }}>+ Novo grupo</button></div>
+        )}
+      </div>
+      <div><p style={{ color: '#8A9BB0', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 10 }}>Métricas</p>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+          {NUM_FIELDS.map(({ key, label, highlight }) => (
+            <div key={key} style={highlight ? { gridColumn: '1 / -1' } : {}}><label style={{ color: highlight ? '#1a7a96' : '#8A9BB0', fontSize: 11, fontWeight: highlight ? 700 : 600, display: 'block', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.04em' }}>{label}</label><input type="number" value={form[key] === null || form[key] === undefined ? '' : form[key]} onChange={e => set(key, e.target.value)} placeholder="—" style={{ ...inp(!!highlight), fontSize: highlight ? 15 : 13 }} /></div>
+          ))}
+        </div>
+      </div>
+      <div style={{ display: 'flex', gap: 8 }}>
+        <button onClick={save} disabled={saving} style={{ flex: 1, background: saved ? '#22c55e' : '#1C252E', color: '#C3EBF7', border: 'none', borderRadius: 12, padding: '12px', fontSize: 14, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+          {saved ? <><Check size={16} /> Salvo!</> : saving ? 'Salvando...' : 'Atualizar story'}
+        </button>
+        {onDelete && <button onClick={() => { if (!confirmDelete) { setConfirmDelete(true); return } onDelete() }} style={{ background: confirmDelete ? '#ef4444' : '#FEF2F2', color: confirmDelete ? '#fff' : '#ef4444', border: `1px solid ${confirmDelete ? '#ef4444' : '#fecaca'}`, borderRadius: 12, padding: '12px 14px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, fontWeight: 600, flexShrink: 0 }}><Trash2 size={15} />{confirmDelete ? 'Confirmar?' : 'Excluir'}</button>}
+      </div>
+      {lightbox && preview && <ImageLightbox src={preview} title={form.nome || 'Story'} onClose={() => setLightbox(false)} />}
+    </div>
+  )
+}
+
+// ─── Modal principal ─────────────────────────────────────────────────────────
+export default function StoryUploadModal({ mode = 'new', story = null, grupos = [], onClose, onSave, onDelete }) {
+  // Modo edição
+  if (mode === 'update') {
+    return (
+      <div style={{ position: 'fixed', inset: 0, background: 'rgba(28,37,46,0.65)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }} className="modal-overlay-bottom" onClick={onClose}>
+        <div style={{ background: '#fff', borderRadius: 20, width: '100%', maxWidth: 520, maxHeight: '92vh', overflow: 'auto', boxShadow: '0 16px 56px rgba(0,0,0,0.22)' }} className="scrollbar-thin modal-inner" onClick={e => e.stopPropagation()}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px', borderBottom: '1px solid #F0F4F8' }}>
+            <h2 style={{ color: '#1C252E', fontSize: 15, fontWeight: 700 }}>Editar story</h2>
+            <button onClick={onClose} style={{ background: '#F4F6F8', border: 'none', borderRadius: 8, padding: 7, cursor: 'pointer', display: 'flex' }}><X size={16} color="#8A9BB0" /></button>
+          </div>
+          <EditStoryModal story={story} grupos={grupos} onClose={onClose} onSave={dados => { onSave(dados); onClose() }} onDelete={onDelete ? () => { onDelete(); onClose() } : undefined} />
+        </div>
+      </div>
+    )
+  }
+
+  // Modo novo: múltiplos arquivos
+  return <MultiStoryModal grupos={grupos} onClose={onClose} onSave={onSave} />
+}
+
+// ─── Multi upload ─────────────────────────────────────────────────────────────
+function MultiStoryModal({ grupos, onClose, onSave }) {
+  const [files, setFiles]           = useState([])
+  const [current, setCurrent]       = useState(0)
+  const [dragging, setDragging]     = useState(false)
+  const [formStates, setFormStates] = useState([])
+  const singleRef = useRef(null)
+
+  function loadFiles(fileList) {
+    const arr = Array.from(fileList).filter(f => f.type.startsWith('image/'))
+    if (!arr.length) return
+    Promise.all(arr.map(f => new Promise(resolve => {
+      const r = new FileReader(); r.onload = e => resolve({ name: f.name, dataUrl: e.target.result }); r.readAsDataURL(f)
+    }))).then(loaded => { setFiles(loaded); setCurrent(0); setFormStates([]) })
+  }
+
+  function navigateTo(idx) {
+    if (singleRef.current) {
+      const snap = singleRef.current.getSnapshot()
+      setFormStates(prev => { const next = [...prev]; next[current] = snap; return next })
+    }
+    setCurrent(idx)
+  }
+
+  if (files.length === 0) {
+    return (
+      <div style={{ position: 'fixed', inset: 0, background: 'rgba(28,37,46,0.65)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }} className="modal-overlay-bottom" onClick={onClose}>
+        <div style={{ background: '#fff', borderRadius: 20, width: '100%', maxWidth: 480, boxShadow: '0 16px 56px rgba(0,0,0,0.22)' }} onClick={e => e.stopPropagation()}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px', borderBottom: '1px solid #F0F4F8' }}>
+            <h2 style={{ color: '#1C252E', fontSize: 15, fontWeight: 700 }}>Novo story</h2>
+            <button onClick={onClose} style={{ background: '#F4F6F8', border: 'none', borderRadius: 8, padding: 7, cursor: 'pointer', display: 'flex' }}><X size={16} color="#8A9BB0" /></button>
+          </div>
+          <div style={{ padding: 20 }}>
+            <div
+              onDragOver={e => { e.preventDefault(); setDragging(true) }} onDragLeave={() => setDragging(false)}
+              onDrop={e => { e.preventDefault(); setDragging(false); loadFiles(e.dataTransfer.files) }}
+              onClick={() => document.getElementById('_multi_story_inp').click()}
+              style={{ border: `2px dashed ${dragging ? '#C3EBF7' : '#D8EEF6'}`, borderRadius: 14, padding: '40px 20px', cursor: 'pointer', background: dragging ? '#F0F8FF' : '#FAFCFE', textAlign: 'center' }}>
+              <input id="_multi_story_inp" type="file" accept="image/*" multiple style={{ display: 'none' }} onChange={e => loadFiles(e.target.files)} />
+              <Upload size={28} color="#C3EBF7" style={{ margin: '0 auto 10px' }} />
+              <p style={{ color: '#1C252E', fontSize: 14, fontWeight: 600, marginBottom: 4 }}>Arraste os prints ou clique para selecionar</p>
+              <p style={{ color: '#8A9BB0', fontSize: 12 }}>Selecione um ou vários de uma vez</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  const isLast      = current === files.length - 1
+  const savedState  = formStates[current]
+  const initialPost = savedState?.form ?? {}
+  const initialPreview = savedState?.preview ?? files[current]?.dataUrl ?? null
+
+  return (
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(28,37,46,0.65)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }} className="modal-overlay-bottom" onClick={onClose}>
+      <div style={{ background: '#fff', borderRadius: 20, width: '100%', maxWidth: 520, maxHeight: '92vh', overflow: 'auto', boxShadow: '0 16px 56px rgba(0,0,0,0.22)' }} className="scrollbar-thin modal-inner" onClick={e => e.stopPropagation()}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px', borderBottom: '1px solid #F0F4F8' }}>
+          <div>
+            <h2 style={{ color: '#1C252E', fontSize: 15, fontWeight: 700 }}>Novo story</h2>
+            {files.length > 1 && <p style={{ color: '#8A9BB0', fontSize: 12, marginTop: 1 }}>{current + 1} de {files.length} arquivos</p>}
+          </div>
+          <button onClick={onClose} style={{ background: '#F4F6F8', border: 'none', borderRadius: 8, padding: 7, cursor: 'pointer', display: 'flex' }}><X size={16} color="#8A9BB0" /></button>
+        </div>
+
+        {/* Miniaturas */}
+        {files.length > 1 && (
+          <div style={{ padding: '10px 20px 0', display: 'flex', gap: 6, overflowX: 'auto' }} className="scrollbar-thin">
+            {files.map((f, i) => (
+              <div key={i} onClick={() => navigateTo(i)} style={{ flexShrink: 0, width: 44, height: 44, borderRadius: 8, overflow: 'hidden', cursor: 'pointer', border: `2px solid ${i === current ? '#F97316' : '#E8ECF0'}` }}>
+                <img src={f.dataUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              </div>
+            ))}
+          </div>
+        )}
+
+        <SingleStoryForm
+          key={current}
+          ref={singleRef}
+          initialPost={initialPost}
+          initialPreview={initialPreview}
+          grupos={grupos}
+          onClose={onClose}
+          onSave={dados => {
+            onSave(dados)
+            if (isLast) onClose()
+            else navigateTo(current + 1)
+          }}
+          isLast={isLast}
+          currentIdx={current}
+          totalFiles={files.length}
+        />
+      </div>
     </div>
   )
 }
