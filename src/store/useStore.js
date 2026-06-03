@@ -93,24 +93,16 @@ export const useStore = create(
             } catch (_) {}
           }
 
-          // Merge stories: preserva imageData local + recupera órfãos
+          // Merge stories: Supabase é fonte da verdade
           const localStories = get().stories
-          const cloudStoryIds = new Set(cloudStories.map(s => s.id))
-          const orphanStories = localStories.filter(ls => !cloudStoryIds.has(ls.id))
-
           const mergedStories = cloudStories.map(cs => {
             const local = localStories.find(ls => ls.id === cs.id)
             return { ...cs, ...(local?.imageData && { imageData: local.imageData }) }
           })
 
-          // Reenviar órfãos para o Supabase
-          if (orphanStories.length > 0) {
-            orphanStories.forEach(s => { upsertStory(s).catch(() => {}) })
-          }
-
           set({
             posts: [...posts, ...orphansNorm],
-            stories: [...mergedStories, ...orphanStories],
+            stories: mergedStories,
             metaMensal: metaMensal ? Number(metaMensal) : get().metaMensal,
             metaAnual:  metaAnual  ? Number(metaAnual)  : get().metaAnual,
             oliverData: newOliver,
