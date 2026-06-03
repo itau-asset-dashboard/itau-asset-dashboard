@@ -279,12 +279,7 @@ export const useStore = create(
           } catch (_) {}
         }
         set(s => ({ stories: [...s.stories, novo] }))
-        try {
-          await upsertStory({ ...novo, imageUrl: novo.imageUrl || null })
-        } catch (e) {
-          console.error('[addStory] upsertStory failed:', e?.message, e)
-          alert('Erro ao salvar story na nuvem: ' + (e?.message || 'desconhecido'))
-        }
+        try { await upsertStory({ ...novo, imageUrl: novo.imageUrl || null }) } catch (_) {}
       },
 
       updateStory: async (id, newData) => {
