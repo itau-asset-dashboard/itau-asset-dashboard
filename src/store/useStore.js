@@ -93,16 +93,24 @@ export const useStore = create(
             } catch (_) {}
           }
 
-          // Merge stories: preserva imageData local
+          // Merge stories: preserva imageData local + recupera órfãos
           const localStories = get().stories
+          const cloudStoryIds = new Set(cloudStories.map(s => s.id))
+          const orphanStories = localStories.filter(ls => !cloudStoryIds.has(ls.id))
+
           const mergedStories = cloudStories.map(cs => {
             const local = localStories.find(ls => ls.id === cs.id)
             return { ...cs, ...(local?.imageData && { imageData: local.imageData }) }
           })
 
+          // Reenviar órfãos para o Supabase
+          if (orphanStories.length > 0) {
+            orphanStories.forEach(s => { try { upsertStory(s) } catch (_) {} })
+          }
+
           set({
             posts: [...posts, ...orphansNorm],
-            stories: mergedStories,
+            stories: [...mergedStories, ...orphanStories],
             metaMensal: metaMensal ? Number(metaMensal) : get().metaMensal,
             metaAnual:  metaAnual  ? Number(metaAnual)  : get().metaAnual,
             oliverData: newOliver,
