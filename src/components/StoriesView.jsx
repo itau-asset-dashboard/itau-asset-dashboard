@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Plus, ChevronDown, ChevronUp, Zap, UserCheck, Search, X, ImageOff } from 'lucide-react'
+import { Plus, ChevronDown, ChevronUp, Eye, Zap, UserCheck, Search, X, ImageOff } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import StoryUploadModal from './StoryUploadModal'
 import ImageLightbox from './ImageLightbox'
