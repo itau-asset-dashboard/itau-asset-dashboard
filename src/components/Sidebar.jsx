@@ -1,4 +1,4 @@
-import { BarChart2, Calendar, List, Lightbulb, Upload, TrendingUp, LineChart } from 'lucide-react'
+import { BarChart2, Calendar, List, Lightbulb, Upload, TrendingUp, LineChart, BookOpen } from 'lucide-react'
 import { useStore } from '../store/useStore'
 
 // ANÁLISE primeiro, depois CONTEÚDO, depois PRODUTOS
@@ -23,6 +23,12 @@ const NAV_GROUPS = [
     label: 'PRODUTOS',
     items: [
       { id: 'etfs', icon: TrendingUp, label: 'ETFs' },
+    ],
+  },
+  {
+    label: 'AJUDA',
+    items: [
+      { id: 'glossario', icon: BookOpen, label: 'Glossário' },
     ],
   },
 ]

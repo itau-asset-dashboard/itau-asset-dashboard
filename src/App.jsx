@@ -16,6 +16,7 @@ import AnnualView from './components/AnnualView'
 import TopPostsMes from './components/TopPostsMes'
 import ETFsView from './components/ETFsView'
 import OliverView from './components/OliverView'
+import Glossario from './components/Glossario'
 
 export default function App() {
   const { activeSection, syncFromCloud } = useStore()
@@ -46,6 +47,7 @@ export default function App() {
           {activeSection === 'oliver'      && <OliverView />}
           {activeSection === 'posts'       && <PostsRanking />}
           {activeSection === 'etfs'        && <ETFsView />}
+          {activeSection === 'glossario'   && <Glossario />}
           {activeSection === 'visao-anual' && <AnnualView />}
           {activeSection === 'visao-geral' && (
             <>
