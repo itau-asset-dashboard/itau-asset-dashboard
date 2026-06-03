@@ -31,6 +31,9 @@ function MetricBadge({ label, value, color }) {
 
 function StoryRow({ story, grupos, onEdit, isEditMode }) {
   const [lightbox, setLightbox] = useState(false)
+  const [imgError, setImgError] = useState(false)
+  const imgSrc = story.imageUrl || story.imageData
+  const showImg = imgSrc && !imgError
   return (
     <div
       onClick={() => isEditMode && onEdit(story)}
@@ -47,14 +50,14 @@ function StoryRow({ story, grupos, onEdit, isEditMode }) {
         onClick={e => { e.stopPropagation(); if (story.imageUrl || story.imageData) setLightbox(true) }}
         style={{
           width: 40, height: 40, borderRadius: 8, flexShrink: 0,
-          background: story.imageUrl || story.imageData ? '#F0F4F8' : '#F8FAFC',
+          background: '#F8FAFC',
           overflow: 'hidden',
           border: '1.5px solid #EAECF0',
-          cursor: story.imageUrl || story.imageData ? 'zoom-in' : 'default',
+          cursor: showImg ? 'zoom-in' : 'default',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
         }}>
-        {story.imageUrl || story.imageData
-          ? <img src={story.imageUrl || story.imageData} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={e => { e.target.style.display='none'; e.target.parentNode.innerHTML='<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#D0D8E4" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="m3 9 4-4 4 4 4-6 6 8"/><circle cx="8.5" cy="8.5" r="1.5"/></svg>' }}/>
+        {showImg
+          ? <img src={imgSrc} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={() => setImgError(true)} />
           : <ImageOff size={13} color="#D0D8E4" strokeWidth={1.5} />
         }
       </div>
@@ -74,7 +77,7 @@ function StoryRow({ story, grupos, onEdit, isEditMode }) {
         <MetricBadge label="Ativ. perfil" value={story.atividade_perfil} color="#059669" />
       </div>
 
-      {lightbox && (story.imageUrl || story.imageData) && (
+      {lightbox && showImg && (
         <ImageLightbox src={story.imageUrl || story.imageData} title={story.nome || 'Story'} onClose={() => setLightbox(false)} />
       )}
     </div>
