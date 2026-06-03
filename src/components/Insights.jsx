@@ -1,5 +1,5 @@
 import { useRef, useEffect, useState } from 'react'
-import { RefreshCw, Send, Trash2, ChevronLeft, ChevronRight } from 'lucide-react'
+import { RefreshCw, Send, Trash2 } from 'lucide-react'
 import { useIsMobile } from '../utils/useIsMobile'
 
 // Renderer simples de markdown para respostas da IA
@@ -62,8 +62,6 @@ const DEFAULT = [
   { icone:'📊', titulo:'Dados prontos para análise',     texto:'Com pelo menos 2 posts cadastrados, você pode gerar análise completa de performance e recomendações estratégicas.' },
   { icone:'📈', titulo:'Acompanhe sua meta mensal',      texto:'Na Visão Anual você encontra a meta ajustada mês a mês com base no saldo acumulado do ano.' },
   { icone:'🎯', titulo:'Top posts por mês',              texto:'Na Visão Mensal você vê o ranking dos 5 melhores posts do período com medalhas e barras de progresso.' },
-  { icone:'🔖', titulo:'Aba dedicada a ETFs',            texto:'A aba ETFs mostra KPIs, evolução mensal de alcance e volume de posts, top posts e performance por formato.' },
-  { icone:'☁️', titulo:'Sincronização automática',      texto:'Todos os dados ficam salvos na nuvem e são compartilhados entre dispositivos automaticamente ao abrir o app.' },
 ]
 
 const SUGESTOES = [
@@ -84,16 +82,12 @@ export default function Insights() {
     if (!apiKey) { alert('Configure sua chave da API Anthropic primeiro.'); return }
     if (allPosts.length < 2) { alert('Adicione pelo menos 2 posts para gerar insights.'); return }
     setLoadingInsights(true)
-    try { setInsights(await generateInsights(allPosts, apiKey)); setInsightPage(0) }
+    try { setInsights(await generateInsights(allPosts, apiKey)) }
     catch(e) { alert('Não foi possível gerar insights: ' + e.message) }
     finally { setLoadingInsights(false) }
   }
 
-  const fullList = insights.length > 0 ? insights : DEFAULT
-  const [insightPage, setInsightPage] = useState(0)
-  const INSIGHTS_PER_PAGE = 4
-  const totalInsightPages = Math.ceil(fullList.length / INSIGHTS_PER_PAGE)
-  const list = fullList.slice(insightPage * INSIGHTS_PER_PAGE, insightPage * INSIGHTS_PER_PAGE + INSIGHTS_PER_PAGE)
+  const list = insights.length > 0 ? insights : DEFAULT
   const mobile = useIsMobile()
 
   // ── Chat ──────────────────────────────────────────────
@@ -161,26 +155,12 @@ export default function Insights() {
 
         <div className="insights-grid" style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(270px,1fr))', gap:12 }}>
           {list.map((ins,i) => (
-            <div key={insightPage * INSIGHTS_PER_PAGE + i} className="card" style={{ padding:'18px 20px' }}>
+            <div key={i} className="card" style={{ padding:'18px 20px' }}>
               <p style={{ color:'#182638', fontWeight:600, fontSize:13, marginBottom:6 }}>{ins.titulo}</p>
               <p style={{ color:'#8A9BB0', fontSize:12, lineHeight:1.65 }}>{ins.texto}</p>
             </div>
           ))}
         </div>
-
-        {totalInsightPages > 1 && (
-          <div style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:12, marginTop:4 }}>
-            <button onClick={() => setInsightPage(p => Math.max(0, p-1))} disabled={insightPage === 0}
-              style={{ background:'#F4F6F8', border:'none', borderRadius:8, padding:'5px 10px', cursor:'pointer', opacity: insightPage === 0 ? 0.4 : 1 }}>
-              <ChevronLeft size={15} color="#1C252E"/>
-            </button>
-            <span style={{ color:'#8A9BB0', fontSize:12 }}>{insightPage + 1} / {totalInsightPages}</span>
-            <button onClick={() => setInsightPage(p => Math.min(totalInsightPages-1, p+1))} disabled={insightPage === totalInsightPages-1}
-              style={{ background:'#F4F6F8', border:'none', borderRadius:8, padding:'5px 10px', cursor:'pointer', opacity: insightPage === totalInsightPages-1 ? 0.4 : 1 }}>
-              <ChevronRight size={15} color="#1C252E"/>
-            </button>
-          </div>
-        )}
       </div>
 
       {/* ── Chat ── */}
