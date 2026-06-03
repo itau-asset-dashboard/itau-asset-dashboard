@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Plus, ChevronDown, ChevronUp, Eye, Zap, UserCheck, Search, X } from 'lucide-react'
+import { Plus, ChevronDown, ChevronUp, Zap, UserCheck, Search, X, ImageOff } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import StoryUploadModal from './StoryUploadModal'
 import ImageLightbox from './ImageLightbox'
@@ -47,14 +47,15 @@ function StoryRow({ story, grupos, onEdit, isEditMode }) {
         onClick={e => { e.stopPropagation(); if (story.imageUrl || story.imageData) setLightbox(true) }}
         style={{
           width: 40, height: 40, borderRadius: 8, flexShrink: 0,
-          background: '#F0F4F8', overflow: 'hidden',
-          border: '1.5px solid #E8ECF0',
+          background: story.imageUrl || story.imageData ? '#F0F4F8' : '#F8FAFC',
+          overflow: 'hidden',
+          border: '1.5px solid #EAECF0',
           cursor: story.imageUrl || story.imageData ? 'zoom-in' : 'default',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
         }}>
         {story.imageUrl || story.imageData
-          ? <img src={story.imageUrl || story.imageData} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-          : <Eye size={14} color="#C3D0DA" />
+          ? <img src={story.imageUrl || story.imageData} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={e => { e.target.style.display='none'; e.target.parentNode.innerHTML='<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#D0D8E4" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="m3 9 4-4 4 4 4-6 6 8"/><circle cx="8.5" cy="8.5" r="1.5"/></svg>' }}/>
+          : <ImageOff size={13} color="#D0D8E4" strokeWidth={1.5} />
         }
       </div>
 
