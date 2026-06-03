@@ -59,7 +59,7 @@ const ORANGE = '#F97316'
 const ORANGE_BG = '#FFF7F0'
 
 export default function Sidebar() {
-  const { activeSection, setActiveSection } = useStore()
+  const { activeSection, setActiveSection, isEditMode } = useStore()
 
   return (
     <>
@@ -119,14 +119,17 @@ export default function Sidebar() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
                 {items.map(({ id, icon: Icon, label: itemLabel }) => {
                   const active = activeSection === id
+                  const blocked = id === 'upload' && !isEditMode
                   return (
-                    <button key={id} onClick={() => setActiveSection(id)}
+                    <button key={id} onClick={() => !blocked && setActiveSection(id)}
                       style={{
                         width: '100%', borderRadius: 9, padding: '7px 8px 7px 10px',
                         background: active ? ORANGE_BG : 'transparent',
                         border: 'none',
                         borderLeft: `2.5px solid ${active ? ORANGE : 'transparent'}`,
-                        cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8,
+                        cursor: blocked ? 'not-allowed' : 'pointer',
+                        opacity: blocked ? 0.4 : 1,
+                        display: 'flex', alignItems: 'center', gap: 8,
                         transition: 'background 0.1s', textAlign: 'left',
                       }}
                       onMouseEnter={e => { if (!active) e.currentTarget.style.background = '#EDEEF0' }}
@@ -162,12 +165,15 @@ export default function Sidebar() {
       <nav className="bottom-nav">
         {NAV_FLAT.map(({ id, icon: Icon, label }) => {
           const active = activeSection === id
+          const blocked = id === 'upload' && !isEditMode
           return (
-            <button key={id} onClick={() => setActiveSection(id)}
+            <button key={id} onClick={() => !blocked && setActiveSection(id)}
               style={{
                 flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center',
                 justifyContent: 'center', gap: 3, background: 'none', border: 'none',
-                cursor: 'pointer', padding: '6px 2px',
+                cursor: blocked ? 'not-allowed' : 'pointer',
+                opacity: blocked ? 0.4 : 1,
+                padding: '6px 2px',
               }}>
               <Icon size={19} color={active ? ORANGE : '#4A6272'} strokeWidth={active ? 2.2 : 1.8} />
               <span style={{ fontSize: 9, color: active ? ORANGE : '#8AAAB8', fontWeight: active ? 700 : 400, whiteSpace: 'nowrap' }}>

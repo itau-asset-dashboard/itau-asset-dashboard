@@ -61,7 +61,6 @@ const DEFAULT = [
   { icone:'🔑', titulo:'Configure sua chave de API',     texto:'Clique no ícone de chave na barra superior para inserir sua chave Anthropic e ativar insights automáticos.' },
   { icone:'📊', titulo:'Dados prontos para análise',     texto:'Com pelo menos 2 posts cadastrados, você pode gerar análise completa de performance e recomendações estratégicas.' },
   { icone:'📈', titulo:'Acompanhe sua meta mensal',      texto:'Na Visão Anual você encontra a meta ajustada mês a mês com base no saldo acumulado do ano.' },
-  { icone:'🎯', titulo:'Top posts por mês',              texto:'Na Visão Mensal você vê o ranking dos 5 melhores posts do período com medalhas e barras de progresso.' },
 ]
 
 const SUGESTOES = [

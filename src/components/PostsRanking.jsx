@@ -27,7 +27,7 @@ function parseDate(d) {
 }
 
 export default function PostsRanking() {
-  const { getPostsDoMes, posts: allPosts, updatePost, deletePost } = useStore()
+  const { getPostsDoMes, posts: allPosts, updatePost, deletePost, isEditMode } = useStore()
   const mobile = useIsMobile()
 
   const [search, setSearch]     = useState('')
@@ -157,8 +157,8 @@ export default function PostsRanking() {
               const tipoAbrev = p.tipo === 'Foto estática' ? 'Foto' : p.tipo
               return (
                 <tr key={p.id}
-                  style={{ borderTop: '1px solid #F5F7FA', cursor: 'pointer' }}
-                  onClick={() => setUpdateTarget(p)}
+                  style={{ borderTop: '1px solid #F5F7FA', cursor: isEditMode ? 'pointer' : 'default' }}
+                  onClick={() => isEditMode && setUpdateTarget(p)}
                   onMouseEnter={e => e.currentTarget.style.background = '#FAFBFC'}
                   onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
                 >

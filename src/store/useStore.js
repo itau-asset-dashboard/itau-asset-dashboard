@@ -25,6 +25,7 @@ export const useStore = create(
       syncing: false,
       syncError: null,
       apiKey: import.meta.env.VITE_ANTHROPIC_API_KEY || '',
+      isEditMode: false,
 
       // ── Sync inicial com Supabase ──────────────────────
       syncFromCloud: async () => {
@@ -119,6 +120,7 @@ export const useStore = create(
       // ── Setters simples ────────────────────────────────
       setApiKey:          (key) => set({ apiKey: key }),
       setActiveSection:   (s)   => set({ activeSection: s }),
+      setEditMode:        (v)   => set({ isEditMode: v }),
       setInsights:        (ins) => set({ insights: ins }),
       setLoadingInsights: (v)   => set({ loadingInsights: v }),
 

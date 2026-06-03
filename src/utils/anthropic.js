@@ -112,18 +112,17 @@ export async function generateInsights(posts, apiKey) {
       messages: [{
         role: 'user',
         content: `Você é um analista de redes sociais especializado em finanças e investimentos.
-Analise os dados de posts do Instagram abaixo e gere EXATAMENTE 4 insights estratégicos em português brasileiro.
+Analise os dados de posts do Instagram abaixo e gere EXATAMENTE 3 insights estratégicos em português brasileiro.
 
 Dados dos posts:
 ${JSON.stringify(resumo, null, 2)}
 
-Cubra obrigatoriamente esses 4 ângulos (um insight por ângulo):
+Cubra obrigatoriamente esses 3 ângulos (um insight por ângulo):
 1. Qual tipo de post (Carrossel, Reels, Foto estática) performa melhor em contas alcançadas
 2. Qual tema tem maior alcance médio
-3. Tendência de contas alcançadas ao longo do tempo
-4. Recomendação prioritária para maximizar o alcance no próximo mês
+3. Recomendação prioritária para maximizar o alcance no próximo mês
 
-Retorne APENAS um JSON válido com exatamente 4 objetos (sem markdown, sem texto fora do JSON):
+Retorne APENAS um JSON válido com exatamente 3 objetos (sem markdown, sem texto fora do JSON):
 [
   { "icone": "📈", "titulo": "título curto", "texto": "insight detalhado em 2-3 frases" },
   ...
