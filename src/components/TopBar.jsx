@@ -1,7 +1,98 @@
 import { useState } from 'react'
-import { Download, Key, Plus, Lock, Unlock, Eye } from 'lucide-react'
+import { Download, Key, Plus, Lock, Unlock, Eye, HelpCircle, X } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import UploadModal from './UploadModal'
+
+const GLOSSARIO = [
+  {
+    termo: 'Contas alcançadas',
+    definicao: 'O número de contas únicas do Instagram que viram este post pelo menos uma vez. Essa métrica é estimada pelo Instagram.',
+    icone: '👥',
+  },
+  {
+    termo: 'Visualizações',
+    definicao: 'O número de vezes que o post foi exibido no total — inclui a mesma conta ver mais de uma vez.',
+    icone: '👁',
+  },
+  {
+    termo: 'Curtidas',
+    definicao: 'Número de contas que curtiram o post. Representado pelo ícone de coração (♡) no app mobile.',
+    icone: '❤️',
+  },
+  {
+    termo: 'Comentários',
+    definicao: 'Número de comentários feitos no post. Representado pelo ícone de balão de fala no app mobile.',
+    icone: '💬',
+  },
+  {
+    termo: 'Salvamentos',
+    definicao: 'Contas que salvaram o post para ver depois. Representado pelo ícone de marcador/bookmark no app mobile.',
+    icone: '🔖',
+  },
+  {
+    termo: 'Compartilhamentos',
+    definicao: 'Inclui encaminhamentos diretos e reposts. Representado pelo ícone de avião de papel ou seta circular no app mobile.',
+    icone: '↗️',
+  },
+  {
+    termo: 'Tempo médio de visualização',
+    definicao: 'O tempo médio gasto na reprodução do seu reel. Calculado dividindo o tempo total de visualização pelo número de visualizações iniciais.',
+    icone: '⏱',
+  },
+  {
+    termo: 'Seguidores ganhos',
+    definicao: 'O número de contas que começaram a seguir o perfil a partir deste post.',
+    icone: '➕',
+  },
+  {
+    termo: 'Dado parcial',
+    definicao: 'Métricas ainda em atualização — o Instagram pode levar alguns dias para estabilizar os números de alcance e visualizações.',
+    icone: '🕐',
+  },
+  {
+    termo: 'Dado final',
+    definicao: 'Métricas consolidadas e estáveis. Recomendado aguardar ao menos 7 dias após a publicação antes de marcar como final.',
+    icone: '✓',
+  },
+]
+
+function GlossarioModal({ onClose }) {
+  return (
+    <div
+      style={{ position: 'fixed', inset: 0, background: 'rgba(28,37,46,0.55)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}
+      onClick={onClose}
+    >
+      <div
+        style={{ background: '#fff', borderRadius: 20, width: '100%', maxWidth: 520, maxHeight: '88vh', overflow: 'hidden', display: 'flex', flexDirection: 'column', boxShadow: '0 16px 56px rgba(0,0,0,0.2)' }}
+        onClick={e => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div style={{ padding: '18px 22px', borderBottom: '1px solid #F0F4F8', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
+          <div>
+            <h2 style={{ color: '#182638', fontSize: 15, fontWeight: 700, margin: 0 }}>Glossário de métricas</h2>
+            <p style={{ color: '#8A9BB0', fontSize: 12, marginTop: 2 }}>Definições oficiais do Instagram</p>
+          </div>
+          <button onClick={onClose} style={{ background: '#F4F6F8', border: 'none', borderRadius: 8, padding: 7, cursor: 'pointer', display: 'flex' }}>
+            <X size={16} color="#8A9BB0" />
+          </button>
+        </div>
+
+        {/* Lista */}
+        <div className="scrollbar-thin" style={{ overflowY: 'auto', padding: '16px 22px', display: 'flex', flexDirection: 'column', gap: 4 }}>
+          {GLOSSARIO.map((item, i) => (
+            <div key={i} style={{ padding: '14px 0', borderBottom: i < GLOSSARIO.length - 1 ? '1px solid #F5F7FA' : 'none' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 5 }}>
+                <span style={{ fontSize: 15 }}>{item.icone}</span>
+                <p style={{ color: '#182638', fontSize: 13, fontWeight: 700, margin: 0 }}>{item.termo}</p>
+              </div>
+              <p style={{ color: '#6B7A8D', fontSize: 12, lineHeight: 1.65, margin: 0, paddingLeft: 24 }}>{item.definicao}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
 
 const MESES_NOMES = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro']
 
@@ -28,6 +119,7 @@ export default function TopBar() {
   const [showLock, setShowLock]       = useState(false)
   const [pwInput, setPwInput]         = useState('')
   const [pwError, setPwError]         = useState(false)
+  const [showGlossario, setShowGlossario] = useState(false)
 
   const posts = getPostsDoMes()
   const section = TITLES[activeSection] || TITLES['visao-anual']
@@ -136,6 +228,16 @@ export default function TopBar() {
           </div>
         )}
 
+        {/* Glossário */}
+        <button onClick={() => setShowGlossario(true)} title="Glossário de métricas"
+          style={{
+            background: '#fff', border: '1.5px solid #EDEFF2', borderRadius: 10,
+            padding: '7px 9px', color: '#8A9BB0', cursor: 'pointer',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}>
+          <HelpCircle size={14} />
+        </button>
+
         {/* CSV */}
         <button onClick={exportCSV} title="Exportar CSV"
           style={{
@@ -231,6 +333,8 @@ export default function TopBar() {
         <UploadModal mode="new" onClose={() => setUploadOpen(false)}
           onSave={dados => addPost(dados)} />
       )}
+
+      {showGlossario && <GlossarioModal onClose={() => setShowGlossario(false)} />}
     </div>
   )
 }
