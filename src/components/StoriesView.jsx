@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Plus, ChevronDown, ChevronUp, Eye, Zap, UserCheck, Search, X } from 'lucide-react'
+import { Plus, ChevronDown, ChevronUp, Eye, Zap, UserCheck, Search, X, Film } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import StoryUploadModal from './StoryUploadModal'
 import ImageLightbox from './ImageLightbox'
@@ -143,9 +143,10 @@ export default function StoriesView() {
   const soltos = sorted.filter(s => !s.grupo)
 
   const KPIS = [
-    { label: 'Visualizações',    value: totalViews, icon: Eye,       color: '#0891B2', bg: 'rgba(8,145,178,0.08)' },
-    { label: 'Interações',       value: totalInter, icon: Zap,       color: '#F97316', bg: 'rgba(249,115,22,0.08)' },
-    { label: 'Atividade perfil', value: totalPerf,  icon: UserCheck, color: '#059669', bg: 'rgba(5,150,105,0.08)' },
+    { label: 'Stories',          value: sorted.length, icon: Film,      color: '#1C252E', bg: 'rgba(28,37,46,0.08)' },
+    { label: 'Visualizações',    value: totalViews,    icon: Eye,       color: '#0891B2', bg: 'rgba(8,145,178,0.08)' },
+    { label: 'Interações',       value: totalInter,    icon: Zap,       color: '#F97316', bg: 'rgba(249,115,22,0.08)' },
+    { label: 'Atividade perfil', value: totalPerf,     icon: UserCheck, color: '#059669', bg: 'rgba(5,150,105,0.08)' },
   ]
 
   return (
