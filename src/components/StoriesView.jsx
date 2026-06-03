@@ -31,9 +31,7 @@ function MetricBadge({ label, value, color }) {
 
 function StoryRow({ story, grupos, onEdit, isEditMode }) {
   const [lightbox, setLightbox] = useState(false)
-  const [imgError, setImgError] = useState(false)
-  const imgSrc = story.imageUrl  // só usa URL do Supabase, não base64 local
-  const showImg = !!imgSrc && !imgError
+  const imgSrc = story.imageUrl
   return (
     <div
       onClick={() => isEditMode && onEdit(story)}
@@ -53,13 +51,10 @@ function StoryRow({ story, grupos, onEdit, isEditMode }) {
           background: '#F8FAFC',
           overflow: 'hidden',
           border: '1.5px solid #EAECF0',
-          cursor: showImg ? 'zoom-in' : 'default',
+          cursor: imgSrc ? 'zoom-in' : 'default',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
         }}>
-        {showImg
-          ? <img src={imgSrc} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={() => setImgError(true)} />
-          : <ImageOff size={13} color="#D0D8E4" strokeWidth={1.5} />
-        }
+        <ImageOff size={13} color="#D0D8E4" strokeWidth={1.5} />
       </div>
 
       {/* Info */}
@@ -77,7 +72,7 @@ function StoryRow({ story, grupos, onEdit, isEditMode }) {
         <MetricBadge label="Ativ. perfil" value={story.atividade_perfil} color="#059669" />
       </div>
 
-      {lightbox && showImg && (
+      {lightbox && imgSrc && (
         <ImageLightbox src={story.imageUrl || story.imageData} title={story.nome || 'Story'} onClose={() => setLightbox(false)} />
       )}
     </div>
