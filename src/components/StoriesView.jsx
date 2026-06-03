@@ -32,8 +32,8 @@ function MetricBadge({ label, value, color }) {
 function StoryRow({ story, grupos, onEdit, isEditMode }) {
   const [lightbox, setLightbox] = useState(false)
   const [imgError, setImgError] = useState(false)
-  const imgSrc = story.imageUrl || story.imageData
-  const showImg = imgSrc && !imgError
+  const imgSrc = story.imageUrl  // só usa URL do Supabase, não base64 local
+  const showImg = !!imgSrc && !imgError
   return (
     <div
       onClick={() => isEditMode && onEdit(story)}
