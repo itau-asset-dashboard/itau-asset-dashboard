@@ -69,6 +69,62 @@ export async function removePost(id) {
   if (error) throw error
 }
 
+// ── Stories ────────────────────────────────────────────
+
+export async function fetchStories() {
+  const { data, error } = await supabase
+    .from('stories')
+    .select('*')
+    .order('created_at', { ascending: true })
+  if (error) throw error
+  return (data || []).map(({ image_url, ...rest }) => ({
+    ...rest,
+    imageUrl: image_url || null,
+  }))
+}
+
+export async function uploadStoryImage(storyId, dataUrl) {
+  if (!dataUrl) return null
+  const [header, base64] = dataUrl.split(',')
+  const mime = header.match(/:(.*?);/)?.[1] || 'image/jpeg'
+  const binary = atob(base64)
+  const bytes = new Uint8Array(binary.length)
+  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i)
+  const blob = new Blob([bytes], { type: mime })
+  const ext = mime.includes('png') ? 'png' : 'jpg'
+  const path = `${storyId}.${ext}`
+  const { error } = await supabase.storage
+    .from('story-images')
+    .upload(path, blob, { upsert: true, contentType: mime })
+  if (error) throw error
+  const { data } = supabase.storage.from('story-images').getPublicUrl(path)
+  return data.publicUrl
+}
+
+const STORY_COLUMNS = [
+  'id','nome','data','grupo','visualizacoes','interacoes','atividade_perfil',
+  'contas_alcancadas','respostas','toques_avancar','toques_retroceder','saidas',
+  'image_url','status',
+]
+
+export async function upsertStory(story) {
+  const { imageData, imageUrl, imagePreview, ...rest } = story
+  const clean = Object.fromEntries(
+    Object.entries(rest).filter(([k]) => STORY_COLUMNS.includes(k))
+  )
+  const { error } = await supabase.from('stories').upsert({ ...clean, image_url: imageUrl || null })
+  if (error) throw error
+}
+
+export async function removeStory(id) {
+  const { error } = await supabase.from('stories').delete().eq('id', id)
+  if (error) throw error
+}
+
+export async function deleteStoryImage(storyId) {
+  await supabase.storage.from('story-images').remove([`${storyId}.jpg`, `${storyId}.png`])
+}
+
 // ── Settings ───────────────────────────────────────────
 
 export async function fetchSetting(key) {

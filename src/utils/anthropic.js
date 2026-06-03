@@ -85,6 +85,62 @@ Use null para qualquer campo não encontrado. Não invente valores.`
   return parseJsonResponse(data.content?.[0]?.text || '')
 }
 
+export async function extractStoryFromImage(base64, mediaType, apiKey) {
+  const response = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': apiKey,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true',
+    },
+    body: JSON.stringify({
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: 800,
+      messages: [{
+        role: 'user',
+        content: [
+          { type: 'image', source: { type: 'base64', media_type: mediaType, data: base64 } },
+          {
+            type: 'text',
+            text: `Você é um assistente que extrai métricas de prints de stories do Instagram.
+
+A tela de insights de um story mostra métricas como:
+- Visualizações (ou "Views") — quantas vezes o story foi visto
+- Interações — toques em links, figurinhas, enquetes, etc.
+- Atividade do perfil — visitas ao perfil a partir do story
+- Contas alcançadas — contas únicas que viram o story
+- Respostas — mensagens diretas enviadas em resposta ao story
+- Toques para avançar — quantas vezes avançaram para o próximo story
+- Toques para retroceder — quantas vezes voltaram para ver de novo
+- Saídas — quantas vezes saíram do story
+
+Retorne APENAS um JSON válido (sem markdown, sem texto fora do JSON):
+{
+  "data": "DD/MM/AAAA ou null",
+  "visualizacoes": número inteiro ou null,
+  "interacoes": número inteiro ou null,
+  "atividade_perfil": número inteiro ou null,
+  "contas_alcancadas": número inteiro ou null,
+  "respostas": número inteiro ou null,
+  "toques_avancar": número inteiro ou null,
+  "toques_retroceder": número inteiro ou null,
+  "saidas": número inteiro ou null
+}
+Use null para qualquer campo não encontrado. Não invente valores.`
+          }
+        ]
+      }]
+    })
+  })
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({}))
+    throw new Error(err?.error?.message || `Erro ${response.status}`)
+  }
+  const data = await response.json()
+  return parseJsonResponse(data.content?.[0]?.text || '')
+}
+
 export async function generateInsights(posts, apiKey) {
   const resumo = posts.map(p => ({
     data: p.data_post,

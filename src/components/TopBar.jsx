@@ -15,8 +15,10 @@ const TITLES = {
   'visao-anual':  { title: 'Visão Anual 2026',  sub: 'Performance consolidada do ano' },
   'visao-geral':  { title: 'Visão Mensal',       sub: 'Métricas de alcance do mês filtrado' },
   'posts':        { title: 'Todos os Posts',     sub: 'Histórico completo de publicações' },
+  'stories':      { title: 'Stories',            sub: 'Análise separada das metas de alcance' },
   'insights':     { title: 'Insights',           sub: 'Análise inteligente de performance' },
   'upload':       { title: 'Upload',             sub: 'Adicionar post com extração automática' },
+  'glossario':    { title: 'Glossário',          sub: 'Definições oficiais do Instagram' },
 }
 
 const EDIT_PASSWORD = import.meta.env.VITE_EDIT_PASSWORD || 'itauasset2026'

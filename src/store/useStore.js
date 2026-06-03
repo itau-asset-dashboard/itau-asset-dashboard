@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import { fetchPosts, upsertPost, removePost, fetchSetting, saveSetting, uploadImage, deleteImage } from '../lib/supabase'
+import { fetchPosts, upsertPost, removePost, fetchSetting, saveSetting, uploadImage, deleteImage,
+         fetchStories, upsertStory, removeStory, uploadStoryImage, deleteStoryImage } from '../lib/supabase'
 import { normalizeTema } from '../utils/temas'
 
 function normalizeDate(d) {
@@ -15,6 +16,7 @@ export const useStore = create(
   persist(
     (set, get) => ({
       posts: [],
+      stories: [],
       metaMensal: 200000,
       metaAnual: 1090000,
       mesFiltro: '01/2026',
@@ -31,12 +33,13 @@ export const useStore = create(
       syncFromCloud: async () => {
         set({ syncing: true, syncError: null })
         try {
-          const [cloudPosts, metaMensal, metaAnual, oliverRaw, evidenciasRaw] = await Promise.all([
+          const [cloudPosts, metaMensal, metaAnual, oliverRaw, evidenciasRaw, cloudStories] = await Promise.all([
             fetchPosts(),
             fetchSetting('meta_mensal'),
             fetchSetting('meta_anual'),
             fetchSetting('oliver_data'),
             fetchSetting('data_evidencias'),
+            fetchStories().catch(() => []),
           ])
           // Preserva imageData local — nunca é salvo no Supabase (muito pesado)
           // Também normaliza o campo `tema` para array limpo
@@ -90,8 +93,16 @@ export const useStore = create(
             } catch (_) {}
           }
 
+          // Merge stories: preserva imageData local
+          const localStories = get().stories
+          const mergedStories = cloudStories.map(cs => {
+            const local = localStories.find(ls => ls.id === cs.id)
+            return { ...cs, ...(local?.imageData && { imageData: local.imageData }) }
+          })
+
           set({
             posts: [...posts, ...orphansNorm],
+            stories: mergedStories,
             metaMensal: metaMensal ? Number(metaMensal) : get().metaMensal,
             metaAnual:  metaAnual  ? Number(metaAnual)  : get().metaAnual,
             oliverData: newOliver,
@@ -247,6 +258,44 @@ export const useStore = create(
         return antigos.length
       },
 
+      // ── Stories ────────────────────────────────────────
+      addStory: async (story) => {
+        const id = Date.now().toString()
+        const { imagePreview, ...rest } = story
+        const novo = { ...rest, id }
+        const src = imagePreview || novo.imageData
+        if (src?.startsWith('data:')) {
+          try {
+            const url = await uploadStoryImage(id, src)
+            if (url) novo.imageUrl = url
+          } catch (_) {}
+        }
+        set(s => ({ stories: [...s.stories, novo] }))
+        try { await upsertStory({ ...novo, imageUrl: novo.imageUrl || null }) } catch (_) {}
+      },
+
+      updateStory: async (id, newData) => {
+        const { imagePreview, ...restData } = newData
+        let imageUrl = restData.imageUrl
+        const src = imagePreview || restData.imageData
+        if (src?.startsWith('data:')) {
+          try { imageUrl = await uploadStoryImage(id, src) } catch (_) {}
+        }
+        set(s => ({
+          stories: s.stories.map(st =>
+            st.id !== id ? st : { ...st, ...restData, imageUrl: imageUrl || st.imageUrl }
+          )
+        }))
+        const updated = get().stories.find(s => s.id === id)
+        if (updated) try { await upsertStory(updated) } catch (_) {}
+      },
+
+      deleteStory: async (id) => {
+        set(s => ({ stories: s.stories.filter(st => st.id !== id) }))
+        try { await removeStory(id) } catch (_) {}
+        try { await deleteStoryImage(id) } catch (_) {}
+      },
+
       // ── Query ──────────────────────────────────────────
       getPostsDoMes: () => {
         const { posts, mesFiltro } = get()
@@ -327,6 +376,7 @@ export const useStore = create(
       name: 'itau-asset-instagram',
       partialize: (s) => ({
         posts:       s.posts,
+        stories:     s.stories,
         metaMensal:  s.metaMensal,
         metaAnual:   s.metaAnual,
         mesFiltro:   s.mesFiltro,
