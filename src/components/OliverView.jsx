@@ -83,9 +83,9 @@ export default function OliverView() {
 
       {/* Header */}
       <div>
-        <h2 style={{ color: '#1C252E', fontSize: 20, fontWeight: 800 }}>Acompanhamento Oliver</h2>
-        <p style={{ color: '#9AAAB8', fontSize: 13, marginTop: 3 }}>
-          Comparativo mensal entre os dados da agência Oliver e o Instagram · {ano}
+        <h2 style={{ color: '#1C252E', fontSize: mobile ? 16 : 20, fontWeight: 800 }}>Acompanhamento Oliver</h2>
+        <p style={{ color: '#9AAAB8', fontSize: 12, marginTop: 2 }}>
+          Comparativo Oliver vs Instagram · {ano}
         </p>
       </div>
 
@@ -112,22 +112,22 @@ export default function OliverView() {
 
       {/* Gráfico comparativo */}
       {chartData.length > 0 && (
-        <div className="card" style={{ padding: '22px' }}>
-          <p style={{ color: '#1C252E', fontSize: 15, fontWeight: 700, marginBottom: 4 }}>Comparativo mensal</p>
-          <p style={{ color: '#9AAAB8', fontSize: 12, marginBottom: 20 }}>Alcance Instagram vs dados Oliver</p>
-          <div className="chart-wrapper"><ResponsiveContainer width="100%" height={240}>
-            <BarChart data={chartData} margin={{ top: 8, right: 8, left: 0, bottom: 0 }} barGap={4}>
-              <XAxis dataKey="mes" tick={{ fill: '#9AAAB8', fontSize: 11 }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fill: '#9AAAB8', fontSize: 10 }} axisLine={false} tickLine={false}
-                tickFormatter={v => v === 0 ? '' : fmt(v)} width={48} />
+        <div className="card" style={{ padding: mobile ? '14px' : '22px' }}>
+          <p style={{ color: '#1C252E', fontSize: 14, fontWeight: 700, marginBottom: 2 }}>Comparativo mensal</p>
+          <p style={{ color: '#9AAAB8', fontSize: 11, marginBottom: 14 }}>Alcance Instagram vs Oliver</p>
+          <div className="chart-wrapper"><ResponsiveContainer width="100%" height={mobile ? 160 : 240}>
+            <BarChart data={chartData} margin={{ top: 8, right: 4, left: 0, bottom: 0 }} barGap={2}>
+              <XAxis dataKey="mes" tick={{ fill: '#9AAAB8', fontSize: mobile ? 9 : 11 }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fill: '#9AAAB8', fontSize: 9 }} axisLine={false} tickLine={false}
+                tickFormatter={v => v === 0 ? '' : fmt(v)} width={mobile ? 34 : 48} />
               <Tooltip
                 formatter={(v, name) => [name === 'alcance_oliver' ? fmtExato(v) : fmt(v), name === 'alcance_insta' ? 'Instagram' : 'Oliver']}
                 labelFormatter={(_, p) => p?.[0]?.payload?.mesFull || ''}
                 contentStyle={{ borderRadius: 10, border: '1px solid #EAECF0', fontSize: 12, boxShadow: '0 4px 16px rgba(0,0,0,0.08)' }}
               />
-              <Legend formatter={v => v === 'alcance_insta' ? 'Instagram' : 'Oliver'} wrapperStyle={{ fontSize: 12 }} />
-              <Bar dataKey="alcance_insta"  name="alcance_insta"  radius={[6,6,0,0]} barSize={20} fill="#1C252E" />
-              <Bar dataKey="alcance_oliver" name="alcance_oliver" radius={[6,6,0,0]} barSize={20} fill="#F97316" />
+              <Legend formatter={v => v === 'alcance_insta' ? 'Instagram' : 'Oliver'} wrapperStyle={{ fontSize: 11 }} />
+              <Bar dataKey="alcance_insta"  name="alcance_insta"  radius={[4,4,0,0]} barSize={mobile ? 10 : 20} fill="#1C252E" />
+              <Bar dataKey="alcance_oliver" name="alcance_oliver" radius={[4,4,0,0]} barSize={mobile ? 10 : 20} fill="#F97316" />
             </BarChart>
           </ResponsiveContainer></div>
         </div>
@@ -146,8 +146,11 @@ export default function OliverView() {
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
               <tr style={{ background: '#FAFBFC' }}>
-                {['Mês','Posts','Alcance Instagram','Alcance Oliver','Diferença',''].map(h => (
-                  <th key={h} style={{ padding: '10px 16px', color: '#8A9BB0', fontSize: 11, fontWeight: 600,
+                {(mobile
+                  ? ['Mês','Instagram','Oliver','']
+                  : ['Mês','Posts','Alcance Instagram','Alcance Oliver','Diferença','']
+                ).map(h => (
+                  <th key={h} style={{ padding: mobile ? '8px 12px' : '10px 16px', color: '#8A9BB0', fontSize: 11, fontWeight: 600,
                     textTransform: 'uppercase', letterSpacing: '0.05em', textAlign: 'left', whiteSpace: 'nowrap' }}>
                     {h}
                   </th>
@@ -165,54 +168,58 @@ export default function OliverView() {
                 return (
                   <tr key={m.chave}
                     style={{ borderTop: '1px solid #F5F7FA', opacity: hasData ? 1 : 0.45 }}>
-                    <td style={{ padding: '13px 16px', color: '#1C252E', fontSize: 13, fontWeight: 600 }}>
-                      {m.mesFull}
+                    <td style={{ padding: mobile ? '10px 12px' : '13px 16px', color: '#1C252E', fontSize: mobile ? 12 : 13, fontWeight: 600, whiteSpace: 'nowrap' }}>
+                      {mobile ? m.mes : m.mesFull}
                     </td>
-                    <td style={{ padding: '13px 16px', color: '#9AAAB8', fontSize: 12 }}>
-                      {m.nPosts > 0 ? `${m.nPosts} posts` : '—'}
+                    {!mobile && (
+                      <td style={{ padding: '13px 16px', color: '#9AAAB8', fontSize: 12 }}>
+                        {m.nPosts > 0 ? `${m.nPosts} posts` : '—'}
+                      </td>
+                    )}
+                    <td style={{ padding: mobile ? '10px 12px' : '13px 16px', color: '#1C252E', fontSize: mobile ? 12 : 13, fontWeight: 600 }}>
+                      {m.alcance_insta > 0 ? fmt(m.alcance_insta) : '—'}
                     </td>
-                    <td style={{ padding: '13px 16px', color: '#1C252E', fontSize: 13, fontWeight: 600 }}>
-                      {m.alcance_insta > 0 ? fmtExato(m.alcance_insta) : '—'}
-                    </td>
-                    <td style={{ padding: '13px 16px' }}>
+                    <td style={{ padding: mobile ? '10px 12px' : '13px 16px' }}>
                       {isEditing ? (
                         <input type="number" value={inputVal.alcance_oliver}
                           onChange={e => setInputVal(v => ({ ...v, alcance_oliver: e.target.value }))}
                           placeholder="ex: 185000"
-                          style={{ width: 120, border: '1.5px solid #C3EBF7', borderRadius: 8,
+                          style={{ width: mobile ? 90 : 120, border: '1.5px solid #C3EBF7', borderRadius: 8,
                             padding: '5px 9px', fontSize: 13, outline: 'none', fontFamily: 'DM Sans, sans-serif' }}
                           autoFocus />
                       ) : (
-                        <span style={{ color: '#F97316', fontSize: 13, fontWeight: 600 }}>
-                          {fmtExato(m.alcance_oliver)}
+                        <span style={{ color: '#F97316', fontSize: mobile ? 12 : 13, fontWeight: 600 }}>
+                          {fmt(m.alcance_oliver)}
                         </span>
                       )}
                     </td>
-                    <td style={{ padding: '13px 16px' }}>
-                      {diff != null ? (
-                        <span style={{
-                          color: diffColor, fontSize: 12, fontWeight: 700,
-                          background: Number(diff) > 0 ? 'rgba(22,163,74,0.08)' : 'rgba(239,68,68,0.08)',
-                          borderRadius: 6, padding: '2px 8px',
-                        }}>
-                          {Number(diff) > 0 ? '+' : ''}{diff}%
-                        </span>
-                      ) : <span style={{ color: '#D0D8E0', fontSize: 12 }}>—</span>}
-                    </td>
-                    <td style={{ padding: '13px 16px' }}>
+                    {!mobile && (
+                      <td style={{ padding: '13px 16px' }}>
+                        {diff != null ? (
+                          <span style={{
+                            color: diffColor, fontSize: 12, fontWeight: 700,
+                            background: Number(diff) > 0 ? 'rgba(22,163,74,0.08)' : 'rgba(239,68,68,0.08)',
+                            borderRadius: 6, padding: '2px 8px',
+                          }}>
+                            {Number(diff) > 0 ? '+' : ''}{diff}%
+                          </span>
+                        ) : <span style={{ color: '#D0D8E0', fontSize: 12 }}>—</span>}
+                      </td>
+                    )}
+                    <td style={{ padding: mobile ? '10px 8px' : '13px 16px' }}>
                       {isEditing ? (
                         <button onClick={() => saveEdit(m.chave)}
                           style={{ background: '#1C252E', color: '#C3EBF7', border: 'none',
-                            borderRadius: 8, padding: '6px 12px', cursor: 'pointer',
-                            display: 'flex', alignItems: 'center', gap: 5, fontSize: 12 }}>
-                          <Check size={13} /> Salvar
+                            borderRadius: 8, padding: mobile ? '5px 8px' : '6px 12px', cursor: 'pointer',
+                            display: 'flex', alignItems: 'center', gap: 4, fontSize: 12 }}>
+                          <Check size={13} /> {!mobile && 'Salvar'}
                         </button>
                       ) : (
                         <button onClick={() => startEdit(m.chave, m)}
                           style={{ background: '#F4F6F8', border: 'none', borderRadius: 8,
-                            padding: '6px 10px', cursor: 'pointer',
-                            display: 'flex', alignItems: 'center', gap: 5, color: '#8A9BB0', fontSize: 12 }}>
-                          <Edit2 size={12} /> Editar
+                            padding: mobile ? '5px 8px' : '6px 10px', cursor: 'pointer',
+                            display: 'flex', alignItems: 'center', gap: 4, color: '#8A9BB0', fontSize: 12 }}>
+                          <Edit2 size={12} /> {!mobile && 'Editar'}
                         </button>
                       )}
                     </td>

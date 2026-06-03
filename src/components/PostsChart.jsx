@@ -83,17 +83,17 @@ export default function PostsChart() {
           <p style={{ color: '#8A9BB0', fontSize: 14 }}>Nenhum post no período</p>
         </div>
       ) : (
-        <div className="chart-wrapper"><ResponsiveContainer width="100%" height={220}>
-          <BarChart data={data} margin={{ top: 4, right: 16, left: 0, bottom: 0 }}>
+        <div className="chart-wrapper"><ResponsiveContainer width="100%" height={mobile ? 160 : 220}>
+          <BarChart data={data} margin={{ top: 4, right: mobile ? 4 : 16, left: 0, bottom: 0 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#F0F2F5" vertical={false} />
-            <XAxis dataKey="label" tick={{ fontSize: 11, fill: '#8A9BB0' }} axisLine={false} tickLine={false} />
-            <YAxis tickFormatter={fmt} tick={{ fontSize: 11, fill: '#8A9BB0' }} axisLine={false} tickLine={false} width={44} />
+            <XAxis dataKey="label" tick={{ fontSize: mobile ? 9 : 11, fill: '#8A9BB0' }} axisLine={false} tickLine={false} />
+            <YAxis tickFormatter={fmt} tick={{ fontSize: mobile ? 9 : 11, fill: '#8A9BB0' }} axisLine={false} tickLine={false} width={mobile ? 32 : 44} />
             <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(0,0,0,0.03)', radius: 6 }} />
             {media > 0 && (
               <ReferenceLine y={media} stroke="#8A9BB0" strokeDasharray="5 3" strokeWidth={1.5}
                 label={mobile ? undefined : { value: `${fmt(media)}`, position: 'right', fill: '#8A9BB0', fontSize: 11 }} />
             )}
-            <Bar dataKey="contas_alcancadas" radius={[6, 6, 0, 0]} maxBarSize={44}>
+            <Bar dataKey="contas_alcancadas" radius={[4, 4, 0, 0]} maxBarSize={mobile ? 28 : 44}>
               {data.map((entry) => (
                 <Cell
                   key={entry.id}

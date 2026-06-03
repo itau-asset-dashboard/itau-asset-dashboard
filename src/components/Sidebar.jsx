@@ -15,9 +15,8 @@ const NAV_GROUPS = [
   {
     label: 'CONTEÚDO',
     items: [
-      { id: 'posts',   icon: List,        label: 'Todos os Posts' },
-      { id: 'stories', icon: PlaySquare,  label: 'Stories' },
-      { id: 'upload',  icon: Upload,      label: 'Upload' },
+      { id: 'posts',   icon: List,       label: 'Todos os Posts' },
+      { id: 'stories', icon: PlaySquare, label: 'Stories' },
     ],
   },
   {

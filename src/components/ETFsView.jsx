@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useIsMobile } from '../utils/useIsMobile'
 import { useStore } from '../store/useStore'
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, Legend,
@@ -27,6 +28,7 @@ const ETF_TEMAS  = ['ETFs']
 
 export default function ETFsView() {
   const { posts: allPosts, mesFiltro, updatePost, deletePost } = useStore()
+  const mobile = useIsMobile()
   const ano = mesFiltro?.split('/')?.[1] || '2026'
 
   // ── view mode ──────────────────────────────────────
@@ -214,26 +216,28 @@ export default function ETFsView() {
         <div className="card" style={{ padding:'22px' }}>
           <p style={{ color:'#1C252E', fontSize:15, fontWeight:700, marginBottom:4 }}>Evolução mensal</p>
           <p style={{ color:'#9AAAB8', fontSize:12, marginBottom:20 }}>Alcance e volume de posts ETF por mês em {ano}</p>
-          <div className="chart-wrapper"><ResponsiveContainer width="100%" height={240}>
-            <BarChart data={byMonth} margin={{top:16,right:8,left:0,bottom:0}} barGap={4}>
-              <XAxis dataKey="mes" tick={{ fill:'#9AAAB8', fontSize:11 }} axisLine={false} tickLine={false}/>
+          <div className="chart-wrapper"><ResponsiveContainer width="100%" height={mobile ? 160 : 240}>
+            <BarChart data={byMonth} margin={{top:16, right: mobile ? 4 : 8, left:0, bottom:0}} barGap={4}>
+              <XAxis dataKey="mes" tick={{ fill:'#9AAAB8', fontSize: mobile ? 9 : 11 }} axisLine={false} tickLine={false}/>
               <YAxis yAxisId="left" tick={{ fill:'#9AAAB8', fontSize:10 }} axisLine={false} tickLine={false}
-                tickFormatter={v=>v===0?'':fmt(v)} width={44}/>
-              <YAxis yAxisId="right" orientation="right" tick={{ fill:'#9AAAB8', fontSize:10 }}
-                axisLine={false} tickLine={false} width={24}
-                tickFormatter={v=>v===0?'':v} allowDecimals={false}/>
+                tickFormatter={v=>v===0?'':fmt(v)} width={mobile ? 34 : 44}/>
+              {!mobile && (
+                <YAxis yAxisId="right" orientation="right" tick={{ fill:'#9AAAB8', fontSize:10 }}
+                  axisLine={false} tickLine={false} width={24}
+                  tickFormatter={v=>v===0?'':v} allowDecimals={false}/>
+              )}
               <Tooltip
                 formatter={(v,name) => name==='alcance' ? [fmt(v),'Alcance'] : [v,'Nº de posts']}
                 labelFormatter={(_,p) => p?.[0]?.payload?.mesFull || ''}
                 contentStyle={{ borderRadius:10, border:'1px solid #EAECF0', fontSize:12, boxShadow:'0 4px 16px rgba(0,0,0,0.08)' }}
               />
-              <Legend formatter={v => v==='alcance'?'Alcance':'Nº de posts'} wrapperStyle={{ fontSize:12, color:'#9AAAB8' }}/>
-              <Bar yAxisId="left" dataKey="alcance" radius={[8,8,0,0]} barSize={22}>
+              {!mobile && <Legend formatter={v => v==='alcance'?'Alcance':'Nº de posts'} wrapperStyle={{ fontSize:12, color:'#9AAAB8' }}/>}
+              <Bar yAxisId="left" dataKey="alcance" radius={[6,6,0,0]} barSize={mobile ? 16 : 22}>
                 {byMonth.map((e,i) => (
                   <Cell key={i} fill={e.alcance>0?'#0891B2':'#F0F2F5'}/>
                 ))}
               </Bar>
-              <Bar yAxisId="right" dataKey="posts" radius={[6,6,0,0]} fill="rgba(8,145,178,0.18)" barSize={14}/>
+              {!mobile && <Bar yAxisId="right" dataKey="posts" radius={[6,6,0,0]} fill="rgba(8,145,178,0.18)" barSize={14}/>}
             </BarChart>
           </ResponsiveContainer></div>
         </div>

@@ -34,7 +34,7 @@ export default function TopBar() {
 
   const posts = getPostsDoMes()
   const section = TITLES[activeSection] || TITLES['visao-anual']
-  const showMesFiltro = activeSection === 'visao-geral' || activeSection === 'posts' || activeSection === 'insights'
+  const showMesFiltro = activeSection === 'visao-geral' || activeSection === 'posts'
 
   function exportCSV() {
     const headers = ['Data','Tipo','Tema','Contas Alcançadas','Visualizações','Curtidas','Comentários','Salvamentos','Compartilhamentos','Status']

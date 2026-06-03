@@ -23,6 +23,10 @@ export default function App() {
   const { activeSection, syncFromCloud } = useStore()
 
   useEffect(() => {
+    document.querySelector('.content-scroll')?.scrollTo({ top: 0, behavior: 'instant' })
+  }, [activeSection])
+
+  useEffect(() => {
     // Sync inicial
     syncFromCloud()
 
