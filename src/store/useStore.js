@@ -36,7 +36,7 @@ export const useStore = create(
             fetchSetting('meta_mensal'),
             fetchSetting('meta_anual'),
             fetchSetting('oliver_data'),
-            fetchSetting('data_evidencias'),   // mapa { postId: "DD/MM/YYYY" }
+            fetchSetting('data_evidencias'),
           ])
           // Preserva imageData local — nunca é salvo no Supabase (muito pesado)
           // Também normaliza o campo `tema` para array limpo
@@ -120,7 +120,7 @@ export const useStore = create(
       // ── Setters simples ────────────────────────────────
       setApiKey:          (key) => set({ apiKey: key }),
       setActiveSection:   (s)   => set({ activeSection: s }),
-      setEditMode:        (v)   => set({ isEditMode: v }),
+      setEditMode: (v) => set({ isEditMode: v }),
       setInsights:        (ins) => set({ insights: ins }),
       setLoadingInsights: (v)   => set({ loadingInsights: v }),
 
@@ -333,6 +333,7 @@ export const useStore = create(
         insights:    s.insights,
         apiKey:      s.apiKey,
         oliverData:  s.oliverData,
+        isEditMode:  s.isEditMode,
       }),
     }
   )
