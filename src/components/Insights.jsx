@@ -72,7 +72,7 @@ const SUGESTOES = [
 ]
 
 export default function Insights() {
-  const { insights, loadingInsights, setInsights, setLoadingInsights, apiKey, posts, metaMensal, metaAnual, mesFiltro } = useStore()
+  const { insights, loadingInsights, setInsights, setLoadingInsights, apiKey, posts, stories, metaMensal, metaAnual, mesFiltro } = useStore()
 
   // ── Insights automáticos ──────────────────────────────
   const allPosts = posts
@@ -113,7 +113,7 @@ export default function Insights() {
     setChatError(null)
 
     try {
-      const reply = await chatWithData(updated, allPosts, metaMensal, metaAnual, mesFiltro, apiKey)
+      const reply = await chatWithData(updated, allPosts, stories, metaMensal, metaAnual, mesFiltro, apiKey)
       setChatMessages(prev => [...prev, { role: 'assistant', content: reply }])
     } catch(e) {
       setChatError('Erro ao obter resposta: ' + e.message)

@@ -191,7 +191,7 @@ Retorne APENAS um JSON válido com exatamente 3 objetos (sem markdown, sem texto
   return parseJsonResponse(data.content?.[0]?.text || '')
 }
 
-export async function chatWithData(messages, posts, metaMensal, metaAnual, mesFiltro, apiKey) {
+export async function chatWithData(messages, posts, stories, metaMensal, metaAnual, mesFiltro, apiKey) {
   const resumo = posts.map(p => ({
     nome: p.nome,
     data: p.data_post,
@@ -206,6 +206,15 @@ export async function chatWithData(messages, posts, metaMensal, metaAnual, mesFi
     status: p.status,
   }))
 
+  const resumoStories = stories.map(s => ({
+    nome: s.nome,
+    data: s.data,
+    grupo: s.grupo || null,
+    visualizacoes: s.visualizacoes,
+    interacoes: s.interacoes,
+    atividade_perfil: s.atividade_perfil,
+  }))
+
   const systemPrompt = `Você é uma especialista sênior em redes sociais para o mercado financeiro, responsável pela performance do Instagram @itauasset da Itaú Asset Management.
 
 Você tem acesso completo aos dados de performance do dashboard e responde com profundidade analítica, como uma consultora que conhece cada post, cada número e o contexto do mercado financeiro.
@@ -214,10 +223,14 @@ CONTEXTO DO DASHBOARD:
 - Período filtrado: ${mesFiltro}
 - Meta mensal ajustada: ${metaMensal?.toLocaleString('pt-BR')} contas alcançadas
 - Meta anual: ${metaAnual?.toLocaleString('pt-BR')} contas alcançadas
-- Posts na base: ${posts.length}
+- Posts de feed na base: ${posts.length}
+- Stories na base: ${stories.length}
 
-DADOS DOS POSTS:
+DADOS DOS POSTS (FEED):
 ${JSON.stringify(resumo, null, 2)}
+
+DADOS DOS STORIES:
+${resumoStories.length > 0 ? JSON.stringify(resumoStories, null, 2) : 'Nenhum story cadastrado ainda.'}
 
 DIRETRIZES DE RESPOSTA:
 - Use **negrito** para destacar dados importantes, nomes de posts e conclusões
