@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Plus, ChevronDown, ChevronUp, Eye, Zap, UserCheck, Search, X, ImageOff } from 'lucide-react'
+import { Plus, ChevronDown, ChevronUp, Eye, Zap, UserCheck, Search, X } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import StoryUploadModal from './StoryUploadModal'
 import ImageLightbox from './ImageLightbox'
@@ -31,7 +31,6 @@ function MetricBadge({ label, value, color }) {
 
 function StoryRow({ story, grupos, onEdit, isEditMode }) {
   const [lightbox, setLightbox] = useState(false)
-  const imgSrc = story.imageUrl
   return (
     <div
       onClick={() => isEditMode && onEdit(story)}
@@ -43,26 +42,15 @@ function StoryRow({ story, grupos, onEdit, isEditMode }) {
       onMouseEnter={e => isEditMode && (e.currentTarget.style.background = '#FAFCFE')}
       onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
     >
-      {/* Thumbnail */}
-      <div
-        onClick={e => { e.stopPropagation(); if (story.imageUrl || story.imageData) setLightbox(true) }}
-        style={{
-          width: 40, height: 40, borderRadius: 8, flexShrink: 0,
-          background: '#F8FAFC',
-          overflow: 'hidden',
-          border: '1.5px solid #EAECF0',
-          cursor: imgSrc ? 'zoom-in' : 'default',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-        }}>
-        <ImageOff size={13} color="#D0D8E4" strokeWidth={1.5} />
-      </div>
+      {/* Dot */}
+      <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#E2E8F0', flexShrink: 0 }} />
 
       {/* Info */}
       <div style={{ flex: 1, minWidth: 0 }}>
         <p style={{ color: '#182638', fontSize: 13, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
           {story.nome || '—'}
         </p>
-        <p style={{ color: '#9AAAB8', fontSize: 11, marginTop: 1 }}>{story.data || '—'}</p>
+        <p style={{ color: '#9AAAB8', fontSize: 11, marginTop: 2 }}>{story.data || '—'}</p>
       </div>
 
       {/* Métricas */}
@@ -72,8 +60,8 @@ function StoryRow({ story, grupos, onEdit, isEditMode }) {
         <MetricBadge label="Ativ. perfil" value={story.atividade_perfil} color="#059669" />
       </div>
 
-      {lightbox && imgSrc && (
-        <ImageLightbox src={story.imageUrl || story.imageData} title={story.nome || 'Story'} onClose={() => setLightbox(false)} />
+      {lightbox && story.imageUrl && (
+        <ImageLightbox src={story.imageUrl} title={story.nome || 'Story'} onClose={() => setLightbox(false)} />
       )}
     </div>
   )
