@@ -107,10 +107,14 @@ const STORY_COLUMNS = [
   'image_url','status',
 ]
 
+const STORY_INT_COLS = ['visualizacoes','interacoes','atividade_perfil','contas_alcancadas','respostas','toques_avancar','toques_retroceder','saidas']
+
 export async function upsertStory(story) {
   const { imageData, imageUrl, imagePreview, ...rest } = story
   const clean = Object.fromEntries(
-    Object.entries(rest).filter(([k]) => STORY_COLUMNS.includes(k))
+    Object.entries(rest)
+      .filter(([k]) => STORY_COLUMNS.includes(k))
+      .map(([k, v]) => [k, STORY_INT_COLS.includes(k) ? (Number(v) || null) : (v === '' ? null : v)])
   )
   const body = { ...clean, image_url: imageUrl || null }
   const response = await fetch(`${url}/rest/v1/stories`, {
