@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Plus, ChevronDown, ChevronUp, Eye, Users, Zap, UserCheck, Search, X } from 'lucide-react'
+import { Plus, ChevronDown, ChevronUp, Eye, Zap, UserCheck, Search, X } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import StoryUploadModal from './StoryUploadModal'
 import ImageLightbox from './ImageLightbox'
@@ -70,7 +70,7 @@ function StoryRow({ story, grupos, onEdit, isEditMode }) {
       <div style={{ display: 'flex', gap: 20, flexShrink: 0 }}>
         <MetricBadge label="Visual." value={story.visualizacoes} color="#0891B2" />
         <MetricBadge label="Interações" value={story.interacoes} color="#F97316" />
-        <MetricBadge label="Alcance" value={story.contas_alcancadas} color="#7C3AED" />
+        <MetricBadge label="Ativ. perfil" value={story.atividade_perfil} color="#059669" />
       </div>
 
       {lightbox && (story.imageUrl || story.imageData) && (
@@ -101,7 +101,7 @@ function GrupoCard({ nome, stories, isEditMode, onEdit }) {
         <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
           <MetricBadge label="Visual." value={total('visualizacoes')} color="#0891B2" />
           <MetricBadge label="Interações" value={total('interacoes')} color="#F97316" />
-          <MetricBadge label="Alcance" value={total('contas_alcancadas')} color="#7C3AED" />
+          <MetricBadge label="Ativ. perfil" value={total('atividade_perfil')} color="#059669" />
           {open ? <ChevronUp size={15} color="#9AAAB8" /> : <ChevronDown size={15} color="#9AAAB8" />}
         </div>
       </div>
@@ -142,11 +142,10 @@ export default function StoriesView() {
   const sorted = [...filtered].sort((a, b) => parseDate(b.data) - parseDate(a.data))
 
   // KPIs
-  const kpiTotal    = (k) => sorted.reduce((s, st) => s + (st[k] || 0), 0)
-  const totalViews  = kpiTotal('visualizacoes')
-  const totalInter  = kpiTotal('interacoes')
-  const totalAlc    = kpiTotal('contas_alcancadas')
-  const totalPerf   = kpiTotal('atividade_perfil')
+  const kpiTotal   = (k) => sorted.reduce((s, st) => s + (st[k] || 0), 0)
+  const totalViews = kpiTotal('visualizacoes')
+  const totalInter = kpiTotal('interacoes')
+  const totalPerf  = kpiTotal('atividade_perfil')
 
   // Grupos
   const gruposNomes = [...new Set(stories.filter(s => s.grupo).map(s => s.grupo))].sort()
@@ -158,7 +157,6 @@ export default function StoriesView() {
 
   const KPIS = [
     { label: 'Visualizações',    value: totalViews, icon: Eye,       color: '#0891B2', bg: 'rgba(8,145,178,0.08)' },
-    { label: 'Alcance',          value: totalAlc,   icon: Users,     color: '#7C3AED', bg: 'rgba(124,58,237,0.08)' },
     { label: 'Interações',       value: totalInter, icon: Zap,       color: '#F97316', bg: 'rgba(249,115,22,0.08)' },
     { label: 'Atividade perfil', value: totalPerf,  icon: UserCheck, color: '#059669', bg: 'rgba(5,150,105,0.08)' },
   ]

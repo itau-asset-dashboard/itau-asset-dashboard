@@ -120,12 +120,7 @@ Retorne APENAS um JSON válido (sem markdown, sem texto fora do JSON):
   "data": "DD/MM/AAAA ou null",
   "visualizacoes": número inteiro ou null,
   "interacoes": número inteiro ou null,
-  "atividade_perfil": número inteiro ou null,
-  "contas_alcancadas": número inteiro ou null,
-  "respostas": número inteiro ou null,
-  "toques_avancar": número inteiro ou null,
-  "toques_retroceder": número inteiro ou null,
-  "saidas": número inteiro ou null
+  "atividade_perfil": número inteiro ou null
 }
 Use null para qualquer campo não encontrado. Não invente valores.`
           }

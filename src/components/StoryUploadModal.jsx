@@ -5,15 +5,12 @@ import { useStore } from '../store/useStore'
 import ImageLightbox from './ImageLightbox'
 
 const NUM_FIELDS = [
-  { key: 'visualizacoes',     label: 'Visualizações',         highlight: true },
-  { key: 'contas_alcancadas', label: 'Contas alcançadas',      highlight: false },
-  { key: 'interacoes',        label: 'Interações',             highlight: false },
-  { key: 'atividade_perfil',  label: 'Atividade do perfil',    highlight: false },
-  { key: 'respostas',         label: 'Respostas',              highlight: false },
-  { key: 'toques_avancar',    label: 'Toques para avançar',    highlight: false },
-  { key: 'toques_retroceder', label: 'Toques para retroceder', highlight: false },
-  { key: 'saidas',            label: 'Saídas',                 highlight: false },
+  { key: 'visualizacoes',    label: 'Visualizações',        highlight: true },
+  { key: 'interacoes',       label: 'Interações',           highlight: false },
+  { key: 'atividade_perfil', label: 'Atividade do perfil',  highlight: false },
 ]
+
+const DEFAULT_GRUPOS = ['Ativações feed', 'Eventos', 'Ações para stories']
 
 const EMPTY = {
   nome: '', data: '', grupo: '',
@@ -192,7 +189,7 @@ const SingleStoryForm = forwardRef(function SingleStoryForm(
           <div style={{ display: 'flex', gap: 8 }}>
             <select value={form.grupo || ''} onChange={e => set('grupo', e.target.value)} style={{ ...inp(false), flex: 1, background: '#fff' }}>
               <option value="">Sem grupo (story solto)</option>
-              {grupos.map(g => <option key={g} value={g}>{g}</option>)}
+              {[...new Set([...DEFAULT_GRUPOS, ...grupos])].map(g => <option key={g} value={g}>{g}</option>)}
             </select>
             <button onClick={() => { setNovoGrupo(true); set('grupo', '') }} style={{ background: '#F4F6F8', border: 'none', borderRadius: 9, padding: '8px 12px', cursor: 'pointer', fontSize: 12, color: '#1C252E', whiteSpace: 'nowrap' }}>+ Novo grupo</button>
           </div>
@@ -287,7 +284,7 @@ function EditStoryModal({ story, grupos, onClose, onSave, onDelete }) {
         {novoGrupo ? (
           <div style={{ display: 'flex', gap: 8 }}><input value={form.grupo || ''} onChange={e => set('grupo', e.target.value)} placeholder="Nome do grupo" style={{ ...inp(false), flex: 1 }} autoFocus /><button onClick={() => setNovoGrupo(false)} style={{ background: '#F4F6F8', border: 'none', borderRadius: 9, padding: '8px 12px', cursor: 'pointer', fontSize: 12, color: '#8A9BB0' }}>Cancelar</button></div>
         ) : (
-          <div style={{ display: 'flex', gap: 8 }}><select value={form.grupo || ''} onChange={e => set('grupo', e.target.value)} style={{ ...inp(false), flex: 1, background: '#fff' }}><option value="">Sem grupo</option>{grupos.map(g => <option key={g} value={g}>{g}</option>)}</select><button onClick={() => { setNovoGrupo(true); set('grupo', '') }} style={{ background: '#F4F6F8', border: 'none', borderRadius: 9, padding: '8px 12px', cursor: 'pointer', fontSize: 12, color: '#1C252E', whiteSpace: 'nowrap' }}>+ Novo grupo</button></div>
+          <div style={{ display: 'flex', gap: 8 }}><select value={form.grupo || ''} onChange={e => set('grupo', e.target.value)} style={{ ...inp(false), flex: 1, background: '#fff' }}><option value="">Sem grupo</option>{[...new Set([...DEFAULT_GRUPOS, ...grupos])].map(g => <option key={g} value={g}>{g}</option>)}</select><button onClick={() => { setNovoGrupo(true); set('grupo', '') }} style={{ background: '#F4F6F8', border: 'none', borderRadius: 9, padding: '8px 12px', cursor: 'pointer', fontSize: 12, color: '#1C252E', whiteSpace: 'nowrap' }}>+ Novo grupo</button></div>
         )}
       </div>
       <div><p style={{ color: '#8A9BB0', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 10 }}>Métricas</p>
