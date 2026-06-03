@@ -271,7 +271,7 @@ export default function StoriesView() {
           mode="new"
           grupos={gruposNomes}
           onClose={() => setUploadOpen(false)}
-          onSave={dados => { addStory(dados); setUploadOpen(false) }}
+          onSave={dados => { addStory(dados) }}
         />
       )}
       {editTarget && (

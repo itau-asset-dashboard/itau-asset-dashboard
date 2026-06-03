@@ -383,15 +383,16 @@ export const useStore = create(
     {
       name: 'itau-asset-instagram',
       partialize: (s) => ({
-        posts:       s.posts,
-        stories:     s.stories,
-        metaMensal:  s.metaMensal,
-        metaAnual:   s.metaAnual,
-        mesFiltro:   s.mesFiltro,
-        insights:    s.insights,
-        apiKey:      s.apiKey,
-        oliverData:  s.oliverData,
-        isEditMode:  s.isEditMode,
+        posts:          s.posts,
+        stories:        s.stories,
+        metaMensal:     s.metaMensal,
+        metaAnual:      s.metaAnual,
+        mesFiltro:      s.mesFiltro,
+        insights:       s.insights,
+        apiKey:         s.apiKey,
+        oliverData:     s.oliverData,
+        isEditMode:     s.isEditMode,
+        activeSection:  s.activeSection,
       }),
     }
   )
