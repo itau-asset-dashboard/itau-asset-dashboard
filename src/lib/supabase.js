@@ -130,8 +130,17 @@ export async function upsertStory(story) {
 }
 
 export async function removeStory(id) {
-  const { error } = await supabase.from('stories').delete().eq('id', id)
-  if (error) throw error
+  const response = await fetch(`${url}/rest/v1/stories?id=eq.${id}`, {
+    method: 'DELETE',
+    headers: {
+      'apikey': key,
+      'Authorization': `Bearer ${key}`,
+    },
+  })
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({}))
+    throw new Error(err.message || `Erro ${response.status}`)
+  }
 }
 
 export async function deleteStoryImage(storyId) {
