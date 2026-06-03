@@ -112,7 +112,9 @@ export async function upsertStory(story) {
   const clean = Object.fromEntries(
     Object.entries(rest).filter(([k]) => STORY_COLUMNS.includes(k))
   )
-  const { error } = await supabase.from('stories').upsert({ ...clean, image_url: imageUrl || null })
+  const { error } = await supabase
+    .from('stories')
+    .upsert({ ...clean, image_url: imageUrl || null }, { onConflict: 'id' })
   if (error) throw error
 }
 

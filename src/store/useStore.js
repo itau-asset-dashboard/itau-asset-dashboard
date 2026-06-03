@@ -105,7 +105,7 @@ export const useStore = create(
 
           // Reenviar órfãos para o Supabase
           if (orphanStories.length > 0) {
-            orphanStories.forEach(s => { try { upsertStory(s) } catch (_) {} })
+            orphanStories.forEach(s => { upsertStory(s).catch(() => {}) })
           }
 
           set({
