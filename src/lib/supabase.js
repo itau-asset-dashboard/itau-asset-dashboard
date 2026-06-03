@@ -112,10 +112,21 @@ export async function upsertStory(story) {
   const clean = Object.fromEntries(
     Object.entries(rest).filter(([k]) => STORY_COLUMNS.includes(k))
   )
-  const { error } = await supabase
-    .from('stories')
-    .upsert({ ...clean, image_url: imageUrl || null }, { onConflict: 'id' })
-  if (error) throw error
+  const body = { ...clean, image_url: imageUrl || null }
+  const response = await fetch(`${url}/rest/v1/stories`, {
+    method: 'POST',
+    headers: {
+      'apikey': key,
+      'Authorization': `Bearer ${key}`,
+      'Content-Type': 'application/json',
+      'Prefer': 'resolution=merge-duplicates',
+    },
+    body: JSON.stringify(body),
+  })
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({}))
+    throw new Error(err.message || `Erro ${response.status}`)
+  }
 }
 
 export async function removeStory(id) {
