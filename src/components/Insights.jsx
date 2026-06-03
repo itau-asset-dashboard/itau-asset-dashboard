@@ -1,5 +1,5 @@
 import { useRef, useEffect, useState } from 'react'
-import { RefreshCw, Send, Trash2 } from 'lucide-react'
+import { RefreshCw, Send, Trash2, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useIsMobile } from '../utils/useIsMobile'
 
 // Renderer simples de markdown para respostas da IA
@@ -84,12 +84,16 @@ export default function Insights() {
     if (!apiKey) { alert('Configure sua chave da API Anthropic primeiro.'); return }
     if (allPosts.length < 2) { alert('Adicione pelo menos 2 posts para gerar insights.'); return }
     setLoadingInsights(true)
-    try { setInsights(await generateInsights(allPosts, apiKey)) }
+    try { setInsights(await generateInsights(allPosts, apiKey)); setInsightPage(0) }
     catch(e) { alert('Não foi possível gerar insights: ' + e.message) }
     finally { setLoadingInsights(false) }
   }
 
-  const list = insights.length > 0 ? insights : DEFAULT
+  const fullList = insights.length > 0 ? insights : DEFAULT
+  const [insightPage, setInsightPage] = useState(0)
+  const INSIGHTS_PER_PAGE = 4
+  const totalInsightPages = Math.ceil(fullList.length / INSIGHTS_PER_PAGE)
+  const list = fullList.slice(insightPage * INSIGHTS_PER_PAGE, insightPage * INSIGHTS_PER_PAGE + INSIGHTS_PER_PAGE)
   const mobile = useIsMobile()
 
   // ── Chat ──────────────────────────────────────────────
@@ -157,12 +161,26 @@ export default function Insights() {
 
         <div className="insights-grid" style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(270px,1fr))', gap:12 }}>
           {list.map((ins,i) => (
-            <div key={i} className="card" style={{ padding:'18px 20px' }}>
+            <div key={insightPage * INSIGHTS_PER_PAGE + i} className="card" style={{ padding:'18px 20px' }}>
               <p style={{ color:'#182638', fontWeight:600, fontSize:13, marginBottom:6 }}>{ins.titulo}</p>
               <p style={{ color:'#8A9BB0', fontSize:12, lineHeight:1.65 }}>{ins.texto}</p>
             </div>
           ))}
         </div>
+
+        {totalInsightPages > 1 && (
+          <div style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:12, marginTop:4 }}>
+            <button onClick={() => setInsightPage(p => Math.max(0, p-1))} disabled={insightPage === 0}
+              style={{ background:'#F4F6F8', border:'none', borderRadius:8, padding:'5px 10px', cursor:'pointer', opacity: insightPage === 0 ? 0.4 : 1 }}>
+              <ChevronLeft size={15} color="#1C252E"/>
+            </button>
+            <span style={{ color:'#8A9BB0', fontSize:12 }}>{insightPage + 1} / {totalInsightPages}</span>
+            <button onClick={() => setInsightPage(p => Math.min(totalInsightPages-1, p+1))} disabled={insightPage === totalInsightPages-1}
+              style={{ background:'#F4F6F8', border:'none', borderRadius:8, padding:'5px 10px', cursor:'pointer', opacity: insightPage === totalInsightPages-1 ? 0.4 : 1 }}>
+              <ChevronRight size={15} color="#1C252E"/>
+            </button>
+          </div>
+        )}
       </div>
 
       {/* ── Chat ── */}

@@ -53,11 +53,14 @@ export default function KPICards() {
     <style>{`
       @media (max-width: 768px) {
         .kpi-grid-js { grid-template-columns: repeat(2,1fr) !important; gap: 8px !important; }
-        .kpi-card-js { padding: 11px 11px !important; }
-        .kpi-label-js { font-size: 9px !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; margin-bottom: 7px !important; }
-        .kpi-number-js { font-size: 19px !important; margin-bottom: 3px !important; }
-        .kpi-sub-js { font-size: 9px !important; }
+        .kpi-card-js { padding: 10px !important; }
+        .kpi-label-js { font-size: 8px !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; margin-bottom: 5px !important; }
+        .kpi-number-js { font-size: 16px !important; margin-bottom: 2px !important; }
+        .kpi-sub-js { font-size: 8px !important; }
         .kpi-icon-js { display: none !important; }
+      }
+      @media (max-width: 390px) {
+        .kpi-number-js { font-size: 14px !important; }
       }
     `}</style>
     <div className="kpi-grid-js" style={{

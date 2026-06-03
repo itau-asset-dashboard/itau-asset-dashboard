@@ -109,7 +109,7 @@ export default function AnnualView() {
     <div style={{ display:'flex', flexDirection:'column', gap:16 }}>
 
       {/* ── KPI Cards ── */}
-      <style>{`@media(max-width:768px){.kpi-grid-js{grid-template-columns:repeat(2,1fr)!important;gap:8px!important}.kpi-card-js{padding:11px 11px!important}.kpi-label-js{font-size:9px!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;margin-bottom:7px!important}.kpi-number-js{font-size:19px!important;margin-bottom:3px!important}.kpi-sub-js{font-size:9px!important}.kpi-icon-js{display:none!important}}`}</style>
+      <style>{`@media(max-width:768px){.kpi-grid-js{grid-template-columns:repeat(2,1fr)!important;gap:8px!important}.kpi-card-js{padding:10px!important}.kpi-label-js{font-size:8px!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;margin-bottom:5px!important}.kpi-number-js{font-size:16px!important;margin-bottom:2px!important}.kpi-sub-js{font-size:8px!important}.kpi-icon-js{display:none!important}}@media(max-width:390px){.kpi-number-js{font-size:14px!important}}`}</style>
       <div className="kpi-grid-js" style={{
         display:'grid',
         gridTemplateColumns: mobile ? 'repeat(2,1fr)' : 'repeat(4,1fr)',
@@ -181,25 +181,27 @@ export default function AnnualView() {
               </p>
             </div>
           </div>
-          <div className="chart-wrapper"><ResponsiveContainer width="100%" height={230}>
-            <BarChart data={byMonth} barSize={28} margin={{top:18,right:8,left:0,bottom:0}}>
-              <XAxis dataKey="mes" tick={{ fill:'#9AAAB8', fontSize:11 }} axisLine={false} tickLine={false}/>
+          <div className="chart-wrapper"><ResponsiveContainer width="100%" height={mobile ? 170 : 230}>
+            <BarChart data={byMonth} barSize={mobile ? 16 : 28} margin={{top: mobile ? 4 : 18, right:8, left:0, bottom:0}}>
+              <XAxis dataKey="mes" tick={{ fill:'#9AAAB8', fontSize: mobile ? 9 : 11 }} axisLine={false} tickLine={false}/>
               <YAxis tick={{ fill:'#9AAAB8', fontSize:10 }} axisLine={false} tickLine={false}
-                tickFormatter={v=>v===0?'':fmt(v)} width={44}/>
+                tickFormatter={v=>v===0?'':fmt(v)} width={mobile ? 36 : 44}/>
               <Tooltip
                 formatter={(v,_,p)=>[fmt(v), `${p.payload.mesFull} · ${p.payload.count} posts · meta ${fmt(p.payload.meta)}`]}
                 contentStyle={{ borderRadius:10, border:'1px solid #EAECF0', fontSize:12, boxShadow:'0 4px 16px rgba(0,0,0,0.08)' }}
                 labelStyle={{ display:'none' }}
                 cursor={{ fill:'rgba(0,0,0,0.04)' }}
               />
-              <Bar dataKey="total" radius={[8,8,0,0]}>
+              <Bar dataKey="total" radius={[6,6,0,0]}>
                 {byMonth.map((entry,i)=>(
                   <Cell key={i}
                     fill={entry.total === 0 ? '#F0F2F5' : entry.total >= entry.meta ? '#F97316' : '#C3EBF7'}
                   />
                 ))}
-                <LabelList dataKey="total" position="top" formatter={v=>v>0?fmt(v):''}
-                  style={{ fill:'#9AAAB8', fontSize:9, fontWeight:600 }}/>
+                {!mobile && (
+                  <LabelList dataKey="total" position="top" formatter={v=>v>0?fmt(v):''}
+                    style={{ fill:'#9AAAB8', fontSize:9, fontWeight:600 }}/>
+                )}
               </Bar>
             </BarChart>
           </ResponsiveContainer></div>

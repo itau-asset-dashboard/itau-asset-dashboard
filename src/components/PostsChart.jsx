@@ -91,7 +91,7 @@ export default function PostsChart() {
             <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(0,0,0,0.03)', radius: 6 }} />
             {media > 0 && (
               <ReferenceLine y={media} stroke="#8A9BB0" strokeDasharray="5 3" strokeWidth={1.5}
-                label={{ value: `${fmt(media)}`, position: 'right', fill: '#8A9BB0', fontSize: 11 }} />
+                label={mobile ? undefined : { value: `${fmt(media)}`, position: 'right', fill: '#8A9BB0', fontSize: 11 }} />
             )}
             <Bar dataKey="contas_alcancadas" radius={[6, 6, 0, 0]} maxBarSize={44}>
               {data.map((entry) => (
