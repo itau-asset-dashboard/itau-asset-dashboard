@@ -80,7 +80,7 @@ function fileToName(filename) {
     .trim()
 }
 
-async function compressImage(dataUrl, maxPx = 800, quality = 0.72) {
+async function compressImage(dataUrl, maxPx = 1400, quality = 0.90) {
   return new Promise(resolve => {
     const timer = setTimeout(() => resolve(dataUrl), 8000) // timeout 8s
     const img = new Image()
@@ -285,6 +285,16 @@ const SinglePostModal = forwardRef(function SinglePostModal({ initialPost, initi
           </div>
         )}
       </div>
+
+      {/* Aviso de qualidade — quando a imagem vem do Storage (comprimida pelo sync antigo) */}
+      {isUpdate && form.imageUrl && !preview?.startsWith('data:') && (
+        <div style={{ background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.2)', borderRadius: 9, padding: '8px 12px', display: 'flex', gap: 8, alignItems: 'flex-start' }}>
+          <span style={{ fontSize: 13, flexShrink: 0 }}>💡</span>
+          <p style={{ color: '#92400e', fontSize: 12, lineHeight: 1.5 }}>
+            Para melhorar a qualidade, substitua a imagem acima pelo print original do Instagram.
+          </p>
+        </div>
+      )}
 
       {/* Botão extrair */}
       {preview && (

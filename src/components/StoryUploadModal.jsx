@@ -20,7 +20,7 @@ const EMPTY = {
   status: 'final', imageData: null,
 }
 
-async function compressImage(dataUrl, maxPx = 800, quality = 0.72) {
+async function compressImage(dataUrl, maxPx = 1400, quality = 0.90) {
   return new Promise(resolve => {
     const timer = setTimeout(() => resolve(dataUrl), 8000)
     const img = new Image()
