@@ -13,17 +13,15 @@ function fmt(n) {
 
 export default function MetaMensalBanner() {
   const mobile = useIsMobile()
-  if (!mobile) return null
-
   const { getPostsDoMes, posts: allPosts, metaAnual, mesFiltro } = useStore()
   const posts = getPostsDoMes()
   const total = posts.reduce((s, p) => s + (p.contas_alcancadas || 0), 0)
-
   const [mm, yyyy] = (mesFiltro || '').split('/')
   const meta = calcMetaMesProgressiva({ posts: allPosts, metaAnual, mm, yyyy })
   const pct  = meta > 0 ? Math.min((total / meta) * 100, 100) : 0
   const mesNome = MESES_NOMES[(parseInt(mm, 10) || 1) - 1]
 
+  if (!mobile) return null
   return (
     <div className="card" style={{ padding: '14px 16px', marginBottom: 4 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
