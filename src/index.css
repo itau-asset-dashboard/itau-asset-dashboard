@@ -72,7 +72,7 @@ html, body, #root {
   html, body, #root { height: auto; min-height: 100%; overflow: auto; }
 
   /* Layout */
-  .app-layout    { flex-direction: column; height: auto; min-height: 100dvh; padding-bottom: calc(68px + env(safe-area-inset-bottom)); overflow: visible; }
+  .app-layout    { flex-direction: column; height: auto; min-height: 100dvh; padding-bottom: calc(68px + env(safe-area-inset-bottom)); padding-top: env(safe-area-inset-top); overflow: visible; }
   .main-column   { height: auto; overflow: visible; }
   .content-scroll { padding: 12px 14px 28px; overflow: visible; }
 
