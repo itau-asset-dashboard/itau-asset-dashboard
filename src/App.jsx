@@ -18,6 +18,7 @@ import ETFsView from './components/ETFsView'
 import OliverView from './components/OliverView'
 import Glossario from './components/Glossario'
 import StoriesView from './components/StoriesView'
+import MetaMensalBanner from './components/MetaMensalBanner'
 
 export default function App() {
   const { activeSection, syncFromCloud } = useStore()
@@ -58,6 +59,7 @@ export default function App() {
           {activeSection === 'visao-geral' && (
             <>
               <KPICards />
+              <MetaMensalBanner />
               <TopPostsMes />
               <PostsChart />
               <TypeComparison />
