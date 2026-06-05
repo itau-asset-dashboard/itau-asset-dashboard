@@ -160,9 +160,9 @@ export default function ETFsView() {
             </div>
 
             {/* Pill participação */}
-            <div style={{ background:'rgba(8,145,178,0.08)', borderRadius:12, padding:'8px 16px', textAlign:'center' }}>
-              <p style={{ color:'#0891B2', fontSize:20, fontWeight:800, lineHeight:1 }}>{participacao.toFixed(1)}%</p>
-              <p style={{ color:'#9AAAB8', fontSize:11, marginTop:2 }}>do alcance total</p>
+            <div style={{ background:'rgba(8,145,178,0.08)', borderRadius:10, padding:'6px 12px', textAlign:'center', border:'1px solid rgba(8,145,178,0.12)' }}>
+              <p style={{ color:'#0891B2', fontSize:15, fontWeight:800, lineHeight:1 }}>{participacao.toFixed(1)}%</p>
+              <p style={{ color:'#9AAAB8', fontSize:10, marginTop:2, whiteSpace:'nowrap' }}>do alcance total</p>
             </div>
           </div>
         </div>
