@@ -1,0 +1,17 @@
+{
+  "name": "Itaú Asset · Instagram",
+  "short_name": "Asset IG",
+  "description": "Dashboard de performance do Instagram @itauasset",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#182638",
+  "theme_color": "#182638",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
