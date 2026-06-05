@@ -72,7 +72,7 @@ html, body, #root {
   html, body, #root { height: auto; min-height: 100%; overflow: auto; }
 
   /* Layout */
-  .app-layout    { flex-direction: column; height: auto; min-height: 100dvh; padding-bottom: 68px; overflow: visible; }
+  .app-layout    { flex-direction: column; height: auto; min-height: 100dvh; padding-bottom: calc(68px + env(safe-area-inset-bottom)); overflow: visible; }
   .main-column   { height: auto; overflow: visible; }
   .content-scroll { padding: 12px 14px 28px; overflow: visible; }
 
@@ -86,12 +86,15 @@ html, body, #root {
     position: fixed; bottom: 0; left: 0; right: 0;
     background: #fff;
     border-top: 1px solid #EDEFF2;
-    height: 60px; z-index: 200;
+    height: calc(60px + env(safe-area-inset-bottom));
+    padding-bottom: env(safe-area-inset-bottom);
+    z-index: 200;
     overflow-x: auto;
     overflow-y: hidden;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
-    padding: 0 2px;
+    padding-left: max(2px, env(safe-area-inset-left));
+    padding-right: max(2px, env(safe-area-inset-right));
   }
   .bottom-nav::-webkit-scrollbar { display: none; }
   .bottom-nav button { flex-shrink: 0; min-width: 58px; }
