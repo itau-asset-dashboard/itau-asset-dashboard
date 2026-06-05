@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Download, Key, Plus, Lock, Unlock, Eye } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import UploadModal from './UploadModal'
+import { useIsMobile } from '../utils/useIsMobile'
 
 
 const MESES_NOMES = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro']
@@ -25,6 +26,7 @@ const EDIT_PASSWORD = import.meta.env.VITE_EDIT_PASSWORD || 'itauasset2026'
 
 export default function TopBar() {
   const { mesFiltro, setMesFiltro, apiKey, setApiKey, getPostsDoMes, activeSection, addPost, isEditMode, setEditMode } = useStore()
+  const mobile = useIsMobile()
   const [showApi, setShowApi]         = useState(false)
   const [keyInput, setKeyInput]       = useState(apiKey)
   const [uploadOpen, setUploadOpen]   = useState(false)
@@ -105,8 +107,8 @@ export default function TopBar() {
           </button>
         )}
 
-        {/* API — só no modo edição */}
-        {isEditMode && (
+        {/* API — só no modo edição e desktop */}
+        {isEditMode && !mobile && (
           <div style={{ position: 'relative' }}>
             <button onClick={() => setShowApi(v => !v)}
               title={apiKey ? 'API ativa' : 'Sem API — clique para configurar'}
@@ -139,15 +141,17 @@ export default function TopBar() {
           </div>
         )}
 
-        {/* CSV */}
-        <button onClick={exportCSV} title="Exportar CSV"
-          style={{
-            background: '#fff', border: '1.5px solid #EDEFF2', borderRadius: 10,
-            padding: '7px 9px', color: '#4A5568', cursor: 'pointer',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-          }}>
-          <Download size={14} />
-        </button>
+        {/* CSV — só desktop */}
+        {!mobile && (
+          <button onClick={exportCSV} title="Exportar CSV"
+            style={{
+              background: '#fff', border: '1.5px solid #EDEFF2', borderRadius: 10,
+              padding: '7px 9px', color: '#4A5568', cursor: 'pointer',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>
+            <Download size={14} />
+          </button>
+        )}
 
         {/* Botão cadeado */}
         <div style={{ position: 'relative' }}>
