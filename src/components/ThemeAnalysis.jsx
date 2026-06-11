@@ -52,7 +52,7 @@ export default function ThemeAnalysis() {
                   {fmt(media)}
                 </span>
               </div>
-              <div style={{ background: '#F0F4F8', borderRadius: 999, height: 5, overflow: 'hidden' }}>
+              <div style={{ background: '#F0F4F8', borderRadius: 999, height: 6, overflow: 'hidden' }}>
                 <div style={{
                   width: `${barPct}%`, height: '100%',
                   background: isLider ? '#F97316' : '#C3EBF7',

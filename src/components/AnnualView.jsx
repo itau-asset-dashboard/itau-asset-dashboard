@@ -230,7 +230,7 @@ export default function AnnualView() {
                     <span style={{ color:'#9AAAB8', fontSize:11, marginLeft:6 }}>{t.count} posts</span>
                   </div>
                 </div>
-                <div style={{ background:'#F0F2F5', borderRadius:4, height:7, overflow:'hidden' }}>
+                <div style={{ background:'#F0F2F5', borderRadius:4, height:6, overflow:'hidden' }}>
                   <div style={{
                     height:'100%', borderRadius:4,
                     background: TIPO_COLOR[t.tipo]==='#C3EBF7' ? '#7ecde8' : TIPO_COLOR[t.tipo],

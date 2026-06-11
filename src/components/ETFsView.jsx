@@ -345,7 +345,7 @@ export default function ETFsView() {
                         fontWeight: isEtf?700:400 }}>{tema}</span>
                       <span style={{ color:'#9AAAB8', fontSize:11 }}>{fmt(val)}</span>
                     </div>
-                    <div style={{ background:'#F0F2F5', borderRadius:3, height:4, overflow:'hidden' }}>
+                    <div style={{ background:'#F0F2F5', borderRadius:3, height:6, overflow:'hidden' }}>
                       <div style={{ height:'100%', borderRadius:3,
                         background: isEtf?'#0891B2':'#D0D8E0',
                         width:`${(val/maxTema)*100}%`, transition:'width 0.5s' }}/>
