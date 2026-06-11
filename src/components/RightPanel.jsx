@@ -46,24 +46,12 @@ function EditableValue({ value, color, onSave }) {
 }
 
 export default function RightPanel() {
-  const { metaMensal, setMetaMensal, metaAnual, setMetaAnual, getPostsDoMes, posts: allPosts, addPost, updatePost, deletePost, mesFiltro } = useStore()
+  const { metaMensal, setMetaMensal, metaAnual, getPostsDoMes, posts: allPosts, updatePost, deletePost, mesFiltro } = useStore()
   const postsMes = getPostsDoMes()
-  const [uploadOpen, setUploadOpen]   = useState(false)
-  const [editTarget, setEditTarget]   = useState(null)
-
-  // Anual: todos os posts do ano do filtro
-  const anoFiltro = mesFiltro?.split('/')?.[1] || new Date().getFullYear().toString()
-  const postsAno = allPosts.filter(p => {
-    const parts = p.data_post?.split('/')
-    return parts?.[2] === anoFiltro
-  })
-
-  const totalAnual     = postsAno.reduce((s,p)=>s+(p.contas_alcancadas||0),0)
+  const [editTarget, setEditTarget] = useState(null)
   const totalMensal    = postsMes.reduce((s,p)=>s+(p.contas_alcancadas||0),0)
-  // Meta progressiva do mês filtrado: (metaAnual − total dos meses anteriores) ÷ meses restantes
   const [mmFiltro, yyyyFiltro] = (mesFiltro || '').split('/')
   const metaAjustada = calcMetaMesProgressiva({ posts: allPosts, metaAnual, mm: mmFiltro, yyyy: yyyyFiltro })
-  const pctAnual       = metaAnual>0 ? Math.min((totalAnual/metaAnual)*100,100) : 0
   const pctMensal      = metaAjustada>0 ? Math.min((totalMensal/metaAjustada)*100,100) : 0
   const metaMesOriginal = Math.round(metaAnual/12)
 
@@ -72,10 +60,6 @@ export default function RightPanel() {
       const p=(s)=>{const[d,m,y]=(s||'').split('/');return new Date(`${y}-${m}-${d}`)}
       return p(b.data_post)-p(a.data_post)
     }).slice(0,5)
-
-  // SVG anel anual
-  const R=50, CIRC=2*Math.PI*R
-  const dash=(pctAnual/100)*CIRC
 
   return (
     <aside className="right-panel-desktop" style={{
@@ -92,70 +76,36 @@ export default function RightPanel() {
     }}>
 
       {/* Card meta anual — principal */}
+      {/* Card meta do mês */}
       <div style={{ background:'#F5F8FA', borderRadius:16, padding:'14px', border:'1px solid #E8ECF0' }}>
-        <p style={{ color:'#8A9BB0', fontSize:10, fontWeight:700, textTransform:'uppercase', letterSpacing:'0.08em', marginBottom:10 }}>
-          Meta anual {anoFiltro}
-        </p>
-
-        {/* Anel */}
-        <div style={{ display:'flex', justifyContent:'center', marginBottom:10 }}>
-          <div style={{ position:'relative', width:110, height:110 }}>
-            <svg width="110" height="110" viewBox="0 0 120 120">
-              <circle cx="60" cy="60" r={R} fill="none" stroke="#E8ECF0" strokeWidth="9"/>
-              <circle cx="60" cy="60" r={R} fill="none" stroke="rgba(195,235,247,0.5)" strokeWidth="9"
-                strokeDasharray={`${CIRC} 0`} transform="rotate(-90 60 60)"/>
-              <circle cx="60" cy="60" r={R} fill="none" stroke="#F97316" strokeWidth="9"
-                strokeLinecap="round"
-                strokeDasharray={`${dash} ${CIRC-dash}`}
-                transform="rotate(-90 60 60)"
-                style={{ transition:'stroke-dasharray 0.6s ease' }}
-              />
-            </svg>
-            <div style={{ position:'absolute', inset:0, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center' }}>
-              <span style={{ color:'#1C252E', fontSize:22, fontWeight:800, lineHeight:1 }}>{pctAnual.toFixed(0)}%</span>
-              <span style={{ color:'#8A9BB0', fontSize:10, marginTop:1 }}>do ano</span>
-            </div>
+        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:12 }}>
+          <p style={{ color:'#8A9BB0', fontSize:10, fontWeight:700, textTransform:'uppercase', letterSpacing:'0.08em' }}>
+            {mesFiltroLabel(mesFiltro)}
+          </p>
+          <p style={{ color:'#1C252E', fontSize:11, fontWeight:700 }}>{pctMensal.toFixed(0)}%</p>
+        </div>
+        <div style={{ background:'#E8ECF0', borderRadius:4, height:6, overflow:'hidden', marginBottom:10 }}>
+          <div style={{
+            height:'100%', borderRadius:4,
+            background: pctMensal>=100 ? '#16a34a' : '#F97316',
+            width:`${Math.min(pctMensal,100)}%`,
+            transition:'width 0.6s ease',
+          }}/>
+        </div>
+        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center' }}>
+          <div>
+            <p style={{ color:'#F97316', fontSize:18, fontWeight:800, lineHeight:1 }}>{fmt(totalMensal)}</p>
+            <p style={{ color:'#8A9BB0', fontSize:10, marginTop:3 }}>alcançadas</p>
+          </div>
+          <div style={{ textAlign:'right' }}>
+            <EditableValue value={metaAjustada} color="#0891B2" onSave={setMetaMensal}/>
           </div>
         </div>
-
-        {/* Alcançado × Meta anual */}
-        <div style={{ display:'grid', gridTemplateColumns:'1fr 1px 1fr', alignItems:'center', marginBottom:8 }}>
-          <div style={{ textAlign:'center' }}>
-            <p style={{ color:'#F97316', fontSize:16, fontWeight:800, lineHeight:1 }}>{fmt(totalAnual)}</p>
-            <p style={{ color:'#8A9BB0', fontSize:10, marginTop:2 }}>alcançadas</p>
-          </div>
-          <div style={{ background:'#E8ECF0', height:28, width:1, margin:'0 auto' }}/>
-          <div style={{ textAlign:'center' }}>
-            <EditableValue value={metaAnual} color="#0891B2" onSave={setMetaAnual}/>
-          </div>
-        </div>
-
-        {/* Barra progresso mensal ajustada */}
-        <div style={{ background:'#fff', borderRadius:10, padding:'10px 12px', border:'1px solid #E8ECF0' }}>
-          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:5 }}>
-            <p style={{ color:'#8A9BB0', fontSize:10, fontWeight:700, textTransform:'uppercase', letterSpacing:'0.06em' }}>
-              {mesFiltroLabel(mesFiltro)}
-            </p>
-            <p style={{ color:'#1C252E', fontSize:11, fontWeight:700 }}>{pctMensal.toFixed(0)}%</p>
-          </div>
-          <div style={{ background:'#E8ECF0', borderRadius:4, height:6, overflow:'hidden', marginBottom:6 }}>
-            <div style={{
-              height:'100%', borderRadius:4,
-              background: pctMensal>=100 ? '#16a34a' : '#F97316',
-              width:`${Math.min(pctMensal,100)}%`,
-              transition:'width 0.6s ease',
-            }}/>
-          </div>
-          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center' }}>
-            <span style={{ color:'#F97316', fontSize:12, fontWeight:700 }}>{fmt(totalMensal)}</span>
-            <span style={{ color:'#1C252E', fontSize:12, fontWeight:700 }}>{fmt(metaAjustada)}</span>
-          </div>
-          {metaAjustada !== metaMesOriginal && (
-            <p style={{ color:'#8A9BB0', fontSize:10, marginTop:5, textAlign:'center', lineHeight:1.4 }}>
-              ↻ Meta ajustada (saldo acumulado)
-            </p>
-          )}
-        </div>
+        {metaAjustada !== metaMesOriginal && (
+          <p style={{ color:'#8A9BB0', fontSize:10, marginTop:10, textAlign:'center', lineHeight:1.4 }}>
+            ↻ Meta ajustada (saldo acumulado)
+          </p>
+        )}
       </div>
 
       {/* Posts recentes */}
