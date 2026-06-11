@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Edit2, Check, Plus, Film, LayoutPanelLeft, Image } from 'lucide-react'
+import { Edit2, Check } from 'lucide-react'
 import { calcMetaMesProgressiva } from '../utils/metaCalc'
 import { useStore } from '../store/useStore'
 import UploadModal from './UploadModal'
@@ -170,9 +170,7 @@ export default function RightPanel() {
             <p style={{ color:'#8A9BB0', fontSize:12, textAlign:'center', marginTop:16 }}>Nenhum post ainda</p>
           )}
           {recentes.map(p=>{
-            const color   = TIPO_COLOR[p.tipo] || '#0891B2'
-            const bg      = TIPO_BG[p.tipo]    || 'rgba(8,145,178,0.08)'
-            const TipoIcon = TIPO_ICON[p.tipo]  || Image
+            const color = TIPO_COLOR[p.tipo] || '#0891B2'
             return (
               <div key={p.id} onClick={()=>setEditTarget(p)} style={{
                 background:'transparent', border:'1px solid #EDEFF2',
@@ -183,15 +181,15 @@ export default function RightPanel() {
               onMouseEnter={e=>e.currentTarget.style.background='#F8FAFC'}
               onMouseLeave={e=>e.currentTarget.style.background='transparent'}
               >
-                <div style={{ width:30, height:30, borderRadius:8, background:bg, flexShrink:0, display:'flex', alignItems:'center', justifyContent:'center' }}>
-                  <TipoIcon size={13} color={color} strokeWidth={1.8} />
-                </div>
+                {/* Dot colorido do tipo */}
+                <div style={{ width:7, height:7, borderRadius:'50%', background:color, flexShrink:0 }} />
                 <div style={{ flex:1, minWidth:0 }}>
                   <p style={{ color:'#182638', fontSize:12, fontWeight:600, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
                     {p.nome||p.tema||p.descricao||'—'}
                   </p>
-                  <p style={{ color:'#A8B5C0', fontSize:10, marginTop:2 }}>
-                    {p.data_post}{p.status==='parcial'&&<span style={{ color:'#d97706', marginLeft:4, fontSize:9 }}>parcial</span>}
+                  <p style={{ color:'#A8B5C0', fontSize:10, marginTop:2, display:'flex', alignItems:'center', gap:4 }}>
+                    {p.data_post}
+                    {p.status==='parcial' && <span style={{ color:'#d97706', fontSize:9, fontWeight:600 }}>parcial</span>}
                   </p>
                 </div>
                 <span style={{ color, fontSize:12, fontWeight:700, flexShrink:0 }}>{fmt(p.contas_alcancadas)}</span>

@@ -60,8 +60,6 @@ export function PositionPill({ i }) {
 // Linha padrão de ranking de post
 export function PostRankRow({ post, i, maxVal, firstColor = '#F97316', onClick }) {
   const color    = TIPO_COLOR[post.tipo] || '#0EA5E9'
-  const bg       = TIPO_BG[post.tipo]   || 'rgba(14,165,233,0.09)'
-  const TipoIcon = TIPO_ICON[post.tipo] || Image
   const pct      = maxVal > 0 ? ((post.contas_alcancadas || 0) / maxVal) * 100 : 0
   const barColor = i === 0 ? firstColor : color
 
@@ -79,13 +77,11 @@ export function PostRankRow({ post, i, maxVal, firstColor = '#F97316', onClick }
     >
       <PositionPill i={i} />
 
-      {/* Ícone do tipo */}
+      {/* Dot colorido do tipo */}
       <div style={{
-        width: 32, height: 32, borderRadius: 8, background: bg, flexShrink: 0,
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-      }}>
-        <TipoIcon size={13} color={color} strokeWidth={1.8} />
-      </div>
+        width: 8, height: 8, borderRadius: '50%',
+        background: color, flexShrink: 0,
+      }} />
 
       {/* Nome + barra */}
       <div style={{ flex: 1, minWidth: 0 }}>
@@ -95,7 +91,7 @@ export function PostRankRow({ post, i, maxVal, firstColor = '#F97316', onClick }
         }}>
           {post.nome || post.tema || '—'}
         </p>
-        <div style={{ background: '#F0F2F5', borderRadius: 3, height: 4, overflow: 'hidden' }}>
+        <div style={{ background: '#F0F2F5', borderRadius: 3, height: 3, overflow: 'hidden' }}>
           <div style={{
             height: '100%', borderRadius: 3,
             background: barColor, width: `${pct}%`, transition: 'width 0.5s ease',

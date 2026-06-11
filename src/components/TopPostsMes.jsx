@@ -23,14 +23,9 @@ export default function TopPostsMes() {
 
   return (
     <div className="card" style={{ padding: '20px 22px', marginBottom: 16 }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
-        <div>
-          <p style={{ color: '#182638', fontSize: 15, fontWeight: 700 }}>Top 5 posts</p>
-          <p style={{ color: '#A8B5C0', fontSize: 12, marginTop: 2 }}>{mesNome} · por contas alcançadas</p>
-        </div>
-        <span style={{ background: 'rgba(249,115,22,0.08)', color: '#F97316', fontSize: 11, fontWeight: 700, padding: '4px 10px', borderRadius: 20 }}>
-          {posts.length} posts no mês
-        </span>
+      <div style={{ marginBottom: 14 }}>
+        <p style={{ color: '#182638', fontSize: 15, fontWeight: 700 }}>Top 5 posts</p>
+        <p style={{ color: '#A8B5C0', fontSize: 12, marginTop: 2 }}>{mesNome} · por contas alcançadas</p>
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
