@@ -10,7 +10,6 @@ import TypeComparison from './components/TypeComparison'
 import ThemeAnalysis from './components/ThemeAnalysis'
 import Insights from './components/Insights'
 import UploadSection from './components/UploadSection'
-import RightPanel from './components/RightPanel'
 import SyncBadge from './components/SyncBadge'
 import AnnualView from './components/AnnualView'
 import TopPostsMes from './components/TopPostsMes'
@@ -75,8 +74,6 @@ export default function App() {
     return () => document.removeEventListener('visibilitychange', onVisible)
   }, [])
 
-  const showRight = activeSection === 'visao-geral'
-
   return (
     <div className="app-layout">
       <Sidebar />
@@ -105,7 +102,6 @@ export default function App() {
         </div>
       </div>
 
-      {showRight && <RightPanel />}
     </div>
   )
 }
