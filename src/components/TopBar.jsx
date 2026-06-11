@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Download, Key, Plus, Lock, Unlock, Eye } from 'lucide-react'
+import { Key, Plus, Lock, Unlock, Eye } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import UploadModal from './UploadModal'
 import { useIsMobile } from '../utils/useIsMobile'
@@ -96,8 +96,8 @@ export default function TopBar() {
           </select>
         )}
 
-        {/* Novo post — só no modo edição */}
-        {isEditMode && (
+        {/* Novo post — só no modo edição e fora da aba de stories */}
+        {isEditMode && activeSection !== 'stories' && (
           <button onClick={() => setUploadOpen(true)} style={{
             background: '#F97316', color: '#fff', border: 'none', borderRadius: 10,
             padding: '8px 12px', fontSize: 13, fontWeight: 600, cursor: 'pointer',
@@ -107,11 +107,11 @@ export default function TopBar() {
           </button>
         )}
 
-        {/* API — só no modo edição e desktop */}
-        {isEditMode && !mobile && (
+        {/* API — desktop, sempre visível (necessário para a IA funcionar) */}
+        {!mobile && (
           <div style={{ position: 'relative' }}>
             <button onClick={() => setShowApi(v => !v)}
-              title={apiKey ? 'API ativa' : 'Sem API — clique para configurar'}
+              title={apiKey ? 'API configurada' : 'Configure a chave da API para usar a IA'}
               style={{
                 background: '#fff',
                 border: `1.5px solid ${apiKey ? '#EDEFF2' : 'rgba(239,68,68,0.3)'}`,
@@ -139,18 +139,6 @@ export default function TopBar() {
               </div>
             )}
           </div>
-        )}
-
-        {/* CSV — só desktop */}
-        {!mobile && (
-          <button onClick={exportCSV} title="Exportar CSV"
-            style={{
-              background: '#fff', border: '1.5px solid #EDEFF2', borderRadius: 10,
-              padding: '7px 9px', color: '#4A5568', cursor: 'pointer',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-            }}>
-            <Download size={14} />
-          </button>
         )}
 
         {/* Botão cadeado */}

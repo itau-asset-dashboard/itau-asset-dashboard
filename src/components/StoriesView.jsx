@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { Plus, ChevronDown, ChevronUp, Eye, Zap, UserCheck, Search, X, Film } from 'lucide-react'
+import { useState, useCallback } from 'react'
+import { Plus, Eye, Zap, UserCheck, Search, X, Film, CheckSquare, Square } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import StoryUploadModal from './StoryUploadModal'
 import ImageLightbox from './ImageLightbox'
@@ -29,32 +29,56 @@ function MetricBadge({ label, value, color }) {
   )
 }
 
-function StoryRow({ story, grupos, onEdit, isEditMode }) {
+function StoryRow({ story, grupos, onEdit, isEditMode, selected, onToggleSelect }) {
   const [lightbox, setLightbox] = useState(false)
   return (
     <div
-      onClick={() => isEditMode && onEdit(story)}
+      onClick={() => onEdit(story)}
       style={{
         display: 'flex', alignItems: 'center', gap: 12,
         padding: '12px 16px', borderBottom: '1px solid #F5F7FA',
-        cursor: isEditMode ? 'pointer' : 'default', transition: 'background 0.1s',
+        cursor: 'pointer', transition: 'background 0.1s',
+        background: selected ? 'rgba(249,115,22,0.04)' : 'transparent',
       }}
-      onMouseEnter={e => isEditMode && (e.currentTarget.style.background = '#FAFCFE')}
-      onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+      onMouseEnter={e => { e.currentTarget.style.background = selected ? 'rgba(249,115,22,0.06)' : '#FAFCFE' }}
+      onMouseLeave={e => { e.currentTarget.style.background = selected ? 'rgba(249,115,22,0.04)' : 'transparent' }}
     >
-      {/* Dot */}
-      <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#E2E8F0', flexShrink: 0 }} />
+      {/* Checkbox (edit mode) ou Dot (view mode) */}
+      {isEditMode && onToggleSelect ? (
+        <div
+          onClick={e => { e.stopPropagation(); onToggleSelect(story.id) }}
+          style={{ flexShrink: 0, cursor: 'pointer', display: 'flex', alignItems: 'center' }}
+        >
+          {selected
+            ? <CheckSquare size={16} color="#F97316" />
+            : <Square size={16} color="#D0D8E0" />
+          }
+        </div>
+      ) : (
+        <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#E2E8F0', flexShrink: 0 }} />
+      )}
 
       {/* Info */}
       <div style={{ flex: 1, minWidth: 0 }}>
         <p style={{ color: '#182638', fontSize: 13, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
           {story.nome || '—'}
         </p>
-        <p style={{ color: '#9AAAB8', fontSize: 11, marginTop: 2 }}>{story.data || '—'}</p>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 3, flexWrap: 'wrap' }}>
+          <span style={{ color: '#9AAAB8', fontSize: 11 }}>{story.data || '—'}</span>
+          {Array.isArray(story.tema) && story.tema.slice(0, 2).map(t => (
+            <span key={t} style={{ background: 'rgba(28,37,46,0.07)', color: '#4A6272', borderRadius: 5, padding: '1px 7px', fontSize: 10, fontWeight: 600, whiteSpace: 'nowrap' }}>{t}</span>
+          ))}
+          {Array.isArray(story.tema) && story.tema.length > 2 && (
+            <span style={{ color: '#9AAAB8', fontSize: 10 }}>+{story.tema.length - 2}</span>
+          )}
+        </div>
       </div>
 
       {/* Métricas */}
-      <div style={{ display: 'flex', gap: 20, flexShrink: 0 }}>
+      <div
+        style={{ display: 'flex', gap: 20, flexShrink: 0 }}
+        onClick={e => { if (isEditMode && onToggleSelect) { e.stopPropagation(); onEdit(story) } }}
+      >
         <MetricBadge label="Visual." value={story.visualizacoes} color="#0891B2" />
         <MetricBadge label="Interações" value={story.interacoes} color="#F97316" />
         <MetricBadge label="Ativ. perfil" value={story.atividade_perfil} color="#059669" />
@@ -67,7 +91,7 @@ function StoryRow({ story, grupos, onEdit, isEditMode }) {
   )
 }
 
-function GrupoCard({ nome, stories, isEditMode, onEdit }) {
+function GrupoCard({ nome, stories, isEditMode, onEdit, selectedIds, onToggleSelect }) {
   const [open, setOpen] = useState(false)
   const total = (k) => stories.reduce((s, st) => s + (st[k] || 0), 0)
 
@@ -95,15 +119,15 @@ function GrupoCard({ nome, stories, isEditMode, onEdit }) {
 
       {/* Stories do grupo */}
       {open && stories.map(st => (
-        <StoryRow key={st.id} story={st} isEditMode={isEditMode} onEdit={onEdit} />
+        <StoryRow key={st.id} story={st} isEditMode={isEditMode} onEdit={onEdit}
+          selected={selectedIds?.has(st.id)} onToggleSelect={onToggleSelect} />
       ))}
     </div>
   )
 }
 
 export default function StoriesView() {
-  const { stories, addStory, updateStory, deleteStory, isEditMode } = useStore()
-  const [tab, setTab]               = useState('todos') // 'todos' | 'grupos'
+  const { stories, addStory, updateStory, deleteStory, isEditMode, syncError } = useStore()
   const [mesFiltro, setMesFiltro]   = useState(() => {
     const now = new Date()
     return `${String(now.getMonth()+1).padStart(2,'0')}/${now.getFullYear()}`
@@ -111,36 +135,71 @@ export default function StoriesView() {
   const [uploadOpen, setUploadOpen] = useState(false)
   const [editTarget, setEditTarget] = useState(null)
   const [search, setSearch]         = useState('')
+  const [temaFiltro, setTemaFiltro] = useState('')   // filtro por tema
+  const [selected, setSelected]         = useState(new Set())
+  const [editQueue, setEditQueue]       = useState([])
+  const [editQueueTotal, setQueueTotal] = useState(0)
 
-  // Filtra por mês ou busca
+  const toggleSelect = useCallback((id) => {
+    setSelected(prev => {
+      const next = new Set(prev)
+      next.has(id) ? next.delete(id) : next.add(id)
+      return next
+    })
+  }, [])
+
+  const clearSelection = () => setSelected(new Set())
+  const selectAll = (list) => setSelected(new Set(list.map(s => s.id)))
+
+  function startMultiEdit() {
+    const queue = sorted.filter(s => selected.has(s.id))
+    if (queue.length === 0) return
+    setEditQueue(queue)
+    setQueueTotal(queue.length)
+    setSelected(new Set())
+  }
+
+  function handleQueueSave(dados) {
+    updateStory(editQueue[0].id, dados)
+    setEditQueue(q => q.slice(1))
+  }
+
+  function handleQueueClose() {
+    setEditQueue([])
+    setQueueTotal(0)
+  }
+
+  // Temas disponíveis (dos stories existentes)
+  const temasDisponiveis = [...new Set(
+    stories.flatMap(s => Array.isArray(s.tema) ? s.tema : []).filter(Boolean)
+  )].sort()
+
+  // Filtra por mês, busca e tema
   const q = search.trim().toLowerCase()
-  const filtered = q
-    ? stories.filter(s =>
-        (s.nome || '').toLowerCase().includes(q) ||
-        (s.data || '').includes(q) ||
-        (s.grupo || '').toLowerCase().includes(q)
-      )
-    : stories.filter(s => {
-        if (!s.data) return false
-        const [, mm, yyyy] = s.data.split('/')
-        return `${mm}/${yyyy}` === mesFiltro
-      })
+  const filtered = stories.filter(s => {
+    // Filtro de mês (ignorado se há busca de texto)
+    if (!q) {
+      if (!s.data) return false
+      const [, mm, yyyy] = s.data.split('/')
+      if (`${mm}/${yyyy}` !== mesFiltro) return false
+    }
+    // Filtro de texto
+    if (q && !(
+      (s.nome || '').toLowerCase().includes(q) ||
+      (s.data || '').includes(q)
+    )) return false
+    // Filtro de tema
+    if (temaFiltro && !(Array.isArray(s.tema) && s.tema.includes(temaFiltro))) return false
+    return true
+  })
 
   const sorted = [...filtered].sort((a, b) => parseDate(b.data) - parseDate(a.data))
 
-  // KPIs
+  // KPIs (baseados nos stories filtrados)
   const kpiTotal   = (k) => sorted.reduce((s, st) => s + (st[k] || 0), 0)
   const totalViews = kpiTotal('visualizacoes')
   const totalInter = kpiTotal('interacoes')
   const totalPerf  = kpiTotal('atividade_perfil')
-
-  // Grupos
-  const gruposNomes = [...new Set(stories.filter(s => s.grupo).map(s => s.grupo))].sort()
-  const gruposFiltrados = gruposNomes.map(g => ({
-    nome: g,
-    stories: sorted.filter(s => s.grupo === g),
-  })).filter(g => g.stories.length > 0)
-  const soltos = sorted.filter(s => !s.grupo)
 
   const KPIS = [
     { label: 'Stories',          value: sorted.length, icon: Film,      color: '#1C252E', bg: 'rgba(28,37,46,0.08)' },
@@ -152,17 +211,34 @@ export default function StoriesView() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
 
+      {/* Erro de sincronização */}
+      {syncError && syncError.includes('story') && (
+        <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 10, padding: '10px 16px', display: 'flex', alignItems: 'center', gap: 10 }}>
+          <span style={{ fontSize: 14 }}>⚠️</span>
+          <p style={{ color: '#ef4444', fontSize: 13, fontWeight: 500 }}>{syncError}</p>
+        </div>
+      )}
+
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 10 }}>
         <div>
           <h2 style={{ color: '#1C252E', fontSize: 15, fontWeight: 700 }}>Stories</h2>
           <p style={{ color: '#8A9BB0', fontSize: 12, marginTop: 2 }}>Análise separada das metas de alcance</p>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
           <select value={mesFiltro} onChange={e => setMesFiltro(e.target.value)}
             style={{ background: '#fff', border: '1.5px solid #EDEFF2', borderRadius: 10, padding: '7px 10px', fontSize: 13, color: '#1C252E', outline: 'none', fontFamily: 'DM Sans, sans-serif' }}>
             {MESES.map((m, i) => <option key={m} value={m}>{MESES_LABEL[i]} 2026</option>)}
           </select>
+          {isEditMode && selected.size === 0 && sorted.length > 0 && (
+            <button onClick={() => selectAll(sorted)} style={{
+              background: '#F5F7FA', color: '#4A6272', border: '1.5px solid #EDEFF2', borderRadius: 10,
+              padding: '7px 12px', fontSize: 13, fontWeight: 600, cursor: 'pointer',
+              display: 'flex', alignItems: 'center', gap: 5,
+            }}>
+              <CheckSquare size={14} /> Selecionar
+            </button>
+          )}
           {isEditMode && (
             <button onClick={() => setUploadOpen(true)} style={{
               background: '#F97316', color: '#fff', border: 'none', borderRadius: 10,
@@ -190,66 +266,91 @@ export default function StoriesView() {
         ))}
       </div>
 
-      {/* Tabs */}
-      <div style={{ display: 'flex', gap: 4, background: '#F4F6F8', borderRadius: 10, padding: 4, width: 'fit-content' }}>
-        {[{ id: 'todos', label: 'Todos os stories' }, { id: 'grupos', label: 'Grupos' }].map(t => (
-          <button key={t.id} onClick={() => setTab(t.id)}
+      {/* Barra de filtros: label + tema */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+        {/* Label "Todos os stories" */}
+        <div style={{ background: '#fff', borderRadius: 10, padding: '6px 16px', border: '1.5px solid #EDEFF2', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
+          <span style={{ fontSize: 13, fontWeight: 600, color: '#182638' }}>Todos os stories</span>
+        </div>
+
+        {/* Filtro por tema */}
+        {temasDisponiveis.length > 0 && (
+          <select
+            value={temaFiltro}
+            onChange={e => setTemaFiltro(e.target.value)}
             style={{
-              padding: '6px 16px', borderRadius: 8, border: 'none', cursor: 'pointer',
-              fontSize: 13, fontWeight: tab === t.id ? 600 : 400,
-              background: tab === t.id ? '#fff' : 'transparent',
-              color: tab === t.id ? '#182638' : '#8A9BB0',
-              boxShadow: tab === t.id ? '0 1px 4px rgba(0,0,0,0.08)' : 'none',
-              transition: 'all 0.15s',
-            }}>
-            {t.label}
+              background: temaFiltro ? '#1C252E' : '#fff',
+              color: temaFiltro ? '#C3EBF7' : '#4A6272',
+              border: `1.5px solid ${temaFiltro ? '#1C252E' : '#EDEFF2'}`,
+              borderRadius: 10, padding: '6px 12px', fontSize: 13, fontWeight: temaFiltro ? 600 : 400,
+              outline: 'none', cursor: 'pointer', fontFamily: 'DM Sans, sans-serif',
+            }}
+          >
+            <option value="">Todos os temas</option>
+            {temasDisponiveis.map(t => <option key={t} value={t}>{t}</option>)}
+          </select>
+        )}
+        {temaFiltro && (
+          <button onClick={() => setTemaFiltro('')} style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4, color: '#8A9BB0', fontSize: 12 }}>
+            <X size={13} /> Limpar filtro
           </button>
+        )}
+
+        {/* Busca */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#F5F7FA', borderRadius: 10, border: `1.5px solid ${q ? '#F97316' : '#EDEFF2'}`, padding: '6px 12px', flex: '1 1 160px', minWidth: 0 }}>
+          <Search size={14} color={q ? '#F97316' : '#A8B5C0'} style={{ flexShrink: 0 }} />
+          <input value={search} onChange={e => setSearch(e.target.value)}
+            placeholder="Buscar por nome ou data..."
+            style={{ border: 'none', background: 'transparent', outline: 'none', fontSize: 13, color: '#182638', width: '100%', fontFamily: 'DM Sans, sans-serif' }} />
+          {q && <button onClick={() => setSearch('')} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex' }}><X size={13} color="#A8B5C0" /></button>}
+        </div>
+      </div>
+
+      {/* Lista */}
+      <div className="card" style={{ overflow: 'hidden' }}>
+        {sorted.length === 0 ? (
+          <div style={{ padding: '40px 20px', textAlign: 'center' }}>
+            <p style={{ color: '#9AAAB8', fontSize: 13 }}>
+              {temaFiltro ? `Nenhum story com tema "${temaFiltro}" neste período` : 'Nenhum story encontrado para este período'}
+            </p>
+            {isEditMode && !temaFiltro && (
+              <button onClick={() => setUploadOpen(true)} style={{ marginTop: 12, background: '#F97316', color: '#fff', border: 'none', borderRadius: 10, padding: '8px 16px', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
+                Adicionar primeiro story
+              </button>
+            )}
+          </div>
+        ) : sorted.map(st => (
+          <StoryRow key={st.id} story={st} isEditMode={isEditMode} onEdit={setEditTarget}
+            selected={selected.has(st.id)} onToggleSelect={isEditMode ? toggleSelect : null} />
         ))}
       </div>
 
-      {/* Busca */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#F5F7FA', borderRadius: 10, border: `1.5px solid ${q ? '#F97316' : '#EDEFF2'}`, padding: '7px 12px', maxWidth: 320 }}>
-        <Search size={14} color={q ? '#F97316' : '#A8B5C0'} style={{ flexShrink: 0 }} />
-        <input value={search} onChange={e => setSearch(e.target.value)}
-          placeholder="Buscar por nome, data, grupo..."
-          style={{ border: 'none', background: 'transparent', outline: 'none', fontSize: 13, color: '#182638', width: '100%', fontFamily: 'DM Sans, sans-serif' }} />
-        {q && <button onClick={() => setSearch('')} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex' }}><X size={13} color="#A8B5C0" /></button>}
-      </div>
-
-      {/* Conteúdo */}
-      {tab === 'todos' && (
-        <div className="card" style={{ overflow: 'hidden' }}>
-          {sorted.length === 0 ? (
-            <div style={{ padding: '40px 20px', textAlign: 'center' }}>
-              <p style={{ color: '#9AAAB8', fontSize: 13 }}>Nenhum story encontrado para este período</p>
-              {isEditMode && <button onClick={() => setUploadOpen(true)} style={{ marginTop: 12, background: '#F97316', color: '#fff', border: 'none', borderRadius: 10, padding: '8px 16px', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>Adicionar primeiro story</button>}
-            </div>
-          ) : sorted.map(st => (
-            <StoryRow key={st.id} story={st} isEditMode={isEditMode} onEdit={setEditTarget} />
-          ))}
-        </div>
-      )}
-
-      {tab === 'grupos' && (
-        <div>
-          {gruposFiltrados.length === 0 && soltos.length === 0 && (
-            <div className="card" style={{ padding: '40px 20px', textAlign: 'center' }}>
-              <p style={{ color: '#9AAAB8', fontSize: 13 }}>Nenhum story com grupo neste período</p>
-            </div>
-          )}
-          {gruposFiltrados.map(g => (
-            <GrupoCard key={g.nome} nome={g.nome} stories={g.stories} isEditMode={isEditMode} onEdit={setEditTarget} />
-          ))}
-          {soltos.length > 0 && (
-            <div>
-              <p style={{ color: '#9AAAB8', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 8, marginTop: gruposFiltrados.length > 0 ? 16 : 0 }}>Stories soltos</p>
-              <div className="card" style={{ overflow: 'hidden' }}>
-                {soltos.map(st => (
-                  <StoryRow key={st.id} story={st} isEditMode={isEditMode} onEdit={setEditTarget} />
-                ))}
-              </div>
-            </div>
-          )}
+      {/* Barra flutuante de seleção */}
+      {selected.size > 0 && (
+        <div style={{
+          position: 'fixed', bottom: 80, left: '50%', transform: 'translateX(-50%)',
+          background: '#1C252E', borderRadius: 14, padding: '12px 20px',
+          display: 'flex', alignItems: 'center', gap: 14,
+          boxShadow: '0 8px 32px rgba(0,0,0,0.22)', zIndex: 500,
+          whiteSpace: 'nowrap',
+        }}>
+          <span style={{ color: '#C3EBF7', fontSize: 13, fontWeight: 600 }}>
+            {selected.size} selecionado{selected.size > 1 ? 's' : ''}
+          </span>
+          <div style={{ width: 1, height: 18, background: 'rgba(255,255,255,0.15)' }} />
+          <button onClick={startMultiEdit} style={{
+            background: '#F97316', color: '#fff', border: 'none', borderRadius: 9,
+            padding: '7px 14px', fontSize: 13, fontWeight: 700, cursor: 'pointer',
+            display: 'flex', alignItems: 'center', gap: 6,
+          }}>
+            Editar {selected.size > 1 ? `${selected.size} stories` : 'story'}
+          </button>
+          <button onClick={clearSelection} style={{
+            background: 'transparent', color: '#8A9BB0', border: 'none',
+            cursor: 'pointer', padding: '4px', display: 'flex',
+          }}>
+            <X size={16} />
+          </button>
         </div>
       )}
 
@@ -257,7 +358,6 @@ export default function StoriesView() {
       {uploadOpen && (
         <StoryUploadModal
           mode="new"
-          grupos={gruposNomes}
           onClose={() => setUploadOpen(false)}
           onSave={dados => { addStory(dados) }}
         />
@@ -266,10 +366,23 @@ export default function StoriesView() {
         <StoryUploadModal
           mode="update"
           story={editTarget}
-          grupos={gruposNomes}
           onClose={() => setEditTarget(null)}
           onSave={dados => { updateStory(editTarget.id, dados); setEditTarget(null) }}
           onDelete={() => { deleteStory(editTarget.id); setEditTarget(null) }}
+        />
+      )}
+
+      {/* Modal de edição sequencial */}
+      {editQueue.length > 0 && (
+        <StoryUploadModal
+          key={editQueue[0].id}
+          mode="update"
+          story={editQueue[0]}
+          queueIdx={editQueueTotal - editQueue.length}
+          queueTotal={editQueueTotal}
+          onClose={handleQueueClose}
+          onSave={handleQueueSave}
+          onDelete={() => { deleteStory(editQueue[0].id); setEditQueue(q => q.slice(1)) }}
         />
       )}
     </div>

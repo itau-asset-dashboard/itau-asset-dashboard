@@ -102,7 +102,7 @@ export async function uploadStoryImage(storyId, dataUrl) {
 }
 
 const STORY_COLUMNS = [
-  'id','nome','data','grupo','visualizacoes','interacoes','atividade_perfil',
+  'id','nome','data','grupo','tema','visualizacoes','interacoes','atividade_perfil',
   'contas_alcancadas','respostas','toques_avancar','toques_retroceder','saidas',
   'image_url','status',
 ]
@@ -114,9 +114,14 @@ export async function upsertStory(story) {
   const clean = Object.fromEntries(
     Object.entries(rest)
       .filter(([k]) => STORY_COLUMNS.includes(k))
-      .map(([k, v]) => [k, STORY_INT_COLS.includes(k) ? (Number(v) || null) : (v === '' ? null : v)])
+      .map(([k, v]) => {
+        if (STORY_INT_COLS.includes(k)) return [k, Number(v) || null]
+        if (Array.isArray(v)) return [k, v.length > 0 ? v : null]
+        return [k, v === '' ? null : v]
+      })
   )
   const body = { ...clean, image_url: imageUrl || null }
+  console.log('[upsertStory] body:', JSON.stringify(body))
   const response = await fetch(`${url}/rest/v1/stories`, {
     method: 'POST',
     headers: {
@@ -127,8 +132,10 @@ export async function upsertStory(story) {
     },
     body: JSON.stringify(body),
   })
+  console.log('[upsertStory] status:', response.status)
   if (!response.ok) {
     const err = await response.json().catch(() => ({}))
+    console.error('[upsertStory] error body:', err)
     throw new Error(err.message || `Erro ${response.status}`)
   }
 }

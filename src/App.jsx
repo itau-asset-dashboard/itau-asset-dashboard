@@ -20,6 +20,42 @@ import Glossario from './components/Glossario'
 import StoriesView from './components/StoriesView'
 import MetaMensalBanner from './components/MetaMensalBanner'
 
+// Limpa dados pesados do localStorage logo na inicialização (roda antes do React montar).
+// Remove imageData de posts, e limpa stories/insights que não precisam mais ser persistidos.
+;(function cleanLocalStorage() {
+  try {
+    const raw = localStorage.getItem('itau-asset-instagram')
+    if (!raw) return
+    const parsed = JSON.parse(raw)
+    const state = parsed?.state
+    if (!state) return
+    let dirty = false
+
+    // Remove imageData de posts
+    if (state.posts?.some(p => p.imageData)) {
+      state.posts = state.posts.map(({ imageData, ...p }) => p)
+      dirty = true
+    }
+
+    // Remove stories do localStorage (Supabase é a fonte da verdade)
+    if (state.stories !== undefined) {
+      delete state.stories
+      dirty = true
+    }
+
+    // Remove insights do localStorage (gerados sob demanda)
+    if (state.insights !== undefined) {
+      delete state.insights
+      dirty = true
+    }
+
+    if (dirty) {
+      localStorage.setItem('itau-asset-instagram', JSON.stringify(parsed))
+      console.log('[startup] localStorage limpo (stories/insights/imageData removidos)')
+    }
+  } catch (_) {}
+})()
+
 export default function App() {
   const { activeSection, syncFromCloud } = useStore()
 

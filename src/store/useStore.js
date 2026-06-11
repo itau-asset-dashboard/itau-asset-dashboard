@@ -33,13 +33,13 @@ export const useStore = create(
       syncFromCloud: async () => {
         set({ syncing: true, syncError: null })
         try {
-          const [cloudPosts, metaMensal, metaAnual, oliverRaw, evidenciasRaw, cloudStories] = await Promise.all([
+          const [cloudPosts, metaMensal, metaAnual, oliverRaw, evidenciasRaw, cloudStoriesRaw] = await Promise.all([
             fetchPosts(),
             fetchSetting('meta_mensal'),
             fetchSetting('meta_anual'),
             fetchSetting('oliver_data'),
             fetchSetting('data_evidencias'),
-            fetchStories().catch(() => []),
+            fetchStories().catch(() => null), // null = falha, [] = Supabase vazio de verdade
           ])
           // Preserva imageData local — nunca é salvo no Supabase (muito pesado)
           // Também normaliza o campo `tema` para array limpo
@@ -62,11 +62,8 @@ export const useStore = create(
 
           const posts = cloudPosts.map(cp => {
             const local = localPosts.find(lp => lp.id === cp.id)
-            // Preserva campos que existem só no localStorage (não estão no Supabase)
-            const merged   = {
+            const merged = {
               ...cp,
-              ...(local?.imageData && { imageData: local.imageData }),
-              // data_evidencia: prioridade para o mapa do Supabase, fallback para local
               data_evidencia: evidencias[cp.id] || local?.data_evidencia || cp.data_evidencia || '',
             }
             const temaNorm = normalizeTema(merged.tema)
@@ -93,12 +90,27 @@ export const useStore = create(
             } catch (_) {}
           }
 
-          // Merge stories: Supabase é fonte da verdade
+          // Merge stories: Supabase é fonte da verdade quando retorna dados
           const localStories = get().stories
-          const mergedStories = cloudStories.map(cs => {
-            const local = localStories.find(ls => ls.id === cs.id)
-            return { ...cs, ...(local?.imageData && { imageData: local.imageData }) }
-          })
+          console.log('[sync] cloudStoriesRaw:', cloudStoriesRaw?.length ?? 'null', '| localStories:', localStories.length)
+          let mergedStories = localStories // fallback: mantém local
+
+          if (cloudStoriesRaw !== null) {
+            const cloudStories = cloudStoriesRaw
+            if (cloudStories.length > 0) {
+              // Supabase tem dados: usa como fonte da verdade
+              mergedStories = cloudStories
+            } else {
+              // Supabase retornou vazio: pode ser que os saves ainda não chegaram
+              // Re-envia stories locais para garantir sincronização
+              if (localStories.length > 0) {
+                mergedStories = localStories
+                localStories.forEach(st => {
+                  try { upsertStory(st) } catch (_) {}
+                })
+              }
+            }
+          }
 
           set({
             posts: [...posts, ...orphansNorm],
@@ -268,10 +280,15 @@ export const useStore = create(
           try {
             const url = await uploadStoryImage(id, src)
             if (url) novo.imageUrl = url
-          } catch (_) {}
+          } catch (e) { console.error('[story image upload]', e) }
         }
         set(s => ({ stories: [...s.stories, novo] }))
-        try { await upsertStory({ ...novo, imageUrl: novo.imageUrl || null }) } catch (_) {}
+        try {
+          await upsertStory({ ...novo, imageUrl: novo.imageUrl || null })
+        } catch (e) {
+          console.error('[upsertStory]', e)
+          set({ syncError: 'Erro ao salvar story: ' + (e.message || 'verifique o console') })
+        }
       },
 
       updateStory: async (id, newData) => {
@@ -279,7 +296,7 @@ export const useStore = create(
         let imageUrl = restData.imageUrl
         const src = imagePreview || restData.imageData
         if (src?.startsWith('data:')) {
-          try { imageUrl = await uploadStoryImage(id, src) } catch (_) {}
+          try { imageUrl = await uploadStoryImage(id, src) } catch (e) { console.error('[story image upload]', e) }
         }
         set(s => ({
           stories: s.stories.map(st =>
@@ -287,7 +304,14 @@ export const useStore = create(
           )
         }))
         const updated = get().stories.find(s => s.id === id)
-        if (updated) try { await upsertStory(updated) } catch (_) {}
+        if (updated) {
+          try {
+            await upsertStory(updated)
+          } catch (e) {
+            console.error('[upsertStory update]', e)
+            set({ syncError: 'Erro ao atualizar story: ' + (e.message || 'verifique o console') })
+          }
+        }
       },
 
       deleteStory: async (id) => {
@@ -375,12 +399,14 @@ export const useStore = create(
     {
       name: 'itau-asset-instagram',
       partialize: (s) => ({
-        posts:          s.posts,
-        stories:        s.stories,
+        // imageData (base64) NÃO é persistido — ocupa muito espaço e as imagens
+        // já estão no Supabase Storage via imageUrl.
+        // stories e insights NÃO são persistidos: stories vêm do Supabase no sync,
+        // insights são gerados sob demanda — não precisam ocupar espaço no localStorage.
+        posts:          s.posts.map(({ imageData, ...p }) => p),
         metaMensal:     s.metaMensal,
         metaAnual:      s.metaAnual,
         mesFiltro:      s.mesFiltro,
-        insights:       s.insights,
         apiKey:         s.apiKey,
         oliverData:     s.oliverData,
         isEditMode:     s.isEditMode,

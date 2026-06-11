@@ -68,7 +68,10 @@ const SUGESTOES = [
   'Como estamos em relação à meta mensal?',
   'Qual tipo de post performa melhor?',
   'Quais temas têm mais engajamento?',
-  'Que dia da semana costuma ir melhor?',
+  'Como foram os stories neste mês?',
+  'Quais stories tiveram mais visualizações?',
+  'Que temas de stories performam melhor?',
+  'Compare feed e stories: qual canal tem mais impacto?',
 ]
 
 export default function Insights() {

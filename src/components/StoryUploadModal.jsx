@@ -3,6 +3,7 @@ import { X, Upload, Sparkles, Check, Trash2, ChevronRight } from 'lucide-react'
 import { extractStoryFromImage } from '../utils/anthropic'
 import { useStore } from '../store/useStore'
 import ImageLightbox from './ImageLightbox'
+import { TEMAS } from './UploadModal'
 
 const NUM_FIELDS = [
   { key: 'visualizacoes',    label: 'Visualizações',        highlight: true },
@@ -10,10 +11,8 @@ const NUM_FIELDS = [
   { key: 'atividade_perfil', label: 'Atividade do perfil',  highlight: false },
 ]
 
-const DEFAULT_GRUPOS = ['Ativações feed', 'Eventos', 'Ações para stories']
-
 const EMPTY = {
-  nome: '', data: '', grupo: '',
+  nome: '', data: '', tema: [],
   visualizacoes: '', contas_alcancadas: '', interacoes: '',
   atividade_perfil: '', respostas: '', toques_avancar: '',
   toques_retroceder: '', saidas: '',
@@ -50,7 +49,7 @@ const inp = (highlight) => ({
 
 // ─── Formulário de um story ──────────────────────────────────────────────────
 const SingleStoryForm = forwardRef(function SingleStoryForm(
-  { initialPost, initialPreview, grupos, onClose, onSave, isLast, currentIdx, totalFiles }, ref
+  { initialPost, initialPreview, onClose, onSave, isLast, currentIdx, totalFiles }, ref
 ) {
   const { apiKey } = useStore()
   const [preview, setPreview]     = useState(initialPreview || initialPost?.imageData || null)
@@ -60,7 +59,6 @@ const SingleStoryForm = forwardRef(function SingleStoryForm(
   const [error, setError]         = useState(null)
   const [dragging, setDragging]   = useState(false)
   const [lightbox, setLightbox]   = useState(false)
-  const [novoGrupo, setNovoGrupo] = useState(false)
   const [form, setFormState]      = useState(() => ({ ...EMPTY, ...initialPost }))
 
   useImperativeHandle(ref, () => ({ getSnapshot: () => ({ form, preview }) }))
@@ -171,30 +169,44 @@ const SingleStoryForm = forwardRef(function SingleStoryForm(
         <input value={form.nome || ''} onChange={e => set('nome', e.target.value)} placeholder="Ex: Cobertura ETF Day — dia 1" style={inp(false)} />
       </div>
 
+      {/* Tema — pills multi-select */}
+      <div>
+        <label style={{ color: '#8A9BB0', fontSize: 11, fontWeight: 600, display: 'block', marginBottom: 2, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+          Tema
+        </label>
+        {form.tema?.length > 0 && (
+          <p style={{ color: '#0891B2', fontSize: 11, marginBottom: 6 }}>
+            {form.tema.length} selecionado{form.tema.length > 1 ? 's' : ''}: {form.tema.join(' · ')}
+          </p>
+        )}
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+          {TEMAS.map(t => {
+            const sel = Array.isArray(form.tema) && form.tema.includes(t)
+            return (
+              <button key={t} type="button"
+                onClick={() => set('tema', sel ? form.tema.filter(x => x !== t) : [...(form.tema || []), t])}
+                style={{
+                  padding: '5px 12px', borderRadius: 20, fontSize: 12, cursor: 'pointer',
+                  fontFamily: 'DM Sans, sans-serif', fontWeight: sel ? 700 : 400,
+                  background: sel ? '#1C252E' : '#F0F4F8',
+                  color: sel ? '#C3EBF7' : '#4A6272',
+                  border: sel ? '1.5px solid #1C252E' : '1.5px solid #E0E7EF',
+                  transition: 'all 0.12s',
+                }}>
+                {sel && <span style={{ marginRight: 4, fontSize: 10 }}>✓</span>}
+                {t}
+              </button>
+            )
+          })}
+        </div>
+      </div>
+
       {/* Data */}
       <div>
         <label style={{ color: '#8A9BB0', fontSize: 11, fontWeight: 600, display: 'block', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Data</label>
         <input value={form.data || ''} onChange={e => set('data', e.target.value)} placeholder="DD/MM/AAAA" style={inp(false)} />
       </div>
 
-      {/* Grupo */}
-      <div>
-        <label style={{ color: '#8A9BB0', fontSize: 11, fontWeight: 600, display: 'block', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Grupo <span style={{ color: '#B0BEC5', fontWeight: 400, textTransform: 'none' }}>(opcional)</span></label>
-        {novoGrupo ? (
-          <div style={{ display: 'flex', gap: 8 }}>
-            <input value={form.grupo || ''} onChange={e => set('grupo', e.target.value)} placeholder="Nome do novo grupo" style={{ ...inp(false), flex: 1 }} autoFocus />
-            <button onClick={() => setNovoGrupo(false)} style={{ background: '#F4F6F8', border: 'none', borderRadius: 9, padding: '8px 12px', cursor: 'pointer', fontSize: 12, color: '#8A9BB0' }}>Cancelar</button>
-          </div>
-        ) : (
-          <div style={{ display: 'flex', gap: 8 }}>
-            <select value={form.grupo || ''} onChange={e => set('grupo', e.target.value)} style={{ ...inp(false), flex: 1, background: '#fff' }}>
-              <option value="">Sem grupo (story solto)</option>
-              {[...new Set([...DEFAULT_GRUPOS, ...grupos])].map(g => <option key={g} value={g}>{g}</option>)}
-            </select>
-            <button onClick={() => { setNovoGrupo(true); set('grupo', '') }} style={{ background: '#F4F6F8', border: 'none', borderRadius: 9, padding: '8px 12px', cursor: 'pointer', fontSize: 12, color: '#1C252E', whiteSpace: 'nowrap' }}>+ Novo grupo</button>
-          </div>
-        )}
-      </div>
 
       {/* Métricas */}
       <div>
@@ -220,9 +232,9 @@ const SingleStoryForm = forwardRef(function SingleStoryForm(
 })
 
 // ─── Modal de edição (single) ────────────────────────────────────────────────
-function EditStoryModal({ story, grupos, onClose, onSave, onDelete }) {
+function EditStoryModal({ story, onClose, onSave, onDelete, inQueue, isLast }) {
   const [confirmDelete, setConfirmDelete] = useState(false)
-  const { apiKey } = useStore()
+  const { apiKey, isEditMode } = useStore()
   const [preview, setPreview]   = useState(story?.imageUrl || story?.imageData || null)
   const [loading, setLoading]   = useState(false)
   const [saving, setSaving]     = useState(false)
@@ -230,7 +242,6 @@ function EditStoryModal({ story, grupos, onClose, onSave, onDelete }) {
   const [error, setError]       = useState(null)
   const [dragging, setDragging] = useState(false)
   const [lightbox, setLightbox] = useState(false)
-  const [novoGrupo, setNovoGrupo] = useState(false)
   const [form, setFormState]    = useState({ ...EMPTY, ...story })
 
   function set(k, v) { setFormState(f => ({ ...f, [k]: v })) }
@@ -278,15 +289,24 @@ function EditStoryModal({ story, grupos, onClose, onSave, onDelete }) {
       {preview && <button onClick={extract} disabled={loading} style={{ background: '#1C252E', color: '#C3EBF7', border: 'none', borderRadius: 10, padding: '10px', fontSize: 13, fontWeight: 700, cursor: loading ? 'wait' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7, opacity: loading ? 0.75 : 1 }}><Sparkles size={14} />{loading ? 'Extraindo...' : 'Extrair métricas'}</button>}
       {error && <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 9, padding: '8px 12px' }}><p style={{ color: '#ef4444', fontSize: 12 }}>{error}</p></div>}
       <div><label style={{ color: '#8A9BB0', fontSize: 11, fontWeight: 600, display: 'block', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Nome</label><input value={form.nome || ''} onChange={e => set('nome', e.target.value)} style={inp(false)} /></div>
-      <div><label style={{ color: '#8A9BB0', fontSize: 11, fontWeight: 600, display: 'block', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Data</label><input value={form.data || ''} onChange={e => set('data', e.target.value)} placeholder="DD/MM/AAAA" style={inp(false)} /></div>
+      {/* Tema */}
       <div>
-        <label style={{ color: '#8A9BB0', fontSize: 11, fontWeight: 600, display: 'block', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Grupo</label>
-        {novoGrupo ? (
-          <div style={{ display: 'flex', gap: 8 }}><input value={form.grupo || ''} onChange={e => set('grupo', e.target.value)} placeholder="Nome do grupo" style={{ ...inp(false), flex: 1 }} autoFocus /><button onClick={() => setNovoGrupo(false)} style={{ background: '#F4F6F8', border: 'none', borderRadius: 9, padding: '8px 12px', cursor: 'pointer', fontSize: 12, color: '#8A9BB0' }}>Cancelar</button></div>
-        ) : (
-          <div style={{ display: 'flex', gap: 8 }}><select value={form.grupo || ''} onChange={e => set('grupo', e.target.value)} style={{ ...inp(false), flex: 1, background: '#fff' }}><option value="">Sem grupo</option>{[...new Set([...DEFAULT_GRUPOS, ...grupos])].map(g => <option key={g} value={g}>{g}</option>)}</select><button onClick={() => { setNovoGrupo(true); set('grupo', '') }} style={{ background: '#F4F6F8', border: 'none', borderRadius: 9, padding: '8px 12px', cursor: 'pointer', fontSize: 12, color: '#1C252E', whiteSpace: 'nowrap' }}>+ Novo grupo</button></div>
-        )}
+        <label style={{ color: '#8A9BB0', fontSize: 11, fontWeight: 600, display: 'block', marginBottom: 2, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Tema</label>
+        {form.tema?.length > 0 && <p style={{ color: '#0891B2', fontSize: 11, marginBottom: 6 }}>{form.tema.length} selecionado{form.tema.length > 1 ? 's' : ''}: {form.tema.join(' · ')}</p>}
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+          {TEMAS.map(t => {
+            const sel = Array.isArray(form.tema) && form.tema.includes(t)
+            return (
+              <button key={t} type="button"
+                onClick={() => set('tema', sel ? form.tema.filter(x => x !== t) : [...(form.tema || []), t])}
+                style={{ padding: '5px 12px', borderRadius: 20, fontSize: 12, cursor: 'pointer', fontFamily: 'DM Sans, sans-serif', fontWeight: sel ? 700 : 400, background: sel ? '#1C252E' : '#F0F4F8', color: sel ? '#C3EBF7' : '#4A6272', border: sel ? '1.5px solid #1C252E' : '1.5px solid #E0E7EF', transition: 'all 0.12s' }}>
+                {sel && <span style={{ marginRight: 4, fontSize: 10 }}>✓</span>}{t}
+              </button>
+            )
+          })}
+        </div>
       </div>
+      <div><label style={{ color: '#8A9BB0', fontSize: 11, fontWeight: 600, display: 'block', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Data</label><input value={form.data || ''} onChange={e => set('data', e.target.value)} placeholder="DD/MM/AAAA" style={inp(false)} /></div>
       <div><p style={{ color: '#8A9BB0', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 10 }}>Métricas</p>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
           {NUM_FIELDS.map(({ key, label, highlight }) => (
@@ -294,40 +314,69 @@ function EditStoryModal({ story, grupos, onClose, onSave, onDelete }) {
           ))}
         </div>
       </div>
-      <div style={{ display: 'flex', gap: 8 }}>
-        <button onClick={save} disabled={saving} style={{ flex: 1, background: saved ? '#22c55e' : '#1C252E', color: '#C3EBF7', border: 'none', borderRadius: 12, padding: '12px', fontSize: 14, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-          {saved ? <><Check size={16} /> Salvo!</> : saving ? 'Salvando...' : 'Atualizar story'}
-        </button>
-        {onDelete && <button onClick={() => { if (!confirmDelete) { setConfirmDelete(true); return } onDelete() }} style={{ background: confirmDelete ? '#ef4444' : '#FEF2F2', color: confirmDelete ? '#fff' : '#ef4444', border: `1px solid ${confirmDelete ? '#ef4444' : '#fecaca'}`, borderRadius: 12, padding: '12px 14px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, fontWeight: 600, flexShrink: 0 }}><Trash2 size={15} />{confirmDelete ? 'Confirmar?' : 'Excluir'}</button>}
-      </div>
+      {isEditMode ? (
+        <div style={{ display: 'flex', gap: 8 }}>
+          <button onClick={save} disabled={saving} style={{ flex: 1, background: saved ? '#22c55e' : '#1C252E', color: '#C3EBF7', border: 'none', borderRadius: 12, padding: '12px', fontSize: 14, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+            {saved ? <><Check size={16} /> Salvo!</>
+              : saving ? 'Salvando...'
+              : inQueue && !isLast ? <>Salvar e continuar <ChevronRight size={15} /></>
+              : 'Atualizar story'}
+          </button>
+          {onDelete && <button onClick={() => { if (!confirmDelete) { setConfirmDelete(true); return } onDelete() }} style={{ background: confirmDelete ? '#ef4444' : '#FEF2F2', color: confirmDelete ? '#fff' : '#ef4444', border: `1px solid ${confirmDelete ? '#ef4444' : '#fecaca'}`, borderRadius: 12, padding: '12px 14px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, fontWeight: 600, flexShrink: 0 }}><Trash2 size={15} />{confirmDelete ? 'Confirmar?' : 'Excluir'}</button>}
+        </div>
+      ) : (
+        <div style={{ background: 'rgba(195,235,247,0.15)', border: '1px solid rgba(195,235,247,0.5)', borderRadius: 9, padding: '8px 14px' }}>
+          <p style={{ color: '#1a7a96', fontSize: 12, fontWeight: 600 }}>Modo visualização — desbloqueie para editar</p>
+        </div>
+      )}
       {lightbox && preview && <ImageLightbox src={preview} title={form.nome || 'Story'} onClose={() => setLightbox(false)} />}
     </div>
   )
 }
 
 // ─── Modal principal ─────────────────────────────────────────────────────────
-export default function StoryUploadModal({ mode = 'new', story = null, grupos = [], onClose, onSave, onDelete }) {
+export default function StoryUploadModal({ mode = 'new', story = null, onClose, onSave, onDelete, queueIdx, queueTotal }) {
+  const { isEditMode } = useStore()
+
   // Modo edição
   if (mode === 'update') {
+    const inQueue    = queueTotal != null && queueTotal > 1
+    const isLast     = inQueue && queueIdx === queueTotal - 1
+    const queueLabel = inQueue ? `Story ${queueIdx + 1} de ${queueTotal}` : null
+
     return (
       <div style={{ position: 'fixed', inset: 0, background: 'rgba(28,37,46,0.65)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }} className="modal-overlay-bottom" onClick={onClose}>
         <div style={{ background: '#fff', borderRadius: 20, width: '100%', maxWidth: 520, maxHeight: '92vh', overflow: 'auto', boxShadow: '0 16px 56px rgba(0,0,0,0.22)' }} className="scrollbar-thin modal-inner" onClick={e => e.stopPropagation()}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px', borderBottom: '1px solid #F0F4F8' }}>
-            <h2 style={{ color: '#1C252E', fontSize: 15, fontWeight: 700 }}>Editar story</h2>
+            <div>
+              <h2 style={{ color: '#1C252E', fontSize: 15, fontWeight: 700 }}>{isEditMode ? 'Editar story' : 'Ver story'}</h2>
+              {queueLabel && <p style={{ color: '#8A9BB0', fontSize: 12, marginTop: 1 }}>{queueLabel}</p>}
+            </div>
             <button onClick={onClose} style={{ background: '#F4F6F8', border: 'none', borderRadius: 8, padding: 7, cursor: 'pointer', display: 'flex' }}><X size={16} color="#8A9BB0" /></button>
           </div>
-          <EditStoryModal story={story} grupos={grupos} onClose={onClose} onSave={dados => { onSave(dados); onClose() }} onDelete={onDelete ? () => { onDelete(); onClose() } : undefined} />
+          <EditStoryModal
+            story={story}
+            inQueue={inQueue}
+            isLast={isLast}
+            onClose={onClose}
+            onSave={dados => {
+              onSave(dados)
+              if (!inQueue || isLast) onClose()
+              // se não é último, o pai (fila) já avança — modal some via key
+            }}
+            onDelete={onDelete ? () => { onDelete(); onClose() } : undefined}
+          />
         </div>
       </div>
     )
   }
 
   // Modo novo: múltiplos arquivos
-  return <MultiStoryModal grupos={grupos} onClose={onClose} onSave={onSave} />
+  return <MultiStoryModal onClose={onClose} onSave={onSave} />
 }
 
 // ─── Multi upload ─────────────────────────────────────────────────────────────
-function MultiStoryModal({ grupos, onClose, onSave }) {
+function MultiStoryModal({ onClose, onSave }) {
   const [files, setFiles]           = useState([])
   const [current, setCurrent]       = useState(0)
   const [dragging, setDragging]     = useState(false)
@@ -407,7 +456,6 @@ function MultiStoryModal({ grupos, onClose, onSave }) {
           ref={singleRef}
           initialPost={initialPost}
           initialPreview={initialPreview}
-          grupos={grupos}
           onClose={onClose}
           onSave={dados => {
             onSave(dados)
