@@ -120,51 +120,54 @@ export default function PostsRanking() {
   return (
     <div className="card" style={{ overflow: 'hidden', marginBottom: 18 }}>
       <div style={{ padding: '16px 20px 12px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <div>
-            <h2 style={{ color: '#1C252E', fontSize: 15, fontWeight: 700, margin: 0 }}>Ranking de posts</h2>
-            <p style={{ color: '#8A9BB0', fontSize: 12, marginTop: 2 }}>
-              {q ? `${posts.length} resultado${posts.length !== 1 ? 's' : ''} em todos os posts` : `${posts.length} publicações`}
-            </p>
-          </div>
-          {isEditMode && sorted.length > 0 && (
-            <button onClick={() => selectMode ? clearSelection() : setSelectMode(true)} style={{
-              background: 'none', border: 'none', cursor: 'pointer', padding: '2px 4px',
-              display: 'flex', alignItems: 'center', gap: 4,
-              color: selectMode ? '#F97316' : '#C0CAD4',
-              fontSize: 11, fontWeight: 600,
-              transition: 'color 0.15s',
-            }}>
-              <CheckSquare size={12} />
-              {selectMode ? 'Cancelar' : 'Selecionar'}
-            </button>
-          )}
+        <div>
+          <h2 style={{ color: '#1C252E', fontSize: 15, fontWeight: 700, margin: 0 }}>Ranking de posts</h2>
+          <p style={{ color: '#8A9BB0', fontSize: 12, marginTop: 2 }}>
+            {q ? `${posts.length} resultado${posts.length !== 1 ? 's' : ''} em todos os posts` : `${posts.length} publicações`}
+          </p>
         </div>
-        {/* Campo de busca */}
-        <div style={{
-          display: 'flex', alignItems: 'center', gap: 8,
-          background: '#F5F7FA', borderRadius: 10,
-          border: `1.5px solid ${q ? '#F97316' : '#EDEFF2'}`,
-          padding: '7px 12px',
-          transition: 'border-color 0.15s',
-          flex: mobile ? '1 1 100%' : '0 0 auto',
-          minWidth: mobile ? 0 : 220,
-        }}>
-          <Search size={14} color={q ? '#F97316' : '#A8B5C0'} style={{ flexShrink: 0 }} />
-          <input
-            value={search}
-            onChange={e => { setSearch(e.target.value); setPage(0) }}
-            placeholder="Buscar por nome, data, tema..."
-            style={{
-              border: 'none', background: 'transparent', outline: 'none',
-              fontSize: 13, color: '#182638', width: '100%',
-              fontFamily: 'DM Sans, sans-serif',
-            }}
-          />
-          {q && (
-            <button onClick={() => { setSearch(''); setPage(0) }}
-              style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex' }}>
-              <X size={13} color="#A8B5C0" />
+        {/* Campo de busca + ícone de seleção */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: mobile ? '1 1 100%' : '0 0 auto' }}>
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: 8,
+            background: '#F5F7FA', borderRadius: 10,
+            border: `1.5px solid ${q ? '#F97316' : '#EDEFF2'}`,
+            padding: '7px 12px',
+            transition: 'border-color 0.15s',
+            flex: '1 1 auto',
+            minWidth: mobile ? 0 : 220,
+          }}>
+            <Search size={14} color={q ? '#F97316' : '#A8B5C0'} style={{ flexShrink: 0 }} />
+            <input
+              value={search}
+              onChange={e => { setSearch(e.target.value); setPage(0) }}
+              placeholder="Buscar por nome, data, tema..."
+              style={{
+                border: 'none', background: 'transparent', outline: 'none',
+                fontSize: 13, color: '#182638', width: '100%',
+                fontFamily: 'DM Sans, sans-serif',
+              }}
+            />
+            {q && (
+              <button onClick={() => { setSearch(''); setPage(0) }}
+                style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex' }}>
+                <X size={13} color="#A8B5C0" />
+              </button>
+            )}
+          </div>
+          {isEditMode && !mobile && sorted.length > 0 && (
+            <button
+              onClick={() => selectMode ? clearSelection() : setSelectMode(true)}
+              title={selectMode ? 'Cancelar seleção' : 'Selecionar posts'}
+              style={{
+                background: selectMode ? 'rgba(249,115,22,0.08)' : '#F5F7FA',
+                border: `1.5px solid ${selectMode ? 'rgba(249,115,22,0.3)' : '#EDEFF2'}`,
+                borderRadius: 10, padding: '7px 9px', cursor: 'pointer', flexShrink: 0,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                color: selectMode ? '#F97316' : '#A8B5C0',
+                transition: 'all 0.15s',
+              }}>
+              <CheckSquare size={15} />
             </button>
           )}
         </div>
