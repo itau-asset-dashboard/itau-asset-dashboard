@@ -77,12 +77,6 @@ export function PostRankRow({ post, i, maxVal, firstColor = '#F97316', onClick }
     >
       <PositionPill i={i} />
 
-      {/* Dot colorido do tipo */}
-      <div style={{
-        width: 8, height: 8, borderRadius: '50%',
-        background: color, flexShrink: 0,
-      }} />
-
       {/* Nome + barra */}
       <div style={{ flex: 1, minWidth: 0 }}>
         <p style={{
@@ -91,7 +85,7 @@ export function PostRankRow({ post, i, maxVal, firstColor = '#F97316', onClick }
         }}>
           {post.nome || post.tema || '—'}
         </p>
-        <div style={{ background: '#F0F2F5', borderRadius: 3, height: 3, overflow: 'hidden' }}>
+        <div style={{ background: '#F0F2F5', borderRadius: 3, height: 4, overflow: 'hidden' }}>
           <div style={{
             height: '100%', borderRadius: 3,
             background: barColor, width: `${pct}%`, transition: 'width 0.5s ease',

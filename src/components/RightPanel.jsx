@@ -179,8 +179,6 @@ export default function RightPanel() {
               onMouseEnter={e=>e.currentTarget.style.background='#F8FAFC'}
               onMouseLeave={e=>e.currentTarget.style.background='transparent'}
               >
-                {/* Dot colorido do tipo */}
-                <div style={{ width:7, height:7, borderRadius:'50%', background:color, flexShrink:0 }} />
                 <div style={{ flex:1, minWidth:0 }}>
                   <p style={{ color:'#182638', fontSize:12, fontWeight:600, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
                     {p.nome||p.tema||p.descricao||'—'}
