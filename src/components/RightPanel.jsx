@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { Edit2, Check } from 'lucide-react'
 import { calcMetaMesProgressiva } from '../utils/metaCalc'
 import { useStore } from '../store/useStore'
-import UploadModal from './UploadModal'
 
 const MESES_NOMES = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro']
 function mesFiltroLabel(val) {
@@ -17,8 +16,6 @@ function fmt(n) {
   if (n>=1000) return (n/1000).toFixed(1).replace('.',',')+'K'
   return n.toLocaleString('pt-BR')
 }
-
-const TIPO_COLOR = { Carrossel:'#F97316', Reels:'#182638', 'Foto estática':'#0E7490' }
 
 function EditableValue({ value, color, onSave }) {
   const [editing, setEditing] = useState(false)
@@ -46,20 +43,13 @@ function EditableValue({ value, color, onSave }) {
 }
 
 export default function RightPanel() {
-  const { metaMensal, setMetaMensal, metaAnual, getPostsDoMes, posts: allPosts, updatePost, deletePost, mesFiltro } = useStore()
+  const { setMetaMensal, metaAnual, getPostsDoMes, posts: allPosts, mesFiltro } = useStore()
   const postsMes = getPostsDoMes()
-  const [editTarget, setEditTarget] = useState(null)
-  const totalMensal    = postsMes.reduce((s,p)=>s+(p.contas_alcancadas||0),0)
+  const totalMensal = postsMes.reduce((s,p)=>s+(p.contas_alcancadas||0),0)
   const [mmFiltro, yyyyFiltro] = (mesFiltro || '').split('/')
   const metaAjustada = calcMetaMesProgressiva({ posts: allPosts, metaAnual, mm: mmFiltro, yyyy: yyyyFiltro })
-  const pctMensal      = metaAjustada>0 ? Math.min((totalMensal/metaAjustada)*100,100) : 0
+  const pctMensal = metaAjustada>0 ? Math.min((totalMensal/metaAjustada)*100,100) : 0
   const metaMesOriginal = Math.round(metaAnual/12)
-
-  const recentes = [...allPosts]
-    .sort((a,b)=>{
-      const p=(s)=>{const[d,m,y]=(s||'').split('/');return new Date(`${y}-${m}-${d}`)}
-      return p(b.data_post)-p(a.data_post)
-    }).slice(0,10)
 
   return (
     <aside className="right-panel-desktop" style={{
@@ -68,23 +58,26 @@ export default function RightPanel() {
       background: '#FFFFFF',
       borderLeft: '1px solid #E8ECF0',
       display: 'flex',
-      flexDirection: 'column',
-      padding: '16px 14px',
-      gap: 12,
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: '24px 16px',
       flexShrink: 0,
-      overflow: 'hidden',
     }}>
+      <div style={{ background:'#F5F8FA', borderRadius:16, padding:'20px', border:'1px solid #E8ECF0', width:'100%' }}>
+        <p style={{ color:'#8A9BB0', fontSize:10, fontWeight:700, textTransform:'uppercase', letterSpacing:'0.08em', marginBottom:14 }}>
+          {mesFiltroLabel(mesFiltro)}
+        </p>
 
-      {/* Card meta anual — principal */}
-      {/* Card meta do mês */}
-      <div style={{ background:'#F5F8FA', borderRadius:16, padding:'14px', border:'1px solid #E8ECF0' }}>
-        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:12 }}>
-          <p style={{ color:'#8A9BB0', fontSize:10, fontWeight:700, textTransform:'uppercase', letterSpacing:'0.08em' }}>
-            {mesFiltroLabel(mesFiltro)}
+        {/* Percentual em destaque */}
+        <div style={{ textAlign:'center', marginBottom:16 }}>
+          <p style={{ color: pctMensal>=100 ? '#16a34a' : '#F97316', fontSize:36, fontWeight:800, lineHeight:1 }}>
+            {pctMensal.toFixed(0)}%
           </p>
-          <p style={{ color:'#1C252E', fontSize:11, fontWeight:700 }}>{pctMensal.toFixed(0)}%</p>
+          <p style={{ color:'#8A9BB0', fontSize:11, marginTop:4 }}>da meta do mês</p>
         </div>
-        <div style={{ background:'#E8ECF0', borderRadius:4, height:6, overflow:'hidden', marginBottom:10 }}>
+
+        {/* Barra */}
+        <div style={{ background:'#E8ECF0', borderRadius:4, height:6, overflow:'hidden', marginBottom:16 }}>
           <div style={{
             height:'100%', borderRadius:4,
             background: pctMensal>=100 ? '#16a34a' : '#F97316',
@@ -92,65 +85,24 @@ export default function RightPanel() {
             transition:'width 0.6s ease',
           }}/>
         </div>
+
+        {/* Alcançado × Meta */}
         <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center' }}>
           <div>
-            <p style={{ color:'#F97316', fontSize:18, fontWeight:800, lineHeight:1 }}>{fmt(totalMensal)}</p>
+            <p style={{ color:'#F97316', fontSize:20, fontWeight:800, lineHeight:1 }}>{fmt(totalMensal)}</p>
             <p style={{ color:'#8A9BB0', fontSize:10, marginTop:3 }}>alcançadas</p>
           </div>
           <div style={{ textAlign:'right' }}>
             <EditableValue value={metaAjustada} color="#0891B2" onSave={setMetaMensal}/>
           </div>
         </div>
+
         {metaAjustada !== metaMesOriginal && (
-          <p style={{ color:'#8A9BB0', fontSize:10, marginTop:10, textAlign:'center', lineHeight:1.4 }}>
+          <p style={{ color:'#8A9BB0', fontSize:10, marginTop:12, textAlign:'center', lineHeight:1.4 }}>
             ↻ Meta ajustada (saldo acumulado)
           </p>
         )}
       </div>
-
-      {/* Posts recentes */}
-      <div style={{ flex:1, display:'flex', flexDirection:'column', overflow:'hidden', minHeight:0 }}>
-        <p style={{ color:'#8A9BB0', fontSize:10, fontWeight:700, textTransform:'uppercase', letterSpacing:'0.08em', marginBottom:8 }}>
-          Posts recentes
-        </p>
-        <div style={{ display:'flex', flexDirection:'column', gap:8, overflowY:'auto', flex:1 }} className="scrollbar-thin">
-          {recentes.length===0 && (
-            <p style={{ color:'#8A9BB0', fontSize:12, textAlign:'center', marginTop:16 }}>Nenhum post ainda</p>
-          )}
-          {recentes.map(p=>{
-            const color = TIPO_COLOR[p.tipo] || '#0891B2'
-            return (
-              <div key={p.id} onClick={()=>setEditTarget(p)} style={{
-                background:'transparent', border:'1px solid #EDEFF2',
-                borderRadius:10, padding:'10px 12px',
-                display:'flex', alignItems:'center', gap:9, flexShrink:0,
-                cursor:'pointer', transition:'background 0.1s',
-              }}
-              onMouseEnter={e=>e.currentTarget.style.background='#F8FAFC'}
-              onMouseLeave={e=>e.currentTarget.style.background='transparent'}
-              >
-                <div style={{ flex:1, minWidth:0 }}>
-                  <p style={{ color:'#182638', fontSize:12, fontWeight:600, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
-                    {p.nome||p.tema||p.descricao||'—'}
-                  </p>
-                  <p style={{ color:'#A8B5C0', fontSize:10, marginTop:2, display:'flex', alignItems:'center', gap:4 }}>
-                    {p.data_post}
-                    {p.status==='parcial' && <span style={{ color:'#d97706', fontSize:9, fontWeight:600 }}>parcial</span>}
-                  </p>
-                </div>
-                <span style={{ color, fontSize:12, fontWeight:700, flexShrink:0 }}>{fmt(p.contas_alcancadas)}</span>
-              </div>
-            )
-          })}
-        </div>
-      </div>
-
-{editTarget && (
-        <UploadModal mode="update" post={editTarget}
-          onClose={()=>setEditTarget(null)}
-          onSave={dados=>{updatePost(editTarget.id,dados);setEditTarget(null)}}
-          onDelete={()=>{deletePost(editTarget.id);setEditTarget(null)}}/>
-      )}
     </aside>
   )
 }

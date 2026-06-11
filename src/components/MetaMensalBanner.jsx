@@ -21,6 +21,7 @@ export default function MetaMensalBanner() {
   const pct  = meta > 0 ? Math.min((total / meta) * 100, 100) : 0
   const mesNome = MESES_NOMES[(parseInt(mm, 10) || 1) - 1]
 
+  if (!mobile) return null
   return (
     <div className="card" style={{ padding: '14px 16px', marginBottom: 4 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>

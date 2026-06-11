@@ -11,6 +11,7 @@ import ThemeAnalysis from './components/ThemeAnalysis'
 import Insights from './components/Insights'
 import UploadSection from './components/UploadSection'
 import SyncBadge from './components/SyncBadge'
+import RightPanel from './components/RightPanel'
 import AnnualView from './components/AnnualView'
 import TopPostsMes from './components/TopPostsMes'
 import ETFsView from './components/ETFsView'
@@ -102,6 +103,7 @@ export default function App() {
         </div>
       </div>
 
+      {activeSection === 'visao-geral' && <RightPanel />}
     </div>
   )
 }
