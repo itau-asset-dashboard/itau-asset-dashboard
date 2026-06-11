@@ -118,7 +118,20 @@ export default function PostsRanking() {
   )
 
   return (
-    <div className="card" style={{ overflow: 'hidden', marginBottom: 18 }}>
+    <div className="card" style={{ overflow: 'hidden', marginBottom: 18, position: 'relative' }}>
+      {isEditMode && sorted.length > 0 && (
+        <button onClick={() => selectMode ? clearSelection() : setSelectMode(true)} style={{
+          position: 'absolute', top: 14, right: 20,
+          background: 'none', border: 'none', cursor: 'pointer', padding: '2px 4px',
+          display: 'flex', alignItems: 'center', gap: 4,
+          color: selectMode ? '#F97316' : '#B0BEC5',
+          fontSize: 11, fontWeight: 600,
+          transition: 'color 0.15s',
+        }}>
+          <CheckSquare size={13} />
+          {selectMode ? 'Cancelar' : 'Selecionar'}
+        </button>
+      )}
       <div style={{ padding: '16px 20px 12px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
         <div>
           <h2 style={{ color: '#1C252E', fontSize: 15, fontWeight: 700, margin: 0 }}>Ranking de posts</h2>
@@ -126,27 +139,6 @@ export default function PostsRanking() {
             {q ? `${posts.length} resultado${posts.length !== 1 ? 's' : ''} em todos os posts` : `${posts.length} publicações`}
           </p>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-          {isEditMode && !selectMode && sorted.length > 0 && (
-            <button onClick={() => setSelectMode(true)} style={{
-              background: '#F5F7FA', color: '#4A6272', border: '1.5px solid #EDEFF2', borderRadius: 10,
-              padding: '7px 12px', fontSize: 13, fontWeight: 600, cursor: 'pointer',
-              display: 'flex', alignItems: 'center', gap: 5,
-            }}>
-              <CheckSquare size={14} /> Selecionar
-            </button>
-          )}
-          {isEditMode && selectMode && (
-            <button onClick={clearSelection} style={{
-              background: '#F5F7FA', color: '#8A9BB0', border: '1.5px solid #EDEFF2', borderRadius: 10,
-              padding: '7px 12px', fontSize: 13, fontWeight: 600, cursor: 'pointer',
-              display: 'flex', alignItems: 'center', gap: 5,
-            }}>
-              <X size={14} /> Cancelar
-            </button>
-          )}
-        </div>
-
         {/* Campo de busca */}
         <div style={{
           display: 'flex', alignItems: 'center', gap: 8,
