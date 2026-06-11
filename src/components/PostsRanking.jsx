@@ -118,26 +118,27 @@ export default function PostsRanking() {
   )
 
   return (
-    <div className="card" style={{ overflow: 'hidden', marginBottom: 18, position: 'relative' }}>
-      {isEditMode && sorted.length > 0 && (
-        <button onClick={() => selectMode ? clearSelection() : setSelectMode(true)} style={{
-          position: 'absolute', top: 14, right: 20,
-          background: 'none', border: 'none', cursor: 'pointer', padding: '2px 4px',
-          display: 'flex', alignItems: 'center', gap: 4,
-          color: selectMode ? '#F97316' : '#B0BEC5',
-          fontSize: 11, fontWeight: 600,
-          transition: 'color 0.15s',
-        }}>
-          <CheckSquare size={13} />
-          {selectMode ? 'Cancelar' : 'Selecionar'}
-        </button>
-      )}
+    <div className="card" style={{ overflow: 'hidden', marginBottom: 18 }}>
       <div style={{ padding: '16px 20px 12px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
-        <div>
-          <h2 style={{ color: '#1C252E', fontSize: 15, fontWeight: 700, margin: 0 }}>Ranking de posts</h2>
-          <p style={{ color: '#8A9BB0', fontSize: 12, marginTop: 2 }}>
-            {q ? `${posts.length} resultado${posts.length !== 1 ? 's' : ''} em todos os posts` : `${posts.length} publicações`}
-          </p>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <div>
+            <h2 style={{ color: '#1C252E', fontSize: 15, fontWeight: 700, margin: 0 }}>Ranking de posts</h2>
+            <p style={{ color: '#8A9BB0', fontSize: 12, marginTop: 2 }}>
+              {q ? `${posts.length} resultado${posts.length !== 1 ? 's' : ''} em todos os posts` : `${posts.length} publicações`}
+            </p>
+          </div>
+          {isEditMode && sorted.length > 0 && (
+            <button onClick={() => selectMode ? clearSelection() : setSelectMode(true)} style={{
+              background: 'none', border: 'none', cursor: 'pointer', padding: '2px 4px',
+              display: 'flex', alignItems: 'center', gap: 4,
+              color: selectMode ? '#F97316' : '#C0CAD4',
+              fontSize: 11, fontWeight: 600,
+              transition: 'color 0.15s',
+            }}>
+              <CheckSquare size={12} />
+              {selectMode ? 'Cancelar' : 'Selecionar'}
+            </button>
+          )}
         </div>
         {/* Campo de busca */}
         <div style={{
