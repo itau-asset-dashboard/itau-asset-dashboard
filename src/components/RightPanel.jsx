@@ -18,9 +18,7 @@ function fmt(n) {
   return n.toLocaleString('pt-BR')
 }
 
-const TIPO_ICON  = { Carrossel: LayoutPanelLeft, Reels: Film, 'Foto estática': Image }
-const TIPO_COLOR = { Carrossel:'#F97316', Reels:'#0891B2', 'Foto estática':'#0E7490' }
-const TIPO_BG    = { Carrossel:'rgba(249,115,22,0.08)', Reels:'rgba(8,145,178,0.08)', 'Foto estática':'rgba(14,116,144,0.08)' }
+const TIPO_COLOR = { Carrossel:'#F97316', Reels:'#182638', 'Foto estática':'#0E7490' }
 
 function EditableValue({ value, color, onSave }) {
   const [editing, setEditing] = useState(false)
