@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { ArrowUpDown, ChevronLeft, ChevronRight, ArrowUp, ArrowDown, Search, X } from 'lucide-react'
+import { useState, useCallback } from 'react'
+import { ArrowUpDown, ChevronLeft, ChevronRight, ArrowUp, ArrowDown, Search, X, CheckSquare, Square } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import UploadModal from './UploadModal'
 import { temasLabel, getTemas } from '../utils/temas'
@@ -30,11 +30,39 @@ export default function PostsRanking() {
   const { getPostsDoMes, posts: allPosts, updatePost, deletePost, isEditMode } = useStore()
   const mobile = useIsMobile()
 
-  const [search, setSearch]     = useState('')
-  const [sortKey, setSortKey]   = useState('data_post')
-  const [sortDir, setSortDir]   = useState(-1)
-  const [page, setPage]         = useState(0)
+  const [search, setSearch]         = useState('')
+  const [sortKey, setSortKey]       = useState('data_post')
+  const [sortDir, setSortDir]       = useState(-1)
+  const [page, setPage]             = useState(0)
   const [updateTarget, setUpdateTarget] = useState(null)
+  const [selectMode, setSelectMode] = useState(false)
+  const [selected, setSelected]     = useState(new Set())
+  const [editQueue, setEditQueue]   = useState([])
+  const [editQueueTotal, setQueueTotal] = useState(0)
+
+  const toggleSelect = useCallback((id) => {
+    setSelected(prev => {
+      const next = new Set(prev)
+      next.has(id) ? next.delete(id) : next.add(id)
+      return next
+    })
+  }, [])
+
+  const clearSelection = () => { setSelected(new Set()); setSelectMode(false) }
+
+  function startMultiEdit() {
+    const queue = sorted.filter(p => selected.has(p.id))
+    if (!queue.length) return
+    setEditQueue(queue)
+    setQueueTotal(queue.length)
+    setSelected(new Set())
+    setSelectMode(false)
+  }
+
+  function handleQueueSave(dados) {
+    updatePost(editQueue[0].id, dados)
+    setEditQueue(q => q.slice(1))
+  }
 
   const q = search.trim().toLowerCase()
 
@@ -98,6 +126,27 @@ export default function PostsRanking() {
             {q ? `${posts.length} resultado${posts.length !== 1 ? 's' : ''} em todos os posts` : `${posts.length} publicações`}
           </p>
         </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+          {isEditMode && !selectMode && sorted.length > 0 && (
+            <button onClick={() => setSelectMode(true)} style={{
+              background: '#F5F7FA', color: '#4A6272', border: '1.5px solid #EDEFF2', borderRadius: 10,
+              padding: '7px 12px', fontSize: 13, fontWeight: 600, cursor: 'pointer',
+              display: 'flex', alignItems: 'center', gap: 5,
+            }}>
+              <CheckSquare size={14} /> Selecionar
+            </button>
+          )}
+          {isEditMode && selectMode && (
+            <button onClick={clearSelection} style={{
+              background: '#F5F7FA', color: '#8A9BB0', border: '1.5px solid #EDEFF2', borderRadius: 10,
+              padding: '7px 12px', fontSize: 13, fontWeight: 600, cursor: 'pointer',
+              display: 'flex', alignItems: 'center', gap: 5,
+            }}>
+              <X size={14} /> Cancelar
+            </button>
+          )}
+        </div>
+
         {/* Campo de busca */}
         <div style={{
           display: 'flex', alignItems: 'center', gap: 8,
@@ -132,6 +181,7 @@ export default function PostsRanking() {
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
             <tr>
+              {selectMode && <th style={{ width: 36, padding: '11px 8px 11px 16px', background: '#FAFBFC' }} />}
               <Th k="data_post">Data</Th>
               <th style={{ padding: mobile ? '10px 10px' : '11px 14px', color: '#8A9BB0', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', textAlign: 'left', background: '#FAFBFC' }}>
                 {mobile ? 'Post' : 'Post / Tema'}
@@ -157,11 +207,22 @@ export default function PostsRanking() {
               const tipoAbrev = p.tipo === 'Foto estática' ? 'Foto' : p.tipo
               return (
                 <tr key={p.id}
-                  style={{ borderTop: '1px solid #F5F7FA', cursor: isEditMode ? 'pointer' : 'default' }}
-                  onClick={() => isEditMode && setUpdateTarget(p)}
-                  onMouseEnter={e => e.currentTarget.style.background = '#FAFBFC'}
-                  onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+                  style={{
+                    borderTop: '1px solid #F5F7FA',
+                    cursor: isEditMode ? 'pointer' : 'default',
+                    background: selected.has(p.id) ? 'rgba(249,115,22,0.04)' : 'transparent',
+                  }}
+                  onClick={() => selectMode ? toggleSelect(p.id) : (isEditMode && setUpdateTarget(p))}
+                  onMouseEnter={e => { if (!selected.has(p.id)) e.currentTarget.style.background = '#FAFBFC' }}
+                  onMouseLeave={e => { e.currentTarget.style.background = selected.has(p.id) ? 'rgba(249,115,22,0.04)' : 'transparent' }}
                 >
+                  {selectMode && (
+                    <td style={{ padding: '12px 8px 12px 16px' }} onClick={e => { e.stopPropagation(); toggleSelect(p.id) }}>
+                      {selected.has(p.id)
+                        ? <CheckSquare size={15} color="#F97316" />
+                        : <Square size={15} color="#D0D8E0" />}
+                    </td>
+                  )}
                   <td style={{ padding: mobile ? '10px 8px' : '12px 14px', color: '#8A9BB0', fontSize: mobile ? 11 : 12, whiteSpace: 'nowrap' }}>{p.data_post}</td>
                   <td style={{ padding: mobile ? '10px 8px' : '12px 14px', overflow: 'hidden' }}>
                     <p style={{ color: '#1C252E', fontSize: mobile ? 12 : 13, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: mobile ? 160 : 200 }}>
@@ -210,11 +271,51 @@ export default function PostsRanking() {
         </div>
       )}
 
+      {/* Barra flutuante de seleção */}
+      {selected.size > 0 && (
+        <div style={{
+          position: 'fixed', bottom: 80, left: '50%', transform: 'translateX(-50%)',
+          background: '#1C252E', borderRadius: 14, padding: '12px 20px',
+          display: 'flex', alignItems: 'center', gap: 14,
+          boxShadow: '0 8px 32px rgba(0,0,0,0.22)', zIndex: 500, whiteSpace: 'nowrap',
+        }}>
+          <span style={{ color: '#C3EBF7', fontSize: 13, fontWeight: 600 }}>
+            {selected.size} selecionado{selected.size > 1 ? 's' : ''}
+          </span>
+          <div style={{ width: 1, height: 18, background: 'rgba(255,255,255,0.15)' }} />
+          <button onClick={startMultiEdit} style={{
+            background: '#F97316', color: '#fff', border: 'none', borderRadius: 9,
+            padding: '7px 14px', fontSize: 13, fontWeight: 700, cursor: 'pointer',
+            display: 'flex', alignItems: 'center', gap: 6,
+          }}>
+            Editar {selected.size > 1 ? `${selected.size} posts` : 'post'}
+          </button>
+          <button onClick={clearSelection} style={{
+            background: 'transparent', color: '#8A9BB0', border: 'none', cursor: 'pointer', padding: 4, display: 'flex',
+          }}>
+            <X size={16} />
+          </button>
+        </div>
+      )}
+
       {updateTarget && (
         <UploadModal mode="update" post={updateTarget}
           onClose={() => setUpdateTarget(null)}
           onSave={(dados) => { updatePost(updateTarget.id, dados); setUpdateTarget(null) }}
           onDelete={() => { deletePost(updateTarget.id); setUpdateTarget(null) }}
+        />
+      )}
+
+      {editQueue.length > 0 && (
+        <UploadModal
+          key={editQueue[0].id}
+          mode="update"
+          post={editQueue[0]}
+          queueIdx={editQueueTotal - editQueue.length}
+          queueTotal={editQueueTotal}
+          onClose={() => setEditQueue([])}
+          onSave={handleQueueSave}
+          onDelete={() => { deletePost(editQueue[0].id); setEditQueue(q => q.slice(1)) }}
         />
       )}
     </div>

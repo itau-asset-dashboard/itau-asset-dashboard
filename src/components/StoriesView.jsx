@@ -158,6 +158,7 @@ export default function StoriesView() {
     setEditQueue(queue)
     setQueueTotal(queue.length)
     setSelected(new Set())
+    setSelectMode(false)
   }
 
   function handleQueueSave(dados) {
@@ -238,6 +239,15 @@ export default function StoriesView() {
               display: 'flex', alignItems: 'center', gap: 5,
             }}>
               <CheckSquare size={14} /> Selecionar
+            </button>
+          )}
+          {isEditMode && selectMode && (
+            <button onClick={clearSelection} style={{
+              background: '#F5F7FA', color: '#8A9BB0', border: '1.5px solid #EDEFF2', borderRadius: 10,
+              padding: '7px 12px', fontSize: 13, fontWeight: 600, cursor: 'pointer',
+              display: 'flex', alignItems: 'center', gap: 5,
+            }}>
+              <X size={14} /> Cancelar
             </button>
           )}
           {isEditMode && (
