@@ -137,6 +137,7 @@ export default function StoriesView() {
   const [search, setSearch]         = useState('')
   const [temaFiltro, setTemaFiltro] = useState('')   // filtro por tema
   const [selected, setSelected]         = useState(new Set())
+  const [selectMode, setSelectMode]     = useState(false)
   const [editQueue, setEditQueue]       = useState([])
   const [editQueueTotal, setQueueTotal] = useState(0)
 
@@ -148,8 +149,8 @@ export default function StoriesView() {
     })
   }, [])
 
-  const clearSelection = () => setSelected(new Set())
-  const selectAll = (list) => setSelected(new Set(list.map(s => s.id)))
+  const clearSelection = () => { setSelected(new Set()); setSelectMode(false) }
+  const selectAll = (list) => { setSelectMode(true); setSelected(new Set(list.map(s => s.id))) }
 
   function startMultiEdit() {
     const queue = sorted.filter(s => selected.has(s.id))
@@ -230,8 +231,8 @@ export default function StoriesView() {
             style={{ background: '#fff', border: '1.5px solid #EDEFF2', borderRadius: 10, padding: '7px 10px', fontSize: 13, color: '#1C252E', outline: 'none', fontFamily: 'DM Sans, sans-serif' }}>
             {MESES.map((m, i) => <option key={m} value={m}>{MESES_LABEL[i]} 2026</option>)}
           </select>
-          {isEditMode && selected.size === 0 && sorted.length > 0 && (
-            <button onClick={() => selectAll(sorted)} style={{
+          {isEditMode && !selectMode && sorted.length > 0 && (
+            <button onClick={() => setSelectMode(true)} style={{
               background: '#F5F7FA', color: '#4A6272', border: '1.5px solid #EDEFF2', borderRadius: 10,
               padding: '7px 12px', fontSize: 13, fontWeight: 600, cursor: 'pointer',
               display: 'flex', alignItems: 'center', gap: 5,
@@ -321,7 +322,7 @@ export default function StoriesView() {
           </div>
         ) : sorted.map(st => (
           <StoryRow key={st.id} story={st} isEditMode={isEditMode} onEdit={setEditTarget}
-            selected={selected.has(st.id)} onToggleSelect={isEditMode ? toggleSelect : null} />
+            selected={selected.has(st.id)} onToggleSelect={selectMode ? toggleSelect : null} />
         ))}
       </div>
 
