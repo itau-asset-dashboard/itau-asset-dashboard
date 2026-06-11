@@ -59,7 +59,7 @@ export default function RightPanel() {
     .sort((a,b)=>{
       const p=(s)=>{const[d,m,y]=(s||'').split('/');return new Date(`${y}-${m}-${d}`)}
       return p(b.data_post)-p(a.data_post)
-    }).slice(0,5)
+    }).slice(0,10)
 
   return (
     <aside className="right-panel-desktop" style={{
@@ -113,7 +113,7 @@ export default function RightPanel() {
         <p style={{ color:'#8A9BB0', fontSize:10, fontWeight:700, textTransform:'uppercase', letterSpacing:'0.08em', marginBottom:8 }}>
           Posts recentes
         </p>
-        <div style={{ display:'flex', flexDirection:'column', gap:6, overflowY:'auto', flex:1 }} className="scrollbar-thin">
+        <div style={{ display:'flex', flexDirection:'column', gap:8, overflowY:'auto', flex:1 }} className="scrollbar-thin">
           {recentes.length===0 && (
             <p style={{ color:'#8A9BB0', fontSize:12, textAlign:'center', marginTop:16 }}>Nenhum post ainda</p>
           )}
@@ -122,7 +122,7 @@ export default function RightPanel() {
             return (
               <div key={p.id} onClick={()=>setEditTarget(p)} style={{
                 background:'transparent', border:'1px solid #EDEFF2',
-                borderRadius:10, padding:'8px 10px',
+                borderRadius:10, padding:'10px 12px',
                 display:'flex', alignItems:'center', gap:9, flexShrink:0,
                 cursor:'pointer', transition:'background 0.1s',
               }}
