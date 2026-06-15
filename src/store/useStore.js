@@ -60,15 +60,26 @@ export const useStore = create(
             try { legacyEvidencias = JSON.parse(evidenciasRaw) } catch (_) {}
           }
 
+          // Recupera URLs de imagem que ficaram pendentes (página morreu no mobile)
+          const recoveredImages = {}
+          for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i)
+            if (key?.startsWith('pending_image_')) {
+              const postId = key.replace('pending_image_', '')
+              recoveredImages[postId] = localStorage.getItem(key)
+            }
+          }
+
           const posts = cloudPosts.map(cp => {
             const local = localPosts.find(lp => lp.id === cp.id)
             const evidencia = cp.data_evidencia
               || legacyEvidencias[cp.id]
               || local?.data_evidencia
               || ''
-            // Se há um save em andamento para este post, preserva a imageUrl local
+            // Prioridade: save em andamento > URL recuperada do localStorage > cloud
             const pending = pendingUpdates.get(cp.id)
-            const imageUrl = pending?.imageUrl ?? cp.imageUrl ?? local?.imageUrl ?? null
+            const recovered = recoveredImages[cp.id]
+            const imageUrl = pending?.imageUrl ?? recovered ?? cp.imageUrl ?? local?.imageUrl ?? null
             const merged = { ...cp, data_evidencia: evidencia, imageUrl }
             const temaNorm = normalizeTema(merged.tema)
             const dateNorm = normalizeDate(merged.data_post)
@@ -130,6 +141,20 @@ export const useStore = create(
           const toSave = [...orphansNorm, ...dirty]
           if (toSave.length > 0) {
             toSave.forEach(p => { try { upsertPost(p) } catch (_) {} })
+          }
+
+          // Reenviar imagens que ficaram pendentes (mobile matou a página antes do upsert)
+          const recoveredIds = Object.keys(recoveredImages)
+          if (recoveredIds.length > 0) {
+            recoveredIds.forEach(async pid => {
+              const post = posts.find(p => p.id === pid)
+              if (post) {
+                try {
+                  await upsertPost(post)
+                  localStorage.removeItem('pending_image_' + pid)
+                } catch (_) {}
+              }
+            })
           }
 
           // Sempre garante que oliverData local está no Supabase
@@ -196,13 +221,14 @@ export const useStore = create(
         const srcForUpload = imagePreview || restData.imageData
         const isNewImage = srcForUpload?.startsWith('data:')
         if (isNewImage) {
-          // Registra save em andamento antes de qualquer await
           pendingUpdates.set(id, { imageUrl })
           try {
             const uploaded = await uploadImage(id, srcForUpload)
-            // Cache-buster para forçar CDN a servir a versão nova
             imageUrl = uploaded ? `${uploaded.split('?')[0]}?v=${Date.now()}` : imageUrl
-            pendingUpdates.set(id, { imageUrl }) // atualiza com nova URL
+            pendingUpdates.set(id, { imageUrl })
+            // Write-ahead log: persiste URL no localStorage imediatamente após upload.
+            // Se a página morrer antes do upsertPost, o sync vai recuperar no próximo load.
+            try { localStorage.setItem('pending_image_' + id, imageUrl) } catch (_) {}
           } catch (e) {
             console.error('[updatePost] upload de imagem falhou:', e)
             set({ syncError: 'Erro ao fazer upload da imagem: ' + (e?.message || String(e)) })
@@ -235,6 +261,8 @@ export const useStore = create(
         if (updated) {
           try {
             await upsertPost(updated)
+            // Upsert confirmado — limpa write-ahead log
+            try { localStorage.removeItem('pending_image_' + id) } catch (_) {}
           } catch (e) {
             console.error('[updatePost] upsert falhou:', e)
             set({ syncError: 'Erro ao salvar post: ' + (e?.message || JSON.stringify(e)) })
