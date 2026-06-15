@@ -191,10 +191,17 @@ export const useStore = create(
         // Usa imagePreview (original) para Storage; fallback para imageData comprimido
         let imageUrl = restData.imageUrl
         const srcForUpload = imagePreview || restData.imageData
-        if (srcForUpload?.startsWith('data:')) {
+        // Só faz upload se a imagem mudou (é um novo base64, não uma URL existente)
+        const isNewImage = srcForUpload?.startsWith('data:')
+        if (isNewImage) {
           try {
-            imageUrl = await uploadImage(id, srcForUpload)
-          } catch (_) {}
+            const uploaded = await uploadImage(id, srcForUpload)
+            // Adiciona cache-buster para garantir que CDN sirva a versão nova
+            imageUrl = uploaded ? `${uploaded.split('?')[0]}?v=${Date.now()}` : imageUrl
+          } catch (e) {
+            console.error('[updatePost] upload de imagem falhou:', e)
+            set({ syncError: 'Erro ao fazer upload da imagem: ' + (e?.message || String(e)) })
+          }
         }
 
         set((state) => {
