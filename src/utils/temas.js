@@ -7,7 +7,7 @@ const TEMA_MIGRATION = {
 // Temas válidos atualmente
 export const TEMAS_VALIDOS = [
   'Carreira','ETFs','Análises econômicas','Trends','Fundos',
-  'Performance em destaque','Ring the bell','Dump','Live',
+  'Performance em destaque','ESG','Ring the bell','Dump','Live',
   'Dividendos','Premiações','Mind Asset','Eventos',
 ]
 
@@ -51,11 +51,12 @@ export function getTemas(post) {
 
   if (!Array.isArray(t)) t = [String(t)]
 
-  // Aplica migração de temas antigos + remove duplicatas + remove vazios
+  // Aplica migração de temas antigos + remove inválidos + remove duplicatas + remove vazios
   const migrated = t
-    .map(x => String(x).trim().replace(/^["']+|["']+$/g, '').trim()) // remove aspas residuais
+    .map(x => String(x).trim().replace(/^["']+|["']+$/g, '').trim())
     .filter(Boolean)
     .map(x => TEMA_MIGRATION[x] || x)
+    .filter(x => TEMAS_VALIDOS.includes(x))
 
   return [...new Set(migrated)]
 }
