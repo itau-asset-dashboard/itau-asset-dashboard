@@ -14,7 +14,7 @@ export default async function handler(req, res) {
 
   if (password === process.env.AUTH_PASSWORD) {
     const maxAge = 60 * 60 * 24 * 30 // 30 dias
-    res.setHeader('Set-Cookie', `itau_auth=ok; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=${maxAge}`)
+    res.setHeader('Set-Cookie', `itau_auth=ok; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=${maxAge}`)
     res.writeHead(302, { Location: '/' })
     res.end()
   } else {

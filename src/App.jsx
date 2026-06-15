@@ -71,8 +71,16 @@ export default function App() {
     function onVisible() {
       if (document.visibilityState === 'visible') syncFromCloud()
     }
+    // pageshow cobre o bfcache do iOS Safari: página restaurada do cache sem recarregar
+    function onPageShow(e) {
+      if (e.persisted) syncFromCloud()
+    }
     document.addEventListener('visibilitychange', onVisible)
-    return () => document.removeEventListener('visibilitychange', onVisible)
+    window.addEventListener('pageshow', onPageShow)
+    return () => {
+      document.removeEventListener('visibilitychange', onVisible)
+      window.removeEventListener('pageshow', onPageShow)
+    }
   }, [])
 
   return (
