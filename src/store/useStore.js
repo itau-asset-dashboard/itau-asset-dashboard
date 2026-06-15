@@ -4,6 +4,9 @@ import { fetchPosts, upsertPost, removePost, fetchSetting, saveSetting, uploadIm
          fetchStories, upsertStory, removeStory, uploadStoryImage, deleteStoryImage } from '../lib/supabase'
 import { normalizeTema } from '../utils/temas'
 
+// Posts com save em andamento — protege contra sync sobrescrever antes do upsert terminar
+const pendingUpdates = new Map() // id → { imageUrl }
+
 function normalizeDate(d) {
   if (!d) return d
   const parts = d.replace(/-/g, '/').split('/')
@@ -58,14 +61,15 @@ export const useStore = create(
           }
 
           const posts = cloudPosts.map(cp => {
-            // Coluna data_evidencia agora vem direto do Supabase (fonte da verdade)
-            // Fallback para o mapa legado (migração) ou valor local se coluna ainda vazia
             const local = localPosts.find(lp => lp.id === cp.id)
             const evidencia = cp.data_evidencia
               || legacyEvidencias[cp.id]
               || local?.data_evidencia
               || ''
-            const merged = { ...cp, data_evidencia: evidencia }
+            // Se há um save em andamento para este post, preserva a imageUrl local
+            const pending = pendingUpdates.get(cp.id)
+            const imageUrl = pending?.imageUrl ?? cp.imageUrl ?? local?.imageUrl ?? null
+            const merged = { ...cp, data_evidencia: evidencia, imageUrl }
             const temaNorm = normalizeTema(merged.tema)
             const dateNorm = normalizeDate(merged.data_post)
             const wasDirty = JSON.stringify(merged.tema) !== JSON.stringify(temaNorm)
@@ -188,19 +192,21 @@ export const useStore = create(
 
       updatePost: async (id, newData) => {
         const { imagePreview, ...restData } = newData
-        // Usa imagePreview (original) para Storage; fallback para imageData comprimido
         let imageUrl = restData.imageUrl
         const srcForUpload = imagePreview || restData.imageData
-        // Só faz upload se a imagem mudou (é um novo base64, não uma URL existente)
         const isNewImage = srcForUpload?.startsWith('data:')
         if (isNewImage) {
+          // Registra save em andamento antes de qualquer await
+          pendingUpdates.set(id, { imageUrl })
           try {
             const uploaded = await uploadImage(id, srcForUpload)
-            // Adiciona cache-buster para garantir que CDN sirva a versão nova
+            // Cache-buster para forçar CDN a servir a versão nova
             imageUrl = uploaded ? `${uploaded.split('?')[0]}?v=${Date.now()}` : imageUrl
+            pendingUpdates.set(id, { imageUrl }) // atualiza com nova URL
           } catch (e) {
             console.error('[updatePost] upload de imagem falhou:', e)
             set({ syncError: 'Erro ao fazer upload da imagem: ' + (e?.message || String(e)) })
+            pendingUpdates.delete(id)
           }
         }
 
@@ -232,6 +238,8 @@ export const useStore = create(
           } catch (e) {
             console.error('[updatePost] upsert falhou:', e)
             set({ syncError: 'Erro ao salvar post: ' + (e?.message || JSON.stringify(e)) })
+          } finally {
+            pendingUpdates.delete(id)
           }
         }
       },
