@@ -219,7 +219,14 @@ export const useStore = create(
           return { posts }
         })
         const updated = get().posts.find((p) => p.id === id)
-        if (updated) try { await upsertPost(updated) } catch (_) {}
+        if (updated) {
+          try {
+            await upsertPost(updated)
+          } catch (e) {
+            console.error('[updatePost] upsert falhou:', e)
+            set({ syncError: 'Erro ao salvar post: ' + (e?.message || JSON.stringify(e)) })
+          }
+        }
       },
 
       deletePost: async (id) => {
