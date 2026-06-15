@@ -18,7 +18,7 @@ export default async function handler(req, res) {
     res.writeHead(302, { Location: '/' })
     res.end()
   } else {
-    res.writeHead(302, { Location: '/login?erro=1' })
+    res.writeHead(302, { Location: '/login.html?erro=1' })
     res.end()
   }
 }
