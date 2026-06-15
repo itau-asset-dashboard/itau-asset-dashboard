@@ -55,9 +55,9 @@ export const useStore = create(
           if (evidenciasRaw) {
             try { evidencias = JSON.parse(evidenciasRaw) } catch (_) {}
           }
-          // Merge com dados locais (local tem prioridade se mais recente)
+          // Cloud tem prioridade; local só preenche o que o cloud não tem
           localPosts.forEach(lp => {
-            if (lp.data_evidencia) evidencias[lp.id] = lp.data_evidencia
+            if (lp.data_evidencia && !evidencias[lp.id]) evidencias[lp.id] = lp.data_evidencia
           })
 
           const posts = cloudPosts.map(cp => {

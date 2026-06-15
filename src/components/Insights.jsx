@@ -1,6 +1,7 @@
 import { useRef, useEffect, useState } from 'react'
 import { RefreshCw, Send, Trash2 } from 'lucide-react'
 import { useIsMobile } from '../utils/useIsMobile'
+import { calcMetaMesProgressiva } from '../utils/metaCalc'
 
 // Renderer simples de markdown para respostas da IA
 function MarkdownText({ text }) {
@@ -75,7 +76,9 @@ const SUGESTOES = [
 ]
 
 export default function Insights() {
-  const { insights, loadingInsights, setInsights, setLoadingInsights, apiKey, posts, stories, metaMensal, metaAnual, mesFiltro } = useStore()
+  const { insights, loadingInsights, setInsights, setLoadingInsights, apiKey, posts, stories, metaAnual, mesFiltro } = useStore()
+  const [mmFiltro, yyyyFiltro] = (mesFiltro || '').split('/')
+  const metaAjustada = calcMetaMesProgressiva({ posts, metaAnual, mm: mmFiltro, yyyy: yyyyFiltro })
 
   // ── Insights automáticos ──────────────────────────────
   const allPosts = posts
@@ -116,7 +119,7 @@ export default function Insights() {
     setChatError(null)
 
     try {
-      const reply = await chatWithData(updated, allPosts, stories, metaMensal, metaAnual, mesFiltro, apiKey)
+      const reply = await chatWithData(updated, allPosts, stories, metaAjustada, metaAnual, mesFiltro, apiKey)
       setChatMessages(prev => [...prev, { role: 'assistant', content: reply }])
     } catch(e) {
       setChatError('Erro ao obter resposta: ' + e.message)
