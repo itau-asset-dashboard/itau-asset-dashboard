@@ -3,418 +3,424 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Como o Dashboard funciona · Itaú Asset</title>
+  <title>Arquitetura do Dashboard · Itaú Asset</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
       background: linear-gradient(135deg, #001B36 0%, #003366 60%, #004080 100%);
       min-height: 100dvh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 32px 20px;
+      padding: 40px 20px 60px;
+      color: white;
     }
 
-    .container {
-      width: 100%;
-      max-width: 680px;
-    }
+    .page { max-width: 700px; margin: 0 auto; }
 
-    /* Header */
-    .header {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      margin-bottom: 36px;
+    /* ── Header ── */
+    .topbar {
+      display: flex; align-items: center; gap: 14px;
+      margin-bottom: 40px;
     }
-    .logo-badge {
-      width: 44px; height: 44px;
+    .logo {
+      width: 46px; height: 46px;
       background: #F97316;
-      border-radius: 12px;
+      border-radius: 13px;
       display: flex; align-items: center; justify-content: center;
-      font-size: 18px; font-weight: 900; color: white;
-      flex-shrink: 0;
+      font-size: 17px; font-weight: 900; color: white;
+      letter-spacing: -1px; flex-shrink: 0;
+      box-shadow: 0 4px 14px rgba(249,115,22,.35);
     }
-    .header-text h1 {
-      color: white; font-size: 18px; font-weight: 700;
-    }
-    .header-text p {
-      color: rgba(255,255,255,.45); font-size: 12px; margin-top: 2px;
-    }
+    .topbar-text h1 { font-size: 19px; font-weight: 800; color: white; }
+    .topbar-text p  { font-size: 12px; color: rgba(255,255,255,.4); margin-top: 2px; font-weight: 500; }
 
-    /* Layer section */
-    .layer { margin-bottom: 8px; }
-    .layer-label {
+    /* ── Section title ── */
+    .section-title {
       font-size: 10px; font-weight: 700;
-      text-transform: uppercase; letter-spacing: .1em;
-      color: rgba(255,255,255,.35);
-      margin-bottom: 8px; padding-left: 2px;
+      text-transform: uppercase; letter-spacing: .12em;
+      color: rgba(255,255,255,.3);
+      margin-bottom: 10px; padding-left: 2px;
     }
 
-    .row { display: flex; gap: 10px; }
+    /* ── Layer ── */
+    .layer { margin-bottom: 6px; }
+    .row   { display: flex; gap: 10px; }
 
-    /* Cards */
-    .card {
+    /* ── Block cards ── */
+    .block {
       flex: 1;
-      background: rgba(255,255,255,.07);
-      border: 1.5px solid rgba(255,255,255,.1);
-      border-radius: 14px;
-      padding: 14px 14px 12px;
+      background: rgba(255,255,255,.06);
+      border: 1.5px solid rgba(255,255,255,.09);
+      border-radius: 16px;
+      padding: 16px 14px 14px;
       cursor: pointer;
-      transition: background .18s, border-color .18s, transform .15s;
+      transition: background .18s, border-color .18s, transform .15s, box-shadow .15s;
       -webkit-tap-highlight-color: transparent;
+      backdrop-filter: blur(8px);
     }
-    .card:hover  { background: rgba(255,255,255,.12); border-color: rgba(255,255,255,.2); transform: translateY(-2px); }
-    .card.active { border-color: #F97316; background: rgba(249,115,22,.12); }
+    .block:hover {
+      background: rgba(255,255,255,.1);
+      border-color: rgba(255,255,255,.18);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0,0,0,.2);
+    }
+    .block.active {
+      border-color: #F97316;
+      background: rgba(249,115,22,.1);
+      box-shadow: 0 0 0 3px rgba(249,115,22,.15);
+    }
+    .block-icon { font-size: 22px; margin-bottom: 10px; display: block; }
+    .block-name { font-size: 13px; font-weight: 700; color: white; margin-bottom: 3px; }
+    .block-role { font-size: 11px; color: rgba(255,255,255,.4); line-height: 1.4; font-weight: 500; }
 
-    .card-icon { font-size: 22px; margin-bottom: 8px; display: block; }
-    .card-name { font-size: 13px; font-weight: 700; color: white; margin-bottom: 3px; }
-    .card-role { font-size: 11px; color: rgba(255,255,255,.45); line-height: 1.4; }
-
-    /* Arrow connector */
+    /* ── Connector ── */
     .connector {
       display: flex; align-items: center; gap: 10px;
-      margin: 6px 0;
-      padding: 0 4px;
+      margin: 8px 0; padding: 0 6px;
     }
-    .connector-line {
-      flex: 1; height: 1px;
-      background: rgba(255,255,255,.12);
-    }
-    .connector-text {
-      font-size: 10px; color: rgba(255,255,255,.3);
-      font-weight: 600; letter-spacing: .05em;
-      white-space: nowrap;
-    }
-
-    /* Detail panel */
-    .detail {
-      margin-top: 16px;
-      background: rgba(255,255,255,.06);
-      border: 1.5px solid rgba(255,255,255,.1);
-      border-radius: 16px;
-      padding: 20px;
-      min-height: 120px;
-      transition: all .25s;
-    }
-    .detail.highlighted {
-      border-color: rgba(249,115,22,.4);
-      background: rgba(249,115,22,.07);
-    }
-    .detail-title {
-      font-size: 14px; font-weight: 700; color: white;
-      margin-bottom: 8px;
-    }
-    .detail-text {
-      font-size: 12px; color: rgba(255,255,255,.6);
-      line-height: 1.7;
-    }
-    .tags {
-      display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px;
-    }
-    .tag {
-      background: rgba(255,255,255,.08);
-      border: 1px solid rgba(255,255,255,.12);
-      border-radius: 6px;
-      padding: 3px 9px;
+    .connector-line { flex: 1; height: 1px; background: rgba(255,255,255,.08); }
+    .connector-label {
       font-size: 10px; font-weight: 600;
-      color: rgba(255,255,255,.5);
+      color: rgba(255,255,255,.25); white-space: nowrap;
+      letter-spacing: .04em;
     }
 
-    .hint {
-      text-align: center;
-      color: rgba(255,255,255,.2);
-      font-size: 11px;
-      margin-top: 14px;
-    }
-
-    /* Migration section */
-    .migration {
-      margin-top: 28px;
+    /* ── Detail panel ── */
+    .detail {
+      margin-top: 12px;
       background: rgba(255,255,255,.05);
-      border: 1.5px solid rgba(255,255,255,.1);
+      border: 1.5px solid rgba(255,255,255,.08);
       border-radius: 16px;
       padding: 20px;
+      min-height: 110px;
+      transition: border-color .2s, background .2s;
+      backdrop-filter: blur(8px);
     }
-    .migration-header {
-      display: flex; align-items: flex-start; gap: 12px; margin-bottom: 18px;
+    .detail.on {
+      border-color: rgba(249,115,22,.35);
+      background: rgba(249,115,22,.06);
     }
-    .migration-icon { font-size: 26px; flex-shrink: 0; margin-top: 2px; }
-    .migration-title { font-size: 14px; font-weight: 700; color: white; margin-bottom: 3px; }
-    .migration-sub { font-size: 11px; color: rgba(255,255,255,.4); line-height: 1.5; }
+    .detail-title { font-size: 14px; font-weight: 700; color: white; margin-bottom: 7px; }
+    .detail-text  { font-size: 12px; color: rgba(255,255,255,.55); line-height: 1.75; font-weight: 400; }
+    .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+    .tag {
+      background: rgba(255,255,255,.07);
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 6px; padding: 3px 9px;
+      font-size: 10px; font-weight: 600; color: rgba(255,255,255,.4);
+    }
 
-    .migration-table { display: flex; flex-direction: column; gap: 6px; }
+    /* ── Divider ── */
+    .divider {
+      display: flex; align-items: center; gap: 12px;
+      margin: 32px 0 24px;
+    }
+    .divider-line { flex: 1; height: 1px; background: rgba(255,255,255,.08); }
+    .divider-badge {
+      background: rgba(249,115,22,.15);
+      border: 1.5px solid rgba(249,115,22,.25);
+      border-radius: 20px;
+      padding: 5px 14px;
+      font-size: 11px; font-weight: 700;
+      color: #FB923C; white-space: nowrap;
+    }
 
+    /* ── Migration table ── */
+    .mig-card {
+      background: rgba(255,255,255,.05);
+      border: 1.5px solid rgba(255,255,255,.09);
+      border-radius: 16px;
+      overflow: hidden;
+      backdrop-filter: blur(8px);
+    }
+    .mig-intro {
+      padding: 18px 20px 14px;
+      border-bottom: 1px solid rgba(255,255,255,.07);
+    }
+    .mig-intro-title {
+      font-size: 14px; font-weight: 700; color: white; margin-bottom: 4px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .mig-intro-text { font-size: 11px; color: rgba(255,255,255,.4); line-height: 1.6; font-weight: 500; }
+
+    .mig-table { padding: 6px 0; }
+    .mig-head {
+      display: grid; grid-template-columns: 1fr 24px 1fr 68px;
+      gap: 6px; padding: 8px 20px;
+      font-size: 9px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .1em; color: rgba(255,255,255,.25);
+      border-bottom: 1px solid rgba(255,255,255,.06);
+    }
     .mig-row {
-      display: grid;
-      grid-template-columns: 1fr 28px 1fr 70px;
-      align-items: center;
-      gap: 6px;
+      display: grid; grid-template-columns: 1fr 24px 1fr 68px;
+      gap: 6px; align-items: center;
+      padding: 10px 20px;
+      border-bottom: 1px solid rgba(255,255,255,.04);
+      transition: background .15s;
     }
-    .mig-row.header .mig-cell {
-      font-size: 10px; font-weight: 700; text-transform: uppercase;
-      letter-spacing: .08em; color: rgba(255,255,255,.3);
-      padding: 0 4px 6px;
-    }
-    .mig-row.header { border-bottom: 1px solid rgba(255,255,255,.08); margin-bottom: 4px; }
+    .mig-row:last-child { border-bottom: none; }
+    .mig-row:hover { background: rgba(255,255,255,.03); }
 
-    .mig-cell { display: flex; align-items: center; }
-    .mig-cell.right { justify-content: flex-end; }
-    .mig-arrow { text-align: center; color: rgba(255,255,255,.2); font-size: 13px; }
+    .mig-arrow { text-align: center; color: rgba(255,255,255,.18); font-size: 12px; }
+    .mig-right { display: flex; justify-content: flex-end; }
 
     .chip {
-      display: inline-block;
-      padding: 5px 10px;
-      border-radius: 8px;
-      font-size: 11px; font-weight: 600;
-      white-space: nowrap;
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 4px 10px; border-radius: 7px;
+      font-size: 11px; font-weight: 600; white-space: nowrap;
     }
-    .chip.green  { background: rgba(22,163,74,.15);  color: #4ade80; }
-    .chip.purple { background: rgba(139,92,246,.15); color: #c4b5fd; }
-    .chip.orange { background: rgba(249,115,22,.15); color: #fb923c; }
-    .chip.blue   { background: rgba(59,130,246,.15); color: #93c5fd; }
+    .chip.green  { background: rgba(22,163,74,.14);  color: #4ade80; border: 1px solid rgba(74,222,128,.15); }
+    .chip.purple { background: rgba(139,92,246,.14); color: #c4b5fd; border: 1px solid rgba(196,181,253,.15); }
+    .chip.orange { background: rgba(249,115,22,.14); color: #fb923c; border: 1px solid rgba(251,146,60,.15); }
+    .chip.sky    { background: rgba(14,165,233,.14); color: #7dd3fc; border: 1px solid rgba(125,211,252,.15); }
+    .chip.dim    { background: rgba(255,255,255,.06); color: rgba(255,255,255,.35); border: 1px solid rgba(255,255,255,.08); }
 
     .effort {
-      display: inline-block;
-      padding: 3px 9px; border-radius: 6px;
-      font-size: 10px; font-weight: 700;
+      display: inline-block; padding: 3px 9px;
+      border-radius: 6px; font-size: 10px; font-weight: 700;
     }
-    .effort.none { background: rgba(100,116,139,.15); color: rgba(255,255,255,.3); }
+    .effort.none { background: rgba(100,116,139,.12); color: rgba(255,255,255,.3); }
     .effort.low  { background: rgba(22,163,74,.15);   color: #4ade80; }
-    .effort.mid  { background: rgba(234,179,8,.15);   color: #fde047; }
-    .effort.high { background: rgba(239,68,68,.15);   color: #f87171; }
+    .effort.mid  { background: rgba(234,179,8,.14);   color: #fde047; }
+    .effort.high { background: rgba(239,68,68,.14);   color: #f87171; }
 
-    .migration-note {
-      display: flex; gap: 12px; align-items: flex-start;
-      margin-top: 16px;
-      background: rgba(255,255,255,.04);
-      border: 1px solid rgba(255,255,255,.08);
-      border-radius: 10px;
-      padding: 14px;
+    .mig-note {
+      display: flex; gap: 12px;
+      margin: 0; padding: 16px 20px;
+      border-top: 1px solid rgba(255,255,255,.06);
+      background: rgba(249,115,22,.05);
     }
-    .note-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
-    .note-text { font-size: 11px; color: rgba(255,255,255,.45); line-height: 1.7; }
-    .note-text strong { color: rgba(255,255,255,.7); font-weight: 600; }
+    .mig-note-icon { font-size: 15px; flex-shrink: 0; margin-top: 1px; }
+    .mig-note-text { font-size: 11px; color: rgba(255,255,255,.45); line-height: 1.7; }
+    .mig-note-text strong { color: rgba(255,255,255,.7); font-weight: 600; }
 
-    @media (max-width: 480px) {
-      .mig-row { grid-template-columns: 1fr 18px 1fr 56px; gap: 4px; }
-      .chip { font-size: 10px; padding: 4px 7px; }
-      .effort { font-size: 9px; }
+    /* ── Footer ── */
+    .footer {
+      text-align: center; margin-top: 36px;
+      font-size: 11px; color: rgba(255,255,255,.18); font-weight: 500;
     }
 
-    /* Mobile */
-    @media (max-width: 480px) {
-      .row { gap: 8px; }
-      .card { padding: 12px 10px 10px; }
-      .card-icon { font-size: 18px; margin-bottom: 6px; }
-      .card-name { font-size: 12px; }
-      .card-role { font-size: 10px; }
+    /* ── Mobile ── */
+    @media (max-width: 500px) {
+      .block { padding: 13px 11px 11px; }
+      .block-icon { font-size: 19px; }
+      .block-name { font-size: 12px; }
+      .block-role { font-size: 10px; }
+      .mig-head, .mig-row { grid-template-columns: 1fr 18px 1fr 54px; padding: 9px 14px; gap: 4px; }
+      .chip { font-size: 10px; padding: 3px 7px; }
+      .effort { font-size: 9px; padding: 3px 7px; }
+      .topbar-text h1 { font-size: 16px; }
     }
   </style>
 </head>
 <body>
-  <div class="container">
+<div class="page">
 
-    <div class="header">
-      <div class="logo-badge">IA</div>
-      <div class="header-text">
-        <h1>Como o Dashboard funciona</h1>
-        <p>Itaú Asset · Instagram Dashboard · Guia para não-técnicos</p>
-      </div>
+  <!-- Header -->
+  <div class="topbar">
+    <div class="logo">IA</div>
+    <div class="topbar-text">
+      <h1>Como o Dashboard funciona</h1>
+      <p>Itaú Asset · Instagram Dashboard · Guia de arquitetura</p>
     </div>
-
-    <!-- Camada 1: Acesso -->
-    <div class="layer">
-      <div class="layer-label">📱 Você acessa por aqui</div>
-      <div class="row">
-        <div class="card" onclick="show(this,'browser')">
-          <span class="card-icon">🌐</span>
-          <div class="card-name">Navegador</div>
-          <div class="card-role">Chrome, Safari, celular…</div>
-        </div>
-        <div class="card" onclick="show(this,'github')">
-          <span class="card-icon">🐙</span>
-          <div class="card-name">GitHub</div>
-          <div class="card-role">Guarda o código-fonte</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="connector">
-      <div class="connector-line"></div>
-      <span class="connector-text">↕ publica automaticamente</span>
-      <div class="connector-line"></div>
-    </div>
-
-    <!-- Camada 2: Hospedagem -->
-    <div class="layer">
-      <div class="layer-label">🚀 Hospedagem & proteção</div>
-      <div class="row">
-        <div class="card" onclick="show(this,'vercel')">
-          <span class="card-icon">▲</span>
-          <div class="card-name">Vercel</div>
-          <div class="card-role">Publica o site na internet</div>
-        </div>
-        <div class="card" onclick="show(this,'senha')">
-          <span class="card-icon">🔐</span>
-          <div class="card-name">Senha de acesso</div>
-          <div class="card-role">Bloqueia quem não tem a senha</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="connector">
-      <div class="connector-line"></div>
-      <span class="connector-text">↕ busca e salva dados</span>
-      <div class="connector-line"></div>
-    </div>
-
-    <!-- Camada 3: Dados -->
-    <div class="layer">
-      <div class="layer-label">🗄️ Onde os dados vivem</div>
-      <div class="row">
-        <div class="card" onclick="show(this,'supabase')">
-          <span class="card-icon">🐘</span>
-          <div class="card-name">Supabase</div>
-          <div class="card-role">Banco de dados dos posts</div>
-        </div>
-        <div class="card" onclick="show(this,'storage')">
-          <span class="card-icon">🖼️</span>
-          <div class="card-name">Storage</div>
-          <div class="card-role">Armazena as fotos</div>
-        </div>
-        <div class="card" onclick="show(this,'anthropic')">
-          <span class="card-icon">✨</span>
-          <div class="card-name">Anthropic IA</div>
-          <div class="card-role">Gera insights e analisa</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Painel de detalhe -->
-    <div class="detail" id="detail">
-      <div class="detail-title" id="d-title">Toque em qualquer bloco para entender o que ele faz</div>
-      <div class="detail-text" id="d-text">Cada peça tem um papel específico. Juntas, elas formam o dashboard completo.</div>
-      <div class="tags" id="d-tags"></div>
-    </div>
-
-    <!-- Seção de migração AWS -->
-    <div class="migration">
-      <div class="migration-header">
-        <span class="migration-icon">☁️</span>
-        <div>
-          <div class="migration-title">Migração futura para AWS</div>
-          <div class="migration-sub">Como ficaria a estrutura caso o dashboard migrasse para a Amazon Web Services</div>
-        </div>
-      </div>
-
-      <div class="migration-table">
-        <div class="mig-row header">
-          <div class="mig-cell">Peça atual</div>
-          <div class="mig-arrow"></div>
-          <div class="mig-cell">Equivalente AWS</div>
-          <div class="mig-cell right">Esforço</div>
-        </div>
-
-        <div class="mig-row">
-          <div class="mig-cell"><span class="chip purple">▲ Vercel</span></div>
-          <div class="mig-arrow">→</div>
-          <div class="mig-cell"><span class="chip orange">S3 + CloudFront</span></div>
-          <div class="mig-cell right"><span class="effort low">Baixo</span></div>
-        </div>
-
-        <div class="mig-row">
-          <div class="mig-cell"><span class="chip green">🐘 Supabase (banco)</span></div>
-          <div class="mig-arrow">→</div>
-          <div class="mig-cell"><span class="chip orange">RDS (PostgreSQL)</span></div>
-          <div class="mig-cell right"><span class="effort mid">Médio</span></div>
-        </div>
-
-        <div class="mig-row">
-          <div class="mig-cell"><span class="chip green">🖼️ Supabase Storage</span></div>
-          <div class="mig-arrow">→</div>
-          <div class="mig-cell"><span class="chip orange">S3 (bucket)</span></div>
-          <div class="mig-cell right"><span class="effort low">Baixo</span></div>
-        </div>
-
-        <div class="mig-row">
-          <div class="mig-cell"><span class="chip green">🔑 Supabase API</span></div>
-          <div class="mig-arrow">→</div>
-          <div class="mig-cell"><span class="chip orange">API Gateway + Lambda</span></div>
-          <div class="mig-cell right"><span class="effort high">Alto</span></div>
-        </div>
-
-        <div class="mig-row">
-          <div class="mig-cell"><span class="chip blue">✨ Anthropic IA</span></div>
-          <div class="mig-arrow">→</div>
-          <div class="mig-cell"><span class="chip blue">✨ Permanece igual</span></div>
-          <div class="mig-cell right"><span class="effort none">Nenhum</span></div>
-        </div>
-      </div>
-
-      <div class="migration-note">
-        <div class="note-icon">💡</div>
-        <div class="note-text">
-          A maior vantagem de migrar para AWS seria ter os dados hospedados na região <strong>sa-east-1 (São Paulo)</strong>, o que pode ser exigido por conformidade ou política interna. O maior esforço estaria em recriar a camada de API — hoje o Supabase faz isso automaticamente, na AWS seria necessário construir com Lambda.
-        </div>
-      </div>
-    </div>
-
-    <p class="hint">Desenvolvido com Claude Code · Itaú Asset Management</p>
   </div>
 
-  <script>
-    const info = {
-      browser: {
-        title: '🌐 Navegador — a janela que você usa',
-        text: 'É o Chrome, Safari ou qualquer browser no celular ou computador. Você digita o endereço do site e o navegador carrega o dashboard. Ele não guarda nenhum dado importante — tudo vive nos servidores.',
-        tags: ['Chrome', 'Safari', 'Mobile', 'Desktop']
-      },
-      github: {
-        title: '🐙 GitHub — o cofre do código',
-        text: 'É onde fica armazenado todo o código que faz o dashboard funcionar. Pense como um Google Docs do código: guarda o histórico de cada alteração feita. Toda vez que uma melhoria é feita, ela vai para cá primeiro — e a Vercel publica automaticamente.',
-        tags: ['Código-fonte', 'Histórico de mudanças', 'Gratuito']
-      },
-      vercel: {
-        title: '▲ Vercel — a empresa que publica o site',
-        text: 'É como uma "gráfica" do site. Quando o código no GitHub é atualizado, a Vercel pega esse código automaticamente, monta o site e disponibiliza no endereço do dashboard em menos de 2 minutos. Funciona 24h por dia, acessível do mundo inteiro.',
-        tags: ['Hospedagem', 'Deploy automático', 'CDN global', 'Plano gratuito']
-      },
-      senha: {
-        title: '🔐 Senha de acesso — o porteiro do site',
-        text: 'Antes de qualquer pessoa ver qualquer dado, o sistema verifica se ela tem a senha certa. Quem não tem a senha vê apenas uma tela de login em branco — nenhuma informação do dashboard vaza. A senha fica guardada só na Vercel, nunca no código.',
-        tags: ['Cookie 30 dias', 'Middleware de segurança', 'Proteção de acesso']
-      },
-      supabase: {
-        title: '🐘 Supabase — a gaveta de todos os dados',
-        text: 'É um banco de dados na nuvem. Guarda todos os posts: métricas, datas, temas, evidências, metas. Quando você adiciona, edita ou apaga um post em qualquer dispositivo, a informação vai para cá. É por isso que celular e computador mostram sempre os mesmos dados.',
-        tags: ['Banco de dados', 'Sincronização em tempo real', 'Plano gratuito']
-      },
-      storage: {
-        title: '🖼️ Storage — o álbum de fotos',
-        text: 'Parte do Supabase dedicada só a guardar imagens. Quando você faz upload de um print de métricas, a foto vai para cá e fica disponível por um link. O banco de dados guarda só o endereço da foto — não a foto em si — para economizar espaço.',
-        tags: ['Imagens dos posts', 'Dentro do Supabase', 'Link público']
-      },
-      anthropic: {
-        title: '✨ Anthropic — o cérebro de IA',
-        text: 'É a empresa por trás do Claude. Quando você pede insights ou faz uma pergunta no chat do dashboard, os dados são enviados para a Anthropic, que processa tudo e devolve a análise em segundos. O custo é baixo e cobrado por uso, via chave de API.',
-        tags: ['Claude Haiku', 'Pago por uso', 'Chave de API']
-      }
-    }
+  <!-- Camada 1 -->
+  <div class="layer">
+    <div class="section-title">📱 Você acessa por aqui</div>
+    <div class="row">
+      <div class="block" onclick="show(this,'browser')">
+        <span class="block-icon">🌐</span>
+        <div class="block-name">Navegador</div>
+        <div class="block-role">Chrome, Safari, celular…</div>
+      </div>
+      <div class="block" onclick="show(this,'github')">
+        <span class="block-icon">🐙</span>
+        <div class="block-name">GitHub</div>
+        <div class="block-role">Guarda o código-fonte</div>
+      </div>
+    </div>
+  </div>
 
-    function show(card, key) {
-      const d = info[key]
-      document.getElementById('d-title').textContent = d.title
-      document.getElementById('d-text').textContent = d.text
-      document.getElementById('d-tags').innerHTML = d.tags.map(t => `<span class="tag">${t}</span>`).join('')
-      document.querySelectorAll('.card').forEach(c => c.classList.remove('active'))
-      card.classList.add('active')
-      const detail = document.getElementById('detail')
-      detail.classList.add('highlighted')
-      detail.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+  <div class="connector">
+    <div class="connector-line"></div>
+    <span class="connector-label">↕ publica automaticamente</span>
+    <div class="connector-line"></div>
+  </div>
+
+  <!-- Camada 2 -->
+  <div class="layer">
+    <div class="section-title">🚀 Hospedagem & proteção</div>
+    <div class="row">
+      <div class="block" onclick="show(this,'vercel')">
+        <span class="block-icon">▲</span>
+        <div class="block-name">Vercel</div>
+        <div class="block-role">Publica o site na internet</div>
+      </div>
+      <div class="block" onclick="show(this,'senha')">
+        <span class="block-icon">🔐</span>
+        <div class="block-name">Senha de acesso</div>
+        <div class="block-role">Bloqueia quem não tem a senha</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="connector">
+    <div class="connector-line"></div>
+    <span class="connector-label">↕ busca e salva dados</span>
+    <div class="connector-line"></div>
+  </div>
+
+  <!-- Camada 3 -->
+  <div class="layer">
+    <div class="section-title">🗄️ Onde os dados vivem</div>
+    <div class="row">
+      <div class="block" onclick="show(this,'supabase')">
+        <span class="block-icon">🐘</span>
+        <div class="block-name">Supabase</div>
+        <div class="block-role">Banco de dados dos posts</div>
+      </div>
+      <div class="block" onclick="show(this,'storage')">
+        <span class="block-icon">🖼️</span>
+        <div class="block-name">Storage</div>
+        <div class="block-role">Armazena as fotos</div>
+      </div>
+      <div class="block" onclick="show(this,'anthropic')">
+        <span class="block-icon">✨</span>
+        <div class="block-name">Anthropic IA</div>
+        <div class="block-role">Gera insights e analisa</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Painel de detalhe -->
+  <div class="detail" id="detail">
+    <div class="detail-title" id="d-title">Toque em qualquer bloco para ver o que ele faz</div>
+    <div class="detail-text"  id="d-text">Cada peça tem um papel específico. Juntas, elas formam o dashboard completo.</div>
+    <div class="tags" id="d-tags"></div>
+  </div>
+
+  <!-- Divisor migração -->
+  <div class="divider">
+    <div class="divider-line"></div>
+    <div class="divider-badge">☁️ Migração futura · AWS</div>
+    <div class="divider-line"></div>
+  </div>
+
+  <!-- Migration card -->
+  <div class="mig-card">
+    <div class="mig-intro">
+      <div class="mig-intro-title">Como ficaria na Amazon Web Services</div>
+      <div class="mig-intro-text">Cada ferramenta atual tem um equivalente direto na AWS. A migração é tecnicamente viável — o maior esforço estaria em recriar a camada de API, que hoje o Supabase entrega automaticamente.</div>
+    </div>
+
+    <div class="mig-table">
+      <div class="mig-head">
+        <div>Hoje</div>
+        <div></div>
+        <div>Na AWS</div>
+        <div style="text-align:right">Esforço</div>
+      </div>
+
+      <div class="mig-row">
+        <div><span class="chip purple">▲ Vercel</span></div>
+        <div class="mig-arrow">→</div>
+        <div><span class="chip orange">S3 + CloudFront</span></div>
+        <div class="mig-right"><span class="effort low">Baixo</span></div>
+      </div>
+
+      <div class="mig-row">
+        <div><span class="chip green">🐘 Supabase (banco)</span></div>
+        <div class="mig-arrow">→</div>
+        <div><span class="chip orange">RDS PostgreSQL</span></div>
+        <div class="mig-right"><span class="effort mid">Médio</span></div>
+      </div>
+
+      <div class="mig-row">
+        <div><span class="chip green">🖼️ Supabase Storage</span></div>
+        <div class="mig-arrow">→</div>
+        <div><span class="chip orange">S3 (bucket)</span></div>
+        <div class="mig-right"><span class="effort low">Baixo</span></div>
+      </div>
+
+      <div class="mig-row">
+        <div><span class="chip green">🔑 Supabase API</span></div>
+        <div class="mig-arrow">→</div>
+        <div><span class="chip orange">API Gateway + Lambda</span></div>
+        <div class="mig-right"><span class="effort high">Alto</span></div>
+      </div>
+
+      <div class="mig-row">
+        <div><span class="chip sky">✨ Anthropic IA</span></div>
+        <div class="mig-arrow">→</div>
+        <div><span class="chip dim">✨ Permanece igual</span></div>
+        <div class="mig-right"><span class="effort none">Nenhum</span></div>
+      </div>
+    </div>
+
+    <div class="mig-note">
+      <div class="mig-note-icon">💡</div>
+      <div class="mig-note-text">
+        A principal vantagem seria hospedar os dados na região <strong>sa-east-1 (São Paulo)</strong>, atendendo a requisitos de conformidade ou política interna. O maior esforço estaria em recriar a camada de API — hoje o Supabase faz isso automaticamente, na AWS seria necessário construir com Lambda.
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">Desenvolvido com Claude Code · Itaú Asset Management</div>
+
+</div>
+
+<script>
+  const info = {
+    browser: {
+      title: '🌐 Navegador — a janela que você usa',
+      text: 'É o Chrome, Safari ou qualquer browser no celular ou computador. Você digita o endereço do site e o navegador carrega o dashboard. Ele não guarda nenhum dado importante — tudo vive nos servidores.',
+      tags: ['Chrome', 'Safari', 'Mobile', 'Desktop']
+    },
+    github: {
+      title: '🐙 GitHub — o cofre do código',
+      text: 'É onde fica armazenado todo o código que faz o dashboard funcionar. Pense como um Google Docs do código: guarda o histórico de cada alteração feita. Toda vez que uma melhoria é feita, ela vai para cá primeiro — e a Vercel publica automaticamente.',
+      tags: ['Código-fonte', 'Histórico de mudanças', 'Gratuito']
+    },
+    vercel: {
+      title: '▲ Vercel — a empresa que publica o site',
+      text: 'É como uma "gráfica" do site. Quando o código no GitHub é atualizado, a Vercel pega esse código automaticamente, monta o site e disponibiliza no endereço do dashboard em menos de 2 minutos. Funciona 24h por dia, acessível do mundo inteiro.',
+      tags: ['Hospedagem', 'Deploy automático', 'CDN global', 'Plano gratuito']
+    },
+    senha: {
+      title: '🔐 Senha de acesso — o porteiro do site',
+      text: 'Antes de qualquer pessoa ver qualquer dado, o sistema verifica se ela tem a senha certa. Quem não tem a senha vê apenas uma tela de login em branco — nenhuma informação do dashboard vaza. A senha fica guardada só na Vercel, nunca no código.',
+      tags: ['Cookie 30 dias', 'Middleware de segurança', 'Proteção de acesso']
+    },
+    supabase: {
+      title: '🐘 Supabase — a gaveta de todos os dados',
+      text: 'É um banco de dados na nuvem. Guarda todos os posts: métricas, datas, temas, evidências, metas. Quando você adiciona, edita ou apaga um post em qualquer dispositivo, a informação vai para cá. É por isso que celular e computador mostram sempre os mesmos dados.',
+      tags: ['Banco de dados', 'Sincronização em tempo real', 'Plano gratuito']
+    },
+    storage: {
+      title: '🖼️ Storage — o álbum de fotos',
+      text: 'Parte do Supabase dedicada só a guardar imagens. Quando você faz upload de um print de métricas, a foto vai para cá e fica disponível por um link. O banco de dados guarda só o endereço da foto — não a foto em si — para economizar espaço.',
+      tags: ['Imagens dos posts', 'Dentro do Supabase', 'Link público']
+    },
+    anthropic: {
+      title: '✨ Anthropic — o cérebro de IA',
+      text: 'É a empresa por trás do Claude. Quando você pede insights ou faz uma pergunta no chat do dashboard, os dados são enviados para a Anthropic, que processa tudo e devolve a análise em segundos. O custo é baixo e cobrado por uso, via chave de API.',
+      tags: ['Claude Haiku', 'Pago por uso', 'Chave de API']
     }
-  </script>
+  }
+
+  function show(card, key) {
+    const d = info[key]
+    document.getElementById('d-title').textContent = d.title
+    document.getElementById('d-text').textContent  = d.text
+    document.getElementById('d-tags').innerHTML    = d.tags.map(t => `<span class="tag">${t}</span>`).join('')
+    document.querySelectorAll('.block').forEach(b => b.classList.remove('active'))
+    card.classList.add('active')
+    const panel = document.getElementById('detail')
+    panel.classList.add('on')
+    panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+  }
+</script>
 </body>
 </html>
