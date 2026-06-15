@@ -36,13 +36,14 @@ export const useStore = create(
       syncFromCloud: async () => {
         set({ syncing: true, syncError: null })
         try {
-          const [cloudPosts, metaMensal, metaAnual, oliverRaw, evidenciasRaw, cloudStoriesRaw] = await Promise.all([
+          const [cloudPosts, metaMensal, metaAnual, oliverRaw, evidenciasRaw, cloudStoriesRaw, insightsRaw] = await Promise.all([
             fetchPosts(),
             fetchSetting('meta_mensal'),
             fetchSetting('meta_anual'),
             fetchSetting('oliver_data'),
             fetchSetting('data_evidencias'),
-            fetchStories().catch(() => null), // null = falha, [] = Supabase vazio de verdade
+            fetchStories().catch(() => null),
+            fetchSetting('insights').catch(() => null),
           ])
           const localPosts = get().posts
 
@@ -115,9 +116,18 @@ export const useStore = create(
             }
           }
 
+          let savedInsights = get().insights
+          if (insightsRaw) {
+            try {
+              const parsed = JSON.parse(insightsRaw)
+              if (Array.isArray(parsed) && parsed.length > 0) savedInsights = parsed
+            } catch (_) {}
+          }
+
           set({
             posts,
             stories: mergedStories,
+            insights: savedInsights,
             metaMensal: metaMensal ? Number(metaMensal) : get().metaMensal,
             metaAnual:  metaAnual  ? Number(metaAnual)  : get().metaAnual,
             oliverData: newOliver,
@@ -156,7 +166,10 @@ export const useStore = create(
       setApiKey:          (key) => set({ apiKey: key }),
       setActiveSection:   (s)   => set({ activeSection: s }),
       setEditMode: (v) => set({ isEditMode: v }),
-      setInsights:        (ins) => set({ insights: ins }),
+      setInsights: (ins) => {
+        set({ insights: ins })
+        try { saveSetting('insights', JSON.stringify(ins)) } catch (_) {}
+      },
       setLoadingInsights: (v)   => set({ loadingInsights: v }),
 
       setMetaMensal: async (meta) => {
