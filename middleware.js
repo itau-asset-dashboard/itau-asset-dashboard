@@ -1,5 +1,5 @@
 export const config = {
-  matcher: ['/((?!login.html|api).*)'],
+  matcher: ['/((?!login.html|arquitetura.html|api).*)'],
 }
 
 export default function middleware(request) {

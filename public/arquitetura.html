@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Como o Dashboard funciona · Itaú Asset</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #001B36 0%, #003366 60%, #004080 100%);
+      min-height: 100dvh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 32px 20px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 680px;
+    }
+
+    /* Header */
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 36px;
+    }
+    .logo-badge {
+      width: 44px; height: 44px;
+      background: #F97316;
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; font-weight: 900; color: white;
+      flex-shrink: 0;
+    }
+    .header-text h1 {
+      color: white; font-size: 18px; font-weight: 700;
+    }
+    .header-text p {
+      color: rgba(255,255,255,.45); font-size: 12px; margin-top: 2px;
+    }
+
+    /* Layer section */
+    .layer { margin-bottom: 8px; }
+    .layer-label {
+      font-size: 10px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .1em;
+      color: rgba(255,255,255,.35);
+      margin-bottom: 8px; padding-left: 2px;
+    }
+
+    .row { display: flex; gap: 10px; }
+
+    /* Cards */
+    .card {
+      flex: 1;
+      background: rgba(255,255,255,.07);
+      border: 1.5px solid rgba(255,255,255,.1);
+      border-radius: 14px;
+      padding: 14px 14px 12px;
+      cursor: pointer;
+      transition: background .18s, border-color .18s, transform .15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .card:hover  { background: rgba(255,255,255,.12); border-color: rgba(255,255,255,.2); transform: translateY(-2px); }
+    .card.active { border-color: #F97316; background: rgba(249,115,22,.12); }
+
+    .card-icon { font-size: 22px; margin-bottom: 8px; display: block; }
+    .card-name { font-size: 13px; font-weight: 700; color: white; margin-bottom: 3px; }
+    .card-role { font-size: 11px; color: rgba(255,255,255,.45); line-height: 1.4; }
+
+    /* Arrow connector */
+    .connector {
+      display: flex; align-items: center; gap: 10px;
+      margin: 6px 0;
+      padding: 0 4px;
+    }
+    .connector-line {
+      flex: 1; height: 1px;
+      background: rgba(255,255,255,.12);
+    }
+    .connector-text {
+      font-size: 10px; color: rgba(255,255,255,.3);
+      font-weight: 600; letter-spacing: .05em;
+      white-space: nowrap;
+    }
+
+    /* Detail panel */
+    .detail {
+      margin-top: 16px;
+      background: rgba(255,255,255,.06);
+      border: 1.5px solid rgba(255,255,255,.1);
+      border-radius: 16px;
+      padding: 20px;
+      min-height: 120px;
+      transition: all .25s;
+    }
+    .detail.highlighted {
+      border-color: rgba(249,115,22,.4);
+      background: rgba(249,115,22,.07);
+    }
+    .detail-title {
+      font-size: 14px; font-weight: 700; color: white;
+      margin-bottom: 8px;
+    }
+    .detail-text {
+      font-size: 12px; color: rgba(255,255,255,.6);
+      line-height: 1.7;
+    }
+    .tags {
+      display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px;
+    }
+    .tag {
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 6px;
+      padding: 3px 9px;
+      font-size: 10px; font-weight: 600;
+      color: rgba(255,255,255,.5);
+    }
+
+    .hint {
+      text-align: center;
+      color: rgba(255,255,255,.2);
+      font-size: 11px;
+      margin-top: 14px;
+    }
+
+    /* Mobile */
+    @media (max-width: 480px) {
+      .row { gap: 8px; }
+      .card { padding: 12px 10px 10px; }
+      .card-icon { font-size: 18px; margin-bottom: 6px; }
+      .card-name { font-size: 12px; }
+      .card-role { font-size: 10px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <div class="header">
+      <div class="logo-badge">IA</div>
+      <div class="header-text">
+        <h1>Como o Dashboard funciona</h1>
+        <p>Itaú Asset · Instagram Dashboard · Guia para não-técnicos</p>
+      </div>
+    </div>
+
+    <!-- Camada 1: Acesso -->
+    <div class="layer">
+      <div class="layer-label">📱 Você acessa por aqui</div>
+      <div class="row">
+        <div class="card" onclick="show(this,'browser')">
+          <span class="card-icon">🌐</span>
+          <div class="card-name">Navegador</div>
+          <div class="card-role">Chrome, Safari, celular…</div>
+        </div>
+        <div class="card" onclick="show(this,'github')">
+          <span class="card-icon">🐙</span>
+          <div class="card-name">GitHub</div>
+          <div class="card-role">Guarda o código-fonte</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="connector">
+      <div class="connector-line"></div>
+      <span class="connector-text">↕ publica automaticamente</span>
+      <div class="connector-line"></div>
+    </div>
+
+    <!-- Camada 2: Hospedagem -->
+    <div class="layer">
+      <div class="layer-label">🚀 Hospedagem & proteção</div>
+      <div class="row">
+        <div class="card" onclick="show(this,'vercel')">
+          <span class="card-icon">▲</span>
+          <div class="card-name">Vercel</div>
+          <div class="card-role">Publica o site na internet</div>
+        </div>
+        <div class="card" onclick="show(this,'senha')">
+          <span class="card-icon">🔐</span>
+          <div class="card-name">Senha de acesso</div>
+          <div class="card-role">Bloqueia quem não tem a senha</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="connector">
+      <div class="connector-line"></div>
+      <span class="connector-text">↕ busca e salva dados</span>
+      <div class="connector-line"></div>
+    </div>
+
+    <!-- Camada 3: Dados -->
+    <div class="layer">
+      <div class="layer-label">🗄️ Onde os dados vivem</div>
+      <div class="row">
+        <div class="card" onclick="show(this,'supabase')">
+          <span class="card-icon">🐘</span>
+          <div class="card-name">Supabase</div>
+          <div class="card-role">Banco de dados dos posts</div>
+        </div>
+        <div class="card" onclick="show(this,'storage')">
+          <span class="card-icon">🖼️</span>
+          <div class="card-name">Storage</div>
+          <div class="card-role">Armazena as fotos</div>
+        </div>
+        <div class="card" onclick="show(this,'anthropic')">
+          <span class="card-icon">✨</span>
+          <div class="card-name">Anthropic IA</div>
+          <div class="card-role">Gera insights e analisa</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Painel de detalhe -->
+    <div class="detail" id="detail">
+      <div class="detail-title" id="d-title">Toque em qualquer bloco para entender o que ele faz</div>
+      <div class="detail-text" id="d-text">Cada peça tem um papel específico. Juntas, elas formam o dashboard completo.</div>
+      <div class="tags" id="d-tags"></div>
+    </div>
+
+    <p class="hint">Desenvolvido com Claude Code · Itaú Asset Management</p>
+  </div>
+
+  <script>
+    const info = {
+      browser: {
+        title: '🌐 Navegador — a janela que você usa',
+        text: 'É o Chrome, Safari ou qualquer browser no celular ou computador. Você digita o endereço do site e o navegador carrega o dashboard. Ele não guarda nenhum dado importante — tudo vive nos servidores.',
+        tags: ['Chrome', 'Safari', 'Mobile', 'Desktop']
+      },
+      github: {
+        title: '🐙 GitHub — o cofre do código',
+        text: 'É onde fica armazenado todo o código que faz o dashboard funcionar. Pense como um Google Docs do código: guarda o histórico de cada alteração feita. Toda vez que uma melhoria é feita, ela vai para cá primeiro — e a Vercel publica automaticamente.',
+        tags: ['Código-fonte', 'Histórico de mudanças', 'Gratuito']
+      },
+      vercel: {
+        title: '▲ Vercel — a empresa que publica o site',
+        text: 'É como uma "gráfica" do site. Quando o código no GitHub é atualizado, a Vercel pega esse código automaticamente, monta o site e disponibiliza no endereço do dashboard em menos de 2 minutos. Funciona 24h por dia, acessível do mundo inteiro.',
+        tags: ['Hospedagem', 'Deploy automático', 'CDN global', 'Plano gratuito']
+      },
+      senha: {
+        title: '🔐 Senha de acesso — o porteiro do site',
+        text: 'Antes de qualquer pessoa ver qualquer dado, o sistema verifica se ela tem a senha certa. Quem não tem a senha vê apenas uma tela de login em branco — nenhuma informação do dashboard vaza. A senha fica guardada só na Vercel, nunca no código.',
+        tags: ['Cookie 30 dias', 'Middleware de segurança', 'Proteção de acesso']
+      },
+      supabase: {
+        title: '🐘 Supabase — a gaveta de todos os dados',
+        text: 'É um banco de dados na nuvem. Guarda todos os posts: métricas, datas, temas, evidências, metas. Quando você adiciona, edita ou apaga um post em qualquer dispositivo, a informação vai para cá. É por isso que celular e computador mostram sempre os mesmos dados.',
+        tags: ['Banco de dados', 'Sincronização em tempo real', 'Plano gratuito']
+      },
+      storage: {
+        title: '🖼️ Storage — o álbum de fotos',
+        text: 'Parte do Supabase dedicada só a guardar imagens. Quando você faz upload de um print de métricas, a foto vai para cá e fica disponível por um link. O banco de dados guarda só o endereço da foto — não a foto em si — para economizar espaço.',
+        tags: ['Imagens dos posts', 'Dentro do Supabase', 'Link público']
+      },
+      anthropic: {
+        title: '✨ Anthropic — o cérebro de IA',
+        text: 'É a empresa por trás do Claude. Quando você pede insights ou faz uma pergunta no chat do dashboard, os dados são enviados para a Anthropic, que processa tudo e devolve a análise em segundos. O custo é baixo e cobrado por uso, via chave de API.',
+        tags: ['Claude Haiku', 'Pago por uso', 'Chave de API']
+      }
+    }
+
+    function show(card, key) {
+      const d = info[key]
+      document.getElementById('d-title').textContent = d.title
+      document.getElementById('d-text').textContent = d.text
+      document.getElementById('d-tags').innerHTML = d.tags.map(t => `<span class="tag">${t}</span>`).join('')
+      document.querySelectorAll('.card').forEach(c => c.classList.remove('active'))
+      card.classList.add('active')
+      const detail = document.getElementById('detail')
+      detail.classList.add('highlighted')
+      detail.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+    }
+  </script>
+</body>
+</html>
