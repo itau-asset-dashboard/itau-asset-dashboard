@@ -44,13 +44,7 @@ export const useStore = create(
             fetchSetting('data_evidencias'),
             fetchStories().catch(() => null), // null = falha, [] = Supabase vazio de verdade
           ])
-          // Preserva imageData local — nunca é salvo no Supabase (muito pesado)
-          // Também normaliza o campo `tema` para array limpo
           const localPosts = get().posts
-          const cloudIds = new Set(cloudPosts.map(p => p.id))
-
-          // Posts que existem só no localStorage (nunca chegaram ao Supabase) → reenviar
-          const orphans = localPosts.filter(lp => !cloudIds.has(lp.id))
 
           const dirty = []
           // Migração única: lê o mapa antigo de evidências do settings para preencher
@@ -90,13 +84,6 @@ export const useStore = create(
             return { ...merged, tema: temaNorm, data_post: dateNorm }
           })
 
-          // Inclui os órfãos normalizados no estado
-          const orphansNorm = orphans.map(p => ({
-            ...p,
-            tema:      normalizeTema(p.tema),
-            data_post: normalizeDate(p.data_post),
-          }))
-
           // Merge oliverData: cloud tem prioridade, mas mantém entradas locais não presentes na nuvem
           let newOliver = get().oliverData
           if (oliverRaw) {
@@ -129,7 +116,7 @@ export const useStore = create(
           }
 
           set({
-            posts: [...posts, ...orphansNorm],
+            posts,
             stories: mergedStories,
             metaMensal: metaMensal ? Number(metaMensal) : get().metaMensal,
             metaAnual:  metaAnual  ? Number(metaAnual)  : get().metaAnual,
@@ -137,10 +124,9 @@ export const useStore = create(
             syncing: false,
           })
 
-          // Reenviar órfãos + posts com dados sujos para o Supabase
-          const toSave = [...orphansNorm, ...dirty]
-          if (toSave.length > 0) {
-            toSave.forEach(p => { try { upsertPost(p) } catch (_) {} })
+          // Reenviar posts com dados sujos (normalização de tema/data) para o Supabase
+          if (dirty.length > 0) {
+            dirty.forEach(p => { try { upsertPost(p) } catch (_) {} })
           }
 
           // Reenviar imagens que ficaram pendentes (mobile matou a página antes do upsert)
