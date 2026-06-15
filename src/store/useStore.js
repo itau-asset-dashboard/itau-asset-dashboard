@@ -50,26 +50,27 @@ export const useStore = create(
           const orphans = localPosts.filter(lp => !cloudIds.has(lp.id))
 
           const dirty = []
-          // Mapa de datas de evidência salvo no Supabase
-          let evidencias = {}
+          // Migração única: lê o mapa antigo de evidências do settings para preencher
+          // posts que ainda têm a coluna vazia no Supabase
+          let legacyEvidencias = {}
           if (evidenciasRaw) {
-            try { evidencias = JSON.parse(evidenciasRaw) } catch (_) {}
+            try { legacyEvidencias = JSON.parse(evidenciasRaw) } catch (_) {}
           }
-          // Cloud tem prioridade; local só preenche o que o cloud não tem
-          localPosts.forEach(lp => {
-            if (lp.data_evidencia && !evidencias[lp.id]) evidencias[lp.id] = lp.data_evidencia
-          })
 
           const posts = cloudPosts.map(cp => {
+            // Coluna data_evidencia agora vem direto do Supabase (fonte da verdade)
+            // Fallback para o mapa legado (migração) ou valor local se coluna ainda vazia
             const local = localPosts.find(lp => lp.id === cp.id)
-            const merged = {
-              ...cp,
-              data_evidencia: evidencias[cp.id] || local?.data_evidencia || cp.data_evidencia || '',
-            }
+            const evidencia = cp.data_evidencia
+              || legacyEvidencias[cp.id]
+              || local?.data_evidencia
+              || ''
+            const merged = { ...cp, data_evidencia: evidencia }
             const temaNorm = normalizeTema(merged.tema)
             const dateNorm = normalizeDate(merged.data_post)
             const wasDirty = JSON.stringify(merged.tema) !== JSON.stringify(temaNorm)
                           || dateNorm !== merged.data_post
+                          || (evidencia && !cp.data_evidencia) // migra legado para coluna
             if (wasDirty) dirty.push({ ...merged, tema: temaNorm, data_post: dateNorm })
             return { ...merged, tema: temaNorm, data_post: dateNorm }
           })
@@ -131,10 +132,6 @@ export const useStore = create(
           if (Object.keys(newOliver).length > 0) {
             try { saveSetting('oliver_data', JSON.stringify(newOliver)) } catch (_) {}
           }
-          // Persiste mapa de evidências mesclado
-          if (Object.keys(evidencias).length > 0) {
-            try { saveSetting('data_evidencias', JSON.stringify(evidencias)) } catch (_) {}
-          }
         } catch (e) {
           set({ syncing: false, syncError: e.message })
         }
@@ -187,15 +184,6 @@ export const useStore = create(
 
         set((s) => ({ posts: [...s.posts, novo] }))
         try { await upsertPost({ ...novo, imageUrl: novo.imageUrl || null }) } catch (_) {}
-        // Persiste data_evidencia no Supabase
-        if (novo.data_evidencia) {
-          try {
-            const raw = await fetchSetting('data_evidencias').catch(() => null)
-            const map = raw ? JSON.parse(raw) : {}
-            map[id] = novo.data_evidencia
-            await saveSetting('data_evidencias', JSON.stringify(map))
-          } catch (_) {}
-        }
       },
 
       updatePost: async (id, newData) => {
@@ -232,17 +220,6 @@ export const useStore = create(
         })
         const updated = get().posts.find((p) => p.id === id)
         if (updated) try { await upsertPost(updated) } catch (_) {}
-        // Persiste data_evidencia no Supabase quando alterada
-        const newEvidencia = restData.data_evidencia
-        if (newEvidencia !== undefined) {
-          try {
-            const raw = await fetchSetting('data_evidencias').catch(() => null)
-            const map = raw ? JSON.parse(raw) : {}
-            if (newEvidencia) map[id] = newEvidencia
-            else delete map[id]
-            await saveSetting('data_evidencias', JSON.stringify(map))
-          } catch (_) {}
-        }
       },
 
       deletePost: async (id) => {

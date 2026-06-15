@@ -46,11 +46,11 @@ export async function uploadImage(postId, dataUrl) {
 const POST_COLUMNS = [
   'id','nome','tema','data_post','tipo','descricao',
   'contas_alcancadas','visualizacoes','curtidas','comentarios','salvamentos','compartilhamentos',
-  'status','historico','atualizado_em','image_url',
+  'status','historico','atualizado_em','image_url','data_evidencia',
 ]
 
 export async function upsertPost(post) {
-  const { apiKey, imageData, imageUrl, imagePreview, data_evidencia, ...rest } = post
+  const { apiKey, imageData, imageUrl, imagePreview, ...rest } = post
   // Mantém só as colunas conhecidas para não quebrar se houver campos novos no frontend
   const clean = Object.fromEntries(
     Object.entries(rest).filter(([k]) => POST_COLUMNS.includes(k))
