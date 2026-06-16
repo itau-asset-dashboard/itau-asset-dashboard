@@ -246,19 +246,19 @@ export default function ETFsView() {
             </p>
           ) : (
             <div className="chart-wrapper"><ResponsiveContainer width="100%" height={mobile ? 180 : 200}>
-              <BarChart data={porTipo} margin={{top:8, right:8, left:0, bottom: mobile ? 20 : 0}}>
+              <BarChart data={porTipo} margin={{top:8, right: mobile ? 16 : 8, left: mobile ? -8 : 0, bottom: mobile ? 20 : 0}}>
                 <XAxis dataKey="tipo"
                   tick={{ fill:'#9AAAB8', fontSize: mobile ? 10 : 11 }}
                   axisLine={false} tickLine={false}
                   tickFormatter={v => mobile ? (v === 'Foto estática' ? 'Foto' : v) : v}
                 />
                 <YAxis tick={{ fill:'#9AAAB8', fontSize:10 }} axisLine={false} tickLine={false}
-                  tickFormatter={v=>v===0?'':fmt(v)} width={44}/>
+                  tickFormatter={v=>v===0?'':fmt(v)} width={mobile ? 36 : 44}/>
                 <Tooltip
                   formatter={(v,_,props) => [fmt(v), `${props.payload.count} posts`]}
                   contentStyle={{ borderRadius:10, border:'1px solid #EAECF0', fontSize:12, boxShadow:'0 4px 16px rgba(0,0,0,0.08)' }}
                 />
-                <Bar dataKey="total" radius={[8,8,0,0]} barSize={48}>
+                <Bar dataKey="total" radius={[8,8,0,0]} barSize={mobile ? 36 : 48}>
                   {porTipo.map((t,i) => (
                     <Cell key={i} fill={TIPO_COLOR[t.tipo]||'#C3EBF7'}/>
                   ))}
