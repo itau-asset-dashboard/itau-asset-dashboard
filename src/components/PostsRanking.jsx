@@ -173,6 +173,25 @@ export default function PostsRanking() {
         </div>
       </div>
 
+      {/* Resumo quando há busca ativa */}
+      {q && sorted.length > 0 && (
+        <div style={{ padding: '12px 20px', borderTop: '1px solid #F0F2F5', borderBottom: '1px solid #F0F2F5', background: '#FAFBFC', display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 10 }} className="kpi-grid">
+          {[
+            { label: 'Posts',      value: sorted.length,                                                           color: '#1C252E' },
+            { label: 'Alcance',    value: sorted.reduce((s,p)=>s+(p.contas_alcancadas||0),0),                      color: '#FF6200' },
+            { label: 'Visualiz.',  value: sorted.reduce((s,p)=>s+(p.visualizacoes||0),0),                          color: '#0891B2' },
+            { label: 'Engajam.',   value: sorted.reduce((s,p)=>s+((p.curtidas||0)+(p.comentarios||0)+(p.salvamentos||0)+(p.compartilhamentos||0)),0), color: '#4A90A4' },
+          ].map(({ label, value, color }) => (
+            <div key={label}>
+              <p style={{ fontSize: 10, fontWeight: 600, color: '#B0BEC5', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 3 }}>{label}</p>
+              <p style={{ fontSize: 18, fontWeight: 800, color, lineHeight: 1, letterSpacing: '-0.02em' }}>
+                {value >= 1000000 ? (value/1000000).toFixed(1).replace('.',',')+' M' : value >= 1000 ? (value/1000).toFixed(1).replace('.',',')+' K' : value.toLocaleString('pt-BR')}
+              </p>
+            </div>
+          ))}
+        </div>
+      )}
+
       <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }} className="scrollbar-thin">
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
