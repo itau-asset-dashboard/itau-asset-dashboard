@@ -232,10 +232,7 @@ function VisaoMensal({ stories }) {
             <XAxis dataKey="mes" tick={{ fontSize: mobile ? 9 : 11, fill: '#8A9BB0' }} axisLine={false} tickLine={false} />
             <YAxis tickFormatter={fmtY} tick={{ fontSize: mobile ? 9 : 11, fill: '#8A9BB0' }} axisLine={false} tickLine={false} width={mobile ? 32 : 44} />
             <Tooltip content={<StoriesChartTooltip metrica={metrica} />} cursor={{ fill: 'rgba(0,0,0,0.03)', radius: 6 }} />
-            {media > 0 && (
-              <ReferenceLine y={media} stroke="#8A9BB0" strokeDasharray="5 3" strokeWidth={1.5}
-                label={mobile ? undefined : { value: fmtY(media), position: 'right', fill: '#8A9BB0', fontSize: 11 }} />
-            )}
+
             <Bar dataKey="valor" radius={[4, 4, 0, 0]} maxBarSize={mobile ? 28 : 44} fill={metrica.color} />
           </BarChart>
         </ResponsiveContainer>
