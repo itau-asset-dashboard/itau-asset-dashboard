@@ -133,13 +133,13 @@ export default function ETFsView() {
         {/* Linha 1: título + toggle + participação */}
         <div style={{ display:'flex', alignItems:'flex-start', justifyContent:'space-between', flexWrap:'wrap', gap:10 }}>
           <div>
-            <h2 style={{ color:'#1C252E', fontSize:20, fontWeight:800 }}>ETFs</h2>
-            <p style={{ color:'#9AAAB8', fontSize:13, marginTop:3 }}>
+            <h2 style={{ color:'#1C252E', fontSize: mobile ? 17 : 20, fontWeight:800 }}>ETFs</h2>
+            <p style={{ color:'#9AAAB8', fontSize: mobile ? 12 : 13, marginTop:3 }}>
               Performance do tema ETFs · {periodoLabel}
             </p>
           </div>
 
-          <div style={{ display:'flex', alignItems:'center', gap:10 }}>
+          <div style={{ display:'flex', alignItems:'center', gap:8, flexWrap:'wrap' }}>
             {/* Toggle Anual / Mensal */}
             <div style={{
               display:'flex', background:'rgba(28,37,46,0.06)', borderRadius:12,
@@ -148,8 +148,8 @@ export default function ETFsView() {
               {['anual','mensal'].map(mode => (
                 <button key={mode} onClick={() => setViewMode(mode)}
                   style={{
-                    padding:'6px 16px', borderRadius:10, border:'none', cursor:'pointer',
-                    fontSize:13, fontWeight: viewMode===mode ? 700 : 400,
+                    padding: mobile ? '5px 12px' : '6px 16px', borderRadius:10, border:'none', cursor:'pointer',
+                    fontSize: mobile ? 12 : 13, fontWeight: viewMode===mode ? 700 : 400,
                     background: viewMode===mode ? '#1C252E' : 'transparent',
                     color: viewMode===mode ? '#C3EBF7' : '#5A7080',
                     transition:'all 0.15s',
@@ -160,8 +160,8 @@ export default function ETFsView() {
             </div>
 
             {/* Pill participação */}
-            <div style={{ background:'rgba(8,145,178,0.08)', borderRadius:10, padding:'6px 12px', textAlign:'center', border:'1px solid rgba(8,145,178,0.12)' }}>
-              <p style={{ color:'#0891B2', fontSize:15, fontWeight:800, lineHeight:1 }}>{participacao.toFixed(1)}%</p>
+            <div style={{ background:'rgba(8,145,178,0.08)', borderRadius:10, padding: mobile ? '5px 10px' : '6px 12px', textAlign:'center', border:'1px solid rgba(8,145,178,0.12)' }}>
+              <p style={{ color:'#0891B2', fontSize: mobile ? 13 : 15, fontWeight:800, lineHeight:1 }}>{participacao.toFixed(1)}%</p>
               <p style={{ color:'#9AAAB8', fontSize:10, marginTop:2, whiteSpace:'nowrap' }}>do alcance total</p>
             </div>
           </div>
@@ -197,17 +197,17 @@ export default function ETFsView() {
       {/* KPIs */}
       <div className="kpi-grid">
         {KPIS.map(({label,value,sub}) => (
-          <div key={label} className="card" style={{ padding:'18px 20px' }}>
-            <p style={{ color:'#9AAAB8', fontSize:11, fontWeight:600, textTransform:'uppercase', letterSpacing:'0.05em', marginBottom:5 }}>{label}</p>
-            <p style={{ color:'#1C252E', fontSize:24, fontWeight:800, lineHeight:1.1, marginBottom:3 }}>{value}</p>
-            <p style={{ color:'#9AAAB8', fontSize:12 }}>{sub}</p>
+          <div key={label} className="card" style={{ padding: mobile ? '12px 14px' : '18px 20px' }}>
+            <p style={{ color:'#9AAAB8', fontSize: mobile ? 9 : 11, fontWeight:600, textTransform:'uppercase', letterSpacing:'0.05em', marginBottom: mobile ? 4 : 5 }}>{label}</p>
+            <p style={{ color:'#1C252E', fontSize: mobile ? 18 : 24, fontWeight:800, lineHeight:1.1, marginBottom: mobile ? 2 : 3 }}>{value}</p>
+            <p style={{ color:'#9AAAB8', fontSize: mobile ? 10 : 12, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{sub}</p>
           </div>
         ))}
       </div>
 
       {/* Gráfico — anual mostra barras mensais; mensal mostra barras por formato */}
       {viewMode === 'anual' ? (
-        <div className="card" style={{ padding:'22px' }}>
+        <div className="card" style={{ padding: mobile ? '14px' : '22px' }}>
           <p style={{ color:'#1C252E', fontSize:15, fontWeight:700, marginBottom:4 }}>Evolução mensal</p>
           <p style={{ color:'#9AAAB8', fontSize:12, marginBottom:20 }}>Alcance e volume de posts ETF por mês em {ano}</p>
           <div className="chart-wrapper"><ResponsiveContainer width="100%" height={mobile ? 160 : 240}>
@@ -237,7 +237,7 @@ export default function ETFsView() {
         </div>
       ) : (
         /* Modo mensal: gráfico de barras por formato */
-        <div className="card" style={{ padding:'22px' }}>
+        <div className="card" style={{ padding: mobile ? '14px' : '22px' }}>
           <p style={{ color:'#1C252E', fontSize:15, fontWeight:700, marginBottom:4 }}>Alcance por formato</p>
           <p style={{ color:'#9AAAB8', fontSize:12, marginBottom:20 }}>Posts ETF em {MESES_FULL[mesSel]} {ano}</p>
           {porTipo.every(t => t.total === 0) ? (
@@ -266,10 +266,10 @@ export default function ETFsView() {
       )}
 
       {/* Top posts + Performance por formato */}
-      <div style={{ display:'grid', gridTemplateColumns:'2fr 1fr', gap:16 }} className="annual-grid">
+      <div style={{ display:'grid', gridTemplateColumns: mobile ? '1fr' : '2fr 1fr', gap:16 }} className="annual-grid">
 
         {/* Top posts */}
-        <div className="card" style={{ padding:'22px' }}>
+        <div className="card" style={{ padding: mobile ? '14px' : '22px' }}>
           <p style={{ color:'#1C252E', fontSize:15, fontWeight:700, marginBottom:4 }}>
             Top posts ETF {viewMode === 'mensal' ? `· ${MESES_LABEL[mesSel]}` : ''}
           </p>
@@ -293,7 +293,7 @@ export default function ETFsView() {
         </div>
 
         {/* Performance por formato + comparação temas */}
-        <div className="card" style={{ padding:'22px' }}>
+        <div className="card" style={{ padding: mobile ? '14px' : '22px' }}>
           <p style={{ color:'#1C252E', fontSize:15, fontWeight:700, marginBottom:4 }}>Por formato</p>
           <p style={{ color:'#9AAAB8', fontSize:12, marginBottom:18 }}>Dentro do tema ETFs</p>
           <div style={{ display:'flex', flexDirection:'column', gap:18 }}>
