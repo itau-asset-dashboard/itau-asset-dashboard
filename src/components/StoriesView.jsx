@@ -130,10 +130,10 @@ function GrupoCard({ nome, stories, isEditMode, onEdit, selectedIds, onToggleSel
 const MESES_NOMES = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro']
 
 const METRICAS = [
-  { key: 'visualizacoes',    label: 'Visualizações',  color: '#FF6200' },
-  { key: 'interacoes',       label: 'Interações',     color: '#1C252E' },
-  { key: 'atividade_perfil', label: 'Ativ. perfil',   color: '#4A90A4' },
-  { key: 'qtd',              label: 'Qtd. stories',   color: '#C3EBF7' },
+  { key: 'visualizacoes',    label: 'Visualizações',         color: '#FF6200' },
+  { key: 'interacoes',       label: 'Interações',            color: '#1C252E' },
+  { key: 'atividade_perfil', label: 'Atividade de perfil',   color: '#4A90A4' },
+  { key: 'qtd',              label: 'Quantidade de stories', color: '#6C63FF' },
 ]
 
 function fmtY(n) {
@@ -220,7 +220,7 @@ function VisaoMensal({ stories }) {
   }))
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+    <div style={{ display: 'grid', gridTemplateColumns: mobile ? '1fr' : '1fr 1fr', gap: 12 }}>
       {METRICAS.map(m => (
         <MiniChart key={m.key} metrica={m} data={dataFor(m.key)} mobile={mobile} />
       ))}
