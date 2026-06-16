@@ -56,10 +56,22 @@ import MetaMensalBanner from './components/MetaMensalBanner'
   } catch (_) {}
 })()
 
-export default function App() {
-  const { activeSection, syncFromCloud } = useStore()
+const VALID_SECTIONS = ['visao-geral','visao-anual','insights','oliver','posts','etfs','glossario','stories','upload']
 
+export default function App() {
+  const { activeSection, setActiveSection, syncFromCloud } = useStore()
+
+  // Restaura seção pela URL hash no primeiro load
   useEffect(() => {
+    const hash = window.location.hash.replace('#', '')
+    if (hash && VALID_SECTIONS.includes(hash)) {
+      setActiveSection(hash)
+    }
+  }, [])
+
+  // Mantém hash sincronizado com a seção ativa
+  useEffect(() => {
+    window.location.hash = activeSection
     document.querySelector('.content-scroll')?.scrollTo({ top: 0, behavior: 'instant' })
   }, [activeSection])
 
