@@ -13,7 +13,7 @@ function fmt(n) {
 }
 
 const COLOR = { Carrossel: '#FF6200', Reels: '#1C252E', 'Foto estática': '#C3EBF7' }
-const BORDER_COLOR = { 'Foto estática': '#3a7a96' }
+const BORDER_COLOR = {}
 
 const CustomTooltip = ({ active, payload }) => {
   if (!active || !payload?.length) return null
