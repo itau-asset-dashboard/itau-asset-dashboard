@@ -210,8 +210,8 @@ export default function ETFsView() {
         <div className="card" style={{ padding: mobile ? '14px' : '22px' }}>
           <p style={{ color:'#1C252E', fontSize:15, fontWeight:700, marginBottom:4 }}>Evolução mensal</p>
           <p style={{ color:'#9AAAB8', fontSize:12, marginBottom:20 }}>Alcance e volume de posts ETF por mês em {ano}</p>
-          <div className="chart-wrapper"><ResponsiveContainer width="100%" height={mobile ? 160 : 240}>
-            <BarChart data={byMonth} margin={{top:16, right: mobile ? 4 : 8, left:0, bottom:0}} barGap={4}>
+          <div className="chart-wrapper"><ResponsiveContainer width="100%" height={mobile ? 180 : 240}>
+            <BarChart data={byMonth} margin={{top:8, right: mobile ? 4 : 8, left:0, bottom:0}} barGap={4}>
               <XAxis dataKey="mes" tick={{ fill:'#9AAAB8', fontSize: mobile ? 9 : 11 }} axisLine={false} tickLine={false}/>
               <YAxis yAxisId="left" tick={{ fill:'#9AAAB8', fontSize:10 }} axisLine={false} tickLine={false}
                 tickFormatter={v=>v===0?'':fmt(v)} width={mobile ? 34 : 44}/>
@@ -245,9 +245,13 @@ export default function ETFsView() {
               Nenhum post ETF neste mês
             </p>
           ) : (
-            <div className="chart-wrapper"><ResponsiveContainer width="100%" height={200}>
-              <BarChart data={porTipo} margin={{top:8,right:8,left:0,bottom:0}}>
-                <XAxis dataKey="tipo" tick={{ fill:'#9AAAB8', fontSize:11 }} axisLine={false} tickLine={false}/>
+            <div className="chart-wrapper"><ResponsiveContainer width="100%" height={mobile ? 180 : 200}>
+              <BarChart data={porTipo} margin={{top:8, right:8, left:0, bottom: mobile ? 20 : 0}}>
+                <XAxis dataKey="tipo"
+                  tick={{ fill:'#9AAAB8', fontSize: mobile ? 10 : 11 }}
+                  axisLine={false} tickLine={false}
+                  tickFormatter={v => mobile ? (v === 'Foto estática' ? 'Foto' : v) : v}
+                />
                 <YAxis tick={{ fill:'#9AAAB8', fontSize:10 }} axisLine={false} tickLine={false}
                   tickFormatter={v=>v===0?'':fmt(v)} width={44}/>
                 <Tooltip

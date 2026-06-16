@@ -139,7 +139,7 @@ select, input {
   td, th { padding: 9px 8px !important; }
 
   /* Charts — altura reduzida */
-  .chart-wrapper > div { height: 170px !important; }
+  .chart-wrapper > div { height: 180px !important; }
 
   /* ETF month grid — 6 colunas em vez de 12 para pills maiores */
   .etf-month-grid {
