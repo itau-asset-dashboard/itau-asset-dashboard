@@ -18,10 +18,6 @@ function fmt(n) {
   return n.toLocaleString('pt-BR')
 }
 
-function fmtExact(n) {
-  if (!n && n !== 0) return '—'
-  return Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')
-}
 
 function pct(a, b) {
   if (!b) return '0%'
@@ -117,7 +113,7 @@ export default function ETFsView() {
   const maxTema  = temaRank[0]?.[1] || 1
 
   // ── KPI cards ──────────────────────────────────────
-  const f = viewMode === 'mensal' ? fmtExact : fmt
+  const f = fmt
   const KPIS = [
     { label:'Total alcançado',  value:f(totalEtf),  sub:`${participacao.toFixed(1)}% do total${viewMode==='mensal'?' do mês':' do ano'}`, color:'#F97316', bg:'rgba(249,115,22,0.08)' },
     { label:'Média por post',   value:f(mediaEtf),  sub:'contas / publicação',                                                             color:'#0891B2', bg:'rgba(8,145,178,0.08)' },
@@ -251,10 +247,10 @@ export default function ETFsView() {
                 <span style={{ color:'#9AAAB8', fontSize:11, fontWeight:600, textTransform:'uppercase', letterSpacing:'0.04em' }}>{t.tipo}</span>
               </div>
               <p style={{ color:'#1C252E', fontSize: mobile ? 22 : 26, fontWeight:800, lineHeight:1, marginBottom:4 }}>
-                {t.total > 0 ? fmtExact(t.total) : '—'}
+                {t.total > 0 ? fmt(t.total) : '—'}
               </p>
               <p style={{ color:'#9AAAB8', fontSize:11, marginBottom:10 }}>
-                {t.count} post{t.count !== 1 ? 's' : ''} · média {fmtExact(t.media)}
+                {t.count} post{t.count !== 1 ? 's' : ''} · média {fmt(t.media)}
               </p>
               <div style={{ background:'#F0F2F5', borderRadius:6, height:4, overflow:'hidden' }}>
                 <div style={{
