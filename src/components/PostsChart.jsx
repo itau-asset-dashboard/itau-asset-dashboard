@@ -99,8 +99,8 @@ export default function PostsChart() {
                   key={entry.id}
                   fill={COLOR[entry.tipo] || '#C3EBF7'}
                   opacity={entry.status === 'parcial' ? 0.5 : 1}
-                  stroke={entry.tipo === 'Foto estática' ? '#3a7a96' : 'none'}
-                  strokeWidth={entry.tipo === 'Foto estática' ? 1.5 : 0}
+                  stroke="none"
+                  strokeWidth={0}
                 />
               ))}
             </Bar>
