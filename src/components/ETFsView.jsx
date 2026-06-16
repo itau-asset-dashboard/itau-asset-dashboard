@@ -244,21 +244,44 @@ export default function ETFsView() {
             <p style={{ color:'#9AAAB8', fontSize:13, textAlign:'center', padding:'40px 0' }}>
               Nenhum post ETF neste mês
             </p>
+          ) : mobile ? (
+            /* Mobile: barras horizontais em CSS */
+            <div style={{ display:'flex', flexDirection:'column', gap:14 }}>
+              {porTipo.map(t => (
+                <div key={t.tipo}>
+                  <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:6 }}>
+                    <div style={{ display:'flex', alignItems:'center', gap:7 }}>
+                      <div style={{ width:9, height:9, borderRadius:3, background: TIPO_COLOR[t.tipo]||'#C3EBF7', flexShrink:0 }}/>
+                      <span style={{ color:'#1C252E', fontSize:13, fontWeight:600 }}>{t.tipo}</span>
+                    </div>
+                    <div style={{ textAlign:'right' }}>
+                      <span style={{ color:'#1C252E', fontSize:14, fontWeight:700 }}>{fmt(t.total)}</span>
+                      <span style={{ color:'#9AAAB8', fontSize:11, marginLeft:6 }}>{t.count} post{t.count !== 1 ? 's' : ''}</span>
+                    </div>
+                  </div>
+                  <div style={{ background:'#F0F2F5', borderRadius:6, height:8, overflow:'hidden' }}>
+                    <div style={{
+                      height:'100%', borderRadius:6,
+                      background: TIPO_COLOR[t.tipo]||'#C3EBF7',
+                      width:`${maxTipo > 0 ? (t.total/maxTipo)*100 : 0}%`,
+                      transition:'width 0.5s'
+                    }}/>
+                  </div>
+                </div>
+              ))}
+            </div>
           ) : (
-            <div style={{ width:'100%', overflowX:'hidden' }}><ResponsiveContainer width="100%" height={mobile ? 180 : 200}>
-              <BarChart data={porTipo} margin={{top:8, right:20, left: mobile ? -10 : 0, bottom: mobile ? 24 : 0}} barCategoryGap="30%">
-                <XAxis dataKey="tipo"
-                  tick={{ fill:'#9AAAB8', fontSize: mobile ? 10 : 11 }}
-                  axisLine={false} tickLine={false}
-                  tickFormatter={v => mobile ? (v === 'Foto estática' ? 'Foto' : v) : v}
-                />
+            /* Desktop: gráfico Recharts */
+            <div className="chart-wrapper"><ResponsiveContainer width="100%" height={200}>
+              <BarChart data={porTipo} margin={{top:8, right:8, left:0, bottom:0}}>
+                <XAxis dataKey="tipo" tick={{ fill:'#9AAAB8', fontSize:11 }} axisLine={false} tickLine={false}/>
                 <YAxis tick={{ fill:'#9AAAB8', fontSize:10 }} axisLine={false} tickLine={false}
-                  tickFormatter={v=>v===0?'':fmt(v)} width={mobile ? 34 : 44}/>
+                  tickFormatter={v=>v===0?'':fmt(v)} width={44}/>
                 <Tooltip
                   formatter={(v,_,props) => [fmt(v), `${props.payload.count} posts`]}
                   contentStyle={{ borderRadius:10, border:'1px solid #EAECF0', fontSize:12, boxShadow:'0 4px 16px rgba(0,0,0,0.08)' }}
                 />
-                <Bar dataKey="total" radius={[8,8,0,0]} barSize={mobile ? undefined : 48}>
+                <Bar dataKey="total" radius={[8,8,0,0]} barSize={48}>
                   {porTipo.map((t,i) => (
                     <Cell key={i} fill={TIPO_COLOR[t.tipo]||'#C3EBF7'}/>
                   ))}
