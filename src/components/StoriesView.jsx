@@ -131,10 +131,10 @@ function GrupoCard({ nome, stories, isEditMode, onEdit, selectedIds, onToggleSel
 const MESES_NOMES = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro']
 
 const METRICAS = [
-  { key: 'visualizacoes',    label: 'Visualizações',  color: '#0891B2' },
-  { key: 'interacoes',       label: 'Interações',     color: '#F97316' },
-  { key: 'atividade_perfil', label: 'Ativ. perfil',   color: '#059669' },
-  { key: 'qtd',              label: 'Qtd. stories',   color: '#7C3AED' },
+  { key: 'visualizacoes',    label: 'Visualizações',  color: '#FF6200' },
+  { key: 'interacoes',       label: 'Interações',     color: '#1C252E' },
+  { key: 'atividade_perfil', label: 'Ativ. perfil',   color: '#4A90A4' },
+  { key: 'qtd',              label: 'Qtd. stories',   color: '#C3EBF7' },
 ]
 
 function fmtY(n) {
