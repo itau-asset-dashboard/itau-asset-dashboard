@@ -93,7 +93,7 @@ export default function OliverView() {
       <style>{`@media(max-width:768px){.kpi-grid-js{grid-template-columns:repeat(2,1fr)!important;gap:8px!important}.kpi-card-js{padding:11px 11px!important}.kpi-label-js{font-size:9px!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;margin-bottom:7px!important}.kpi-number-js{font-size:19px!important;margin-bottom:3px!important}.kpi-sub-js{font-size:9px!important}}`}</style>
       <div className="kpi-grid-js" style={{ display:'grid', gridTemplateColumns: mobile ? 'repeat(2,1fr)' : 'repeat(4,1fr)', gap: mobile ? 8 : 14, marginBottom:14 }}>
         {[
-          { label: 'Total Instagram (ano)', value: fmt(totalInsta),  color: '#1C252E', bg: 'rgba(28,37,46,0.06)',      desc: 'Soma das contas alcançadas via Instagram' },
+          { label: 'Total Instagram (ano)', value: fmtExato(totalInsta),  color: '#1C252E', bg: 'rgba(28,37,46,0.06)',      desc: 'Soma das contas alcançadas via Instagram' },
           { label: 'Total Oliver (ano)',    value: fmtExato(totalOliver || null), color: '#F97316', bg: 'rgba(249,115,22,0.08)', desc: 'Soma dos dados da agência' },
           { label: 'Diferença acumulada',  value: diff ? `${diff > 0 ? '+' : ''}${diff}%` : '—',
             color: diff == null ? '#9AAAB8' : diff > 0 ? '#16a34a' : '#ef4444',
@@ -177,7 +177,7 @@ export default function OliverView() {
                       </td>
                     )}
                     <td style={{ padding: mobile ? '10px 12px' : '13px 16px', color: '#1C252E', fontSize: mobile ? 12 : 13, fontWeight: 600 }}>
-                      {m.alcance_insta > 0 ? fmt(m.alcance_insta) : '—'}
+                      {m.alcance_insta > 0 ? fmtExato(m.alcance_insta) : '—'}
                     </td>
                     <td style={{ padding: mobile ? '10px 12px' : '13px 16px' }}>
                       {isEditing ? (
@@ -189,7 +189,7 @@ export default function OliverView() {
                           autoFocus />
                       ) : (
                         <span style={{ color: '#F97316', fontSize: mobile ? 12 : 13, fontWeight: 600 }}>
-                          {fmt(m.alcance_oliver)}
+                          {fmtExato(m.alcance_oliver)}
                         </span>
                       )}
                     </td>
