@@ -234,7 +234,7 @@ export default function StoriesView() {
     const now = new Date()
     return `${String(now.getMonth()+1).padStart(2,'0')}/${now.getFullYear()}`
   })
-  const [visao, setVisao]           = useState('lista') // 'lista' | 'mensal'
+  const [visao, setVisao]           = useState('geral') // 'geral' | 'lista'
   const [uploadOpen, setUploadOpen] = useState(false)
   const [editTarget, setEditTarget] = useState(null)
   const [search, setSearch]         = useState('')
@@ -328,14 +328,16 @@ export default function StoriesView() {
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 10 }}>
         <div>
           <h2 style={{ color: '#1C252E', fontSize: 15, fontWeight: 700 }}>Stories</h2>
-          <p style={{ color: '#8A9BB0', fontSize: 12, marginTop: 2 }}>Análise separada das metas de alcance</p>
+          <p style={{ color: '#8A9BB0', fontSize: 12, marginTop: 2 }}>
+            {visao === 'geral' ? 'Visão geral de todos os stories' : 'Lista por período'}
+          </p>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-          {/* Toggle Lista / Mês a mês */}
+          {/* Toggle Visão geral / Lista */}
           <div style={{ display:'flex', background:'#F0F2F5', borderRadius:10, padding:3, gap:2 }}>
             {[
-              { key:'lista',  icon: LayoutList, label:'Lista' },
-              { key:'mensal', icon: BarChart2,  label:'Mês a mês' },
+              { key:'geral', icon: BarChart2,  label:'Visão geral' },
+              { key:'lista', icon: LayoutList, label:'Lista' },
             ].map(({ key, icon: Icon, label }) => (
               <button key={key} onClick={() => setVisao(key)} style={{
                 display:'flex', alignItems:'center', gap:5,
@@ -358,7 +360,7 @@ export default function StoriesView() {
               {MESES.map((m, i) => <option key={m} value={m}>{MESES_LABEL[i]} 2026</option>)}
             </select>
           )}
-          {isEditMode && (
+          {isEditMode && visao === 'lista' && (
             <button
               onClick={() => selectMode ? clearSelection() : setSelectMode(true)}
               title={selectMode ? 'Cancelar seleção' : 'Selecionar stories'}
@@ -384,90 +386,108 @@ export default function StoriesView() {
         </div>
       </div>
 
-      {/* KPI Cards — só na visão lista */}
-      {visao === 'lista' && (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 10, animation: 'fadeIn .2s ease' }} className="kpi-grid">
-          {KPIS.map(({ label, value, icon: Icon, color, bg }) => (
-            <div key={label} className="card kpi-card" style={{ padding: '14px 16px', minWidth: 0 }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-                <p style={{ color: '#8A9BB0', fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}>{label}</p>
-                <div style={{ width: 28, height: 28, borderRadius: 8, background: bg, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <Icon size={13} color={color} />
+      {/* Visão geral — KPIs totais + 4 gráficos */}
+      {visao === 'geral' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12, animation: 'fadeIn .2s ease' }}>
+          {/* KPI totais (todos os stories) */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 10 }} className="kpi-grid">
+            {(() => {
+              const all = stories
+              const sum = k => all.reduce((s, st) => s + (st[k] || 0), 0)
+              return [
+                { label: 'Stories',          value: all.length,              icon: Film,      color: '#1C252E', bg: 'rgba(28,37,46,0.08)' },
+                { label: 'Visualizações',    value: sum('visualizacoes'),    icon: Eye,       color: '#FF6200', bg: 'rgba(255,98,0,0.08)' },
+                { label: 'Interações',       value: sum('interacoes'),       icon: Zap,       color: '#1C252E', bg: 'rgba(28,37,46,0.08)' },
+                { label: 'Atividade perfil', value: sum('atividade_perfil'), icon: UserCheck, color: '#4A90A4', bg: 'rgba(74,144,164,0.08)' },
+              ].map(({ label, value, icon: Icon, color, bg }) => (
+                <div key={label} className="card kpi-card" style={{ padding: '14px 16px', minWidth: 0 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+                    <p style={{ color: '#8A9BB0', fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}>{label}</p>
+                    <div style={{ width: 28, height: 28, borderRadius: 8, background: bg, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <Icon size={13} color={color} />
+                    </div>
+                  </div>
+                  <p style={{ color: '#182638', fontSize: 22, fontWeight: 800, lineHeight: 1 }}>{fmt(value)}</p>
                 </div>
-              </div>
-              <p style={{ color: '#182638', fontSize: 22, fontWeight: 800, lineHeight: 1 }}>{fmt(value)}</p>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* Visão mensal */}
-      {visao === 'mensal' && (
-        <div style={{ animation: 'fadeIn .2s ease' }}>
+              ))
+            })()}
+          </div>
+          {/* 4 gráficos empilhados */}
           <VisaoMensal stories={stories} />
         </div>
       )}
 
-      {/* Barra de filtros: label + tema */}
-      {visao === 'lista' && <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
-        {/* Label "Todos os stories" */}
-        <div style={{ background: '#fff', borderRadius: 10, padding: '6px 16px', border: '1.5px solid #EDEFF2', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
-          <span style={{ fontSize: 13, fontWeight: 600, color: '#182638' }}>Todos os stories</span>
-        </div>
+      {/* Visão lista — KPI do mês + filtros + lista */}
+      {visao === 'lista' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12, animation: 'fadeIn .2s ease' }}>
+          {/* KPIs do mês filtrado */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 10 }} className="kpi-grid">
+            {[
+              { label: 'Stories',          value: sorted.length,                                        icon: Film,      color: '#1C252E', bg: 'rgba(28,37,46,0.08)' },
+              { label: 'Visualizações',    value: sorted.reduce((s,st)=>s+(st.visualizacoes||0),0),    icon: Eye,       color: '#FF6200', bg: 'rgba(255,98,0,0.08)' },
+              { label: 'Interações',       value: sorted.reduce((s,st)=>s+(st.interacoes||0),0),       icon: Zap,       color: '#1C252E', bg: 'rgba(28,37,46,0.08)' },
+              { label: 'Atividade perfil', value: sorted.reduce((s,st)=>s+(st.atividade_perfil||0),0), icon: UserCheck, color: '#4A90A4', bg: 'rgba(74,144,164,0.08)' },
+            ].map(({ label, value, icon: Icon, color, bg }) => (
+              <div key={label} className="card kpi-card" style={{ padding: '14px 16px', minWidth: 0 }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+                  <p style={{ color: '#8A9BB0', fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}>{label}</p>
+                  <div style={{ width: 28, height: 28, borderRadius: 8, background: bg, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <Icon size={13} color={color} />
+                  </div>
+                </div>
+                <p style={{ color: '#182638', fontSize: 22, fontWeight: 800, lineHeight: 1 }}>{fmt(value)}</p>
+              </div>
+            ))}
+          </div>
 
-        {/* Filtro por tema */}
-        {temasDisponiveis.length > 0 && (
-          <select
-            value={temaFiltro}
-            onChange={e => setTemaFiltro(e.target.value)}
-            style={{
-              background: temaFiltro ? '#1C252E' : '#fff',
-              color: temaFiltro ? '#C3EBF7' : '#4A6272',
-              border: `1.5px solid ${temaFiltro ? '#1C252E' : '#EDEFF2'}`,
-              borderRadius: 10, padding: '6px 12px', fontSize: 13, fontWeight: temaFiltro ? 600 : 400,
-              outline: 'none', cursor: 'pointer', fontFamily: 'DM Sans, sans-serif',
-            }}
-          >
-            <option value="">Todos os temas</option>
-            {temasDisponiveis.map(t => <option key={t} value={t}>{t}</option>)}
-          </select>
-        )}
-        {temaFiltro && (
-          <button onClick={() => setTemaFiltro('')} style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4, color: '#8A9BB0', fontSize: 12 }}>
-            <X size={13} /> Limpar filtro
-          </button>
-        )}
-
-        {/* Busca */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#F5F7FA', borderRadius: 10, border: `1.5px solid ${q ? '#F97316' : '#EDEFF2'}`, padding: '6px 12px', flex: '1 1 160px', minWidth: 0 }}>
-          <Search size={14} color={q ? '#F97316' : '#A8B5C0'} style={{ flexShrink: 0 }} />
-          <input value={search} onChange={e => setSearch(e.target.value)}
-            placeholder="Buscar por nome ou data..."
-            style={{ border: 'none', background: 'transparent', outline: 'none', fontSize: 13, color: '#182638', width: '100%', fontFamily: 'DM Sans, sans-serif' }} />
-          {q && <button onClick={() => setSearch('')} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex' }}><X size={13} color="#A8B5C0" /></button>}
-        </div>
-      </div>}
-
-      {/* Lista */}
-      {visao === 'lista' && <div className="card" style={{ overflow: 'hidden' }}>
-        {sorted.length === 0 ? (
-          <div style={{ padding: '40px 20px', textAlign: 'center' }}>
-            <p style={{ color: '#9AAAB8', fontSize: 13 }}>
-              {temaFiltro ? `Nenhum story com tema "${temaFiltro}" neste período` : 'Nenhum story encontrado para este período'}
-            </p>
-            {isEditMode && !temaFiltro && (
-              <button onClick={() => setUploadOpen(true)} style={{ marginTop: 12, background: '#F97316', color: '#fff', border: 'none', borderRadius: 10, padding: '8px 16px', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
-                Adicionar primeiro story
+          {/* Barra de filtros */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+            {temasDisponiveis.length > 0 && (
+              <select value={temaFiltro} onChange={e => setTemaFiltro(e.target.value)} style={{
+                background: temaFiltro ? '#1C252E' : '#fff',
+                color: temaFiltro ? '#C3EBF7' : '#4A6272',
+                border: `1.5px solid ${temaFiltro ? '#1C252E' : '#EDEFF2'}`,
+                borderRadius: 10, padding: '6px 12px', fontSize: 13, fontWeight: temaFiltro ? 600 : 400,
+                outline: 'none', cursor: 'pointer', fontFamily: 'DM Sans, sans-serif',
+              }}>
+                <option value="">Todos os temas</option>
+                {temasDisponiveis.map(t => <option key={t} value={t}>{t}</option>)}
+              </select>
+            )}
+            {temaFiltro && (
+              <button onClick={() => setTemaFiltro('')} style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4, color: '#8A9BB0', fontSize: 12 }}>
+                <X size={13} /> Limpar filtro
               </button>
             )}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#F5F7FA', borderRadius: 10, border: `1.5px solid ${q ? '#F97316' : '#EDEFF2'}`, padding: '6px 12px', flex: '1 1 160px', minWidth: 0 }}>
+              <Search size={14} color={q ? '#F97316' : '#A8B5C0'} style={{ flexShrink: 0 }} />
+              <input value={search} onChange={e => setSearch(e.target.value)}
+                placeholder="Buscar por nome ou data..."
+                style={{ border: 'none', background: 'transparent', outline: 'none', fontSize: 13, color: '#182638', width: '100%', fontFamily: 'DM Sans, sans-serif' }} />
+              {q && <button onClick={() => setSearch('')} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex' }}><X size={13} color="#A8B5C0" /></button>}
+            </div>
           </div>
-        ) : sorted.map(st => (
-          <StoryRow key={st.id} story={st} isEditMode={isEditMode} onEdit={setEditTarget}
-            selected={selected.has(st.id)} onToggleSelect={selectMode ? toggleSelect : null} />
-        ))}
-      </div>
 
-      }
+          {/* Lista */}
+          <div className="card" style={{ overflow: 'hidden' }}>
+            {sorted.length === 0 ? (
+              <div style={{ padding: '40px 20px', textAlign: 'center' }}>
+                <p style={{ color: '#9AAAB8', fontSize: 13 }}>
+                  {temaFiltro ? `Nenhum story com tema "${temaFiltro}" neste período` : 'Nenhum story encontrado para este período'}
+                </p>
+                {isEditMode && !temaFiltro && (
+                  <button onClick={() => setUploadOpen(true)} style={{ marginTop: 12, background: '#F97316', color: '#fff', border: 'none', borderRadius: 10, padding: '8px 16px', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
+                    Adicionar primeiro story
+                  </button>
+                )}
+              </div>
+            ) : sorted.map(st => (
+              <StoryRow key={st.id} story={st} isEditMode={isEditMode} onEdit={setEditTarget}
+                selected={selected.has(st.id)} onToggleSelect={selectMode ? toggleSelect : null} />
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Barra flutuante de seleção */}
       {selected.size > 0 && (
