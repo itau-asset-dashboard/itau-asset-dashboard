@@ -128,22 +128,29 @@ function GrupoCard({ nome, stories, isEditMode, onEdit, selectedIds, onToggleSel
 
 const MESES_NOMES = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro']
 
+const METRICAS = [
+  { key: 'visualizacoes',    label: 'Visualizações',   color: '#0891B2', bg: 'rgba(8,145,178,0.12)'  },
+  { key: 'interacoes',       label: 'Interações',      color: '#F97316', bg: 'rgba(249,115,22,0.12)' },
+  { key: 'atividade_perfil', label: 'Ativ. perfil',    color: '#059669', bg: 'rgba(5,150,105,0.12)'  },
+  { key: 'stories',          label: 'Qtd. stories',    color: '#7C3AED', bg: 'rgba(124,58,237,0.10)' },
+]
+
 function VisaoMensal({ stories }) {
-  // Agrupa stories por mês
+  const [metricaKey, setMetricaKey] = useState('visualizacoes')
+
   const porMes = {}
   stories.forEach(s => {
     if (!s.data) return
     const [, mm, yyyy] = s.data.split('/')
     if (!mm || !yyyy) return
     const key = `${yyyy}-${mm}`
-    if (!porMes[key]) porMes[key] = { mm: parseInt(mm,10), yyyy, stories: [] }
-    porMes[key].stories.push(s)
+    if (!porMes[key]) porMes[key] = { mm: parseInt(mm,10), yyyy, sts: [] }
+    porMes[key].sts.push(s)
   })
 
-  const meses = Object.values(porMes).sort((a,b) => {
-    if (b.yyyy !== a.yyyy) return b.yyyy.localeCompare(a.yyyy)
-    return b.mm - a.mm
-  })
+  const meses = Object.values(porMes).sort((a,b) =>
+    a.yyyy !== b.yyyy ? a.yyyy.localeCompare(b.yyyy) : a.mm - b.mm
+  )
 
   if (meses.length === 0) return (
     <div className="card" style={{ padding: '40px 20px', textAlign: 'center' }}>
@@ -151,69 +158,72 @@ function VisaoMensal({ stories }) {
     </div>
   )
 
-  const maxViews = Math.max(...meses.map(m => m.stories.reduce((s,st) => s+(st.visualizacoes||0),0)), 1)
+  const metrica = METRICAS.find(m => m.key === metricaKey)
+  const getValue = ({ sts, key }) =>
+    key === 'stories' ? sts.length : sts.reduce((s,st) => s+(st[key]||0), 0)
+
+  const valores = meses.map(m => getValue({ sts: m.sts, key: metricaKey }))
+  const maxVal  = Math.max(...valores, 1)
+  const total   = valores.reduce((a,b) => a+b, 0)
+  const media   = meses.length > 0 ? Math.round(total / meses.length) : 0
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-      {meses.map(({ mm, yyyy, stories: sts }) => {
-        const total    = k => sts.reduce((s,st) => s+(st[k]||0), 0)
-        const views    = total('visualizacoes')
-        const inter    = total('interacoes')
-        const perf     = total('atividade_perfil')
-        const avgViews = sts.length > 0 ? Math.round(views / sts.length) : 0
-        const pct      = Math.round((views / maxViews) * 100)
+    <div className="card" style={{ padding: '20px 20px 24px' }}>
+      {/* Seletor de métrica */}
+      <div style={{ display:'flex', gap:6, flexWrap:'wrap', marginBottom:20 }}>
+        {METRICAS.map(m => (
+          <button key={m.key} onClick={() => setMetricaKey(m.key)} style={{
+            padding:'5px 12px', borderRadius:8, border:'1.5px solid',
+            borderColor: metricaKey===m.key ? m.color : '#EDEFF2',
+            background:  metricaKey===m.key ? m.bg   : 'transparent',
+            color:       metricaKey===m.key ? m.color : '#8A9BB0',
+            fontSize:11, fontWeight:700, cursor:'pointer', transition:'all .15s',
+          }}>{m.label}</button>
+        ))}
+      </div>
 
-        // Top temas
-        const temaCount = {}
-        sts.forEach(st => (st.tema || []).forEach(t => { temaCount[t] = (temaCount[t]||0)+1 }))
-        const topTemas = Object.entries(temaCount).sort((a,b)=>b[1]-a[1]).slice(0,3).map(([t])=>t)
+      {/* Totalizador */}
+      <div style={{ display:'flex', gap:20, marginBottom:24 }}>
+        <div>
+          <p style={{ fontSize:10, fontWeight:700, color:'#9AAAB8', textTransform:'uppercase', letterSpacing:'.07em' }}>Total</p>
+          <p style={{ fontSize:22, fontWeight:800, color: metrica.color, lineHeight:1.1, marginTop:3 }}>{fmt(total)}</p>
+        </div>
+        <div style={{ width:1, background:'#F0F2F5' }} />
+        <div>
+          <p style={{ fontSize:10, fontWeight:700, color:'#9AAAB8', textTransform:'uppercase', letterSpacing:'.07em' }}>Média/mês</p>
+          <p style={{ fontSize:22, fontWeight:800, color:'#1C252E', lineHeight:1.1, marginTop:3 }}>{fmt(media)}</p>
+        </div>
+      </div>
 
-        return (
-          <div key={`${yyyy}-${mm}`} className="card" style={{ padding: '18px 20px' }}>
-            {/* Cabeçalho do mês */}
-            <div style={{ display:'flex', alignItems:'flex-start', justifyContent:'space-between', marginBottom:14, flexWrap:'wrap', gap:8 }}>
-              <div>
-                <p style={{ fontSize:15, fontWeight:800, color:'#1C252E' }}>
-                  {MESES_NOMES[mm-1]} <span style={{ color:'#9AAAB8', fontWeight:500 }}>{yyyy}</span>
-                </p>
-                <p style={{ fontSize:11, color:'#9AAAB8', marginTop:2 }}>
-                  {sts.length} story{sts.length!==1?'s':''} · média de {fmt(avgViews)} visualizações
-                </p>
+      {/* Gráfico de barras */}
+      <div style={{ display:'flex', alignItems:'flex-end', gap:6, height:160 }}>
+        {meses.map(({ mm, yyyy, sts }, i) => {
+          const val = valores[i]
+          const pct = maxVal > 0 ? (val / maxVal) * 100 : 0
+          const mesLabel = MESES_LABEL[mm-1]
+          return (
+            <div key={`${yyyy}-${mm}`} style={{ flex:1, display:'flex', flexDirection:'column', alignItems:'center', gap:6, height:'100%', justifyContent:'flex-end' }}>
+              {/* Valor no topo da barra */}
+              <span style={{ fontSize:9, fontWeight:700, color: metrica.color, opacity: pct > 0 ? 1 : 0 }}>
+                {fmt(val)}
+              </span>
+              {/* Barra */}
+              <div style={{ width:'100%', background:'#F0F2F5', borderRadius:6, height:'calc(100% - 36px)', display:'flex', alignItems:'flex-end', overflow:'hidden' }}>
+                <div style={{
+                  width:'100%', background: metrica.color,
+                  borderRadius:6,
+                  height: pct > 0 ? `${pct}%` : '2px',
+                  opacity: pct > 0 ? 1 : 0.2,
+                  transition: 'height .5s ease',
+                  minHeight: 2,
+                }} />
               </div>
-              <div style={{ display:'flex', gap:6, flexWrap:'wrap' }}>
-                {topTemas.map(t => (
-                  <span key={t} style={{ background:'rgba(28,37,46,0.07)', color:'#4A6272', borderRadius:6, padding:'3px 9px', fontSize:11, fontWeight:600 }}>{t}</span>
-                ))}
-              </div>
+              {/* Label mês */}
+              <span style={{ fontSize:10, fontWeight:600, color:'#9AAAB8', whiteSpace:'nowrap' }}>{mesLabel}</span>
             </div>
-
-            {/* Barra de visualizações */}
-            <div style={{ marginBottom:14 }}>
-              <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:5 }}>
-                <span style={{ fontSize:10, fontWeight:600, color:'#9AAAB8', textTransform:'uppercase', letterSpacing:'.06em' }}>Visualizações</span>
-                <span style={{ fontSize:12, fontWeight:700, color:'#0891B2' }}>{fmt(views)}</span>
-              </div>
-              <div style={{ background:'#F0F2F5', borderRadius:6, height:6, overflow:'hidden' }}>
-                <div style={{ height:'100%', borderRadius:6, background:'#0891B2', width:`${pct}%`, transition:'width .6s ease' }} />
-              </div>
-            </div>
-
-            {/* Métricas */}
-            <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:10 }}>
-              {[
-                { label:'Interações',       value:inter, color:'#F97316', bg:'rgba(249,115,22,0.08)' },
-                { label:'Ativ. perfil',     value:perf,  color:'#059669', bg:'rgba(5,150,105,0.08)' },
-                { label:'Média views/story',value:avgViews,color:'#0891B2', bg:'rgba(8,145,178,0.08)' },
-              ].map(({ label, value, color, bg }) => (
-                <div key={label} style={{ background:bg, borderRadius:10, padding:'10px 12px' }}>
-                  <p style={{ fontSize:10, fontWeight:600, color:'#8A9BB0', textTransform:'uppercase', letterSpacing:'.05em', marginBottom:4 }}>{label}</p>
-                  <p style={{ fontSize:15, fontWeight:800, color }}>{fmt(value)}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        )
-      })}
+          )
+        })}
+      </div>
     </div>
   )
 }
@@ -342,27 +352,24 @@ export default function StoriesView() {
             ))}
           </div>
 
-          <select value={mesFiltro} onChange={e => setMesFiltro(e.target.value)}
-            style={{ display: visao === 'mensal' ? 'none' : undefined }}
-            style={{ background: '#fff', border: '1.5px solid #EDEFF2', borderRadius: 10, padding: '7px 10px', fontSize: 13, color: '#1C252E', outline: 'none', fontFamily: 'DM Sans, sans-serif' }}>
-            {MESES.map((m, i) => <option key={m} value={m}>{MESES_LABEL[i]} 2026</option>)}
-          </select>
-          {isEditMode && !selectMode && sorted.length > 0 && (
-            <button onClick={() => setSelectMode(true)} style={{
-              background: '#F5F7FA', color: '#4A6272', border: '1.5px solid #EDEFF2', borderRadius: 10,
-              padding: '7px 12px', fontSize: 13, fontWeight: 600, cursor: 'pointer',
-              display: 'flex', alignItems: 'center', gap: 5,
-            }}>
-              <CheckSquare size={14} /> Selecionar
-            </button>
+          {visao === 'lista' && (
+            <select value={mesFiltro} onChange={e => setMesFiltro(e.target.value)}
+              style={{ background: '#fff', border: '1.5px solid #EDEFF2', borderRadius: 10, padding: '7px 10px', fontSize: 13, color: '#1C252E', outline: 'none', fontFamily: 'DM Sans, sans-serif' }}>
+              {MESES.map((m, i) => <option key={m} value={m}>{MESES_LABEL[i]} 2026</option>)}
+            </select>
           )}
-          {isEditMode && selectMode && (
-            <button onClick={clearSelection} style={{
-              background: '#F5F7FA', color: '#8A9BB0', border: '1.5px solid #EDEFF2', borderRadius: 10,
-              padding: '7px 12px', fontSize: 13, fontWeight: 600, cursor: 'pointer',
-              display: 'flex', alignItems: 'center', gap: 5,
-            }}>
-              <X size={14} /> Cancelar
+          {isEditMode && (
+            <button
+              onClick={() => selectMode ? clearSelection() : setSelectMode(true)}
+              title={selectMode ? 'Cancelar seleção' : 'Selecionar stories'}
+              style={{
+                background: selectMode ? 'rgba(249,115,22,0.08)' : '#F5F7FA',
+                border: `1.5px solid ${selectMode ? 'rgba(249,115,22,0.3)' : '#EDEFF2'}`,
+                borderRadius: 10, padding: '7px 9px', cursor: 'pointer',
+                display: 'flex', alignItems: 'center',
+                color: selectMode ? '#F97316' : '#A8B5C0',
+              }}>
+              <CheckSquare size={15} />
             </button>
           )}
           {isEditMode && (
