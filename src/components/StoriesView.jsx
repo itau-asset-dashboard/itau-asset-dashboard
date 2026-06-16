@@ -449,6 +449,32 @@ export default function StoriesView() {
             </div>
           </div>
 
+          {/* Resumo do tema filtrado */}
+          {temaFiltro && sorted.length > 0 && (() => {
+            const sum = k => sorted.reduce((s, st) => s + (st[k] || 0), 0)
+            const resumo = [
+              { label: 'Stories',          value: sorted.length,              color: '#1C252E' },
+              { label: 'Visualizações',    value: sum('visualizacoes'),       color: '#FF6200' },
+              { label: 'Interações',       value: sum('interacoes'),          color: '#0891B2' },
+              { label: 'Atividade perfil', value: sum('atividade_perfil'),    color: '#4A90A4' },
+            ]
+            return (
+              <div className="card" style={{ padding: '14px 18px' }}>
+                <p style={{ fontSize: 11, fontWeight: 700, color: '#9AAAB8', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 12 }}>
+                  Resumo · <span style={{ color: '#FF6200' }}>{temaFiltro}</span>
+                </p>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 10 }} className="kpi-grid">
+                  {resumo.map(({ label, value, color }) => (
+                    <div key={label}>
+                      <p style={{ fontSize: 10, fontWeight: 600, color: '#B0BEC5', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 4 }}>{label}</p>
+                      <p style={{ fontSize: 20, fontWeight: 800, color, lineHeight: 1, letterSpacing: '-0.02em' }}>{fmt(value)}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )
+          })()}
+
           {/* Lista */}
           <div className="card" style={{ overflow: 'hidden' }}>
             {sorted.length === 0 ? (
