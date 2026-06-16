@@ -20,7 +20,7 @@ function fmt(n) {
 
 function fmtExact(n) {
   if (!n && n !== 0) return '—'
-  return n.toLocaleString('pt-BR')
+  return Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')
 }
 
 function pct(a, b) {
