@@ -162,8 +162,34 @@ function StoriesChartTooltip({ active, payload, metrica }) {
   )
 }
 
+function MiniChart({ metrica, data, mobile }) {
+  const total = data.reduce((s, d) => s + d.valor, 0)
+  const media = data.length > 0 ? Math.round(total / data.length) : 0
+  return (
+    <div className="card" style={{ padding: mobile ? '14px 14px 10px' : '18px 22px 14px' }}>
+      <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 12 }}>
+        <div>
+          <p style={{ fontSize: 10, fontWeight: 700, color: '#9AAAB8', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 4 }}>{metrica.label}</p>
+          <p style={{ fontSize: 22, fontWeight: 800, color: metrica.color, lineHeight: 1 }}>{fmt(total)}</p>
+        </div>
+        <p style={{ fontSize: 11, color: '#B0BEC5', fontWeight: 500 }}>
+          <span style={{ color: '#1C252E', fontWeight: 700 }}>{fmt(media)}</span> /mês
+        </p>
+      </div>
+      <ResponsiveContainer width="100%" height={mobile ? 80 : 110}>
+        <BarChart data={data} margin={{ top: 2, right: 4, left: 0, bottom: 0 }}>
+          <CartesianGrid strokeDasharray="3 3" stroke="#F0F2F5" vertical={false} />
+          <XAxis dataKey="mes" tick={{ fontSize: mobile ? 9 : 10, fill: '#B0BEC5' }} axisLine={false} tickLine={false} />
+          <YAxis hide />
+          <Tooltip content={<StoriesChartTooltip metrica={metrica} />} cursor={{ fill: 'rgba(0,0,0,0.03)', radius: 4 }} />
+          <Bar dataKey="valor" radius={[3, 3, 0, 0]} maxBarSize={mobile ? 20 : 36} fill={metrica.color} fillOpacity={0.9} />
+        </BarChart>
+      </ResponsiveContainer>
+    </div>
+  )
+}
+
 function VisaoMensal({ stories }) {
-  const [metricaKey, setMetricaKey] = useState('visualizacoes')
   const mobile = useIsMobile()
 
   const porMes = {}
@@ -180,62 +206,24 @@ function VisaoMensal({ stories }) {
     a.yyyy !== b.yyyy ? a.yyyy.localeCompare(b.yyyy) : a.mm - b.mm
   )
 
-  const metrica = METRICAS.find(m => m.key === metricaKey)
-
-  const data = meses.map(({ mm, yyyy, sts }) => {
-    const total = k => sts.reduce((s, st) => s + (st[k] || 0), 0)
-    const valor = metricaKey === 'qtd' ? sts.length : total(metricaKey)
-    return {
-      mes: MESES_LABEL[mm - 1],
-      mesNome: `${MESES_NOMES[mm - 1]} ${yyyy}`,
-      valor,
-      qtdStories: sts.length,
-    }
-  })
-
-  const media = data.length > 0
-    ? Math.round(data.reduce((s, d) => s + d.valor, 0) / data.length)
-    : 0
-
-  if (data.length === 0) return (
+  if (meses.length === 0) return (
     <div className="card" style={{ padding: '40px 20px', textAlign: 'center' }}>
       <p style={{ color: '#9AAAB8', fontSize: 13 }}>Nenhum story cadastrado ainda.</p>
     </div>
   )
 
+  const dataFor = (key) => meses.map(({ mm, yyyy, sts }) => ({
+    mes: MESES_LABEL[mm - 1],
+    mesNome: `${MESES_NOMES[mm - 1]} ${yyyy}`,
+    valor: key === 'qtd' ? sts.length : sts.reduce((s, st) => s + (st[key] || 0), 0),
+    qtdStories: sts.length,
+  }))
+
   return (
-    <div className="card" style={{ padding: mobile ? '14px 14px' : '20px 22px' }}>
-      {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 10, marginBottom: 16 }}>
-        <h2 style={{ color: '#1C252E', fontSize: 15, fontWeight: 700, margin: 0 }}>Stories por mês</h2>
-        {/* Seletor de métrica */}
-        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-          {METRICAS.map(m => (
-            <button key={m.key} onClick={() => setMetricaKey(m.key)} style={{
-              padding: '4px 11px', borderRadius: 8,
-              border: `1.5px solid ${metricaKey === m.key ? m.color : '#EDEFF2'}`,
-              background: metricaKey === m.key ? `${m.color}18` : 'transparent',
-              color: metricaKey === m.key ? m.color : '#8A9BB0',
-              fontSize: 11, fontWeight: 700, cursor: 'pointer', transition: 'all .15s',
-              fontFamily: 'DM Sans, sans-serif',
-            }}>{m.label}</button>
-          ))}
-        </div>
-      </div>
-
-      {/* Gráfico */}
-      <div className="chart-wrapper">
-        <ResponsiveContainer width="100%" height={mobile ? 160 : 220}>
-          <BarChart data={data} margin={{ top: 4, right: mobile ? 4 : 16, left: 0, bottom: 0 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#F0F2F5" vertical={false} />
-            <XAxis dataKey="mes" tick={{ fontSize: mobile ? 9 : 11, fill: '#8A9BB0' }} axisLine={false} tickLine={false} />
-            <YAxis tickFormatter={fmtY} tick={{ fontSize: mobile ? 9 : 11, fill: '#8A9BB0' }} axisLine={false} tickLine={false} width={mobile ? 32 : 44} />
-            <Tooltip content={<StoriesChartTooltip metrica={metrica} />} cursor={{ fill: 'rgba(0,0,0,0.03)', radius: 6 }} />
-
-            <Bar dataKey="valor" radius={[4, 4, 0, 0]} maxBarSize={mobile ? 28 : 44} fill={metrica.color} />
-          </BarChart>
-        </ResponsiveContainer>
-      </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+      {METRICAS.map(m => (
+        <MiniChart key={m.key} metrica={m} data={dataFor(m.key)} mobile={mobile} />
+      ))}
     </div>
   )
 }
@@ -396,23 +384,29 @@ export default function StoriesView() {
         </div>
       </div>
 
-      {/* KPI Cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 10 }} className="kpi-grid">
-        {KPIS.map(({ label, value, icon: Icon, color, bg }) => (
-          <div key={label} className="card kpi-card" style={{ padding: '14px 16px', minWidth: 0 }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-              <p style={{ color: '#8A9BB0', fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}>{label}</p>
-              <div style={{ width: 28, height: 28, borderRadius: 8, background: bg, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <Icon size={13} color={color} />
+      {/* KPI Cards — só na visão lista */}
+      {visao === 'lista' && (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 10, animation: 'fadeIn .2s ease' }} className="kpi-grid">
+          {KPIS.map(({ label, value, icon: Icon, color, bg }) => (
+            <div key={label} className="card kpi-card" style={{ padding: '14px 16px', minWidth: 0 }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+                <p style={{ color: '#8A9BB0', fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}>{label}</p>
+                <div style={{ width: 28, height: 28, borderRadius: 8, background: bg, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <Icon size={13} color={color} />
+                </div>
               </div>
+              <p style={{ color: '#182638', fontSize: 22, fontWeight: 800, lineHeight: 1 }}>{fmt(value)}</p>
             </div>
-            <p style={{ color: '#182638', fontSize: 22, fontWeight: 800, lineHeight: 1 }}>{fmt(value)}</p>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
 
       {/* Visão mensal */}
-      {visao === 'mensal' && <VisaoMensal stories={stories} />}
+      {visao === 'mensal' && (
+        <div style={{ animation: 'fadeIn .2s ease' }}>
+          <VisaoMensal stories={stories} />
+        </div>
+      )}
 
       {/* Barra de filtros: label + tema */}
       {visao === 'lista' && <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
