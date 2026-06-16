@@ -24,7 +24,11 @@ export const useStore = create(
       metaAnual: 1090000,
       mesFiltro: '01/2026',
       oliverData: {}, // { 'MM/YYYY': { alcance_oliver: number, meta_oliver: number } }
-      activeSection: 'visao-anual',
+      activeSection: (() => {
+        const VALID = ['visao-geral','visao-anual','insights','oliver','posts','etfs','glossario','stories','upload']
+        const hash = typeof window !== 'undefined' ? window.location.hash.replace('#','') : ''
+        return VALID.includes(hash) ? hash : 'visao-anual'
+      })(),
       insights: [],
       loadingInsights: false,
       syncing: false,
