@@ -70,10 +70,6 @@ export default function PostsChart() {
                 </span>
               </div>
             ))}
-            <div style={{ display:'flex', alignItems:'center', gap:5 }}>
-              <div style={{ width:14, borderTop:'2px dashed #C0CAD4' }} />
-              <span style={{ color:'#A8B5C0', fontSize: mobile ? 10 : 11, fontWeight:500 }}>Média</span>
-            </div>
           </div>
         </div>
       </div>
