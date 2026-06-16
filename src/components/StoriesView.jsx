@@ -417,28 +417,9 @@ export default function StoriesView() {
         </div>
       )}
 
-      {/* Visão lista — KPI do mês + filtros + lista */}
+      {/* Visão lista — filtros + lista */}
       {visao === 'lista' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12, animation: 'fadeIn .2s ease' }}>
-          {/* KPIs do mês filtrado */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 10 }} className="kpi-grid">
-            {[
-              { label: 'Stories',          value: sorted.length,                                        icon: Film,      color: '#1C252E', bg: 'rgba(28,37,46,0.08)' },
-              { label: 'Visualizações',    value: sorted.reduce((s,st)=>s+(st.visualizacoes||0),0),    icon: Eye,       color: '#FF6200', bg: 'rgba(255,98,0,0.08)' },
-              { label: 'Interações',       value: sorted.reduce((s,st)=>s+(st.interacoes||0),0),       icon: Zap,       color: '#1C252E', bg: 'rgba(28,37,46,0.08)' },
-              { label: 'Atividade perfil', value: sorted.reduce((s,st)=>s+(st.atividade_perfil||0),0), icon: UserCheck, color: '#4A90A4', bg: 'rgba(74,144,164,0.08)' },
-            ].map(({ label, value, icon: Icon, color, bg }) => (
-              <div key={label} className="card kpi-card" style={{ padding: '14px 16px', minWidth: 0 }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-                  <p style={{ color: '#8A9BB0', fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}>{label}</p>
-                  <div style={{ width: 28, height: 28, borderRadius: 8, background: bg, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <Icon size={13} color={color} />
-                  </div>
-                </div>
-                <p style={{ color: '#182638', fontSize: 22, fontWeight: 800, lineHeight: 1 }}>{fmt(value)}</p>
-              </div>
-            ))}
-          </div>
 
           {/* Barra de filtros */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
