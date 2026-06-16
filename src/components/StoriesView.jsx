@@ -1,8 +1,10 @@
 import { useState, useCallback } from 'react'
 import { Plus, Eye, Zap, UserCheck, Search, X, Film, CheckSquare, Square, LayoutList, BarChart2 } from 'lucide-react'
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ReferenceLine, ResponsiveContainer, Cell } from 'recharts'
 import { useStore } from '../store/useStore'
 import StoryUploadModal from './StoryUploadModal'
 import ImageLightbox from './ImageLightbox'
+import { useIsMobile } from '../utils/useIsMobile'
 
 function fmt(n) {
   if (n == null || n === 0) return '—'
@@ -129,14 +131,41 @@ function GrupoCard({ nome, stories, isEditMode, onEdit, selectedIds, onToggleSel
 const MESES_NOMES = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro']
 
 const METRICAS = [
-  { key: 'visualizacoes',    label: 'Visualizações',   color: '#0891B2', bg: 'rgba(8,145,178,0.12)'  },
-  { key: 'interacoes',       label: 'Interações',      color: '#F97316', bg: 'rgba(249,115,22,0.12)' },
-  { key: 'atividade_perfil', label: 'Ativ. perfil',    color: '#059669', bg: 'rgba(5,150,105,0.12)'  },
-  { key: 'stories',          label: 'Qtd. stories',    color: '#7C3AED', bg: 'rgba(124,58,237,0.10)' },
+  { key: 'visualizacoes',    label: 'Visualizações',  color: '#0891B2' },
+  { key: 'interacoes',       label: 'Interações',     color: '#F97316' },
+  { key: 'atividade_perfil', label: 'Ativ. perfil',   color: '#059669' },
+  { key: 'qtd',              label: 'Qtd. stories',   color: '#7C3AED' },
 ]
+
+function fmtY(n) {
+  if (n >= 1000000) return (n/1000000).toFixed(1) + 'M'
+  if (n >= 1000) return (n/1000).toFixed(0) + 'K'
+  return n
+}
+
+function StoriesChartTooltip({ active, payload, metrica }) {
+  if (!active || !payload?.length) return null
+  const d = payload[0].payload
+  return (
+    <div style={{
+      background: '#fff', border: '1px solid #E8ECF0', borderRadius: 14,
+      padding: '12px 16px', boxShadow: '0 8px 24px rgba(0,0,0,0.12)', fontSize: 13,
+    }}>
+      <p style={{ fontWeight: 700, color: '#1C252E', marginBottom: 6 }}>{d.mesNome}</p>
+      <p style={{ color: metrica.color, fontWeight: 800, fontSize: 18, margin: 0 }}>
+        {(d.valor || 0).toLocaleString('pt-BR')}
+        <span style={{ color: '#8A9BB0', fontSize: 12, fontWeight: 400 }}> {metrica.label.toLowerCase()}</span>
+      </p>
+      <p style={{ color: '#9AAAB8', fontSize: 11, marginTop: 4 }}>
+        {d.qtdStories} stor{d.qtdStories === 1 ? 'y' : 'ies'}
+      </p>
+    </div>
+  )
+}
 
 function VisaoMensal({ stories }) {
   const [metricaKey, setMetricaKey] = useState('visualizacoes')
+  const mobile = useIsMobile()
 
   const porMes = {}
   stories.forEach(s => {
@@ -144,85 +173,72 @@ function VisaoMensal({ stories }) {
     const [, mm, yyyy] = s.data.split('/')
     if (!mm || !yyyy) return
     const key = `${yyyy}-${mm}`
-    if (!porMes[key]) porMes[key] = { mm: parseInt(mm,10), yyyy, sts: [] }
+    if (!porMes[key]) porMes[key] = { mm: parseInt(mm, 10), yyyy, sts: [] }
     porMes[key].sts.push(s)
   })
 
-  const meses = Object.values(porMes).sort((a,b) =>
+  const meses = Object.values(porMes).sort((a, b) =>
     a.yyyy !== b.yyyy ? a.yyyy.localeCompare(b.yyyy) : a.mm - b.mm
   )
 
-  if (meses.length === 0) return (
+  const metrica = METRICAS.find(m => m.key === metricaKey)
+
+  const data = meses.map(({ mm, yyyy, sts }) => {
+    const total = k => sts.reduce((s, st) => s + (st[k] || 0), 0)
+    const valor = metricaKey === 'qtd' ? sts.length : total(metricaKey)
+    return {
+      mes: MESES_LABEL[mm - 1],
+      mesNome: `${MESES_NOMES[mm - 1]} ${yyyy}`,
+      valor,
+      qtdStories: sts.length,
+    }
+  })
+
+  const media = data.length > 0
+    ? Math.round(data.reduce((s, d) => s + d.valor, 0) / data.length)
+    : 0
+
+  if (data.length === 0) return (
     <div className="card" style={{ padding: '40px 20px', textAlign: 'center' }}>
       <p style={{ color: '#9AAAB8', fontSize: 13 }}>Nenhum story cadastrado ainda.</p>
     </div>
   )
 
-  const metrica = METRICAS.find(m => m.key === metricaKey)
-  const getValue = ({ sts, key }) =>
-    key === 'stories' ? sts.length : sts.reduce((s,st) => s+(st[key]||0), 0)
-
-  const valores = meses.map(m => getValue({ sts: m.sts, key: metricaKey }))
-  const maxVal  = Math.max(...valores, 1)
-  const total   = valores.reduce((a,b) => a+b, 0)
-  const media   = meses.length > 0 ? Math.round(total / meses.length) : 0
-
   return (
-    <div className="card" style={{ padding: '20px 20px 24px' }}>
-      {/* Seletor de métrica */}
-      <div style={{ display:'flex', gap:6, flexWrap:'wrap', marginBottom:20 }}>
-        {METRICAS.map(m => (
-          <button key={m.key} onClick={() => setMetricaKey(m.key)} style={{
-            padding:'5px 12px', borderRadius:8, border:'1.5px solid',
-            borderColor: metricaKey===m.key ? m.color : '#EDEFF2',
-            background:  metricaKey===m.key ? m.bg   : 'transparent',
-            color:       metricaKey===m.key ? m.color : '#8A9BB0',
-            fontSize:11, fontWeight:700, cursor:'pointer', transition:'all .15s',
-          }}>{m.label}</button>
-        ))}
-      </div>
-
-      {/* Totalizador */}
-      <div style={{ display:'flex', gap:20, marginBottom:24 }}>
-        <div>
-          <p style={{ fontSize:10, fontWeight:700, color:'#9AAAB8', textTransform:'uppercase', letterSpacing:'.07em' }}>Total</p>
-          <p style={{ fontSize:22, fontWeight:800, color: metrica.color, lineHeight:1.1, marginTop:3 }}>{fmt(total)}</p>
-        </div>
-        <div style={{ width:1, background:'#F0F2F5' }} />
-        <div>
-          <p style={{ fontSize:10, fontWeight:700, color:'#9AAAB8', textTransform:'uppercase', letterSpacing:'.07em' }}>Média/mês</p>
-          <p style={{ fontSize:22, fontWeight:800, color:'#1C252E', lineHeight:1.1, marginTop:3 }}>{fmt(media)}</p>
+    <div className="card" style={{ padding: mobile ? '14px 14px' : '20px 22px' }}>
+      {/* Header */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 10, marginBottom: 16 }}>
+        <h2 style={{ color: '#1C252E', fontSize: 15, fontWeight: 700, margin: 0 }}>Stories por mês</h2>
+        {/* Seletor de métrica */}
+        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+          {METRICAS.map(m => (
+            <button key={m.key} onClick={() => setMetricaKey(m.key)} style={{
+              padding: '4px 11px', borderRadius: 8,
+              border: `1.5px solid ${metricaKey === m.key ? m.color : '#EDEFF2'}`,
+              background: metricaKey === m.key ? `${m.color}18` : 'transparent',
+              color: metricaKey === m.key ? m.color : '#8A9BB0',
+              fontSize: 11, fontWeight: 700, cursor: 'pointer', transition: 'all .15s',
+              fontFamily: 'DM Sans, sans-serif',
+            }}>{m.label}</button>
+          ))}
         </div>
       </div>
 
-      {/* Gráfico de barras */}
-      <div style={{ display:'flex', alignItems:'flex-end', gap:6, height:160 }}>
-        {meses.map(({ mm, yyyy, sts }, i) => {
-          const val = valores[i]
-          const pct = maxVal > 0 ? (val / maxVal) * 100 : 0
-          const mesLabel = MESES_LABEL[mm-1]
-          return (
-            <div key={`${yyyy}-${mm}`} style={{ flex:1, display:'flex', flexDirection:'column', alignItems:'center', gap:6, height:'100%', justifyContent:'flex-end' }}>
-              {/* Valor no topo da barra */}
-              <span style={{ fontSize:9, fontWeight:700, color: metrica.color, opacity: pct > 0 ? 1 : 0 }}>
-                {fmt(val)}
-              </span>
-              {/* Barra */}
-              <div style={{ width:'100%', background:'#F0F2F5', borderRadius:6, height:'calc(100% - 36px)', display:'flex', alignItems:'flex-end', overflow:'hidden' }}>
-                <div style={{
-                  width:'100%', background: metrica.color,
-                  borderRadius:6,
-                  height: pct > 0 ? `${pct}%` : '2px',
-                  opacity: pct > 0 ? 1 : 0.2,
-                  transition: 'height .5s ease',
-                  minHeight: 2,
-                }} />
-              </div>
-              {/* Label mês */}
-              <span style={{ fontSize:10, fontWeight:600, color:'#9AAAB8', whiteSpace:'nowrap' }}>{mesLabel}</span>
-            </div>
-          )
-        })}
+      {/* Gráfico */}
+      <div className="chart-wrapper">
+        <ResponsiveContainer width="100%" height={mobile ? 160 : 220}>
+          <BarChart data={data} margin={{ top: 4, right: mobile ? 4 : 16, left: 0, bottom: 0 }}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#F0F2F5" vertical={false} />
+            <XAxis dataKey="mes" tick={{ fontSize: mobile ? 9 : 11, fill: '#8A9BB0' }} axisLine={false} tickLine={false} />
+            <YAxis tickFormatter={fmtY} tick={{ fontSize: mobile ? 9 : 11, fill: '#8A9BB0' }} axisLine={false} tickLine={false} width={mobile ? 32 : 44} />
+            <Tooltip content={<StoriesChartTooltip metrica={metrica} />} cursor={{ fill: 'rgba(0,0,0,0.03)', radius: 6 }} />
+            {media > 0 && (
+              <ReferenceLine y={media} stroke="#8A9BB0" strokeDasharray="5 3" strokeWidth={1.5}
+                label={mobile ? undefined : { value: fmtY(media), position: 'right', fill: '#8A9BB0', fontSize: 11 }} />
+            )}
+            <Bar dataKey="valor" radius={[4, 4, 0, 0]} maxBarSize={mobile ? 28 : 44} fill={metrica.color} />
+          </BarChart>
+        </ResponsiveContainer>
       </div>
     </div>
   )
