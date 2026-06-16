@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react'
-import { Plus, Eye, Zap, UserCheck, Search, X, Film, CheckSquare, Square } from 'lucide-react'
+import { Plus, Eye, Zap, UserCheck, Search, X, Film, CheckSquare, Square, LayoutList, BarChart2 } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import StoryUploadModal from './StoryUploadModal'
 import ImageLightbox from './ImageLightbox'
@@ -126,12 +126,105 @@ function GrupoCard({ nome, stories, isEditMode, onEdit, selectedIds, onToggleSel
   )
 }
 
+const MESES_NOMES = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro']
+
+function VisaoMensal({ stories }) {
+  // Agrupa stories por mês
+  const porMes = {}
+  stories.forEach(s => {
+    if (!s.data) return
+    const [, mm, yyyy] = s.data.split('/')
+    if (!mm || !yyyy) return
+    const key = `${yyyy}-${mm}`
+    if (!porMes[key]) porMes[key] = { mm: parseInt(mm,10), yyyy, stories: [] }
+    porMes[key].stories.push(s)
+  })
+
+  const meses = Object.values(porMes).sort((a,b) => {
+    if (b.yyyy !== a.yyyy) return b.yyyy.localeCompare(a.yyyy)
+    return b.mm - a.mm
+  })
+
+  if (meses.length === 0) return (
+    <div className="card" style={{ padding: '40px 20px', textAlign: 'center' }}>
+      <p style={{ color: '#9AAAB8', fontSize: 13 }}>Nenhum story cadastrado ainda.</p>
+    </div>
+  )
+
+  const maxViews = Math.max(...meses.map(m => m.stories.reduce((s,st) => s+(st.visualizacoes||0),0)), 1)
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+      {meses.map(({ mm, yyyy, stories: sts }) => {
+        const total    = k => sts.reduce((s,st) => s+(st[k]||0), 0)
+        const views    = total('visualizacoes')
+        const inter    = total('interacoes')
+        const perf     = total('atividade_perfil')
+        const avgViews = sts.length > 0 ? Math.round(views / sts.length) : 0
+        const pct      = Math.round((views / maxViews) * 100)
+
+        // Top temas
+        const temaCount = {}
+        sts.forEach(st => (st.tema || []).forEach(t => { temaCount[t] = (temaCount[t]||0)+1 }))
+        const topTemas = Object.entries(temaCount).sort((a,b)=>b[1]-a[1]).slice(0,3).map(([t])=>t)
+
+        return (
+          <div key={`${yyyy}-${mm}`} className="card" style={{ padding: '18px 20px' }}>
+            {/* Cabeçalho do mês */}
+            <div style={{ display:'flex', alignItems:'flex-start', justifyContent:'space-between', marginBottom:14, flexWrap:'wrap', gap:8 }}>
+              <div>
+                <p style={{ fontSize:15, fontWeight:800, color:'#1C252E' }}>
+                  {MESES_NOMES[mm-1]} <span style={{ color:'#9AAAB8', fontWeight:500 }}>{yyyy}</span>
+                </p>
+                <p style={{ fontSize:11, color:'#9AAAB8', marginTop:2 }}>
+                  {sts.length} story{sts.length!==1?'s':''} · média de {fmt(avgViews)} visualizações
+                </p>
+              </div>
+              <div style={{ display:'flex', gap:6, flexWrap:'wrap' }}>
+                {topTemas.map(t => (
+                  <span key={t} style={{ background:'rgba(28,37,46,0.07)', color:'#4A6272', borderRadius:6, padding:'3px 9px', fontSize:11, fontWeight:600 }}>{t}</span>
+                ))}
+              </div>
+            </div>
+
+            {/* Barra de visualizações */}
+            <div style={{ marginBottom:14 }}>
+              <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:5 }}>
+                <span style={{ fontSize:10, fontWeight:600, color:'#9AAAB8', textTransform:'uppercase', letterSpacing:'.06em' }}>Visualizações</span>
+                <span style={{ fontSize:12, fontWeight:700, color:'#0891B2' }}>{fmt(views)}</span>
+              </div>
+              <div style={{ background:'#F0F2F5', borderRadius:6, height:6, overflow:'hidden' }}>
+                <div style={{ height:'100%', borderRadius:6, background:'#0891B2', width:`${pct}%`, transition:'width .6s ease' }} />
+              </div>
+            </div>
+
+            {/* Métricas */}
+            <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:10 }}>
+              {[
+                { label:'Interações',       value:inter, color:'#F97316', bg:'rgba(249,115,22,0.08)' },
+                { label:'Ativ. perfil',     value:perf,  color:'#059669', bg:'rgba(5,150,105,0.08)' },
+                { label:'Média views/story',value:avgViews,color:'#0891B2', bg:'rgba(8,145,178,0.08)' },
+              ].map(({ label, value, color, bg }) => (
+                <div key={label} style={{ background:bg, borderRadius:10, padding:'10px 12px' }}>
+                  <p style={{ fontSize:10, fontWeight:600, color:'#8A9BB0', textTransform:'uppercase', letterSpacing:'.05em', marginBottom:4 }}>{label}</p>
+                  <p style={{ fontSize:15, fontWeight:800, color }}>{fmt(value)}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )
+      })}
+    </div>
+  )
+}
+
 export default function StoriesView() {
   const { stories, addStory, updateStory, deleteStory, isEditMode, syncError } = useStore()
   const [mesFiltro, setMesFiltro]   = useState(() => {
     const now = new Date()
     return `${String(now.getMonth()+1).padStart(2,'0')}/${now.getFullYear()}`
   })
+  const [visao, setVisao]           = useState('lista') // 'lista' | 'mensal'
   const [uploadOpen, setUploadOpen] = useState(false)
   const [editTarget, setEditTarget] = useState(null)
   const [search, setSearch]         = useState('')
@@ -228,7 +321,29 @@ export default function StoriesView() {
           <p style={{ color: '#8A9BB0', fontSize: 12, marginTop: 2 }}>Análise separada das metas de alcance</p>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+          {/* Toggle Lista / Mês a mês */}
+          <div style={{ display:'flex', background:'#F0F2F5', borderRadius:10, padding:3, gap:2 }}>
+            {[
+              { key:'lista',  icon: LayoutList, label:'Lista' },
+              { key:'mensal', icon: BarChart2,  label:'Mês a mês' },
+            ].map(({ key, icon: Icon, label }) => (
+              <button key={key} onClick={() => setVisao(key)} style={{
+                display:'flex', alignItems:'center', gap:5,
+                background: visao===key ? 'white' : 'transparent',
+                border:'none', borderRadius:8, padding:'6px 11px',
+                fontSize:12, fontWeight:600,
+                color: visao===key ? '#1C252E' : '#8A9BB0',
+                cursor:'pointer',
+                boxShadow: visao===key ? '0 1px 4px rgba(0,0,0,0.08)' : 'none',
+                transition:'all .15s',
+              }}>
+                <Icon size={13} /> {label}
+              </button>
+            ))}
+          </div>
+
           <select value={mesFiltro} onChange={e => setMesFiltro(e.target.value)}
+            style={{ display: visao === 'mensal' ? 'none' : undefined }}
             style={{ background: '#fff', border: '1.5px solid #EDEFF2', borderRadius: 10, padding: '7px 10px', fontSize: 13, color: '#1C252E', outline: 'none', fontFamily: 'DM Sans, sans-serif' }}>
             {MESES.map((m, i) => <option key={m} value={m}>{MESES_LABEL[i]} 2026</option>)}
           </select>
@@ -277,8 +392,11 @@ export default function StoriesView() {
         ))}
       </div>
 
+      {/* Visão mensal */}
+      {visao === 'mensal' && <VisaoMensal stories={stories} />}
+
       {/* Barra de filtros: label + tema */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+      {visao === 'lista' && <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
         {/* Label "Todos os stories" */}
         <div style={{ background: '#fff', borderRadius: 10, padding: '6px 16px', border: '1.5px solid #EDEFF2', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
           <span style={{ fontSize: 13, fontWeight: 600, color: '#182638' }}>Todos os stories</span>
@@ -315,10 +433,10 @@ export default function StoriesView() {
             style={{ border: 'none', background: 'transparent', outline: 'none', fontSize: 13, color: '#182638', width: '100%', fontFamily: 'DM Sans, sans-serif' }} />
           {q && <button onClick={() => setSearch('')} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex' }}><X size={13} color="#A8B5C0" /></button>}
         </div>
-      </div>
+      </div>}
 
       {/* Lista */}
-      <div className="card" style={{ overflow: 'hidden' }}>
+      {visao === 'lista' && <div className="card" style={{ overflow: 'hidden' }}>
         {sorted.length === 0 ? (
           <div style={{ padding: '40px 20px', textAlign: 'center' }}>
             <p style={{ color: '#9AAAB8', fontSize: 13 }}>
@@ -335,6 +453,8 @@ export default function StoriesView() {
             selected={selected.has(st.id)} onToggleSelect={selectMode ? toggleSelect : null} />
         ))}
       </div>
+
+      }
 
       {/* Barra flutuante de seleção */}
       {selected.size > 0 && (
