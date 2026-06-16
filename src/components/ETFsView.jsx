@@ -23,7 +23,7 @@ function pct(a, b) {
   return ((a/b)*100).toFixed(1)+'%'
 }
 
-const TIPO_COLOR = { Carrossel:'#F97316', Reels:'#1C252E', 'Foto estática':'#0EA5E9' }
+const TIPO_COLOR = { Carrossel:'#F97316', Reels:'#1C252E', 'Foto estática':'#C3EBF7' }
 const ETF_TEMAS  = ['ETFs']
 
 export default function ETFsView() {
@@ -262,7 +262,7 @@ export default function ETFsView() {
                 />
                 <Bar dataKey="total" radius={[8,8,0,0]} barSize={48}>
                   {porTipo.map((t,i) => (
-                    <Cell key={i} fill={TIPO_COLOR[t.tipo]||'#0EA5E9'}/>
+                    <Cell key={i} fill={TIPO_COLOR[t.tipo]||'#C3EBF7'}/>
                   ))}
                 </Bar>
               </BarChart>
@@ -308,7 +308,7 @@ export default function ETFsView() {
                 <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:7 }}>
                   <div style={{ display:'flex', alignItems:'center', gap:7 }}>
                     <div style={{ width:9, height:9, borderRadius:3,
-                      background: TIPO_COLOR[t.tipo] || '#0EA5E9' }}/>
+                      background: TIPO_COLOR[t.tipo] || '#C3EBF7' }}/>
                     <span style={{ color:'#1C252E', fontSize:13, fontWeight:500 }}>{t.tipo}</span>
                     {i===0 && t.total>0 && (
                       <span style={{ background:'rgba(249,115,22,0.1)', color:'#F97316',
@@ -322,7 +322,7 @@ export default function ETFsView() {
                 </div>
                 <div style={{ background:'#F0F2F5', borderRadius:4, height:6, overflow:'hidden', marginBottom:4 }}>
                   <div style={{ height:'100%', borderRadius:4,
-                    background: TIPO_COLOR[t.tipo]||'#0EA5E9',
+                    background: TIPO_COLOR[t.tipo]||'#C3EBF7',
                     width:`${maxTipo>0?(t.total/maxTipo)*100:0}%`, transition:'width 0.5s' }}/>
                 </div>
                 <p style={{ color:'#9AAAB8', fontSize:11 }}>
