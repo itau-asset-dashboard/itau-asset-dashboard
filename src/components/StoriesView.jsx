@@ -131,7 +131,7 @@ const MESES_NOMES = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julh
 
 const METRICAS = [
   { key: 'visualizacoes',    label: 'Visualizações',         color: '#FF6200' },
-  { key: 'interacoes',       label: 'Interações',            color: '#0891B2' },
+  { key: 'interacoes',       label: 'Interações',            color: '#1C2B3A' },
   { key: 'atividade_perfil', label: 'Atividade de perfil',   color: '#4A90A4' },
   { key: 'qtd',              label: 'Quantidade de stories', color: '#7ECDE8' },
 ]
