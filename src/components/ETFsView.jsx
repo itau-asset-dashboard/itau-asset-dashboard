@@ -240,55 +240,40 @@ export default function ETFsView() {
         <div className="card" style={{ padding: mobile ? '14px' : '22px' }}>
           <p style={{ color:'#1C252E', fontSize:15, fontWeight:700, marginBottom:4 }}>Alcance por formato</p>
           <p style={{ color:'#9AAAB8', fontSize:12, marginBottom:20 }}>Posts ETF em {MESES_FULL[mesSel]} {ano}</p>
-          {porTipo.every(t => t.total === 0) ? (
-            <p style={{ color:'#9AAAB8', fontSize:13, textAlign:'center', padding:'40px 0' }}>
-              Nenhum post ETF neste mês
-            </p>
-          ) : mobile ? (
-            /* Mobile: barras horizontais em CSS */
-            <div style={{ display:'flex', flexDirection:'column', gap:14 }}>
-              {porTipo.map(t => (
-                <div key={t.tipo}>
-                  <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:6 }}>
-                    <div style={{ display:'flex', alignItems:'center', gap:7 }}>
-                      <div style={{ width:9, height:9, borderRadius:3, background: TIPO_COLOR[t.tipo]||'#C3EBF7', flexShrink:0 }}/>
-                      <span style={{ color:'#1C252E', fontSize:13, fontWeight:600 }}>{t.tipo}</span>
+          {(() => {
+            const tiposComDados = porTipo.filter(t => t.total > 0)
+            if (tiposComDados.length === 0) return (
+              <p style={{ color:'#9AAAB8', fontSize:13, textAlign:'center', padding:'40px 0' }}>
+                Nenhum post ETF neste mês
+              </p>
+            )
+            return (
+              <div style={{ display:'flex', flexDirection:'column', gap:14 }}>
+                {tiposComDados.map(t => (
+                  <div key={t.tipo}>
+                    <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:6 }}>
+                      <div style={{ display:'flex', alignItems:'center', gap:7 }}>
+                        <div style={{ width:9, height:9, borderRadius:3, background: TIPO_COLOR[t.tipo]||'#C3EBF7', flexShrink:0 }}/>
+                        <span style={{ color:'#1C252E', fontSize:13, fontWeight:600 }}>{t.tipo}</span>
+                      </div>
+                      <div style={{ textAlign:'right' }}>
+                        <span style={{ color:'#1C252E', fontSize:14, fontWeight:700 }}>{fmt(t.total)}</span>
+                        <span style={{ color:'#9AAAB8', fontSize:11, marginLeft:6 }}>{t.count} post{t.count !== 1 ? 's' : ''}</span>
+                      </div>
                     </div>
-                    <div style={{ textAlign:'right' }}>
-                      <span style={{ color:'#1C252E', fontSize:14, fontWeight:700 }}>{fmt(t.total)}</span>
-                      <span style={{ color:'#9AAAB8', fontSize:11, marginLeft:6 }}>{t.count} post{t.count !== 1 ? 's' : ''}</span>
+                    <div style={{ background:'#F0F2F5', borderRadius:6, height:8, overflow:'hidden' }}>
+                      <div style={{
+                        height:'100%', borderRadius:6,
+                        background: TIPO_COLOR[t.tipo]||'#C3EBF7',
+                        width:`${maxTipo > 0 ? (t.total/maxTipo)*100 : 0}%`,
+                        transition:'width 0.5s'
+                      }}/>
                     </div>
                   </div>
-                  <div style={{ background:'#F0F2F5', borderRadius:6, height:8, overflow:'hidden' }}>
-                    <div style={{
-                      height:'100%', borderRadius:6,
-                      background: TIPO_COLOR[t.tipo]||'#C3EBF7',
-                      width:`${maxTipo > 0 ? (t.total/maxTipo)*100 : 0}%`,
-                      transition:'width 0.5s'
-                    }}/>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            /* Desktop: gráfico Recharts */
-            <div className="chart-wrapper"><ResponsiveContainer width="100%" height={200}>
-              <BarChart data={porTipo} margin={{top:8, right:8, left:0, bottom:0}}>
-                <XAxis dataKey="tipo" tick={{ fill:'#9AAAB8', fontSize:11 }} axisLine={false} tickLine={false}/>
-                <YAxis tick={{ fill:'#9AAAB8', fontSize:10 }} axisLine={false} tickLine={false}
-                  tickFormatter={v=>v===0?'':fmt(v)} width={44}/>
-                <Tooltip
-                  formatter={(v,_,props) => [fmt(v), `${props.payload.count} posts`]}
-                  contentStyle={{ borderRadius:10, border:'1px solid #EAECF0', fontSize:12, boxShadow:'0 4px 16px rgba(0,0,0,0.08)' }}
-                />
-                <Bar dataKey="total" radius={[8,8,0,0]} barSize={48}>
-                  {porTipo.map((t,i) => (
-                    <Cell key={i} fill={TIPO_COLOR[t.tipo]||'#C3EBF7'}/>
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer></div>
-          )}
+                ))}
+              </div>
+            )
+          })()}
         </div>
       )}
 
