@@ -16,7 +16,7 @@ const FEED = [
 const STORIES = [
   { termo: 'Visualizações',       icon: Play,      color: '#0891B2', bg: 'rgba(8,145,178,0.08)',  definicao: 'O número de vezes que seu story foi reproduzido ou exibido.' },
   { termo: 'Interações com stories', icon: Zap,    color: '#F97316', bg: 'rgba(249,115,22,0.08)', definicao: 'O número de curtidas, respostas e compartilhamentos do seu story menos o número de descurtidas. Essa métrica está em desenvolvimento pelo Instagram.' },
-  { termo: 'Atividade do perfil', icon: UserCheck, color: '#059669', bg: 'rgba(5,150,105,0.08)', definicao: 'O número de ações que as pessoas realizam quando visitam seu perfil depois de interagir com seu story.' },
+  { termo: 'Atividade do perfil', icon: UserCheck, color: '#059669', bg: 'rgba(5,150,105,0.08)', definicao: 'O número de ações que as pessoas realizam quando visitam seu perfil depois de interagir com seu story. Essas ações incluem visitas ao perfil, cliques no link da bio e interações em outras publicações do feed.' },
 ]
 
 function Section({ title, items }) {
