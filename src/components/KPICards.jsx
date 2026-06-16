@@ -25,25 +25,25 @@ export default function KPICards() {
       label: mobile ? 'Alcançado' : 'Total alcançado',
       value: fmt(total),
       sub: 'contas alcançadas',
-      accent: '#F97316', iconBg: 'rgba(249,115,22,0.10)', icon: Users, highlight: true,
+      accent: '#FF6200', iconBg: 'rgba(255,98,0,0.10)', icon: Users, highlight: true,
     },
     {
       label: mobile ? 'Média/post' : 'Média por post',
       value: fmt(media),
       sub: 'contas por publicação',
-      accent: '#0F7EC0', iconBg: 'rgba(15,126,192,0.10)', icon: TrendingUp, highlight: false,
+      accent: '#4A90A4', iconBg: 'rgba(74,144,164,0.10)', icon: TrendingUp, highlight: false,
     },
     {
       label: mobile ? 'Melhor' : 'Melhor post',
       value: fmt(melhor?.contas_alcancadas),
       sub: (melhor?.nome||melhor?.tema||'—').slice(0, mobile ? 16 : 24),
-      accent: '#7C3AED', iconBg: 'rgba(124,58,237,0.10)', icon: Award, highlight: false,
+      accent: '#0891B2', iconBg: 'rgba(8,145,178,0.10)', icon: Award, highlight: false,
     },
     {
       label: 'Posts',
       value: String(posts.length),
       sub: `${posts.filter(p=>p.status==='parcial').length} parciais`,
-      accent: '#059669', iconBg: 'rgba(5,150,105,0.10)', icon: FileText, highlight: false,
+      accent: '#1C252E', iconBg: 'rgba(28,37,46,0.08)', icon: FileText, highlight: false,
     },
   ]
 

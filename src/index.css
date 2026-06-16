@@ -11,8 +11,10 @@
 html, body, #root {
   width: 100%;
   height: 100%;
-  background: #F5F7FA;
+  background: #F0F2F5;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
 #root { display: flex; overflow: hidden; }
@@ -24,19 +26,19 @@ html, body, #root {
 /* ── Card base ── */
 .card {
   background: #fff;
-  border-radius: 14px;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.03), 0 2px 8px rgba(0,0,0,0.04);
-  border: 1px solid #F0F2F5;
+  border-radius: 16px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.05);
+  border: 1px solid #EAECF0;
 }
 
 /* ── KPI card premium ── */
 .kpi-card {
-  border-radius: 12px;
-  transition: box-shadow 0.15s, transform 0.15s;
+  border-radius: 16px;
+  transition: box-shadow 0.2s, transform 0.2s;
 }
 .kpi-card:hover {
-  box-shadow: 0 4px 16px rgba(0,0,0,0.07);
-  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+  transform: translateY(-2px);
 }
 
 /* ── Scrollbar ── */
@@ -47,7 +49,7 @@ html, body, #root {
 /* ── Layout desktop ── */
 .app-layout { display: flex; width: 100%; height: 100%; overflow: hidden; }
 .main-column { flex: 1; display: flex; flex-direction: column; height: 100%; overflow: hidden; min-width: 0; }
-.content-scroll { flex: 1; overflow-y: auto; padding: 18px 24px 32px; }
+.content-scroll { flex: 1; overflow-y: auto; padding: 22px 28px 40px; }
 
 /* ── Bottom nav (hidden on desktop) ── */
 .bottom-nav { display: none; }
@@ -64,6 +66,22 @@ html, body, #root {
 
 /* ── Chart wrapper — permite override de altura no mobile ── */
 .chart-wrapper { width: 100%; }
+
+/* ── Tipografia refinada ── */
+h2 { letter-spacing: -0.02em; }
+p  { line-height: 1.5; }
+
+/* ── Inputs e selects globais ── */
+select, input {
+  font-family: 'DM Sans', sans-serif;
+}
+
+/* ── Divisores ── */
+.divider {
+  height: 1px;
+  background: #EAECF0;
+  border: none;
+}
 
 /* ════════════════════════════════════════
    MOBILE  ≤ 768px

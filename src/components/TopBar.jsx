@@ -66,13 +66,13 @@ export default function TopBar() {
   return (
     <div className="topbar-root" style={{
       display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-      padding: '10px 24px', gap: 8, flexShrink: 0,
-      background: '#fff', borderBottom: '1px solid #EDEFF2',
+      padding: '12px 28px', gap: 8, flexShrink: 0,
+      background: '#fff', borderBottom: '1px solid #EAECF0',
     }}>
       <div style={{ minWidth: 0, display: 'flex', alignItems: 'center', gap: 10 }}>
         <div>
-          <h1 className="topbar-title" style={{ color: '#182638', fontSize: 18, fontWeight: 700, lineHeight: 1.2, letterSpacing: '-0.02em', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{section.title}</h1>
-          <p className="topbar-sub" style={{ color: '#A8B5C0', fontSize: 12, marginTop: 1 }}>{section.sub}</p>
+          <h1 className="topbar-title" style={{ color: '#0F1923', fontSize: 17, fontWeight: 700, lineHeight: 1.2, letterSpacing: '-0.025em', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{section.title}</h1>
+          <p className="topbar-sub" style={{ color: '#B0BEC5', fontSize: 11.5, marginTop: 2, letterSpacing: '0.01em' }}>{section.sub}</p>
         </div>
         {/* Badge de modo */}
         {!isEditMode && (

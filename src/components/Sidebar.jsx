@@ -71,10 +71,10 @@ export default function Sidebar() {
     <>
       {/* ── Sidebar desktop ── */}
       <aside className="sidebar-desktop" style={{
-        width: 192,
+        width: 196,
         height: '100%',
-        background: '#F8F9FA',
-        borderRight: '1px solid #EDEFF2',
+        background: '#FAFBFC',
+        borderRight: '1px solid #EAECF0',
         display: 'flex',
         flexDirection: 'column',
         padding: '20px 10px 16px',
@@ -109,7 +109,7 @@ export default function Sidebar() {
         </div>
 
         {/* ── Divisor ── */}
-        <div style={{ height: 1, background: '#EDEFF2', marginBottom: 18, marginLeft: 4, marginRight: 4 }} />
+        <div style={{ height: 1, background: '#EAECF0', marginBottom: 18, marginLeft: 4, marginRight: 4 }} />
 
         {/* ── Nav por grupos ── */}
         <nav style={{ display: 'flex', flexDirection: 'column', gap: 22, flex: 1 }}>
@@ -129,25 +129,25 @@ export default function Sidebar() {
                   return (
                     <button key={id} onClick={() => !blocked && setActiveSection(id)}
                       style={{
-                        width: '100%', borderRadius: 9, padding: '7px 8px 7px 10px',
+                        width: '100%', borderRadius: 10, padding: '7px 10px',
                         background: active ? ORANGE_BG : 'transparent',
                         border: 'none',
                         borderLeft: `2.5px solid ${active ? ORANGE : 'transparent'}`,
                         cursor: blocked ? 'not-allowed' : 'pointer',
                         opacity: blocked ? 0.4 : 1,
-                        display: 'flex', alignItems: 'center', gap: 8,
-                        transition: 'background 0.1s', textAlign: 'left',
+                        display: 'flex', alignItems: 'center', gap: 9,
+                        transition: 'background 0.15s', textAlign: 'left',
                       }}
-                      onMouseEnter={e => { if (!active) e.currentTarget.style.background = '#EDEEF0' }}
+                      onMouseEnter={e => { if (!active) e.currentTarget.style.background = '#F0F2F4' }}
                       onMouseLeave={e => { if (!active) e.currentTarget.style.background = 'transparent' }}
                     >
                       <Icon
                         size={14}
-                        color={active ? ORANGE : '#5A6A7A'}
-                        strokeWidth={active ? 2.3 : 1.8}
+                        color={active ? ORANGE : '#6B7A8D'}
+                        strokeWidth={active ? 2.2 : 1.8}
                       />
                       <span style={{
-                        color: active ? ORANGE : '#3D4E5C',
+                        color: active ? ORANGE : '#4A5568',
                         fontSize: 13, fontWeight: active ? 600 : 400,
                         letterSpacing: '-0.01em',
                       }}>

@@ -55,24 +55,24 @@ export default function PostsChart() {
     : 0
 
   return (
-    <div className="card" style={{ padding: mobile ? '14px 14px' : '20px 22px', marginBottom: 18 }}>
+    <div className="card" style={{ padding: mobile ? '16px 14px' : '22px 24px', marginBottom: 18 }}>
       {/* Header */}
-      <div style={{ marginBottom: 14 }}>
+      <div style={{ marginBottom: 16 }}>
         <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between' }}>
-          <h2 style={{ color:'#1C252E', fontSize:15, fontWeight:700, margin:0 }}>Alcance por post</h2>
+          <h2 style={{ color:'#0F1923', fontSize:15, fontWeight:700, margin:0, letterSpacing:'-0.02em' }}>Alcance por post</h2>
           {/* Legenda compacta */}
-          <div style={{ display:'flex', alignItems:'center', gap: mobile ? 8 : 14, flexWrap:'wrap' }}>
+          <div style={{ display:'flex', alignItems:'center', gap: mobile ? 8 : 16, flexWrap:'wrap' }}>
             {Object.entries(COLOR).map(([tipo, cor]) => (
-              <div key={tipo} style={{ display:'flex', alignItems:'center', gap:4 }}>
+              <div key={tipo} style={{ display:'flex', alignItems:'center', gap:5 }}>
                 <div style={{ width:8, height:8, borderRadius:2, background:cor, border: BORDER_COLOR[tipo] ? `1.5px solid ${BORDER_COLOR[tipo]}` : 'none', flexShrink:0 }} />
-                <span style={{ color:'#8A9BB0', fontSize: mobile ? 10 : 12, whiteSpace:'nowrap' }}>
+                <span style={{ color:'#A8B5C0', fontSize: mobile ? 10 : 11, whiteSpace:'nowrap', fontWeight:500 }}>
                   {mobile ? tipo.replace(' estática','') : tipo}
                 </span>
               </div>
             ))}
-            <div style={{ display:'flex', alignItems:'center', gap:4 }}>
-              <div style={{ width:14, borderTop:'2px dashed #8A9BB0' }} />
-              <span style={{ color:'#8A9BB0', fontSize: mobile ? 10 : 12 }}>Média</span>
+            <div style={{ display:'flex', alignItems:'center', gap:5 }}>
+              <div style={{ width:14, borderTop:'2px dashed #C0CAD4' }} />
+              <span style={{ color:'#A8B5C0', fontSize: mobile ? 10 : 11, fontWeight:500 }}>Média</span>
             </div>
           </div>
         </div>
