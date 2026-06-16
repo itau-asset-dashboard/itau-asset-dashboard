@@ -337,7 +337,7 @@ export default function StoriesView() {
           <div style={{ display:'flex', background:'#F0F2F5', borderRadius:10, padding:3, gap:2 }}>
             {[
               { key:'geral', icon: BarChart2,  label:'Visão geral' },
-              { key:'lista', icon: LayoutList, label:'Todos os posts' },
+              { key:'lista', icon: LayoutList, label:'Todos os stories' },
             ].map(({ key, icon: Icon, label }) => (
               <button key={key} onClick={() => setVisao(key)} style={{
                 display:'flex', alignItems:'center', gap:5,
