@@ -225,7 +225,7 @@ export default function ETFsView() {
                 labelFormatter={(_,p) => p?.[0]?.payload?.mesFull || ''}
                 contentStyle={{ borderRadius:10, border:'1px solid #EAECF0', fontSize:12, boxShadow:'0 4px 16px rgba(0,0,0,0.08)' }}
               />
-              {!mobile && <Legend formatter={v => v==='alcance'?'Alcance':'Nº de posts'} wrapperStyle={{ fontSize:12, color:'#9AAAB8' }}/>}
+              {!mobile && <Legend formatter={v => v==='alcance'?'Alcance':'Nº de posts'} wrapperStyle={{ fontSize:12, color:'#4A5568', fontWeight:500 }}/>}
               <Bar yAxisId="left" dataKey="alcance" radius={[6,6,0,0]} barSize={mobile ? 16 : 22}>
                 {byMonth.map((e,i) => (
                   <Cell key={i} fill={e.alcance>0?'#0891B2':'#F0F2F5'}/>
