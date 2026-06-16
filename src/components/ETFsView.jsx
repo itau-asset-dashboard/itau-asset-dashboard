@@ -208,21 +208,7 @@ export default function ETFsView() {
       {/* Gráfico — anual mostra barras mensais; mensal mostra barras por formato */}
       {viewMode === 'anual' ? (
         <div className="card" style={{ padding:'22px' }}>
-          <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:4 }}>
-            <p style={{ color:'#1C252E', fontSize:15, fontWeight:700 }}>Evolução mensal</p>
-            {!mobile && (
-              <div style={{ display:'flex', alignItems:'center', gap:14 }}>
-                <div style={{ display:'flex', alignItems:'center', gap:6 }}>
-                  <div style={{ width:10, height:10, borderRadius:3, background:'#0891B2' }}/>
-                  <span style={{ fontSize:12, color:'#4A5568', fontWeight:500 }}>Alcance</span>
-                </div>
-                <div style={{ display:'flex', alignItems:'center', gap:6 }}>
-                  <div style={{ width:10, height:10, borderRadius:3, background:'rgba(8,145,178,0.35)', border:'1.5px solid #0891B2' }}/>
-                  <span style={{ fontSize:12, color:'#4A5568', fontWeight:500 }}>Nº de posts</span>
-                </div>
-              </div>
-            )}
-          </div>
+          <p style={{ color:'#1C252E', fontSize:15, fontWeight:700, marginBottom:4 }}>Evolução mensal</p>
           <p style={{ color:'#9AAAB8', fontSize:12, marginBottom:20 }}>Alcance e volume de posts ETF por mês em {ano}</p>
           <div className="chart-wrapper"><ResponsiveContainer width="100%" height={mobile ? 160 : 240}>
             <BarChart data={byMonth} margin={{top:16, right: mobile ? 4 : 8, left:0, bottom:0}} barGap={4}>
@@ -239,6 +225,7 @@ export default function ETFsView() {
                 labelFormatter={(_,p) => p?.[0]?.payload?.mesFull || ''}
                 contentStyle={{ borderRadius:10, border:'1px solid #EAECF0', fontSize:12, boxShadow:'0 4px 16px rgba(0,0,0,0.08)' }}
               />
+              {!mobile && <Legend formatter={v => v==='alcance'?'Alcance':'Nº de posts'} wrapperStyle={{ fontSize:12, color:'#4A5568', fontWeight:500 }}/>}
               <Bar yAxisId="left" dataKey="alcance" radius={[6,6,0,0]} barSize={mobile ? 16 : 22}>
                 {byMonth.map((e,i) => (
                   <Cell key={i} fill={e.alcance>0?'#0891B2':'#F0F2F5'}/>
