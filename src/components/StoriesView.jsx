@@ -67,11 +67,10 @@ function StoryRow({ story, grupos, onEdit, isEditMode, selected, onToggleSelect 
         </p>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 3, flexWrap: 'wrap' }}>
           <span style={{ color: '#9AAAB8', fontSize: 11 }}>{story.data || '—'}</span>
-          {Array.isArray(story.tema) && story.tema.slice(0, 2).map(t => (
-            <span key={t} style={{ background: 'rgba(28,37,46,0.07)', color: '#4A6272', borderRadius: 5, padding: '1px 7px', fontSize: 10, fontWeight: 600, whiteSpace: 'nowrap' }}>{t}</span>
-          ))}
-          {Array.isArray(story.tema) && story.tema.length > 2 && (
-            <span style={{ color: '#9AAAB8', fontSize: 10 }}>+{story.tema.length - 2}</span>
+          {Array.isArray(story.tema) && story.tema.length > 0 && (
+            <span style={{ color: '#B0BEC5', fontSize: 10, fontWeight: 600, letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+              {story.tema.join(' · ')}
+            </span>
           )}
         </div>
       </div>
