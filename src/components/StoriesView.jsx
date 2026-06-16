@@ -279,22 +279,19 @@ export default function StoriesView() {
     stories.flatMap(s => Array.isArray(s.tema) ? s.tema : []).filter(Boolean)
   )].sort()
 
-  // Filtra por mês, busca e tema
+  // Filtra por mês ou busca (nome + tema)
   const q = search.trim().toLowerCase()
   const filtered = stories.filter(s => {
-    // Filtro de mês (ignorado se há busca de texto)
     if (!q) {
       if (!s.data) return false
       const [, mm, yyyy] = s.data.split('/')
       if (`${mm}/${yyyy}` !== mesFiltro) return false
+    } else {
+      const nomeMatch  = (s.nome || '').toLowerCase().includes(q)
+      const temaMatch  = Array.isArray(s.tema) && s.tema.some(t => t.toLowerCase().includes(q))
+      const dataMatch  = (s.data || '').includes(q)
+      if (!nomeMatch && !temaMatch && !dataMatch) return false
     }
-    // Filtro de texto
-    if (q && !(
-      (s.nome || '').toLowerCase().includes(q) ||
-      (s.data || '').includes(q)
-    )) return false
-    // Filtro de tema
-    if (temaFiltro && !(Array.isArray(s.tema) && s.tema.includes(temaFiltro))) return false
     return true
   })
 
@@ -421,68 +418,45 @@ export default function StoriesView() {
       {visao === 'lista' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12, animation: 'fadeIn .2s ease' }}>
 
-          {/* Barra de filtros */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
-            {temasDisponiveis.length > 0 && (
-              <select value={temaFiltro} onChange={e => setTemaFiltro(e.target.value)} style={{
-                background: temaFiltro ? '#1C252E' : '#fff',
-                color: temaFiltro ? '#C3EBF7' : '#4A6272',
-                border: `1.5px solid ${temaFiltro ? '#1C252E' : '#EDEFF2'}`,
-                borderRadius: 10, padding: '6px 12px', fontSize: 13, fontWeight: temaFiltro ? 600 : 400,
-                outline: 'none', cursor: 'pointer', fontFamily: 'DM Sans, sans-serif',
-              }}>
-                <option value="">Todos os temas</option>
-                {temasDisponiveis.map(t => <option key={t} value={t}>{t}</option>)}
-              </select>
-            )}
-            {temaFiltro && (
-              <button onClick={() => setTemaFiltro('')} style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4, color: '#8A9BB0', fontSize: 12 }}>
-                <X size={13} /> Limpar filtro
-              </button>
-            )}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#F5F7FA', borderRadius: 10, border: `1.5px solid ${q ? '#F97316' : '#EDEFF2'}`, padding: '6px 12px', flex: '1 1 160px', minWidth: 0 }}>
-              <Search size={14} color={q ? '#F97316' : '#A8B5C0'} style={{ flexShrink: 0 }} />
-              <input value={search} onChange={e => setSearch(e.target.value)}
-                placeholder="Buscar por nome ou data..."
-                style={{ border: 'none', background: 'transparent', outline: 'none', fontSize: 13, color: '#182638', width: '100%', fontFamily: 'DM Sans, sans-serif' }} />
-              {q && <button onClick={() => setSearch('')} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex' }}><X size={13} color="#A8B5C0" /></button>}
-            </div>
+          {/* Barra de busca */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#F5F7FA', borderRadius: 10, border: `1.5px solid ${q ? '#F97316' : '#EDEFF2'}`, padding: '7px 12px' }}>
+            <Search size={14} color={q ? '#F97316' : '#A8B5C0'} style={{ flexShrink: 0 }} />
+            <input value={search} onChange={e => setSearch(e.target.value)}
+              placeholder="Buscar por nome ou tema..."
+              style={{ border: 'none', background: 'transparent', outline: 'none', fontSize: 13, color: '#182638', width: '100%', fontFamily: 'DM Sans, sans-serif' }} />
+            {q && <button onClick={() => setSearch('')} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex' }}><X size={13} color="#A8B5C0" /></button>}
           </div>
 
-          {/* Resumo do tema filtrado */}
-          {temaFiltro && sorted.length > 0 && (() => {
-            const sum = k => sorted.reduce((s, st) => s + (st[k] || 0), 0)
-            const resumo = [
-              { label: 'Stories',          value: sorted.length,              color: '#1C252E' },
-              { label: 'Visualizações',    value: sum('visualizacoes'),       color: '#FF6200' },
-              { label: 'Interações',       value: sum('interacoes'),          color: '#0891B2' },
-              { label: 'Atividade perfil', value: sum('atividade_perfil'),    color: '#4A90A4' },
-            ]
-            return (
-              <div className="card" style={{ padding: '14px 18px' }}>
-                <p style={{ fontSize: 11, fontWeight: 700, color: '#9AAAB8', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 12 }}>
-                  Resumo · <span style={{ color: '#FF6200' }}>{temaFiltro}</span>
-                </p>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 10 }} className="kpi-grid">
-                  {resumo.map(({ label, value, color }) => (
-                    <div key={label}>
-                      <p style={{ fontSize: 10, fontWeight: 600, color: '#B0BEC5', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 4 }}>{label}</p>
-                      <p style={{ fontSize: 20, fontWeight: 800, color, lineHeight: 1, letterSpacing: '-0.02em' }}>{fmt(value)}</p>
-                    </div>
-                  ))}
-                </div>
+          {/* Resumo quando há busca ativa */}
+          {q && sorted.length > 0 && (
+            <div className="card" style={{ padding: '14px 18px' }}>
+              <p style={{ fontSize: 11, fontWeight: 700, color: '#9AAAB8', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 12 }}>
+                Resumo · <span style={{ color: '#FF6200' }}>{sorted.length} resultado{sorted.length !== 1 ? 's' : ''}</span>
+              </p>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 10 }} className="kpi-grid">
+                {[
+                  { label: 'Stories',          value: sorted.length,                                                color: '#1C252E' },
+                  { label: 'Visualizações',    value: sorted.reduce((s,st)=>s+(st.visualizacoes||0),0),            color: '#FF6200' },
+                  { label: 'Interações',       value: sorted.reduce((s,st)=>s+(st.interacoes||0),0),               color: '#0891B2' },
+                  { label: 'Atividade perfil', value: sorted.reduce((s,st)=>s+(st.atividade_perfil||0),0),         color: '#4A90A4' },
+                ].map(({ label, value, color }) => (
+                  <div key={label}>
+                    <p style={{ fontSize: 10, fontWeight: 600, color: '#B0BEC5', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 4 }}>{label}</p>
+                    <p style={{ fontSize: 20, fontWeight: 800, color, lineHeight: 1, letterSpacing: '-0.02em' }}>{fmt(value)}</p>
+                  </div>
+                ))}
               </div>
-            )
-          })()}
+            </div>
+          )}
 
           {/* Lista */}
           <div className="card" style={{ overflow: 'hidden' }}>
             {sorted.length === 0 ? (
               <div style={{ padding: '40px 20px', textAlign: 'center' }}>
                 <p style={{ color: '#9AAAB8', fontSize: 13 }}>
-                  {temaFiltro ? `Nenhum story com tema "${temaFiltro}" neste período` : 'Nenhum story encontrado para este período'}
+                  {q ? `Nenhum story encontrado para "${search}"` : 'Nenhum story encontrado para este período'}
                 </p>
-                {isEditMode && !temaFiltro && (
+                {isEditMode && !q && (
                   <button onClick={() => setUploadOpen(true)} style={{ marginTop: 12, background: '#F97316', color: '#fff', border: 'none', borderRadius: 10, padding: '8px 16px', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
                     Adicionar primeiro story
                   </button>
