@@ -4,9 +4,7 @@ import { useIsMobile } from '../utils/useIsMobile'
 
 function fmt(n) {
   if (n == null || n === 0) return '—'
-  if (n >= 1000000) return (n/1000000).toFixed(1).replace('.',',')+'M'
-  if (n >= 1000) return (n/1000).toFixed(1).replace('.',',')+'K'
-  return n.toLocaleString('pt-BR')
+  return Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')
 }
 
 export default function KPICards() {
