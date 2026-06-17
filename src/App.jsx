@@ -57,7 +57,7 @@ import MetaMensalBanner from './components/MetaMensalBanner'
 })()
 
 export default function App() {
-  const { activeSection, syncFromCloud } = useStore()
+  const { activeSection, syncFromCloud, hasSynced } = useStore()
 
   // Mantém hash sincronizado com a seção ativa (persiste no refresh)
   useEffect(() => {
@@ -84,6 +84,21 @@ export default function App() {
       window.removeEventListener('pageshow', onPageShow)
     }
   }, [])
+
+  if (!hasSynced) return (
+    <div style={{ display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', height:'100dvh', background:'#F6F8FA', gap:16 }}>
+      <svg width={48} height={48} viewBox="0 0 100 100" fill="none">
+        <rect width="100" height="100" rx="26" fill="#1C252E"/>
+        <text x="50" y="68" textAnchor="middle" fontFamily="'DM Sans',sans-serif" fontWeight="900" fontSize="38" fill="#C3EBF7" letterSpacing="-1">itaú</text>
+      </svg>
+      <div style={{ display:'flex', gap:6, alignItems:'center' }}>
+        {[0,1,2].map(i => (
+          <div key={i} style={{ width:7, height:7, borderRadius:'50%', background:'#FF6200', animation:'bounce 1.2s ease-in-out infinite', animationDelay:`${i*0.2}s` }}/>
+        ))}
+      </div>
+      <style>{`@keyframes bounce{0%,80%,100%{transform:translateY(0);opacity:0.4}40%{transform:translateY(-6px);opacity:1}}`}</style>
+    </div>
+  )
 
   return (
     <div className="app-layout">

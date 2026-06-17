@@ -35,6 +35,7 @@ export const useStore = create(
       insights: [],
       loadingInsights: false,
       syncing: false,
+      hasSynced: false,
       syncError: null,
       apiKey: import.meta.env.VITE_ANTHROPIC_API_KEY || '',
       isEditMode: false,
@@ -139,6 +140,7 @@ export const useStore = create(
             metaAnual:  metaAnual  ? Number(metaAnual)  : get().metaAnual,
             oliverData: newOliver,
             syncing: false,
+            hasSynced: true,
           })
 
           // Reenviar posts com dados sujos (normalização de tema/data) para o Supabase
@@ -165,7 +167,7 @@ export const useStore = create(
             try { saveSetting('oliver_data', JSON.stringify(newOliver)) } catch (_) {}
           }
         } catch (e) {
-          set({ syncing: false, syncError: e.message })
+          set({ syncing: false, hasSynced: true, syncError: e.message })
         }
       },
 
@@ -446,7 +448,6 @@ export const useStore = create(
         apiKey:         s.apiKey,
         oliverData:     s.oliverData,
         isEditMode:     s.isEditMode,
-        activeSection:  s.activeSection,
       }),
     }
   )
