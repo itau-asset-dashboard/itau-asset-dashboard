@@ -324,17 +324,41 @@ export async function chatWithData(messages, posts, stories, metaMensal, metaAnu
     })
 
   // ── Totais anuais ────────────────────────────────────────────────────────
-  const anoFoco     = mesFiltro?.split('/')?.[1] || '2026'
-  const postsAno    = posts.filter(p => mesKey(p.data_post)?.endsWith(anoFoco))
-  const storiesAno  = stories.filter(s => mesKey(s.data)?.endsWith(anoFoco))
-  const alcanceAno  = postsAno.reduce((s, p) => s + (p.contas_alcancadas||0), 0)
-  const mesesComDados = Object.keys(postsPorMesMap).filter(k => k.endsWith(anoFoco)).length
+  const anoFoco    = mesFiltro?.split('/')?.[1] || '2026'
+  const postsAno   = posts.filter(p => mesKey(p.data_post)?.endsWith(anoFoco))
+  const storiesAno = stories.filter(s => mesKey(s.data)?.endsWith(anoFoco))
+  const alcanceAno = postsAno.reduce((s, p) => s + (p.contas_alcancadas||0), 0)
 
-  // ── Projeção linear para o ano ───────────────────────────────────────────
-  let projecaoAnual = null
-  if (mesesComDados > 0) {
-    const mediaMensal = Math.round(alcanceAno / mesesComDados)
-    projecaoAnual = mediaMensal * 12
+  // ── Mês atual real (para distinguir mês em curso de meses completos) ──────
+  const hoje        = new Date()
+  const mesAtualKey = `${String(hoje.getMonth()+1).padStart(2,'0')}/${hoje.getFullYear()}`
+  const diaHoje     = hoje.getDate()
+  const diasNoMes   = new Date(hoje.getFullYear(), hoje.getMonth()+1, 0).getDate()
+  const pctMesDecorrido = Math.round(diaHoje / diasNoMes * 100)
+
+  // Meses completos = meses do ano em foco excluindo o mês atual (ainda em curso)
+  const mesesDoAno     = Object.keys(postsPorMesMap).filter(k => k.endsWith(anoFoco))
+  const mesesCompletos = mesesDoAno.filter(k => k !== mesAtualKey)
+  const mesAtualTemDados = mesesDoAno.includes(mesAtualKey)
+
+  // ── Projeção: usa apenas meses completos para a média ────────────────────
+  let projecaoAnual   = null
+  let mediaMensal     = null
+  let alcanceCompletos = 0
+  if (mesesCompletos.length > 0) {
+    alcanceCompletos = mesesCompletos.reduce((s, k) => {
+      return s + (postsPorMesMap[k]?.reduce((a, p) => a + (p.contas_alcancadas||0), 0) || 0)
+    }, 0)
+    mediaMensal  = Math.round(alcanceCompletos / mesesCompletos.length)
+    // Acumulado = alcance dos meses completos + estimativa proporcional do mês atual
+    const alcanceMesAtualParcial = mesAtualTemDados
+      ? (postsPorMesMap[mesAtualKey]?.reduce((s, p) => s + (p.contas_alcancadas||0), 0) || 0)
+      : 0
+    const estimativaMesAtual = pctMesDecorrido > 0
+      ? Math.round(alcanceMesAtualParcial / pctMesDecorrido * 100)
+      : mediaMensal
+    const mesesRestantes = 12 - mesesCompletos.length - 1 // -1 pelo mês atual
+    projecaoAnual = alcanceCompletos + estimativaMesAtual + (mediaMensal * Math.max(mesesRestantes, 0))
   }
 
   // ── Agregados do mês em foco ─────────────────────────────────────────────
@@ -354,10 +378,16 @@ VISÃO ANUAL ${anoFoco}
 ═══════════════════════════════════════
 Alcance acumulado (${anoFoco}): ${fmt(alcanceAno)} contas
 Meta anual: ${fmt(metaAnual)} contas | Progresso: ${pct(alcanceAno, metaAnual)} da meta anual
-Meses com dados: ${mesesComDados} de 12
 Posts publicados no ano: ${postsAno.length} | Stories no ano: ${storiesAno.length}
-Projeção ao final de ${anoFoco} (ritmo atual): ${projecaoAnual ? fmt(projecaoAnual) + ' contas' : '—'}
-${projecaoAnual && metaAnual ? `Cenário projetado: ${projecaoAnual >= metaAnual ? '✅ META ATINGIDA na projeção' : `⚠️ ${fmt(metaAnual - projecaoAnual)} abaixo da meta na projeção`}` : ''}
+
+Mês atual: ${mesAtualKey} (${diaHoje}º dia de ${diasNoMes} — ${pctMesDecorrido}% do mês decorrido)
+⚠️ ATENÇÃO: O mês atual (${mesAtualKey}) está em curso — os dados dele são PARCIAIS. Nunca use o alcance parcial de ${mesAtualKey} como se fosse o resultado final do mês.
+
+Projeção metodologia:
+- Média mensal (baseada em ${mesesCompletos.length} meses completos): ${mediaMensal ? fmt(mediaMensal) + ' contas/mês' : '—'}
+- Estimativa ${mesAtualKey} ao final do mês (extrapolação proporcional): ${mesAtualTemDados && pctMesDecorrido > 0 ? fmt(Math.round((postsPorMesMap[mesAtualKey]?.reduce((s,p)=>s+(p.contas_alcancadas||0),0)||0) / pctMesDecorrido * 100)) + ' contas' : '—'}
+- Projeção ao final de ${anoFoco}: ${projecaoAnual ? fmt(projecaoAnual) + ' contas' : '—'}
+${projecaoAnual && metaAnual ? `- Cenário projetado: ${projecaoAnual >= metaAnual ? '✅ META ATINGIDA na projeção' : `⚠️ ${fmt(metaAnual - projecaoAnual)} abaixo da meta — mas ainda há meses para recuperar`}` : ''}
 
 ═══════════════════════════════════════
 ALCANCE MENSAL DE POSTS — ${anoFoco} (PRÉ-CALCULADO, USE ESTES NÚMEROS)
