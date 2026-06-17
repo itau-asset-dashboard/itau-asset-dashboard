@@ -24,7 +24,7 @@ export const useStore = create(
       posts: [],
       stories: [],
       metaMensal: 200000,
-      metaAnual: 1090000,
+      metaAnual: 743000,
       mesFiltro: '01/2026',
       oliverData: {}, // { 'MM/YYYY': { alcance_oliver: number, meta_oliver: number } }
       activeSection: (() => {
