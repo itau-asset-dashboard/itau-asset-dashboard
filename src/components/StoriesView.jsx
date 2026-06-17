@@ -132,7 +132,7 @@ const MESES_NOMES = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julh
 const METRICAS = [
   { key: 'visualizacoes',    label: 'Visualizações',         color: '#FF6200' },
   { key: 'interacoes',       label: 'Interações',            color: '#1C2B3A' },
-  { key: 'atividade_perfil', label: 'Atividade de perfil',   color: '#C3EBF7' },
+  { key: 'atividade_perfil', label: 'Atividade de perfil',   color: '#1C252E' },
   { key: 'qtd',              label: 'Quantidade de stories', color: '#7ECDE8' },
 ]
 
@@ -395,7 +395,7 @@ export default function StoriesView() {
                 { label: 'Stories',          value: all.length,              icon: Film,      color: '#1C252E', bg: 'rgba(28,37,46,0.08)' },
                 { label: 'Visualizações',    value: sum('visualizacoes'),    icon: Eye,       color: '#FF6200', bg: 'rgba(255,98,0,0.08)' },
                 { label: 'Interações',       value: sum('interacoes'),       icon: Zap,       color: '#1C252E', bg: 'rgba(28,37,46,0.08)' },
-                { label: 'Atividade perfil', value: sum('atividade_perfil'), icon: UserCheck, color: '#C3EBF7', bg: 'rgba(195,235,247,0.25)' },
+                { label: 'Atividade perfil', value: sum('atividade_perfil'), icon: UserCheck, color: '#1C252E', bg: 'rgba(195,235,247,0.3)' },
               ].map(({ label, value, icon: Icon, color, bg }) => (
                 <div key={label} className="card kpi-card" style={{ padding: '14px 16px', minWidth: 0 }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
@@ -438,7 +438,7 @@ export default function StoriesView() {
                   { label: 'Stories',          value: sorted.length,                                                color: '#1C252E' },
                   { label: 'Visualizações',    value: sorted.reduce((s,st)=>s+(st.visualizacoes||0),0),            color: '#FF6200' },
                   { label: 'Interações',       value: sorted.reduce((s,st)=>s+(st.interacoes||0),0),               color: '#1C252E' },
-                  { label: 'Atividade perfil', value: sorted.reduce((s,st)=>s+(st.atividade_perfil||0),0),         color: '#C3EBF7' },
+                  { label: 'Atividade perfil', value: sorted.reduce((s,st)=>s+(st.atividade_perfil||0),0),         color: '#1C252E' },
                 ].map(({ label, value, color }) => (
                   <div key={label}>
                     <p style={{ fontSize: 10, fontWeight: 600, color: '#B0BEC5', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 4 }}>{label}</p>

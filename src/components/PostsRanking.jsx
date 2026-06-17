@@ -184,7 +184,7 @@ export default function PostsRanking() {
             { label: 'Posts',      value: sorted.length,                                                           color: '#1C252E' },
             { label: 'Alcance',    value: sorted.reduce((s,p)=>s+(p.contas_alcancadas||0),0),                      color: '#FF6200' },
             { label: 'Visualiz.',  value: sorted.reduce((s,p)=>s+(p.visualizacoes||0),0),                          color: '#1C252E' },
-            { label: 'Engajam.',   value: sorted.reduce((s,p)=>s+((p.curtidas||0)+(p.comentarios||0)+(p.salvamentos||0)+(p.compartilhamentos||0)),0), color: '#C3EBF7' },
+            { label: 'Engajam.',   value: sorted.reduce((s,p)=>s+((p.curtidas||0)+(p.comentarios||0)+(p.salvamentos||0)+(p.compartilhamentos||0)),0), color: '#1C252E' },
           ].map(({ label, value, color }) => (
             <div key={label}>
               <p style={{ fontSize: 10, fontWeight: 600, color: '#B0BEC5', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 3 }}>{label}</p>
