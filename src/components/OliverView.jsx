@@ -180,7 +180,7 @@ export default function OliverView() {
 
                 return (
                   <tr key={m.chave}
-                    style={{ borderTop: '1px solid #F5F7FA', opacity: hasData ? 1 : 0.45 }}>
+                    style={{ borderTop: '1px solid #F5F7FA' }}>
                     <td style={{ padding: mobile ? '10px 12px' : '13px 16px', color: '#1C252E', fontSize: mobile ? 12 : 13, fontWeight: 600, whiteSpace: 'nowrap' }}>
                       {mobile ? m.mes : m.mesFull}
                     </td>
