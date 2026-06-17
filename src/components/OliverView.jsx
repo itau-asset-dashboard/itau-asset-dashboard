@@ -104,6 +104,19 @@ export default function OliverView() {
 
       {ano === '2025' ? (
         /* ── Visão 2025: só histórico Oliver ── */
+        <>
+        <div style={{ display:'grid', gridTemplateColumns: mobile ? '1fr 1fr' : '1fr 1fr', gap: mobile ? 8 : 14 }}>
+          <div className="card" style={{ padding: mobile ? '12px 14px' : '18px 20px' }}>
+            <p style={{ color:'#9AAAB8', fontSize:11, fontWeight:600, textTransform:'uppercase', letterSpacing:'0.04em', marginBottom:5 }}>Total alcance Oliver</p>
+            <p style={{ color:'#F97316', fontSize: mobile ? 20 : 26, fontWeight:800, lineHeight:1.1 }}>{fmtExato(totalOliver || null)}</p>
+            <p style={{ color:'#9AAAB8', fontSize:12, marginTop:3 }}>soma do ano</p>
+          </div>
+          <div className="card" style={{ padding: mobile ? '12px 14px' : '18px 20px' }}>
+            <p style={{ color:'#9AAAB8', fontSize:11, fontWeight:600, textTransform:'uppercase', letterSpacing:'0.04em', marginBottom:5 }}>Meses preenchidos</p>
+            <p style={{ color:'#0891B2', fontSize: mobile ? 20 : 26, fontWeight:800, lineHeight:1.1 }}>{meses.filter(m => m.alcance_oliver).length} <span style={{ fontSize:14, fontWeight:500, color:'#9AAAB8' }}>/ 12</span></p>
+            <p style={{ color:'#9AAAB8', fontSize:12, marginTop:3 }}>com dado inserido</p>
+          </div>
+        </div>
         <div className="card" style={{ overflow: 'hidden' }}>
           <div style={{ padding: '18px 20px 14px' }}>
             <p style={{ color: '#1C252E', fontSize: 15, fontWeight: 700 }}>Histórico Oliver 2025</p>
@@ -167,6 +180,7 @@ export default function OliverView() {
             </table>
           </div>
         </div>
+        </>
       ) : (
       <>
       {/* KPIs */}
