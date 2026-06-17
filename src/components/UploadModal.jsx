@@ -210,7 +210,7 @@ const SinglePostModal = forwardRef(function SinglePostModal({ initialPost, initi
       {totalFiles > 1 && (
         <div style={{ background: '#F5F8FA', borderRadius: 8, padding: '6px 12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <span style={{ color: '#8A9BB0', fontSize: 12 }}>Post {currentIdx + 1} de {totalFiles}</span>
-          <span style={{ color: isLast ? '#22c55e' : '#F97316', fontSize: 11, fontWeight: 600 }}>
+          <span style={{ color: isLast ? '#16a34a' : '#FF6200', fontSize: 11, fontWeight: 600 }}>
             {isLast ? '✓ Último post' : `Faltam ${totalFiles - currentIdx - 1}`}
           </span>
         </div>
@@ -257,7 +257,7 @@ const SinglePostModal = forwardRef(function SinglePostModal({ initialPost, initi
                 />
                 <span style={{ color: '#C0CAD4', fontSize: 11 }}>·</span>
                 <span
-                  style={{ color: '#0891B2', fontSize: 11, cursor: 'pointer', fontWeight: 600 }}
+                  style={{ color: '#1C252E', fontSize: 11, cursor: 'pointer', fontWeight: 600 }}
                   onClick={e => { e.stopPropagation(); setLightboxOpen(true) }}
                 >
                   ver imagem ↗
@@ -323,7 +323,7 @@ const SinglePostModal = forwardRef(function SinglePostModal({ initialPost, initi
           Tema
         </label>
         {form.tema?.length > 0 && (
-          <p style={{ color: '#0891B2', fontSize: 11, marginBottom: 6 }}>
+          <p style={{ color: '#1C252E', fontSize: 11, marginBottom: 6 }}>
             {form.tema.length} selecionado{form.tema.length > 1 ? 's' : ''}: {form.tema.join(' · ')}
           </p>
         )}
@@ -432,7 +432,7 @@ const SinglePostModal = forwardRef(function SinglePostModal({ initialPost, initi
       {/* Salvar + Excluir */}
       <div style={{ display: 'flex', gap: 8 }}>
         <button onClick={save} disabled={saving} style={{
-          flex: 1, background: saved ? '#22c55e' : saving ? '#4A6272' : '#1C252E',
+          flex: 1, background: saved ? '#16a34a' : saving ? '#4A6272' : '#1C252E',
           color: '#C3EBF7', border: 'none', borderRadius: 12,
           padding: '12px', fontSize: 14, fontWeight: 700, cursor: saving ? 'wait' : 'pointer',
           display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
@@ -602,7 +602,7 @@ function MultiUploadModal({ onClose, onSave }) {
             {files.map((f, i) => (
               <div key={i} onClick={() => navigateTo(i)}
                 style={{ flexShrink: 0, width: 44, height: 44, borderRadius: 8, overflow: 'hidden', cursor: 'pointer',
-                  border: `2px solid ${i === current ? '#F97316' : '#E8ECF0'}` }}>
+                  border: `2px solid ${i === current ? '#FF6200' : '#E8ECF0'}` }}>
                 <img src={f.dataUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               </div>
             ))}

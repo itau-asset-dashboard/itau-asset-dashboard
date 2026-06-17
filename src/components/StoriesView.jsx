@@ -40,10 +40,10 @@ function StoryRow({ story, grupos, onEdit, isEditMode, selected, onToggleSelect 
         display: 'flex', alignItems: 'center', gap: 12,
         padding: '12px 16px', borderBottom: '1px solid #F5F7FA',
         cursor: 'pointer', transition: 'background 0.1s',
-        background: selected ? 'rgba(249,115,22,0.04)' : 'transparent',
+        background: selected ? 'rgba(255,98,0,0.04)' : 'transparent',
       }}
-      onMouseEnter={e => { e.currentTarget.style.background = selected ? 'rgba(249,115,22,0.06)' : '#FAFCFE' }}
-      onMouseLeave={e => { e.currentTarget.style.background = selected ? 'rgba(249,115,22,0.04)' : 'transparent' }}
+      onMouseEnter={e => { e.currentTarget.style.background = selected ? 'rgba(255,98,0,0.06)' : '#FAFCFE' }}
+      onMouseLeave={e => { e.currentTarget.style.background = selected ? 'rgba(255,98,0,0.04)' : 'transparent' }}
     >
       {/* Checkbox (edit mode) ou Dot (view mode) */}
       {isEditMode && onToggleSelect ? (
@@ -52,7 +52,7 @@ function StoryRow({ story, grupos, onEdit, isEditMode, selected, onToggleSelect 
           style={{ flexShrink: 0, cursor: 'pointer', display: 'flex', alignItems: 'center' }}
         >
           {selected
-            ? <CheckSquare size={16} color="#F97316" />
+            ? <CheckSquare size={16} color="#FF6200" />
             : <Square size={16} color="#D0D8E0" />
           }
         </div>
@@ -80,9 +80,9 @@ function StoryRow({ story, grupos, onEdit, isEditMode, selected, onToggleSelect 
         style={{ display: 'flex', gap: 20, flexShrink: 0 }}
         onClick={e => { if (isEditMode && onToggleSelect) { e.stopPropagation(); onEdit(story) } }}
       >
-        <MetricBadge label="Visual." value={story.visualizacoes} color="#0891B2" />
-        <MetricBadge label="Interações" value={story.interacoes} color="#F97316" />
-        <MetricBadge label="Ativ. perfil" value={story.atividade_perfil} color="#059669" />
+        <MetricBadge label="Visual." value={story.visualizacoes} color="#1C252E" />
+        <MetricBadge label="Interações" value={story.interacoes} color="#FF6200" />
+        <MetricBadge label="Ativ. perfil" value={story.atividade_perfil} color="#1C252E" />
       </div>
 
       {lightbox && story.imageUrl && (
@@ -104,16 +104,16 @@ function GrupoCard({ nome, stories, isEditMode, onEdit, selectedIds, onToggleSel
         style={{ padding: '14px 18px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer', background: '#FAFBFC' }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#F97316', flexShrink: 0 }} />
+          <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#FF6200', flexShrink: 0 }} />
           <div>
             <p style={{ color: '#182638', fontSize: 13, fontWeight: 700 }}>{nome}</p>
             <p style={{ color: '#9AAAB8', fontSize: 11, marginTop: 1 }}>{stories.length} story{stories.length !== 1 ? 's' : ''}</p>
           </div>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
-          <MetricBadge label="Visual." value={total('visualizacoes')} color="#0891B2" />
-          <MetricBadge label="Interações" value={total('interacoes')} color="#F97316" />
-          <MetricBadge label="Ativ. perfil" value={total('atividade_perfil')} color="#059669" />
+          <MetricBadge label="Visual." value={total('visualizacoes')} color="#1C252E" />
+          <MetricBadge label="Interações" value={total('interacoes')} color="#FF6200" />
+          <MetricBadge label="Ativ. perfil" value={total('atividade_perfil')} color="#1C252E" />
           {open ? <ChevronUp size={15} color="#9AAAB8" /> : <ChevronDown size={15} color="#9AAAB8" />}
         </div>
       </div>
@@ -132,7 +132,7 @@ const MESES_NOMES = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julh
 const METRICAS = [
   { key: 'visualizacoes',    label: 'Visualizações',         color: '#FF6200' },
   { key: 'interacoes',       label: 'Interações',            color: '#1C2B3A' },
-  { key: 'atividade_perfil', label: 'Atividade de perfil',   color: '#4A90A4' },
+  { key: 'atividade_perfil', label: 'Atividade de perfil',   color: '#C3EBF7' },
   { key: 'qtd',              label: 'Quantidade de stories', color: '#7ECDE8' },
 ]
 
@@ -305,9 +305,9 @@ export default function StoriesView() {
 
   const KPIS = [
     { label: 'Stories',          value: sorted.length, icon: Film,      color: '#1C252E', bg: 'rgba(28,37,46,0.08)' },
-    { label: 'Visualizações',    value: totalViews,    icon: Eye,       color: '#0891B2', bg: 'rgba(8,145,178,0.08)' },
-    { label: 'Interações',       value: totalInter,    icon: Zap,       color: '#F97316', bg: 'rgba(249,115,22,0.08)' },
-    { label: 'Atividade perfil', value: totalPerf,     icon: UserCheck, color: '#059669', bg: 'rgba(5,150,105,0.08)' },
+    { label: 'Visualizações',    value: totalViews,    icon: Eye,       color: '#1C252E', bg: 'rgba(195,235,247,0.25)' },
+    { label: 'Interações',       value: totalInter,    icon: Zap,       color: '#FF6200', bg: 'rgba(255,98,0,0.08)' },
+    { label: 'Atividade perfil', value: totalPerf,     icon: UserCheck, color: '#1C252E', bg: 'rgba(28,37,46,0.06)' },
   ]
 
   return (
@@ -362,18 +362,18 @@ export default function StoriesView() {
               onClick={() => selectMode ? clearSelection() : setSelectMode(true)}
               title={selectMode ? 'Cancelar seleção' : 'Selecionar stories'}
               style={{
-                background: selectMode ? 'rgba(249,115,22,0.08)' : '#F5F7FA',
-                border: `1.5px solid ${selectMode ? 'rgba(249,115,22,0.3)' : '#EDEFF2'}`,
+                background: selectMode ? 'rgba(255,98,0,0.08)' : '#F5F7FA',
+                border: `1.5px solid ${selectMode ? 'rgba(255,98,0,0.3)' : '#EDEFF2'}`,
                 borderRadius: 10, padding: '7px 9px', cursor: 'pointer',
                 display: 'flex', alignItems: 'center',
-                color: selectMode ? '#F97316' : '#A8B5C0',
+                color: selectMode ? '#FF6200' : '#A8B5C0',
               }}>
               <CheckSquare size={15} />
             </button>
           )}
           {isEditMode && (
             <button onClick={() => setUploadOpen(true)} style={{
-              background: '#F97316', color: '#fff', border: 'none', borderRadius: 10,
+              background: '#FF6200', color: '#fff', border: 'none', borderRadius: 10,
               padding: '8px 14px', fontSize: 13, fontWeight: 600, cursor: 'pointer',
               display: 'flex', alignItems: 'center', gap: 6,
             }}>
@@ -395,7 +395,7 @@ export default function StoriesView() {
                 { label: 'Stories',          value: all.length,              icon: Film,      color: '#1C252E', bg: 'rgba(28,37,46,0.08)' },
                 { label: 'Visualizações',    value: sum('visualizacoes'),    icon: Eye,       color: '#FF6200', bg: 'rgba(255,98,0,0.08)' },
                 { label: 'Interações',       value: sum('interacoes'),       icon: Zap,       color: '#1C252E', bg: 'rgba(28,37,46,0.08)' },
-                { label: 'Atividade perfil', value: sum('atividade_perfil'), icon: UserCheck, color: '#4A90A4', bg: 'rgba(74,144,164,0.08)' },
+                { label: 'Atividade perfil', value: sum('atividade_perfil'), icon: UserCheck, color: '#C3EBF7', bg: 'rgba(195,235,247,0.25)' },
               ].map(({ label, value, icon: Icon, color, bg }) => (
                 <div key={label} className="card kpi-card" style={{ padding: '14px 16px', minWidth: 0 }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
@@ -419,8 +419,8 @@ export default function StoriesView() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12, animation: 'fadeIn .2s ease' }}>
 
           {/* Barra de busca */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#F5F7FA', borderRadius: 10, border: `1.5px solid ${q ? '#F97316' : '#EDEFF2'}`, padding: '7px 12px' }}>
-            <Search size={14} color={q ? '#F97316' : '#A8B5C0'} style={{ flexShrink: 0 }} />
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#F5F7FA', borderRadius: 10, border: `1.5px solid ${q ? '#FF6200' : '#EDEFF2'}`, padding: '7px 12px' }}>
+            <Search size={14} color={q ? '#FF6200' : '#A8B5C0'} style={{ flexShrink: 0 }} />
             <input value={search} onChange={e => setSearch(e.target.value)}
               placeholder="Buscar por nome ou tema..."
               style={{ border: 'none', background: 'transparent', outline: 'none', fontSize: 13, color: '#182638', width: '100%', fontFamily: 'DM Sans, sans-serif' }} />
@@ -437,8 +437,8 @@ export default function StoriesView() {
                 {[
                   { label: 'Stories',          value: sorted.length,                                                color: '#1C252E' },
                   { label: 'Visualizações',    value: sorted.reduce((s,st)=>s+(st.visualizacoes||0),0),            color: '#FF6200' },
-                  { label: 'Interações',       value: sorted.reduce((s,st)=>s+(st.interacoes||0),0),               color: '#0891B2' },
-                  { label: 'Atividade perfil', value: sorted.reduce((s,st)=>s+(st.atividade_perfil||0),0),         color: '#4A90A4' },
+                  { label: 'Interações',       value: sorted.reduce((s,st)=>s+(st.interacoes||0),0),               color: '#1C252E' },
+                  { label: 'Atividade perfil', value: sorted.reduce((s,st)=>s+(st.atividade_perfil||0),0),         color: '#C3EBF7' },
                 ].map(({ label, value, color }) => (
                   <div key={label}>
                     <p style={{ fontSize: 10, fontWeight: 600, color: '#B0BEC5', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 4 }}>{label}</p>
@@ -457,7 +457,7 @@ export default function StoriesView() {
                   {q ? `Nenhum story encontrado para "${search}"` : 'Nenhum story encontrado para este período'}
                 </p>
                 {isEditMode && !q && (
-                  <button onClick={() => setUploadOpen(true)} style={{ marginTop: 12, background: '#F97316', color: '#fff', border: 'none', borderRadius: 10, padding: '8px 16px', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
+                  <button onClick={() => setUploadOpen(true)} style={{ marginTop: 12, background: '#FF6200', color: '#fff', border: 'none', borderRadius: 10, padding: '8px 16px', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
                     Adicionar primeiro story
                   </button>
                 )}
@@ -484,7 +484,7 @@ export default function StoriesView() {
           </span>
           <div style={{ width: 1, height: 18, background: 'rgba(255,255,255,0.15)' }} />
           <button onClick={startMultiEdit} style={{
-            background: '#F97316', color: '#fff', border: 'none', borderRadius: 9,
+            background: '#FF6200', color: '#fff', border: 'none', borderRadius: 9,
             padding: '7px 14px', fontSize: 13, fontWeight: 700, cursor: 'pointer',
             display: 'flex', alignItems: 'center', gap: 6,
           }}>

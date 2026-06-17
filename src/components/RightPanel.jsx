@@ -61,7 +61,7 @@ export default function RightPanel() {
   // Anel SVG
   const R = 54, CIRC = 2 * Math.PI * R
   const dash = (pctMensal / 100) * CIRC
-  const ringColor = atingiu ? '#16a34a' : '#F97316'
+  const ringColor = atingiu ? '#16a34a' : '#FF6200'
 
   return (
     <aside className="right-panel-desktop" style={{
@@ -91,7 +91,7 @@ export default function RightPanel() {
         {/* Glow sutil atrás do anel */}
         <div style={{
           position: 'absolute', inset: 12, borderRadius: '50%',
-          background: atingiu ? 'rgba(22,163,74,0.06)' : 'rgba(249,115,22,0.06)',
+          background: atingiu ? 'rgba(22,163,74,0.06)' : 'rgba(255,98,0,0.06)',
           filter: 'blur(8px)',
         }} />
         <svg width="140" height="140" viewBox="0 0 140 140" style={{ position: 'relative' }}>
@@ -129,7 +129,7 @@ export default function RightPanel() {
           backdropFilter: 'blur(4px)',
         }}>
           <span style={{ color: '#8A9BB0', fontSize: 11, fontWeight: 600 }}>Alcançado</span>
-          <span style={{ color: '#F97316', fontSize: 15, fontWeight: 800 }}>{fmt(totalMensal)}</span>
+          <span style={{ color: '#FF6200', fontSize: 15, fontWeight: 800 }}>{fmt(totalMensal)}</span>
         </div>
 
         {/* Meta */}
@@ -141,14 +141,14 @@ export default function RightPanel() {
           backdropFilter: 'blur(4px)',
         }}>
           <span style={{ color: '#8A9BB0', fontSize: 11, fontWeight: 600 }}>Meta</span>
-          <EditableValue value={metaAjustada} color="#0891B2" onSave={setMetaMensal}/>
+          <EditableValue value={metaAjustada} color="#1C252E" onSave={setMetaMensal}/>
         </div>
 
         {/* Falta / Atingiu */}
         {!atingiu && falta > 0 && (
           <div style={{
-            background: 'rgba(249,115,22,0.05)', borderRadius: 12,
-            border: '1px solid rgba(249,115,22,0.15)',
+            background: 'rgba(255,98,0,0.05)', borderRadius: 12,
+            border: '1px solid rgba(255,98,0,0.15)',
             padding: '12px 16px',
             display: 'flex', justifyContent: 'space-between', alignItems: 'center',
           }}>

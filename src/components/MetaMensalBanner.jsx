@@ -29,20 +29,20 @@ export default function MetaMensalBanner() {
         <p style={{ color: '#8A9BB0', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
           Meta · {mesNome}
         </p>
-        <p style={{ color: pct >= 100 ? '#16a34a' : '#F97316', fontSize: 13, fontWeight: 800 }}>
+        <p style={{ color: pct >= 100 ? '#16a34a' : '#FF6200', fontSize: 13, fontWeight: 800 }}>
           {pct.toFixed(0)}%
         </p>
       </div>
       <div style={{ background: '#F0F2F5', borderRadius: 6, height: 8, overflow: 'hidden', marginBottom: 8 }}>
         <div style={{
           height: '100%', borderRadius: 6,
-          background: pct >= 100 ? '#16a34a' : '#F97316',
+          background: pct >= 100 ? '#16a34a' : '#FF6200',
           width: `${pct}%`,
           transition: 'width 0.6s ease',
         }} />
       </div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <span style={{ color: '#F97316', fontSize: 13, fontWeight: 700 }}>{fmt(total)}</span>
+        <span style={{ color: '#FF6200', fontSize: 13, fontWeight: 700 }}>{fmt(total)}</span>
         <span style={{ color: '#9AAAB8', fontSize: 11 }}>de {fmt(meta)}</span>
       </div>
     </div>

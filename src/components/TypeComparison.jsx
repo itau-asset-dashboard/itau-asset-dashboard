@@ -8,7 +8,7 @@ function fmt(n) {
 
 // Carrossel → laranja, Reels → azul escuro, Foto → azul claro
 const CONFIGS = {
-  Carrossel:      { bar:'#F97316',  text:'#F97316',  badge:'rgba(249,115,22,0.1)',   badgeText:'#e05200' },
+  Carrossel:      { bar:'#FF6200',  text:'#FF6200',  badge:'rgba(255,98,0,0.1)',   badgeText:'#cc4f00' },
   Reels:          { bar:'#1C252E',  text:'#1C252E',  badge:'rgba(28,37,46,0.1)',   badgeText:'#1C252E' },
   'Foto estática':{ bar:'#C3EBF7', text:'#1a7a96',  badge:'rgba(195,235,247,0.5)',badgeText:'#1a7a96' },
 }

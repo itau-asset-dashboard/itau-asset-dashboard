@@ -120,7 +120,7 @@ const SingleStoryForm = forwardRef(function SingleStoryForm(
       {totalFiles > 1 && (
         <div style={{ background: '#F5F8FA', borderRadius: 8, padding: '6px 12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <span style={{ color: '#8A9BB0', fontSize: 12 }}>Story {currentIdx + 1} de {totalFiles}</span>
-          <span style={{ color: isLast ? '#22c55e' : '#F97316', fontSize: 11, fontWeight: 600 }}>
+          <span style={{ color: isLast ? '#16a34a' : '#FF6200', fontSize: 11, fontWeight: 600 }}>
             {isLast ? '✓ Último' : `Faltam ${totalFiles - currentIdx - 1}`}
           </span>
         </div>
@@ -140,7 +140,7 @@ const SingleStoryForm = forwardRef(function SingleStoryForm(
             <img src={preview} alt="" style={{ width: 56, height: 56, objectFit: 'cover', borderRadius: 8, flexShrink: 0, cursor: 'zoom-in', border: '1.5px solid #E8ECF0' }} onClick={e => { e.stopPropagation(); setLightbox(true) }} />
             <div style={{ flex: 1 }} onClick={e => e.stopPropagation()}>
               <p style={{ color: '#1C252E', fontWeight: 700, fontSize: 13 }}>Print do story</p>
-              <span style={{ color: '#0891B2', fontSize: 11, fontWeight: 600, cursor: 'pointer' }} onClick={e => { e.stopPropagation(); setLightbox(true) }}>ver imagem ↗</span>
+              <span style={{ color: '#1C252E', fontSize: 11, fontWeight: 600, cursor: 'pointer' }} onClick={e => { e.stopPropagation(); setLightbox(true) }}>ver imagem ↗</span>
             </div>
             <button type="button" onClick={e => { e.stopPropagation(); setPreview(null) }} style={{ flexShrink: 0, background: '#FEF2F2', border: '1px solid #fecaca', borderRadius: 8, width: 30, height: 30, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <Trash2 size={13} color="#ef4444" />
@@ -175,7 +175,7 @@ const SingleStoryForm = forwardRef(function SingleStoryForm(
           Tema
         </label>
         {form.tema?.length > 0 && (
-          <p style={{ color: '#0891B2', fontSize: 11, marginBottom: 6 }}>
+          <p style={{ color: '#1C252E', fontSize: 11, marginBottom: 6 }}>
             {form.tema.length} selecionado{form.tema.length > 1 ? 's' : ''}: {form.tema.join(' · ')}
           </p>
         )}
@@ -222,7 +222,7 @@ const SingleStoryForm = forwardRef(function SingleStoryForm(
       </div>
 
       {/* Salvar */}
-      <button onClick={save} disabled={saving} style={{ background: saved ? '#22c55e' : saving ? '#4A6272' : '#1C252E', color: '#C3EBF7', border: 'none', borderRadius: 12, padding: '12px', fontSize: 14, fontWeight: 700, cursor: saving ? 'wait' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, transition: 'background 0.2s' }}>
+      <button onClick={save} disabled={saving} style={{ background: saved ? '#16a34a' : saving ? '#4A6272' : '#1C252E', color: '#C3EBF7', border: 'none', borderRadius: 12, padding: '12px', fontSize: 14, fontWeight: 700, cursor: saving ? 'wait' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, transition: 'background 0.2s' }}>
         {saved ? <><Check size={16} /> Salvo!</> : saving ? 'Salvando...' : (totalFiles > 1 && !isLast) ? <>Salvar e continuar <ChevronRight size={15} /></> : 'Salvar story'}
       </button>
 
@@ -279,7 +279,7 @@ function EditStoryModal({ story, onClose, onSave, onDelete, inQueue, isLast }) {
         {preview ? (
           <>
             <img src={preview} alt="" style={{ width: 56, height: 56, objectFit: 'cover', borderRadius: 8, flexShrink: 0, cursor: 'zoom-in', border: '1.5px solid #E8ECF0' }} onClick={e => { e.stopPropagation(); setLightbox(true) }} />
-            <div style={{ flex: 1 }} onClick={e => e.stopPropagation()}><p style={{ color: '#1C252E', fontWeight: 700, fontSize: 13 }}>Print do story</p><span style={{ color: '#0891B2', fontSize: 11, fontWeight: 600, cursor: 'pointer' }} onClick={e => { e.stopPropagation(); setLightbox(true) }}>ver imagem ↗</span></div>
+            <div style={{ flex: 1 }} onClick={e => e.stopPropagation()}><p style={{ color: '#1C252E', fontWeight: 700, fontSize: 13 }}>Print do story</p><span style={{ color: '#1C252E', fontSize: 11, fontWeight: 600, cursor: 'pointer' }} onClick={e => { e.stopPropagation(); setLightbox(true) }}>ver imagem ↗</span></div>
             <button type="button" onClick={e => { e.stopPropagation(); setPreview(null) }} style={{ flexShrink: 0, background: '#FEF2F2', border: '1px solid #fecaca', borderRadius: 8, width: 30, height: 30, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Trash2 size={13} color="#ef4444" /></button>
           </>
         ) : (
@@ -292,7 +292,7 @@ function EditStoryModal({ story, onClose, onSave, onDelete, inQueue, isLast }) {
       {/* Tema */}
       <div>
         <label style={{ color: '#8A9BB0', fontSize: 11, fontWeight: 600, display: 'block', marginBottom: 2, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Tema</label>
-        {form.tema?.length > 0 && <p style={{ color: '#0891B2', fontSize: 11, marginBottom: 6 }}>{form.tema.length} selecionado{form.tema.length > 1 ? 's' : ''}: {form.tema.join(' · ')}</p>}
+        {form.tema?.length > 0 && <p style={{ color: '#1C252E', fontSize: 11, marginBottom: 6 }}>{form.tema.length} selecionado{form.tema.length > 1 ? 's' : ''}: {form.tema.join(' · ')}</p>}
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
           {TEMAS.map(t => {
             const sel = Array.isArray(form.tema) && form.tema.includes(t)
@@ -316,7 +316,7 @@ function EditStoryModal({ story, onClose, onSave, onDelete, inQueue, isLast }) {
       </div>
       {isEditMode ? (
         <div style={{ display: 'flex', gap: 8 }}>
-          <button onClick={save} disabled={saving} style={{ flex: 1, background: saved ? '#22c55e' : '#1C252E', color: '#C3EBF7', border: 'none', borderRadius: 12, padding: '12px', fontSize: 14, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+          <button onClick={save} disabled={saving} style={{ flex: 1, background: saved ? '#16a34a' : '#1C252E', color: '#C3EBF7', border: 'none', borderRadius: 12, padding: '12px', fontSize: 14, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
             {saved ? <><Check size={16} /> Salvo!</>
               : saving ? 'Salvando...'
               : inQueue && !isLast ? <>Salvar e continuar <ChevronRight size={15} /></>
@@ -444,7 +444,7 @@ function MultiStoryModal({ onClose, onSave }) {
         {files.length > 1 && (
           <div style={{ padding: '10px 20px 0', display: 'flex', gap: 6, overflowX: 'auto' }} className="scrollbar-thin">
             {files.map((f, i) => (
-              <div key={i} onClick={() => navigateTo(i)} style={{ flexShrink: 0, width: 44, height: 44, borderRadius: 8, overflow: 'hidden', cursor: 'pointer', border: `2px solid ${i === current ? '#F97316' : '#E8ECF0'}` }}>
+              <div key={i} onClick={() => navigateTo(i)} style={{ flexShrink: 0, width: 44, height: 44, borderRadius: 8, overflow: 'hidden', cursor: 'pointer', border: `2px solid ${i === current ? '#FF6200' : '#E8ECF0'}` }}>
                 <img src={f.dataUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               </div>
             ))}

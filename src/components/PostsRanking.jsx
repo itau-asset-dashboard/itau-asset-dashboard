@@ -13,7 +13,7 @@ function fmt(n) {
 }
 
 const BADGE = {
-  Carrossel: { bg: 'rgba(249,115,22,0.1)', color: '#F97316' },
+  Carrossel: { bg: 'rgba(255,98,0,0.1)', color: '#FF6200' },
   Reels: { bg: 'rgba(28,37,46,0.1)', color: '#1C252E' },
   'Foto estática': { bg: 'rgba(14,165,233,0.1)', color: '#0EA5E9' },
 }
@@ -104,12 +104,12 @@ export default function PostsRanking() {
 
   const SortIcon = ({ k }) => {
     if (sortKey !== k) return <ArrowUpDown size={11} color="#D0D8E0" />
-    return sortDir === -1 ? <ArrowDown size={11} color="#F97316" /> : <ArrowUp size={11} color="#F97316" />
+    return sortDir === -1 ? <ArrowDown size={11} color="#FF6200" /> : <ArrowUp size={11} color="#FF6200" />
   }
 
   const Th = ({ k, children }) => (
     <th onClick={() => toggleSort(k)} style={{
-      padding: '11px 14px', color: sortKey === k ? '#F97316' : '#8A9BB0',
+      padding: '11px 14px', color: sortKey === k ? '#FF6200' : '#8A9BB0',
       fontSize: 11, fontWeight: 600, textTransform: 'uppercase',
       letterSpacing: '0.05em', cursor: 'pointer', whiteSpace: 'nowrap',
       textAlign: 'left', userSelect: 'none', background: '#FAFBFC',
@@ -135,13 +135,13 @@ export default function PostsRanking() {
           <div style={{
             display: 'flex', alignItems: 'center', gap: 8,
             background: '#F5F7FA', borderRadius: 10,
-            border: `1.5px solid ${q ? '#F97316' : '#EDEFF2'}`,
+            border: `1.5px solid ${q ? '#FF6200' : '#EDEFF2'}`,
             padding: '7px 12px',
             transition: 'border-color 0.15s',
             flex: '1 1 auto',
             minWidth: mobile ? 0 : 220,
           }}>
-            <Search size={14} color={q ? '#F97316' : '#A8B5C0'} style={{ flexShrink: 0 }} />
+            <Search size={14} color={q ? '#FF6200' : '#A8B5C0'} style={{ flexShrink: 0 }} />
             <input
               value={search}
               onChange={e => { setSearch(e.target.value); setPage(0) }}
@@ -164,11 +164,11 @@ export default function PostsRanking() {
               onClick={() => selectMode ? clearSelection() : setSelectMode(true)}
               title={selectMode ? 'Cancelar seleção' : 'Selecionar posts'}
               style={{
-                background: selectMode ? 'rgba(249,115,22,0.08)' : '#F5F7FA',
-                border: `1.5px solid ${selectMode ? 'rgba(249,115,22,0.3)' : '#EDEFF2'}`,
+                background: selectMode ? 'rgba(255,98,0,0.08)' : '#F5F7FA',
+                border: `1.5px solid ${selectMode ? 'rgba(255,98,0,0.3)' : '#EDEFF2'}`,
                 borderRadius: 10, padding: '7px 9px', cursor: 'pointer', flexShrink: 0,
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                color: selectMode ? '#F97316' : '#A8B5C0',
+                color: selectMode ? '#FF6200' : '#A8B5C0',
                 transition: 'all 0.15s',
               }}>
               <CheckSquare size={15} />
@@ -183,8 +183,8 @@ export default function PostsRanking() {
           {[
             { label: 'Posts',      value: sorted.length,                                                           color: '#1C252E' },
             { label: 'Alcance',    value: sorted.reduce((s,p)=>s+(p.contas_alcancadas||0),0),                      color: '#FF6200' },
-            { label: 'Visualiz.',  value: sorted.reduce((s,p)=>s+(p.visualizacoes||0),0),                          color: '#0891B2' },
-            { label: 'Engajam.',   value: sorted.reduce((s,p)=>s+((p.curtidas||0)+(p.comentarios||0)+(p.salvamentos||0)+(p.compartilhamentos||0)),0), color: '#4A90A4' },
+            { label: 'Visualiz.',  value: sorted.reduce((s,p)=>s+(p.visualizacoes||0),0),                          color: '#1C252E' },
+            { label: 'Engajam.',   value: sorted.reduce((s,p)=>s+((p.curtidas||0)+(p.comentarios||0)+(p.salvamentos||0)+(p.compartilhamentos||0)),0), color: '#C3EBF7' },
           ].map(({ label, value, color }) => (
             <div key={label}>
               <p style={{ fontSize: 10, fontWeight: 600, color: '#B0BEC5', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 3 }}>{label}</p>
@@ -229,16 +229,16 @@ export default function PostsRanking() {
                   style={{
                     borderTop: '1px solid #F5F7FA',
                     cursor: isEditMode ? 'pointer' : 'default',
-                    background: selected.has(p.id) ? 'rgba(249,115,22,0.04)' : 'transparent',
+                    background: selected.has(p.id) ? 'rgba(255,98,0,0.04)' : 'transparent',
                   }}
                   onClick={() => selectMode ? toggleSelect(p.id) : (isEditMode && setUpdateTarget(p))}
                   onMouseEnter={e => { if (!selected.has(p.id)) e.currentTarget.style.background = '#FAFBFC' }}
-                  onMouseLeave={e => { e.currentTarget.style.background = selected.has(p.id) ? 'rgba(249,115,22,0.04)' : 'transparent' }}
+                  onMouseLeave={e => { e.currentTarget.style.background = selected.has(p.id) ? 'rgba(255,98,0,0.04)' : 'transparent' }}
                 >
                   {selectMode && (
                     <td style={{ padding: '12px 8px 12px 16px' }} onClick={e => { e.stopPropagation(); toggleSelect(p.id) }}>
                       {selected.has(p.id)
-                        ? <CheckSquare size={15} color="#F97316" />
+                        ? <CheckSquare size={15} color="#FF6200" />
                         : <Square size={15} color="#D0D8E0" />}
                     </td>
                   )}
@@ -254,7 +254,7 @@ export default function PostsRanking() {
                     }
                   </td>
                   <td style={{ padding: mobile ? '10px 8px' : '12px 14px', whiteSpace: 'nowrap' }}>
-                    <span style={{ color: '#F97316', fontWeight: 700, fontSize: mobile ? 13 : 14, opacity: isParcial ? 0.7 : 1 }}>{fmt(p.contas_alcancadas)}</span>
+                    <span style={{ color: '#FF6200', fontWeight: 700, fontSize: mobile ? 13 : 14, opacity: isParcial ? 0.7 : 1 }}>{fmt(p.contas_alcancadas)}</span>
                     {mobile && isParcial && <span style={{ display: 'block', color: '#f59e0b', fontSize: 9, fontWeight: 600 }}>Parcial</span>}
                   </td>
                   {!mobile && <td style={{ padding: '12px 14px', color: '#1C252E', fontSize: 13, opacity: isParcial ? 0.7 : 1 }}>{fmt(p.visualizacoes)}</td>}
@@ -303,7 +303,7 @@ export default function PostsRanking() {
           </span>
           <div style={{ width: 1, height: 18, background: 'rgba(255,255,255,0.15)' }} />
           <button onClick={startMultiEdit} style={{
-            background: '#F97316', color: '#fff', border: 'none', borderRadius: 9,
+            background: '#FF6200', color: '#fff', border: 'none', borderRadius: 9,
             padding: '7px 14px', fontSize: 13, fontWeight: 700, cursor: 'pointer',
             display: 'flex', alignItems: 'center', gap: 6,
           }}>

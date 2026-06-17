@@ -13,12 +13,12 @@ function fmt(n) {
 }
 
 export const TIPO_COLOR = {
-  Carrossel: '#F97316',
+  Carrossel: '#FF6200',
   Reels: '#182638',
   'Foto estática': '#0EA5E9',
 }
 export const TIPO_BG = {
-  Carrossel: 'rgba(249,115,22,0.09)',
+  Carrossel: 'rgba(255,98,0,0.09)',
   Reels: 'rgba(24,38,56,0.08)',
   'Foto estática': 'rgba(14,165,233,0.09)',
 }
@@ -59,7 +59,7 @@ export function PositionPill({ i }) {
 }
 
 // Linha padrão de ranking de post
-export const PostRankRow = memo(function PostRankRow({ post, i, maxVal, firstColor = '#F97316', onClick }) {
+export const PostRankRow = memo(function PostRankRow({ post, i, maxVal, firstColor = '#FF6200', onClick }) {
   const color    = TIPO_COLOR[post.tipo] || '#0EA5E9'
   const pct      = maxVal > 0 ? ((post.contas_alcancadas || 0) / maxVal) * 100 : 0
   const barColor = i === 0 ? firstColor : color

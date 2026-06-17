@@ -1,22 +1,22 @@
 import { Users, Eye, Heart, MessageCircle, Bookmark, Share2, Clock, UserPlus, AlertCircle, CheckCircle, Play, Zap, UserCheck } from 'lucide-react'
 
 const FEED = [
-  { termo: 'Contas alcançadas',   icon: Users,         color: '#F97316', bg: 'rgba(249,115,22,0.08)',    definicao: 'Número de contas únicas do Instagram que viram este post pelo menos uma vez. Essa métrica é estimada pelo Instagram.' },
-  { termo: 'Visualizações',       icon: Eye,           color: '#0891B2', bg: 'rgba(8,145,178,0.08)',     definicao: 'Número de vezes que o post foi exibido no total — inclui a mesma conta ver mais de uma vez.' },
+  { termo: 'Contas alcançadas',   icon: Users,         color: '#FF6200', bg: 'rgba(255,98,0,0.08)',    definicao: 'Número de contas únicas do Instagram que viram este post pelo menos uma vez. Essa métrica é estimada pelo Instagram.' },
+  { termo: 'Visualizações',       icon: Eye,           color: '#1C252E', bg: 'rgba(195,235,247,0.25)',     definicao: 'Número de vezes que o post foi exibido no total — inclui a mesma conta ver mais de uma vez.' },
   { termo: 'Curtidas',            icon: Heart,         color: '#E11D48', bg: 'rgba(225,29,72,0.08)',     definicao: 'Número de contas que curtiram o post. Representado pelo ícone de coração no app mobile.' },
-  { termo: 'Comentários',         icon: MessageCircle, color: '#7C3AED', bg: 'rgba(124,58,237,0.08)',    definicao: 'Número de comentários feitos no post. Representado pelo ícone de balão de fala no app mobile.' },
-  { termo: 'Salvamentos',         icon: Bookmark,      color: '#059669', bg: 'rgba(5,150,105,0.08)',     definicao: 'Contas que salvaram o post para ver depois. Representado pelo ícone de marcador/bookmark no app mobile.' },
+  { termo: 'Comentários',         icon: MessageCircle, color: '#FF6200', bg: 'rgba(28,37,46,0.06)',    definicao: 'Número de comentários feitos no post. Representado pelo ícone de balão de fala no app mobile.' },
+  { termo: 'Salvamentos',         icon: Bookmark,      color: '#1C252E', bg: 'rgba(28,37,46,0.06)',     definicao: 'Contas que salvaram o post para ver depois. Representado pelo ícone de marcador/bookmark no app mobile.' },
   { termo: 'Compartilhamentos',   icon: Share2,        color: '#0F7EC0', bg: 'rgba(15,126,192,0.08)',    definicao: 'Inclui encaminhamentos diretos e reposts. Representado pelo ícone de avião de papel ou seta circular no app mobile.' },
   { termo: 'Tempo médio de visualização', icon: Clock, color: '#D97706', bg: 'rgba(217,119,6,0.08)',    definicao: 'Tempo médio gasto na reprodução do reel. Calculado dividindo o tempo total de visualização pelo número de visualizações iniciais.' },
-  { termo: 'Seguidores ganhos',   icon: UserPlus,      color: '#0891B2', bg: 'rgba(8,145,178,0.08)',     definicao: 'Número de contas que começaram a seguir o perfil a partir deste post.' },
+  { termo: 'Seguidores ganhos',   icon: UserPlus,      color: '#1C252E', bg: 'rgba(195,235,247,0.25)',     definicao: 'Número de contas que começaram a seguir o perfil a partir deste post.' },
   { termo: 'Dado parcial',        icon: AlertCircle,   color: '#D97706', bg: 'rgba(217,119,6,0.08)',     definicao: 'Métricas ainda em atualização — o Instagram pode levar alguns dias para estabilizar os números de alcance e visualizações.' },
-  { termo: 'Dado final',          icon: CheckCircle,   color: '#059669', bg: 'rgba(5,150,105,0.08)',     definicao: 'Métricas consolidadas e estáveis. Recomendado aguardar ao menos 7 dias após a publicação antes de marcar como final.' },
+  { termo: 'Dado final',          icon: CheckCircle,   color: '#1C252E', bg: 'rgba(28,37,46,0.06)',     definicao: 'Métricas consolidadas e estáveis. Recomendado aguardar ao menos 7 dias após a publicação antes de marcar como final.' },
 ]
 
 const STORIES = [
-  { termo: 'Visualizações',       icon: Play,      color: '#0891B2', bg: 'rgba(8,145,178,0.08)',  definicao: 'O número de vezes que seu story foi reproduzido ou exibido.' },
-  { termo: 'Interações com stories', icon: Zap,    color: '#F97316', bg: 'rgba(249,115,22,0.08)', definicao: 'O número de curtidas, respostas e compartilhamentos do seu story menos o número de descurtidas. Essa métrica está em desenvolvimento pelo Instagram.' },
-  { termo: 'Atividade do perfil', icon: UserCheck, color: '#059669', bg: 'rgba(5,150,105,0.08)', definicao: 'O número de ações que as pessoas realizam quando visitam seu perfil depois de interagir com seu story. Essas ações incluem visitas ao perfil, cliques no link da bio e interações em outras publicações do feed.' },
+  { termo: 'Visualizações',       icon: Play,      color: '#1C252E', bg: 'rgba(195,235,247,0.25)',  definicao: 'O número de vezes que seu story foi reproduzido ou exibido.' },
+  { termo: 'Interações com stories', icon: Zap,    color: '#FF6200', bg: 'rgba(255,98,0,0.08)', definicao: 'O número de curtidas, respostas e compartilhamentos do seu story menos o número de descurtidas. Essa métrica está em desenvolvimento pelo Instagram.' },
+  { termo: 'Atividade do perfil', icon: UserCheck, color: '#1C252E', bg: 'rgba(28,37,46,0.06)', definicao: 'O número de ações que as pessoas realizam quando visitam seu perfil depois de interagir com seu story. Essas ações incluem visitas ao perfil, cliques no link da bio e interações em outras publicações do feed.' },
 ]
 
 function Section({ title, items }) {

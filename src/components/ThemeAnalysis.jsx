@@ -48,14 +48,14 @@ export default function ThemeAnalysis() {
                   <span style={{ color: '#1C252E', fontSize: 13, fontWeight: isLider ? 600 : 400 }}>{tema}</span>
                   <span style={{ color: '#8A9BB0', fontSize: 11 }}>({count})</span>
                 </div>
-                <span style={{ color: isLider ? '#F97316' : '#1C252E', fontWeight: isLider ? 700 : 500, fontSize: 13 }}>
+                <span style={{ color: isLider ? '#FF6200' : '#1C252E', fontWeight: isLider ? 700 : 500, fontSize: 13 }}>
                   {fmt(media)}
                 </span>
               </div>
               <div style={{ background: '#F0F4F8', borderRadius: 999, height: 6, overflow: 'hidden' }}>
                 <div style={{
                   width: `${barPct}%`, height: '100%',
-                  background: isLider ? '#F97316' : '#C3EBF7',
+                  background: isLider ? '#FF6200' : '#C3EBF7',
                   borderRadius: 999, transition: 'width 0.4s ease'
                 }} />
               </div>

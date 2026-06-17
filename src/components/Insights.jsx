@@ -22,7 +22,7 @@ function MarkdownText({ text }) {
           const t = line.replace(/^[-*•]\s/, '')
           return (
             <div key={i} style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
-              <span style={{ color: '#F97316', fontWeight: 800, fontSize: 14, lineHeight: 1.5, flexShrink: 0 }}>·</span>
+              <span style={{ color: '#FF6200', fontWeight: 800, fontSize: 14, lineHeight: 1.5, flexShrink: 0 }}>·</span>
               <span style={{ fontSize: 13, lineHeight: 1.6 }}>{renderInline(t)}</span>
             </div>
           )
@@ -34,7 +34,7 @@ function MarkdownText({ text }) {
           const t = line.replace(/^\d+\.\s/, '')
           return (
             <div key={i} style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
-              <span style={{ color: '#F97316', fontWeight: 700, fontSize: 12, lineHeight: 1.7, flexShrink: 0, minWidth: 16 }}>{num}.</span>
+              <span style={{ color: '#FF6200', fontWeight: 700, fontSize: 12, lineHeight: 1.7, flexShrink: 0, minWidth: 16 }}>{num}.</span>
               <span style={{ fontSize: 13, lineHeight: 1.6 }}>{renderInline(t)}</span>
             </div>
           )

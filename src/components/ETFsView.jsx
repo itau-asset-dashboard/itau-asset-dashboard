@@ -24,7 +24,7 @@ function pct(a, b) {
   return ((a/b)*100).toFixed(1)+'%'
 }
 
-const TIPO_COLOR = { Carrossel:'#F97316', Reels:'#1C252E', 'Foto estática':'#C3EBF7' }
+const TIPO_COLOR = { Carrossel:'#FF6200', Reels:'#1C252E', 'Foto estática':'#C3EBF7' }
 const ETF_TEMAS  = ['ETFs']
 
 export default function ETFsView() {
@@ -115,10 +115,10 @@ export default function ETFsView() {
   // ── KPI cards ──────────────────────────────────────
   const f = fmt
   const KPIS = [
-    { label:'Total alcançado',  value:f(totalEtf),  sub:`${participacao.toFixed(1)}% do total${viewMode==='mensal'?' do mês':' do ano'}`, color:'#F97316', bg:'rgba(249,115,22,0.08)' },
-    { label:'Média por post',   value:f(mediaEtf),  sub:'contas / publicação',                                                             color:'#0891B2', bg:'rgba(8,145,178,0.08)' },
-    { label:'Melhor post',      value:f(melhor?.contas_alcancadas), sub:(melhor?.nome||'—').slice(0,22),                                   color:'#7C3AED', bg:'rgba(124,58,237,0.08)' },
-    { label:'Posts ETF',        value:String(etfPosts.length),      sub:`de ${basePosts.length} posts${viewMode==='mensal'?' no mês':' no ano'}`, color:'#059669', bg:'rgba(5,150,105,0.08)' },
+    { label:'Total alcançado',  value:f(totalEtf),  sub:`${participacao.toFixed(1)}% do total${viewMode==='mensal'?' do mês':' do ano'}`, color:'#FF6200', bg:'rgba(255,98,0,0.08)' },
+    { label:'Média por post',   value:f(mediaEtf),  sub:'contas / publicação',                                                             color:'#1C252E', bg:'rgba(195,235,247,0.25)' },
+    { label:'Melhor post',      value:f(melhor?.contas_alcancadas), sub:(melhor?.nome||'—').slice(0,22),                                   color:'#FF6200', bg:'rgba(28,37,46,0.06)' },
+    { label:'Posts ETF',        value:String(etfPosts.length),      sub:`de ${basePosts.length} posts${viewMode==='mensal'?' no mês':' no ano'}`, color:'#1C252E', bg:'rgba(28,37,46,0.06)' },
   ]
 
   // ── Render ─────────────────────────────────────────
@@ -162,8 +162,8 @@ export default function ETFsView() {
             </div>
 
             {/* Pill participação */}
-            <div style={{ background:'rgba(8,145,178,0.08)', borderRadius:10, padding: mobile ? '5px 10px' : '6px 12px', textAlign:'center', border:'1px solid rgba(8,145,178,0.12)' }}>
-              <p style={{ color:'#0891B2', fontSize: mobile ? 13 : 15, fontWeight:800, lineHeight:1 }}>{participacao.toFixed(1)}%</p>
+            <div style={{ background:'rgba(195,235,247,0.25)', borderRadius:10, padding: mobile ? '5px 10px' : '6px 12px', textAlign:'center', border:'1px solid rgba(195,235,247,0.35)' }}>
+              <p style={{ color:'#1C252E', fontSize: mobile ? 13 : 15, fontWeight:800, lineHeight:1 }}>{participacao.toFixed(1)}%</p>
               <p style={{ color:'#9AAAB8', fontSize:10, marginTop:2, whiteSpace:'nowrap' }}>do alcance total</p>
             </div>
           </div>
@@ -175,7 +175,7 @@ export default function ETFsView() {
             display:'grid',
             gridTemplateColumns:'repeat(12, 1fr)',
             gap:6,
-            background:'rgba(8,145,178,0.05)',
+            background:'rgba(195,235,247,0.15)',
             borderRadius:14,
             padding:6,
           }}>
@@ -184,8 +184,8 @@ export default function ETFsView() {
                 style={{
                   padding:'7px 4px', borderRadius:10, border:'none', cursor:'pointer',
                   fontSize:12, fontWeight: mesSel===i ? 700 : 500,
-                  background: mesSel===i ? '#0891B2' : 'transparent',
-                  color: mesSel===i ? '#fff' : '#0891B2',
+                  background: mesSel===i ? '#1C252E' : 'transparent',
+                  color: mesSel===i ? '#fff' : '#1C252E',
                   transition:'all 0.15s',
                   textAlign:'center',
                 }}>
@@ -230,10 +230,10 @@ export default function ETFsView() {
               {!mobile && <Legend formatter={v => v==='alcance'?'Alcance':'Nº de posts'} wrapperStyle={{ fontSize:12, color:'#4A5568', fontWeight:500 }}/>}
               <Bar yAxisId="left" dataKey="alcance" radius={[6,6,0,0]} barSize={mobile ? 16 : 22}>
                 {byMonth.map((e,i) => (
-                  <Cell key={i} fill={e.alcance>0?'#0891B2':'#F0F2F5'}/>
+                  <Cell key={i} fill={e.alcance>0?'#1C252E':'#F0F2F5'}/>
                 ))}
               </Bar>
-              {!mobile && <Bar yAxisId="right" dataKey="posts" radius={[6,6,0,0]} fill="rgba(8,145,178,0.18)" barSize={14}/>}
+              {!mobile && <Bar yAxisId="right" dataKey="posts" radius={[6,6,0,0]} fill="rgba(195,235,247,0.4)" barSize={14}/>}
             </BarChart>
           </ResponsiveContainer></div>
         </div>
@@ -305,7 +305,7 @@ export default function ETFsView() {
                       background: TIPO_COLOR[t.tipo] || '#C3EBF7' }}/>
                     <span style={{ color:'#1C252E', fontSize:13, fontWeight:500 }}>{t.tipo}</span>
                     {i===0 && t.total>0 && (
-                      <span style={{ background:'rgba(249,115,22,0.1)', color:'#F97316',
+                      <span style={{ background:'rgba(255,98,0,0.1)', color:'#FF6200',
                         borderRadius:6, padding:'1px 7px', fontSize:10, fontWeight:700 }}>Líder</span>
                     )}
                   </div>
@@ -335,13 +335,13 @@ export default function ETFsView() {
                 return (
                   <div key={tema}>
                     <div style={{ display:'flex', justifyContent:'space-between', marginBottom:4 }}>
-                      <span style={{ color: isEtf?'#0891B2':'#1C252E', fontSize:12,
+                      <span style={{ color: isEtf?'#1C252E':'#1C252E', fontSize:12,
                         fontWeight: isEtf?700:400 }}>{tema}</span>
                       <span style={{ color:'#9AAAB8', fontSize:11 }}>{fmt(val)}</span>
                     </div>
                     <div style={{ background:'#F0F2F5', borderRadius:3, height:6, overflow:'hidden' }}>
                       <div style={{ height:'100%', borderRadius:3,
-                        background: isEtf?'#0891B2':'#D0D8E0',
+                        background: isEtf?'#1C252E':'#D0D8E0',
                         width:`${(val/maxTema)*100}%`, transition:'width 0.5s' }}/>
                     </div>
                   </div>

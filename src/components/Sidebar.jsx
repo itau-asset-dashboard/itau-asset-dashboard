@@ -61,8 +61,8 @@ function ItauLogo({ size = 38 }) {
 }
 
 // Laranja Itaú suavizado — menos vermelho, mais âmbar
-const ORANGE = '#F97316'
-const ORANGE_BG = '#FFF7F0'
+const ORANGE = '#FF6200'
+const ORANGE_BG = '#FFF3ED'
 
 export default function Sidebar() {
   const { activeSection, setActiveSection, isEditMode } = useStore()

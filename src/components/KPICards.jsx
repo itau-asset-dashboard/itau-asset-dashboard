@@ -29,13 +29,13 @@ export default function KPICards() {
       label: mobile ? 'Média/post' : 'Média por post',
       value: fmt(media),
       sub: 'contas por publicação',
-      accent: '#4A90A4', iconBg: 'rgba(74,144,164,0.10)', icon: TrendingUp, highlight: false,
+      accent: '#C3EBF7', iconBg: 'rgba(195,235,247,0.3)', icon: TrendingUp, highlight: false,
     },
     {
       label: mobile ? 'Melhor' : 'Melhor post',
       value: fmt(melhor?.contas_alcancadas),
       sub: (melhor?.nome||melhor?.tema||'—').slice(0, mobile ? 16 : 24),
-      accent: '#0891B2', iconBg: 'rgba(8,145,178,0.10)', icon: Award, highlight: false,
+      accent: '#1C252E', iconBg: 'rgba(195,235,247,0.3)', icon: Award, highlight: false,
     },
     {
       label: 'Posts',

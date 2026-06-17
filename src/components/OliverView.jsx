@@ -108,12 +108,12 @@ export default function OliverView() {
         <div style={{ display:'grid', gridTemplateColumns: mobile ? '1fr 1fr' : '1fr 1fr', gap: mobile ? 8 : 14 }}>
           <div className="card" style={{ padding: mobile ? '12px 14px' : '18px 20px' }}>
             <p style={{ color:'#9AAAB8', fontSize:11, fontWeight:600, textTransform:'uppercase', letterSpacing:'0.04em', marginBottom:5 }}>Total alcance Oliver</p>
-            <p style={{ color:'#F97316', fontSize: mobile ? 20 : 26, fontWeight:800, lineHeight:1.1 }}>{fmtExato(totalOliver || null)}</p>
+            <p style={{ color:'#FF6200', fontSize: mobile ? 20 : 26, fontWeight:800, lineHeight:1.1 }}>{fmtExato(totalOliver || null)}</p>
             <p style={{ color:'#9AAAB8', fontSize:12, marginTop:3 }}>soma do ano</p>
           </div>
           <div className="card" style={{ padding: mobile ? '12px 14px' : '18px 20px' }}>
             <p style={{ color:'#9AAAB8', fontSize:11, fontWeight:600, textTransform:'uppercase', letterSpacing:'0.04em', marginBottom:5 }}>Meses preenchidos</p>
-            <p style={{ color:'#0891B2', fontSize: mobile ? 20 : 26, fontWeight:800, lineHeight:1.1 }}>{meses.filter(m => m.alcance_oliver).length} <span style={{ fontSize:14, fontWeight:500, color:'#9AAAB8' }}>/ 12</span></p>
+            <p style={{ color:'#1C252E', fontSize: mobile ? 20 : 26, fontWeight:800, lineHeight:1.1 }}>{meses.filter(m => m.alcance_oliver).length} <span style={{ fontSize:14, fontWeight:500, color:'#9AAAB8' }}>/ 12</span></p>
             <p style={{ color:'#9AAAB8', fontSize:12, marginTop:3 }}>com dado inserido</p>
           </div>
         </div>
@@ -151,7 +151,7 @@ export default function OliverView() {
                               padding: '5px 9px', fontSize: 13, outline: 'none', fontFamily: 'DM Sans, sans-serif' }}
                             autoFocus />
                         ) : (
-                          <span style={{ color: '#F97316', fontSize: 13, fontWeight: 600 }}>
+                          <span style={{ color: '#FF6200', fontSize: 13, fontWeight: 600 }}>
                             {fmtExato(m.alcance_oliver)}
                           </span>
                         )}
@@ -188,13 +188,13 @@ export default function OliverView() {
       <div className="kpi-grid-js" style={{ display:'grid', gridTemplateColumns: mobile ? 'repeat(2,1fr)' : 'repeat(4,1fr)', gap: mobile ? 8 : 14, marginBottom:14 }}>
         {[
           { label: 'Total Instagram (ano)', value: fmtExato(totalInsta),  color: '#1C252E', bg: 'rgba(28,37,46,0.06)',      desc: 'Soma das contas alcançadas via Instagram' },
-          { label: 'Total Oliver (ano)',    value: fmtExato(totalOliver || null), color: '#F97316', bg: 'rgba(249,115,22,0.08)', desc: 'Soma dos dados da agência' },
+          { label: 'Total Oliver (ano)',    value: fmtExato(totalOliver || null), color: '#FF6200', bg: 'rgba(255,98,0,0.08)', desc: 'Soma dos dados da agência' },
           { label: 'Diferença acumulada',  value: diff ? `${diff > 0 ? '+' : ''}${diff}%` : '—',
             color: diff == null ? '#9AAAB8' : diff > 0 ? '#16a34a' : '#ef4444',
             bg: diff == null ? '#F4F6F8' : diff > 0 ? 'rgba(22,163,74,0.08)' : 'rgba(239,68,68,0.08)',
             desc: 'Oliver vs Instagram (+ = Oliver maior)' },
           { label: 'Meses preenchidos',    value: String(meses.filter(m => m.alcance_oliver).length) + ' / 12',
-            color: '#0891B2', bg: 'rgba(8,145,178,0.08)', desc: 'Meses com dado Oliver inserido' },
+            color: '#1C252E', bg: 'rgba(195,235,247,0.25)', desc: 'Meses com dado Oliver inserido' },
         ].map(({ label, value, color, bg, desc }) => (
           <div key={label} className="card kpi-card-js" style={{ padding: mobile ? '12px 12px' : '18px 20px', minWidth: 0, overflow: 'hidden' }}>
             <p className="kpi-label-js" style={{ color: '#9AAAB8', fontSize: mobile ? 10 : 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: mobile ? 6 : 5, lineHeight: 1.3 }}>{label}</p>
@@ -221,7 +221,7 @@ export default function OliverView() {
               />
               <Legend formatter={v => v === 'alcance_insta' ? 'Instagram' : 'Oliver'} wrapperStyle={{ fontSize: 11 }} />
               <Bar dataKey="alcance_insta"  name="alcance_insta"  radius={[4,4,0,0]} barSize={mobile ? 10 : 20} fill="#1C252E" />
-              <Bar dataKey="alcance_oliver" name="alcance_oliver" radius={[4,4,0,0]} barSize={mobile ? 10 : 20} fill="#F97316" />
+              <Bar dataKey="alcance_oliver" name="alcance_oliver" radius={[4,4,0,0]} barSize={mobile ? 10 : 20} fill="#FF6200" />
             </BarChart>
           </ResponsiveContainer></div>
         </div>
@@ -284,7 +284,7 @@ export default function OliverView() {
                             padding: '5px 9px', fontSize: 13, outline: 'none', fontFamily: 'DM Sans, sans-serif' }}
                           autoFocus />
                       ) : (
-                        <span style={{ color: '#F97316', fontSize: mobile ? 12 : 13, fontWeight: 600 }}>
+                        <span style={{ color: '#FF6200', fontSize: mobile ? 12 : 13, fontWeight: 600 }}>
                           {fmtExato(m.alcance_oliver)}
                         </span>
                       )}

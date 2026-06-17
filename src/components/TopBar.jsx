@@ -99,7 +99,7 @@ export default function TopBar() {
         {/* Novo post — só no modo edição e fora da aba de stories */}
         {isEditMode && activeSection !== 'stories' && (
           <button onClick={() => setUploadOpen(true)} style={{
-            background: '#F97316', color: '#fff', border: 'none', borderRadius: 10,
+            background: '#FF6200', color: '#fff', border: 'none', borderRadius: 10,
             padding: '8px 12px', fontSize: 13, fontWeight: 600, cursor: 'pointer',
             display: 'flex', alignItems: 'center', gap: 5, fontFamily: 'DM Sans, sans-serif', whiteSpace: 'nowrap',
           }}>
@@ -147,11 +147,11 @@ export default function TopBar() {
             onClick={() => { setShowLock(v => !v); setPwInput(''); setPwError(false) }}
             title={isEditMode ? 'Sair do modo edição' : 'Entrar no modo edição'}
             style={{
-              background: isEditMode ? 'rgba(249,115,22,0.08)' : '#F4F6F8',
-              border: `1.5px solid ${isEditMode ? 'rgba(249,115,22,0.3)' : '#EDEFF2'}`,
+              background: isEditMode ? 'rgba(255,98,0,0.08)' : '#F4F6F8',
+              border: `1.5px solid ${isEditMode ? 'rgba(255,98,0,0.3)' : '#EDEFF2'}`,
               borderRadius: 10, padding: '7px 9px', cursor: 'pointer',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              color: isEditMode ? '#F97316' : '#8A9BB0',
+              color: isEditMode ? '#FF6200' : '#8A9BB0',
             }}>
             {isEditMode ? <Unlock size={14} /> : <Lock size={14} />}
           </button>
@@ -166,8 +166,8 @@ export default function TopBar() {
               {isEditMode ? (
                 <>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
-                    <div style={{ width: 34, height: 34, borderRadius: 10, background: 'rgba(249,115,22,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <Unlock size={16} color="#F97316" />
+                    <div style={{ width: 34, height: 34, borderRadius: 10, background: 'rgba(255,98,0,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <Unlock size={16} color="#FF6200" />
                     </div>
                     <div>
                       <p style={{ color: '#182638', fontSize: 13, fontWeight: 700 }}>Modo edição ativo</p>
