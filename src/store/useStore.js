@@ -281,19 +281,17 @@ export const useStore = create(
         try { await deleteImage(id) } catch (_) {}
       },
 
-      // Remove todos os posts com ano anterior a 2026
+      // Remove posts anteriores a 2025 (mantém histórico 2025+)
       deletePostsAntigos: async () => {
         const { posts } = get()
         const antigos = posts.filter(p => {
           const ano = p.data_post?.split('/')?.[2]
-          return ano && parseInt(ano, 10) < 2026
+          return ano && parseInt(ano, 10) < 2025
         })
-        // Remove do estado local imediatamente
         set(s => ({ posts: s.posts.filter(p => {
           const ano = p.data_post?.split('/')?.[2]
-          return !ano || parseInt(ano, 10) >= 2026
+          return !ano || parseInt(ano, 10) >= 2025
         })}))
-        // Remove do Supabase em paralelo
         await Promise.allSettled(
           antigos.map(p => removePost(p.id).catch(() => {}))
         )

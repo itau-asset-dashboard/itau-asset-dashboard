@@ -22,6 +22,7 @@ export default function MetaMensalBanner() {
   const mesNome = MESES_NOMES[(parseInt(mm, 10) || 1) - 1]
 
   if (!mobile) return null
+  if (yyyy !== '2026') return null  // metas só existem para 2026
   return (
     <div className="card" style={{ padding: '14px 16px', marginBottom: 4 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>

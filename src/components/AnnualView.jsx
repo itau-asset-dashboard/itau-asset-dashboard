@@ -142,30 +142,34 @@ export default function AnnualView() {
       {/* ── Progresso meta + gráfico ── */}
       <div style={{ display:'grid', gridTemplateColumns:'1fr 2fr', gap:16 }} className="annual-grid">
 
-        {/* Card meta */}
+        {/* Card meta — só para 2026 */}
         <div className="card" style={{ padding:'22px' }}>
-          <p style={{ color:'#9AAAB8', fontSize:11, fontWeight:600, textTransform:'uppercase', letterSpacing:'0.05em', marginBottom:4 }}>Meta anual {ano}</p>
-          <p style={{ color:'#F97316', fontSize:32, fontWeight:800, lineHeight:1, marginBottom:2 }}>{fmt(total)}</p>
-          <p style={{ color:'#9AAAB8', fontSize:13, marginBottom:16 }}>de {fmt(metaAnual)}</p>
-
-          {/* Barra progresso */}
-          <div style={{ background:'#F0F2F5', borderRadius:8, height:10, overflow:'hidden', marginBottom:10 }}>
-            <div style={{ height:'100%', borderRadius:8, background:'#F97316', width:`${pct}%`, transition:'width 0.6s ease',
-              backgroundImage:'linear-gradient(90deg,#F97316,#ff8533)' }}/>
-          </div>
-          <p style={{ color:'#1C252E', fontSize:22, fontWeight:800, marginBottom:2 }}>{pct.toFixed(1)}%</p>
-          <p style={{ color:'#9AAAB8', fontSize:12 }}>atingido</p>
-
-          <div style={{ marginTop:16, padding:'12px 14px', background:'#F8FAFC', borderRadius:10 }}>
-            <p style={{ color:'#9AAAB8', fontSize:11, marginBottom:4 }}>Faltam para a meta</p>
-            <p style={{ color:'#1C252E', fontSize:18, fontWeight:700 }}>{fmt(restante)}</p>
-          </div>
-
-          <div style={{ marginTop:10, padding:'12px 14px', background:'#FFF7F0', borderRadius:10, border:'1px solid rgba(249,115,22,0.12)' }}>
-            <p style={{ color:'#9AAAB8', fontSize:11, marginBottom:4 }}>Meta mensal atualizada</p>
-            <p style={{ color:'#F97316', fontSize:18, fontWeight:700 }}>{fmt(metaMesAtualizada)}</p>
-            <p style={{ color:'#9AAAB8', fontSize:10, marginTop:2 }}>↻ ajustada pelo saldo acumulado</p>
-          </div>
+          {ano !== '2026' ? (
+            <div style={{ display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', height:'100%', gap:8, padding:'20px 0' }}>
+              <p style={{ color:'#9AAAB8', fontSize:13, textAlign:'center' }}>Metas definidas apenas para 2026</p>
+              <p style={{ color:'#C3EBF7', fontSize:12, textAlign:'center' }}>Dados de {ano} são histórico de referência</p>
+            </div>
+          ) : (
+            <>
+              <p style={{ color:'#9AAAB8', fontSize:11, fontWeight:600, textTransform:'uppercase', letterSpacing:'0.05em', marginBottom:4 }}>Meta anual {ano}</p>
+              <p style={{ color:'#F97316', fontSize:32, fontWeight:800, lineHeight:1, marginBottom:2 }}>{fmt(total)}</p>
+              <p style={{ color:'#9AAAB8', fontSize:13, marginBottom:16 }}>de {fmt(metaAnual)}</p>
+              <div style={{ background:'#F0F2F5', borderRadius:8, height:10, overflow:'hidden', marginBottom:10 }}>
+                <div style={{ height:'100%', borderRadius:8, background:'#F97316', width:`${pct}%`, transition:'width 0.6s ease', backgroundImage:'linear-gradient(90deg,#F97316,#ff8533)' }}/>
+              </div>
+              <p style={{ color:'#1C252E', fontSize:22, fontWeight:800, marginBottom:2 }}>{pct.toFixed(1)}%</p>
+              <p style={{ color:'#9AAAB8', fontSize:12 }}>atingido</p>
+              <div style={{ marginTop:16, padding:'12px 14px', background:'#F8FAFC', borderRadius:10 }}>
+                <p style={{ color:'#9AAAB8', fontSize:11, marginBottom:4 }}>Faltam para a meta</p>
+                <p style={{ color:'#1C252E', fontSize:18, fontWeight:700 }}>{fmt(restante)}</p>
+              </div>
+              <div style={{ marginTop:10, padding:'12px 14px', background:'#FFF7F0', borderRadius:10, border:'1px solid rgba(249,115,22,0.12)' }}>
+                <p style={{ color:'#9AAAB8', fontSize:11, marginBottom:4 }}>Meta mensal atualizada</p>
+                <p style={{ color:'#F97316', fontSize:18, fontWeight:700 }}>{fmt(metaMesAtualizada)}</p>
+                <p style={{ color:'#9AAAB8', fontSize:10, marginTop:2 }}>↻ ajustada pelo saldo acumulado</p>
+              </div>
+            </>
+          )}
         </div>
 
         {/* Gráfico mensal */}

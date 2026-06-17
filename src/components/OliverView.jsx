@@ -26,9 +26,9 @@ function pctDiff(a, b) {
 }
 
 export default function OliverView() {
-  const { posts, mesFiltro, oliverData, setOliverData } = useStore()
-  const ano = mesFiltro?.split('/')?.[1] || '2026'
+  const { posts, oliverData, setOliverData } = useStore()
   const mobile = useIsMobile()
+  const [ano, setAno] = useState('2026')
 
   const [editingMes, setEditingMes] = useState(null)
   const [inputVal, setInputVal]     = useState({ alcance_oliver: '', meta_oliver: '' })
@@ -82,11 +82,24 @@ export default function OliverView() {
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
 
       {/* Header */}
-      <div>
-        <h2 style={{ color: '#1C252E', fontSize: mobile ? 16 : 20, fontWeight: 800 }}>Acompanhamento Oliver</h2>
-        <p style={{ color: '#9AAAB8', fontSize: 12, marginTop: 2 }}>
-          Comparativo Oliver vs Instagram · {ano}
-        </p>
+      <div style={{ display:'flex', alignItems:'flex-start', justifyContent:'space-between', flexWrap:'wrap', gap:10 }}>
+        <div>
+          <h2 style={{ color: '#1C252E', fontSize: mobile ? 16 : 20, fontWeight: 800 }}>Acompanhamento Oliver</h2>
+          <p style={{ color: '#9AAAB8', fontSize: 12, marginTop: 2 }}>
+            Comparativo Oliver vs Instagram · {ano}
+          </p>
+        </div>
+        <div style={{ display:'flex', background:'rgba(28,37,46,0.06)', borderRadius:12, padding:3, gap:2 }}>
+          {['2025','2026'].map(a => (
+            <button key={a} onClick={() => setAno(a)} style={{
+              padding:'6px 16px', borderRadius:10, border:'none', cursor:'pointer',
+              fontSize:13, fontWeight: ano===a ? 700 : 400,
+              background: ano===a ? '#1C252E' : 'transparent',
+              color: ano===a ? '#C3EBF7' : '#5A7080',
+              transition:'all 0.15s',
+            }}>{a}</button>
+          ))}
+        </div>
       </div>
 
       {/* KPIs */}

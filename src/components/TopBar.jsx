@@ -7,13 +7,19 @@ import { useIsMobile } from '../utils/useIsMobile'
 
 const MESES_NOMES = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro']
 
-const MESES = Array.from({ length: 12 }, (_, i) => ({
-  value: `${String(i + 1).padStart(2, '0')}/2026`,
-  label: `${MESES_NOMES[i]} 2026`,
-}))
+const MESES = [
+  ...Array.from({ length: 12 }, (_, i) => ({
+    value: `${String(i + 1).padStart(2, '0')}/2025`,
+    label: `${MESES_NOMES[i]} 2025`,
+  })),
+  ...Array.from({ length: 12 }, (_, i) => ({
+    value: `${String(i + 1).padStart(2, '0')}/2026`,
+    label: `${MESES_NOMES[i]} 2026`,
+  })),
+]
 
 const TITLES = {
-  'visao-anual':  { title: 'Visão Anual 2026',  sub: 'Performance consolidada do ano' },
+  'visao-anual':  { title: 'Visão Anual',        sub: 'Performance consolidada do ano' },
   'visao-geral':  { title: 'Visão Mensal',       sub: 'Métricas de alcance do mês filtrado' },
   'posts':        { title: 'Todos os Posts',     sub: 'Histórico completo de publicações' },
   'stories':      { title: 'Stories',            sub: 'Análise separada das metas de alcance' },
