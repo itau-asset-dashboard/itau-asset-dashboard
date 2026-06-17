@@ -253,148 +253,183 @@ Retorne APENAS um JSON válido com exatamente 3 objetos:
 
 export async function chatWithData(messages, posts, stories, metaMensal, metaAnual, mesFiltro, apiKey) {
   const fmt = (n) => n != null ? Number(n).toLocaleString('pt-BR') : '—'
+  const pct = (v, t) => t > 0 ? `${Math.round(v / t * 100)}%` : '—'
 
-  // ── Separar por período ──────────────────────────────────────────────────
-  const postsMes = posts.filter(p => {
-    const parts = p.data_post?.split('/')
-    return parts?.length >= 3 && `${parts[1]}/${parts[2]}` === mesFiltro
+  // ── Helpers de agrupamento ───────────────────────────────────────────────
+  function mesKey(dateStr) {
+    if (!dateStr) return null
+    const p = dateStr.split('/')
+    return p.length >= 3 ? `${p[1]}/${p[2]}` : null   // MM/YYYY
+  }
+  function sortMes(a, b) {
+    const [am, ay] = a.split('/').map(Number)
+    const [bm, by] = b.split('/').map(Number)
+    return ay !== by ? ay - by : am - bm
+  }
+
+  // ── Filtros do mês em foco ───────────────────────────────────────────────
+  const postsMes   = posts.filter(p => mesKey(p.data_post) === mesFiltro)
+  const storiesMes = stories.filter(s => mesKey(s.data)    === mesFiltro)
+
+  const engPost = p => (p.curtidas||0)+(p.comentarios||0)+(p.salvamentos||0)+(p.compartilhamentos||0)
+
+  // ── Resumo mensal de POSTS (pré-calculado — evita erros de soma da IA) ──
+  const postsPorMesMap = {}
+  posts.forEach(p => {
+    const k = mesKey(p.data_post)
+    if (!k) return
+    if (!postsPorMesMap[k]) postsPorMesMap[k] = []
+    postsPorMesMap[k].push(p)
   })
-  const storiesMes = stories.filter(s => {
-    if (!s.data) return false
-    const [, mm, yyyy] = s.data.split('/')
-    return `${mm}/${yyyy}` === mesFiltro
-  })
-
-  // ── Agregados do mês — Posts ─────────────────────────────────────────────
-  const alcanceMes   = postsMes.reduce((s, p) => s + (p.contas_alcancadas || 0), 0)
-  const melhorPost   = postsMes.length ? postsMes.reduce((a, b) => (a.contas_alcancadas||0) > (b.contas_alcancadas||0) ? a : b) : null
-  const engPost      = p => (p.curtidas||0)+(p.comentarios||0)+(p.salvamentos||0)+(p.compartilhamentos||0)
-
-  // ── Agregados do mês — Stories ───────────────────────────────────────────
-  const totalVisStories   = storiesMes.reduce((s, st) => s + (st.visualizacoes||0), 0)
-  const totalInterStories = storiesMes.reduce((s, st) => s + (st.interacoes||0), 0)
-  const totalAtivStories  = storiesMes.reduce((s, st) => s + (st.atividade_perfil||0), 0)
-  const mediaVisStory     = storiesMes.length ? Math.round(totalVisStories / storiesMes.length) : 0
-  const melhorStory       = storiesMes.length ? storiesMes.reduce((a, b) => (a.visualizacoes||0) > (b.visualizacoes||0) ? a : b) : null
-
-  // ── Histórico completo — Posts ───────────────────────────────────────────
-  const todosPostsResumo = posts.map(p => ({
-    nome: p.nome,
-    data: p.data_post,
-    tipo: p.tipo,
-    temas: Array.isArray(p.tema) ? p.tema.join(', ') : (p.tema || null),
-    alcance: p.contas_alcancadas,
-    visualizacoes: p.visualizacoes,
-    curtidas: p.curtidas,
-    comentarios: p.comentarios,
-    salvamentos: p.salvamentos,
-    compartilhamentos: p.compartilhamentos,
-    engajamento_total: engPost(p),
-    status: p.status,
-  }))
-
-  // ── Histórico completo — Stories ─────────────────────────────────────────
-  const todosStoriesResumo = stories.map(s => ({
-    nome: s.nome,
-    data: s.data,
-    temas: Array.isArray(s.tema) ? s.tema.join(', ') : null,
-    visualizacoes: s.visualizacoes,
-    interacoes: s.interacoes,
-    atividade_perfil: s.atividade_perfil,
-  }))
-
-  // ── Resumo mensal de stories (pré-calculado para a IA não precisar contar) ─
-  const storiesPorMes = {}
-  stories.forEach(s => {
-    if (!s.data) return
-    const parts = s.data.split('/')
-    if (parts.length < 3) return
-    const key = `${parts[1]}/${parts[2]}`
-    if (!storiesPorMes[key]) storiesPorMes[key] = []
-    storiesPorMes[key].push(s)
-  })
-  const storiesResumoMensal = Object.entries(storiesPorMes)
-    .sort(([a], [b]) => {
-      const [am, ay] = a.split('/').map(Number)
-      const [bm, by] = b.split('/').map(Number)
-      return ay !== by ? ay - by : am - bm
+  const postsMensalResumo = Object.entries(postsPorMesMap)
+    .sort(([a], [b]) => sortMes(a, b))
+    .map(([mes, ps]) => {
+      const alcanceTotal = ps.reduce((s, p) => s + (p.contas_alcancadas||0), 0)
+      const engTotal     = ps.reduce((s, p) => s + engPost(p), 0)
+      const melhor       = ps.reduce((a, b) => (a.contas_alcancadas||0) > (b.contas_alcancadas||0) ? a : b)
+      return {
+        mes,
+        posts: ps.length,
+        alcance_total: alcanceTotal,
+        alcance_medio: Math.round(alcanceTotal / ps.length),
+        engajamento_total: engTotal,
+        melhor_post: `${melhor.nome} (${fmt(melhor.contas_alcancadas)} contas)`,
+        por_tipo: ['Carrossel','Reels','Foto estática'].map(t => {
+          const tp = ps.filter(p => p.tipo === t)
+          return tp.length ? { tipo: t, posts: tp.length, alcance: tp.reduce((s, p) => s + (p.contas_alcancadas||0), 0) } : null
+        }).filter(Boolean),
+      }
     })
-    .map(([mes, items]) => ({
-      mes,
-      quantidade: items.length,
-      visualizacoes_total: items.reduce((s, st) => s + (st.visualizacoes || 0), 0),
-      interacoes_total: items.reduce((s, st) => s + (st.interacoes || 0), 0),
-      atividade_perfil_total: items.reduce((s, st) => s + (st.atividade_perfil || 0), 0),
-      media_visualizacoes: Math.round(items.reduce((s, st) => s + (st.visualizacoes || 0), 0) / items.length),
-    }))
 
-  const systemPrompt = `Você é uma especialista sênior em redes sociais para o mercado financeiro, responsável pela performance do Instagram @itauasset da Itaú Asset Management. Responde com profundidade analítica, citando números reais e identificando padrões.
+  // ── Resumo mensal de STORIES (pré-calculado) ─────────────────────────────
+  const storiesPorMesMap = {}
+  stories.forEach(s => {
+    const k = mesKey(s.data)
+    if (!k) return
+    if (!storiesPorMesMap[k]) storiesPorMesMap[k] = []
+    storiesPorMesMap[k].push(s)
+  })
+  const storiesMensalResumo = Object.entries(storiesPorMesMap)
+    .sort(([a], [b]) => sortMes(a, b))
+    .map(([mes, ss]) => {
+      const visTotal = ss.reduce((s, st) => s + (st.visualizacoes||0), 0)
+      return {
+        mes,
+        quantidade: ss.length,
+        visualizacoes_total: visTotal,
+        interacoes_total: ss.reduce((s, st) => s + (st.interacoes||0), 0),
+        atividade_perfil_total: ss.reduce((s, st) => s + (st.atividade_perfil||0), 0),
+        media_visualizacoes: Math.round(visTotal / ss.length),
+      }
+    })
+
+  // ── Totais anuais ────────────────────────────────────────────────────────
+  const anoFoco     = mesFiltro?.split('/')?.[1] || '2026'
+  const postsAno    = posts.filter(p => mesKey(p.data_post)?.endsWith(anoFoco))
+  const storiesAno  = stories.filter(s => mesKey(s.data)?.endsWith(anoFoco))
+  const alcanceAno  = postsAno.reduce((s, p) => s + (p.contas_alcancadas||0), 0)
+  const mesesComDados = Object.keys(postsPorMesMap).filter(k => k.endsWith(anoFoco)).length
+
+  // ── Projeção linear para o ano ───────────────────────────────────────────
+  let projecaoAnual = null
+  if (mesesComDados > 0) {
+    const mediaMensal = Math.round(alcanceAno / mesesComDados)
+    projecaoAnual = mediaMensal * 12
+  }
+
+  // ── Agregados do mês em foco ─────────────────────────────────────────────
+  const alcanceMes      = postsMes.reduce((s, p) => s + (p.contas_alcancadas||0), 0)
+  const melhorPost      = postsMes.length ? postsMes.reduce((a, b) => (a.contas_alcancadas||0) > (b.contas_alcancadas||0) ? a : b) : null
+  const totalVisMes     = storiesMes.reduce((s, st) => s + (st.visualizacoes||0), 0)
+  const totalInterMes   = storiesMes.reduce((s, st) => s + (st.interacoes||0), 0)
+  const totalAtivMes    = storiesMes.reduce((s, st) => s + (st.atividade_perfil||0), 0)
+  const melhorStory     = storiesMes.length ? storiesMes.reduce((a, b) => (a.visualizacoes||0) > (b.visualizacoes||0) ? a : b) : null
+
+  const systemPrompt = `Você é uma especialista sênior em redes sociais para o mercado financeiro, responsável pela performance do Instagram @itauasset da Itaú Asset Management.
+
+Você tem acesso a TODOS os dados do dashboard — posts, stories, metas e projeções. Responda com profundidade analítica, citando sempre números reais. Nunca diga que não tem acesso a dados — eles estão todos aqui abaixo.
 
 ═══════════════════════════════════════
-PANORAMA GERAL
+VISÃO ANUAL ${anoFoco}
 ═══════════════════════════════════════
-Período em foco: ${mesFiltro}
-Meta mensal (${mesFiltro}): ${fmt(metaMensal)} contas alcançadas
-Meta anual: ${fmt(metaAnual)} contas alcançadas
-Histórico total: ${posts.length} posts · ${stories.length} stories
+Alcance acumulado (${anoFoco}): ${fmt(alcanceAno)} contas
+Meta anual: ${fmt(metaAnual)} contas | Progresso: ${pct(alcanceAno, metaAnual)} da meta anual
+Meses com dados: ${mesesComDados} de 12
+Posts publicados no ano: ${postsAno.length} | Stories no ano: ${storiesAno.length}
+Projeção ao final de ${anoFoco} (ritmo atual): ${projecaoAnual ? fmt(projecaoAnual) + ' contas' : '—'}
+${projecaoAnual && metaAnual ? `Cenário projetado: ${projecaoAnual >= metaAnual ? '✅ META ATINGIDA na projeção' : `⚠️ ${fmt(metaAnual - projecaoAnual)} abaixo da meta na projeção`}` : ''}
 
 ═══════════════════════════════════════
-MÊS ${mesFiltro} — POSTS (${postsMes.length} publicações)
+ALCANCE MENSAL DE POSTS — ${anoFoco} (PRÉ-CALCULADO, USE ESTES NÚMEROS)
 ═══════════════════════════════════════
-Alcance total: ${fmt(alcanceMes)} contas | Meta: ${fmt(metaMensal)} | Progresso: ${metaMensal ? Math.round(alcanceMes/metaMensal*100) : '—'}%
-Melhor post: ${melhorPost ? `"${melhorPost.nome}" — ${fmt(melhorPost.contas_alcancadas)} contas alcançadas` : 'N/A'}
+${postsMensalResumo.length > 0 ? postsMensalResumo.map(m =>
+  `${m.mes}: ${fmt(m.alcance_total)} contas | ${m.posts} posts | média ${fmt(m.alcance_medio)}/post | engaj. ${fmt(m.engajamento_total)} | melhor: ${m.melhor_post}`
+).join('\n') : 'Nenhum post cadastrado.'}
 
-Detalhe dos posts do mês:
+═══════════════════════════════════════
+ALCANCE MENSAL DE STORIES — ${anoFoco} (PRÉ-CALCULADO)
+═══════════════════════════════════════
+${storiesMensalResumo.length > 0 ? storiesMensalResumo.map(m =>
+  `${m.mes}: ${fmt(m.visualizacoes_total)} visualiz. | ${m.quantidade} stories | média ${fmt(m.media_visualizacoes)}/story | interações ${fmt(m.interacoes_total)}`
+).join('\n') : 'Nenhum story cadastrado.'}
+
+═══════════════════════════════════════
+MÊS EM FOCO: ${mesFiltro}
+═══════════════════════════════════════
+Posts: ${postsMes.length} publicações | Alcance: ${fmt(alcanceMes)} | Meta: ${fmt(metaMensal)} | ${pct(alcanceMes, metaMensal)} da meta mensal
+Melhor post do mês: ${melhorPost ? `"${melhorPost.nome}" — ${fmt(melhorPost.contas_alcancadas)} contas` : 'N/A'}
+Stories: ${storiesMes.length} | Visualiz.: ${fmt(totalVisMes)} | Interações: ${fmt(totalInterMes)} | Ativ. perfil: ${fmt(totalAtivMes)}
+Melhor story do mês: ${melhorStory ? `"${melhorStory.nome}" — ${fmt(melhorStory.visualizacoes)} visualizações` : 'N/A'}
+
+Detalhe posts do mês:
 ${postsMes.length > 0 ? JSON.stringify(postsMes.map(p => ({
   nome: p.nome, data: p.data_post, tipo: p.tipo,
   temas: Array.isArray(p.tema) ? p.tema.join(', ') : p.tema,
-  alcance: p.contas_alcancadas, visualizacoes: p.visualizacoes,
-  curtidas: p.curtidas, comentarios: p.comentarios,
-  salvamentos: p.salvamentos, compartilhamentos: p.compartilhamentos,
-  status: p.status,
+  alcance: p.contas_alcancadas, curtidas: p.curtidas,
+  comentarios: p.comentarios, salvamentos: p.salvamentos,
+  compartilhamentos: p.compartilhamentos, status: p.status,
 })), null, 2) : 'Nenhum post neste período.'}
 
-═══════════════════════════════════════
-MÊS ${mesFiltro} — STORIES (${storiesMes.length} stories)
-═══════════════════════════════════════
-Visualizações totais: ${fmt(totalVisStories)} | Interações: ${fmt(totalInterStories)} | Atividade perfil: ${fmt(totalAtivStories)}
-Média de visualizações/story: ${fmt(mediaVisStory)}
-Story com mais visualizações: ${melhorStory ? `"${melhorStory.nome}" — ${fmt(melhorStory.visualizacoes)} visualizações` : 'N/A'}
-
-Detalhe dos stories do mês:
+Detalhe stories do mês:
 ${storiesMes.length > 0 ? JSON.stringify(storiesMes.map(s => ({
   nome: s.nome, data: s.data,
   temas: Array.isArray(s.tema) ? s.tema.join(', ') : null,
   visualizacoes: s.visualizacoes, interacoes: s.interacoes, atividade_perfil: s.atividade_perfil,
-})), null, 2) : 'Nenhum story registrado neste período.'}
+})), null, 2) : 'Nenhum story neste período.'}
 
 ═══════════════════════════════════════
-RESUMO DE STORIES POR MÊS (use isto para contar/comparar meses)
+TODOS OS POSTS — HISTÓRICO COMPLETO (${posts.length} posts)
 ═══════════════════════════════════════
-${storiesResumoMensal.length > 0 ? JSON.stringify(storiesResumoMensal, null, 2) : 'Nenhum story com data registrada.'}
+${JSON.stringify(posts.map(p => ({
+  nome: p.nome, data: p.data_post, tipo: p.tipo,
+  temas: Array.isArray(p.tema) ? p.tema.join(', ') : (p.tema || null),
+  alcance: p.contas_alcancadas, visualizacoes: p.visualizacoes,
+  curtidas: p.curtidas, comentarios: p.comentarios,
+  salvamentos: p.salvamentos, compartilhamentos: p.compartilhamentos,
+  engajamento_total: engPost(p), status: p.status,
+})), null, 2)}
 
 ═══════════════════════════════════════
-HISTÓRICO COMPLETO — TODOS OS POSTS (${posts.length})
+TODOS OS STORIES — HISTÓRICO COMPLETO (${stories.length} stories)
 ═══════════════════════════════════════
-${JSON.stringify(todosPostsResumo, null, 2)}
+${stories.length > 0 ? JSON.stringify(stories.map(s => ({
+  nome: s.nome, data: s.data,
+  temas: Array.isArray(s.tema) ? s.tema.join(', ') : null,
+  visualizacoes: s.visualizacoes, interacoes: s.interacoes, atividade_perfil: s.atividade_perfil,
+})), null, 2) : 'Nenhum story cadastrado.'}
 
 ═══════════════════════════════════════
-HISTÓRICO COMPLETO — TODOS OS STORIES (${stories.length})
+INSTRUÇÕES DE RESPOSTA
 ═══════════════════════════════════════
-${todosStoriesResumo.length > 0 ? JSON.stringify(todosStoriesResumo, null, 2) : 'Nenhum story cadastrado ainda.'}
-
-═══════════════════════════════════════
-DIRETRIZES DE RESPOSTA
-═══════════════════════════════════════
-- Escreva em parágrafos corridos, não em listas ou tabelas — a visualização mobile não comporta colunas
-- Use **negrito** para destacar números, nomes de posts/stories e conclusões importantes
-- Se precisar separar seções, use ## Título seguido de parágrafo — nunca colunas ou tabelas
-- Cite sempre números reais do contexto acima — nunca invente ou estime dados
-- Para comparações de meses ou contagem de stories, use o "RESUMO DE STORIES POR MÊS" — é pré-calculado e exato
-- Para detalhes de post ou story específico, busque no histórico completo
-- Números no formato brasileiro: ponto para milhar (ex: 27.400), vírgula para decimal
+- NUNCA diga que não tem acesso a dados — todos os dados estão acima
+- Para alcance por mês, use a seção "ALCANCE MENSAL DE POSTS" — os valores já estão somados
+- Para projeções, use a projeção linear calculada acima como base e ajuste com contexto
+- Escreva em parágrafos corridos — sem tabelas ou colunas (visualização mobile)
+- Use **negrito** para destacar números-chave e conclusões
+- Se precisar separar seções use ## Título — nunca tabelas
+- Números no formato brasileiro: ponto para milhar, vírgula para decimal
 - Tom: especialista em social media para mercado financeiro — analítica, direta, com recomendações concretas
-- Respostas objetivas: sem introduções longas, vá direto ao ponto`
+- Respostas objetivas: vá direto ao ponto, sem introduções longas`
 
   const response = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
