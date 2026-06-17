@@ -136,18 +136,55 @@ Use null para qualquer campo não encontrado. Não invente valores.`
   return parseJsonResponse(data.content?.[0]?.text || '')
 }
 
-export async function generateInsights(posts, apiKey) {
-  const resumo = posts.map(p => ({
-    data: p.data_post,
-    tipo: p.tipo,
-    tema: p.tema,
-    contas_alcancadas: p.contas_alcancadas,
-    curtidas: p.curtidas,
-    comentarios: p.comentarios,
-    salvamentos: p.salvamentos,
-    compartilhamentos: p.compartilhamentos,
-    status: p.status,
-  }))
+export async function generateInsights(posts, apiKey, stories = [], metaAnual = 0, mesFiltro = '') {
+  const fmt = n => n != null ? Number(n).toLocaleString('pt-BR') : '—'
+
+  // Breakdown mensal de posts
+  const postsPorMes = {}
+  posts.forEach(p => {
+    const parts = p.data_post?.split('/')
+    if (!parts || parts.length < 3) return
+    const key = `${parts[1]}/${parts[2]}`
+    if (!postsPorMes[key]) postsPorMes[key] = []
+    postsPorMes[key].push(p)
+  })
+  const resumoMensal = Object.entries(postsPorMes)
+    .sort(([a], [b]) => {
+      const [am, ay] = a.split('/').map(Number)
+      const [bm, by] = b.split('/').map(Number)
+      return ay !== by ? ay - by : am - bm
+    })
+    .map(([mes, ps]) => ({
+      mes,
+      posts: ps.length,
+      alcance_total: ps.reduce((s, p) => s + (p.contas_alcancadas || 0), 0),
+      alcance_medio: Math.round(ps.reduce((s, p) => s + (p.contas_alcancadas || 0), 0) / ps.length),
+      por_tipo: ['Carrossel','Reels','Foto estática'].map(t => {
+        const tp = ps.filter(p => p.tipo === t)
+        return { tipo: t, posts: tp.length, alcance: tp.reduce((s, p) => s + (p.contas_alcancadas || 0), 0) }
+      }).filter(t => t.posts > 0),
+    }))
+
+  // Breakdown mensal de stories
+  const storiesPorMes = {}
+  stories.forEach(s => {
+    const parts = s.data?.split('/')
+    if (!parts || parts.length < 3) return
+    const key = `${parts[1]}/${parts[2]}`
+    if (!storiesPorMes[key]) storiesPorMes[key] = []
+    storiesPorMes[key].push(s)
+  })
+  const resumoStoriesMensal = Object.entries(storiesPorMes)
+    .sort(([a],[b]) => {
+      const [am,ay]=a.split('/').map(Number), [bm,by]=b.split('/').map(Number)
+      return ay!==by?ay-by:am-bm
+    })
+    .map(([mes, ss]) => ({
+      mes, quantidade: ss.length,
+      visualizacoes_total: ss.reduce((s,st)=>s+(st.visualizacoes||0),0),
+      interacoes_total: ss.reduce((s,st)=>s+(st.interacoes||0),0),
+      media_visualizacoes: Math.round(ss.reduce((s,st)=>s+(st.visualizacoes||0),0)/ss.length),
+    }))
 
   const response = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
@@ -158,24 +195,47 @@ export async function generateInsights(posts, apiKey) {
       'anthropic-dangerous-direct-browser-access': 'true',
     },
     body: JSON.stringify({
-      model: 'claude-haiku-4-5-20251001',
+      model: 'claude-sonnet-4-6',
       max_tokens: 2000,
       messages: [{
         role: 'user',
-        content: `Você é um analista de redes sociais especializado em finanças e investimentos.
-Analise os dados de posts do Instagram abaixo e gere EXATAMENTE 3 insights estratégicos em português brasileiro.
+        content: `Você é uma especialista sênior em redes sociais para o mercado financeiro, responsável pela performance do Instagram @itauasset da Itaú Asset Management.
 
-Dados dos posts:
-${JSON.stringify(resumo, null, 2)}
+Analise os dados abaixo e gere EXATAMENTE 3 insights estratégicos em português brasileiro, cada um com um ângulo diferente.
 
-Cubra obrigatoriamente esses 3 ângulos (um insight por ângulo):
-1. Qual tipo de post (Carrossel, Reels, Foto estática) performa melhor em contas alcançadas
-2. Qual tema tem maior alcance médio
-3. Recomendação prioritária para maximizar o alcance no próximo mês
+DADOS COMPLETOS:
+- Total de posts cadastrados: ${posts.length}
+- Total de stories cadastrados: ${stories.length}
+- Meta anual: ${fmt(metaAnual)} contas alcançadas
+- Mês em foco: ${mesFiltro}
 
-Retorne APENAS um JSON válido com exatamente 3 objetos (sem markdown, sem texto fora do JSON):
+EVOLUÇÃO MENSAL DE POSTS:
+${JSON.stringify(resumoMensal, null, 2)}
+
+EVOLUÇÃO MENSAL DE STORIES:
+${JSON.stringify(resumoStoriesMensal, null, 2)}
+
+TODOS OS POSTS (dados individuais):
+${JSON.stringify(posts.map(p => ({
+  nome: p.nome, data: p.data_post, tipo: p.tipo,
+  temas: Array.isArray(p.tema) ? p.tema.join(', ') : p.tema,
+  alcance: p.contas_alcancadas, curtidas: p.curtidas,
+  comentarios: p.comentarios, salvamentos: p.salvamentos,
+  compartilhamentos: p.compartilhamentos,
+})), null, 2)}
+
+Cubra obrigatoriamente ângulos distintos entre:
+- Qual formato de post (Carrossel, Reels, Foto estática) traz mais resultado e por quê
+- Quais temas geram mais alcance ou engajamento
+- Tendência de crescimento ou queda ao longo dos meses
+- Comparação feed vs stories
+- Recomendação estratégica concreta para o próximo período
+
+Para cada insight: título direto + texto de 2 a 3 frases com dados reais e conclusão acionável.
+
+Retorne APENAS um JSON válido com exatamente 3 objetos:
 [
-  { "icone": "📈", "titulo": "título curto", "texto": "insight detalhado em 2-3 frases" },
+  { "icone": "📈", "titulo": "título curto", "texto": "insight com dados reais e recomendação" },
   ...
 ]`
       }]
@@ -324,16 +384,17 @@ HISTÓRICO COMPLETO — TODOS OS STORIES (${stories.length})
 ${todosStoriesResumo.length > 0 ? JSON.stringify(todosStoriesResumo, null, 2) : 'Nenhum story cadastrado ainda.'}
 
 ═══════════════════════════════════════
-DIRETRIZES
+DIRETRIZES DE RESPOSTA
 ═══════════════════════════════════════
-- Use **negrito** para dados, nomes de conteúdos e conclusões
-- Use listas (-) para comparações; numeração para prioridades
-- Use ## Títulos em respostas longas com seções distintas
-- Cite sempre números reais do contexto acima — nunca invente dados
-- Para perguntas sobre quantidade ou comparação de stories por mês, use SEMPRE o "RESUMO DE STORIES POR MÊS" — é pré-calculado e exato
-- Para detalhes de um story específico, use o histórico completo (${stories.length} stories no total)
-- Formatação brasileira: ponto para milhar, vírgula para decimal
-- Tom: profissional, direto, analítico`
+- Escreva em parágrafos corridos, não em listas ou tabelas — a visualização mobile não comporta colunas
+- Use **negrito** para destacar números, nomes de posts/stories e conclusões importantes
+- Se precisar separar seções, use ## Título seguido de parágrafo — nunca colunas ou tabelas
+- Cite sempre números reais do contexto acima — nunca invente ou estime dados
+- Para comparações de meses ou contagem de stories, use o "RESUMO DE STORIES POR MÊS" — é pré-calculado e exato
+- Para detalhes de post ou story específico, busque no histórico completo
+- Números no formato brasileiro: ponto para milhar (ex: 27.400), vírgula para decimal
+- Tom: especialista em social media para mercado financeiro — analítica, direta, com recomendações concretas
+- Respostas objetivas: sem introduções longas, vá direto ao ponto`
 
   const response = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
@@ -344,7 +405,7 @@ DIRETRIZES
       'anthropic-dangerous-direct-browser-access': 'true',
     },
     body: JSON.stringify({
-      model: 'claude-haiku-4-5-20251001',
+      model: 'claude-sonnet-4-6',
       max_tokens: 2048,
       system: systemPrompt,
       messages: messages.map(m => ({ role: m.role, content: m.content })),

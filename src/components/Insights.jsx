@@ -77,6 +77,7 @@ const SUGESTOES = [
 
 export default function Insights() {
   const { insights, loadingInsights, setInsights, setLoadingInsights, apiKey, posts, stories, metaAnual, mesFiltro } = useStore()
+
   const [mmFiltro, yyyyFiltro] = (mesFiltro || '').split('/')
   const metaAjustada = calcMetaMesProgressiva({ posts, metaAnual, mm: mmFiltro, yyyy: yyyyFiltro })
 
@@ -87,7 +88,7 @@ export default function Insights() {
     if (!apiKey) { alert('Configure sua chave da API Anthropic primeiro.'); return }
     if (allPosts.length < 2) { alert('Adicione pelo menos 2 posts para gerar insights.'); return }
     setLoadingInsights(true)
-    try { setInsights(await generateInsights(allPosts, apiKey)) }
+    try { setInsights(await generateInsights(allPosts, apiKey, stories, metaAnual, mesFiltro)) }
     catch(e) { alert('Não foi possível gerar insights: ' + e.message) }
     finally { setLoadingInsights(false) }
   }
