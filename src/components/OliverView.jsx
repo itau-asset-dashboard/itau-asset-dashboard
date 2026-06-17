@@ -102,6 +102,73 @@ export default function OliverView() {
         </div>
       </div>
 
+      {ano === '2025' ? (
+        /* ── Visão 2025: só histórico Oliver ── */
+        <div className="card" style={{ overflow: 'hidden' }}>
+          <div style={{ padding: '18px 20px 14px' }}>
+            <p style={{ color: '#1C252E', fontSize: 15, fontWeight: 700 }}>Histórico Oliver 2025</p>
+            <p style={{ color: '#9AAAB8', fontSize: 12, marginTop: 2 }}>Insira os dados mensais da agência</p>
+          </div>
+          <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+              <thead>
+                <tr style={{ background: '#FAFBFC' }}>
+                  {['Mês', 'Alcance Oliver', ''].map(h => (
+                    <th key={h} style={{ padding: '10px 20px', color: '#8A9BB0', fontSize: 11, fontWeight: 600,
+                      textTransform: 'uppercase', letterSpacing: '0.05em', textAlign: 'left', whiteSpace: 'nowrap' }}>
+                      {h}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {meses.map((m) => {
+                  const isEditing = editingMes === m.chave
+                  return (
+                    <tr key={m.chave} style={{ borderTop: '1px solid #F5F7FA' }}>
+                      <td style={{ padding: '13px 20px', color: '#1C252E', fontSize: 13, fontWeight: 600, whiteSpace: 'nowrap' }}>
+                        {m.mesFull}
+                      </td>
+                      <td style={{ padding: '13px 20px' }}>
+                        {isEditing ? (
+                          <input type="number" value={inputVal.alcance_oliver}
+                            onChange={e => setInputVal(v => ({ ...v, alcance_oliver: e.target.value }))}
+                            placeholder="ex: 185000"
+                            style={{ width: 140, border: '1.5px solid #C3EBF7', borderRadius: 8,
+                              padding: '5px 9px', fontSize: 13, outline: 'none', fontFamily: 'DM Sans, sans-serif' }}
+                            autoFocus />
+                        ) : (
+                          <span style={{ color: '#F97316', fontSize: 13, fontWeight: 600 }}>
+                            {fmtExato(m.alcance_oliver)}
+                          </span>
+                        )}
+                      </td>
+                      <td style={{ padding: '13px 16px' }}>
+                        {isEditing ? (
+                          <button onClick={() => saveEdit(m.chave)}
+                            style={{ background: '#1C252E', color: '#C3EBF7', border: 'none',
+                              borderRadius: 8, padding: '6px 12px', cursor: 'pointer',
+                              display: 'flex', alignItems: 'center', gap: 4, fontSize: 12 }}>
+                            <Check size={13} /> Salvar
+                          </button>
+                        ) : (
+                          <button onClick={() => startEdit(m.chave, m)}
+                            style={{ background: '#F4F6F8', border: 'none', borderRadius: 8,
+                              padding: '6px 10px', cursor: 'pointer',
+                              display: 'flex', alignItems: 'center', gap: 4, color: '#8A9BB0', fontSize: 12 }}>
+                            <Edit2 size={12} /> Editar
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      ) : (
+      <>
       {/* KPIs */}
       <style>{`@media(max-width:768px){.kpi-grid-js{grid-template-columns:repeat(2,1fr)!important;gap:8px!important}.kpi-card-js{padding:11px 11px!important}.kpi-label-js{font-size:9px!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;margin-bottom:7px!important}.kpi-number-js{font-size:19px!important;margin-bottom:3px!important}.kpi-sub-js{font-size:9px!important}}`}</style>
       <div className="kpi-grid-js" style={{ display:'grid', gridTemplateColumns: mobile ? 'repeat(2,1fr)' : 'repeat(4,1fr)', gap: mobile ? 8 : 14, marginBottom:14 }}>
@@ -144,6 +211,8 @@ export default function OliverView() {
             </BarChart>
           </ResponsiveContainer></div>
         </div>
+      )}
+      </>
       )}
 
       {/* Tabela mensal */}
