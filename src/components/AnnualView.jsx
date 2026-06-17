@@ -203,7 +203,7 @@ export default function AnnualView() {
               />
               <Bar dataKey="total" radius={[6,6,0,0]}>
                 {byMonth.map((entry, i) => (
-                  <Cell key={i} fill={entry.total === 0 ? '#F0F2F5' : '#FF6200'} />
+                  <Cell key={i} fill={entry.total === 0 ? '#F0F2F5' : '#C3EBF7'} />
                 ))}
                 <LabelList dataKey="pctMes" position="top"
                   formatter={v => v != null ? `${v}%` : ''}
