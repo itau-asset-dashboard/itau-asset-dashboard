@@ -7,16 +7,10 @@ import { useIsMobile } from '../utils/useIsMobile'
 
 const MESES_NOMES = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro']
 
-const MESES = [
-  ...Array.from({ length: 12 }, (_, i) => ({
-    value: `${String(i + 1).padStart(2, '0')}/2025`,
-    label: `${MESES_NOMES[i]} 2025`,
-  })),
-  ...Array.from({ length: 12 }, (_, i) => ({
-    value: `${String(i + 1).padStart(2, '0')}/2026`,
-    label: `${MESES_NOMES[i]} 2026`,
-  })),
-]
+const MESES = Array.from({ length: 12 }, (_, i) => ({
+  value: `${String(i + 1).padStart(2, '0')}/2026`,
+  label: `${MESES_NOMES[i]} 2026`,
+}))
 
 const TITLES = {
   'visao-anual':  { title: 'Visão Anual',        sub: 'Performance consolidada do ano' },
