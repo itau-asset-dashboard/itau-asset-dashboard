@@ -43,12 +43,14 @@ export default function AnnualView() {
     })
     const total = mPosts.reduce((s,p)=>s+(p.contas_alcancadas||0),0)
     const metaMes = calcMetaMesProgressiva({ posts: allPosts, metaAnual, mm, yyyy: ano })
+    const pctMes = metaMes > 0 && total > 0 ? Math.round((total / metaMes) * 100) : null
     return {
       mes:     MESES_LABEL[i],
       mesFull: MESES_FULL[i],
       total,
       count:   mPosts.length,
       meta:    metaMes,
+      pctMes,
     }
   })
 
@@ -174,38 +176,61 @@ export default function AnnualView() {
 
         {/* Gráfico mensal */}
         <div className="card" style={{ padding:'22px' }}>
-          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:20 }}>
-            <div>
-              <p style={{ color:'#1C252E', fontSize:15, fontWeight:700 }}>Contas alcançadas por mês</p>
-              <p style={{ color:'#9AAAB8', fontSize:12, marginTop:2 }}>
-                <span style={{ display:'inline-block', width:10, height:10, borderRadius:3, background:'#F97316', marginRight:5, verticalAlign:'middle' }}/>
-                Acima da meta
-                <span style={{ display:'inline-block', width:10, height:10, borderRadius:3, background:'#C3EBF7', marginLeft:12, marginRight:5, verticalAlign:'middle' }}/>
-                Abaixo da meta
-              </p>
+          <div style={{ marginBottom:16 }}>
+            <p style={{ color:'#1C252E', fontSize:15, fontWeight:700, marginBottom:8 }}>Contas alcançadas por mês</p>
+            <div style={{ display:'flex', flexWrap:'wrap', gap: mobile ? 8 : 14 }}>
+              {[
+                { color:'#16a34a', label:'Meta atingida (≥100%)' },
+                { color:'#86efac', label:'Quase lá (≥90%)' },
+                { color:'#fbbf24', label:'Em construção (≥75%)' },
+                { color:'#C3EBF7', label:'Abaixo (<75%)' },
+              ].map(({ color, label }) => (
+                <div key={label} style={{ display:'flex', alignItems:'center', gap:5 }}>
+                  <div style={{ width:10, height:10, borderRadius:3, background:color, flexShrink:0 }}/>
+                  <span style={{ color:'#9AAAB8', fontSize: mobile ? 10 : 11 }}>{label}</span>
+                </div>
+              ))}
             </div>
           </div>
-          <div className="chart-wrapper"><ResponsiveContainer width="100%" height={mobile ? 170 : 230}>
-            <BarChart data={byMonth} barSize={mobile ? 16 : 28} margin={{top: mobile ? 4 : 18, right:8, left:0, bottom:0}}>
+          <div className="chart-wrapper"><ResponsiveContainer width="100%" height={mobile ? 170 : 240}>
+            <BarChart data={byMonth} barSize={mobile ? 16 : 28} margin={{top: mobile ? 4 : 24, right:8, left:0, bottom:0}}>
               <XAxis dataKey="mes" tick={{ fill:'#9AAAB8', fontSize: mobile ? 9 : 11 }} axisLine={false} tickLine={false}/>
               <YAxis tick={{ fill:'#9AAAB8', fontSize:10 }} axisLine={false} tickLine={false}
                 tickFormatter={v=>v===0?'':fmt(v)} width={mobile ? 36 : 44}/>
               <Tooltip
-                formatter={(v,_,p)=>[fmt(v), `${p.payload.mesFull} · ${p.payload.count} posts · meta ${fmt(p.payload.meta)}`]}
-                contentStyle={{ borderRadius:10, border:'1px solid #EAECF0', fontSize:12, boxShadow:'0 4px 16px rgba(0,0,0,0.08)' }}
-                labelStyle={{ display:'none' }}
-                cursor={{ fill:'rgba(0,0,0,0.04)' }}
+                content={({ active, payload }) => {
+                  if (!active || !payload?.length) return null
+                  const d = payload[0].payload
+                  const pct = d.meta > 0 ? Math.round((d.total / d.meta) * 100) : null
+                  const cor = pct == null ? '#9AAAB8' : pct >= 100 ? '#16a34a' : pct >= 90 ? '#86efac' : pct >= 75 ? '#fbbf24' : '#C3EBF7'
+                  return (
+                    <div style={{ background:'#fff', border:'1px solid #EAECF0', borderRadius:12, padding:'12px 16px', boxShadow:'0 4px 16px rgba(0,0,0,0.08)', fontSize:12, minWidth:180 }}>
+                      <p style={{ fontWeight:700, color:'#1C252E', marginBottom:6 }}>{d.mesFull}</p>
+                      <p style={{ color:'#9AAAB8', marginBottom:4 }}>{d.count} posts publicados</p>
+                      <p style={{ color:'#1C252E', fontWeight:600, marginBottom:2 }}>Alcance: <strong>{fmt(d.total)}</strong></p>
+                      <p style={{ color:'#9AAAB8', marginBottom:6 }}>Meta: {fmt(d.meta)}</p>
+                      {pct != null && d.total > 0 && (
+                        <p style={{ color: cor, fontWeight:800, fontSize:14 }}>{pct}% da meta</p>
+                      )}
+                    </div>
+                  )
+                }}
+                cursor={{ fill:'rgba(0,0,0,0.03)' }}
               />
               <Bar dataKey="total" radius={[6,6,0,0]}>
-                {byMonth.map((entry,i)=>(
-                  <Cell key={i}
-                    fill={entry.total === 0 ? '#F0F2F5' : entry.total >= entry.meta ? '#F97316' : '#C3EBF7'}
-                  />
-                ))}
-                {!mobile && (
-                  <LabelList dataKey="total" position="top" formatter={v=>v>0?fmt(v):''}
-                    style={{ fill:'#9AAAB8', fontSize:9, fontWeight:600 }}/>
-                )}
+                {byMonth.map((entry, i) => {
+                  const pct = entry.meta > 0 ? (entry.total / entry.meta) * 100 : 0
+                  const fill = entry.total === 0 ? '#F0F2F5'
+                    : pct >= 100 ? '#16a34a'
+                    : pct >= 90  ? '#86efac'
+                    : pct >= 75  ? '#fbbf24'
+                    : '#C3EBF7'
+                  return <Cell key={i} fill={fill} />
+                })}
+                <LabelList dataKey="pctMes" position="top"
+                  formatter={v => v != null ? `${v}%` : ''}
+                  style={{ fontSize: mobile ? 8 : 10, fontWeight:700, fill:'#6B7280' }}
+                />
               </Bar>
             </BarChart>
           </ResponsiveContainer></div>
