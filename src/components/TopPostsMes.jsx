@@ -6,7 +6,10 @@ import { PostRankRow } from './PostRankRow'
 const MESES_FULL = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro']
 
 export default function TopPostsMes() {
-  const { getPostsDoMes, updatePost, deletePost, mesFiltro } = useStore()
+  const getPostsDoMes = useStore(s => s.getPostsDoMes)
+  const updatePost    = useStore(s => s.updatePost)
+  const deletePost    = useStore(s => s.deletePost)
+  const mesFiltro     = useStore(s => s.mesFiltro)
   const posts = getPostsDoMes()
   const [editTarget, setEditTarget] = useState(null)
 

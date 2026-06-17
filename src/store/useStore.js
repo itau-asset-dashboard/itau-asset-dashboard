@@ -7,6 +7,9 @@ import { normalizeTema } from '../utils/temas'
 // Posts com save em andamento — protege contra sync sobrescrever antes do upsert terminar
 const pendingUpdates = new Map() // id → { imageUrl }
 
+// Cache para getPostsDoMes — evita re-filtrar o array inteiro em cada render
+let _postsDoMesCache = { posts: null, mesFiltro: null, result: null }
+
 function normalizeDate(d) {
   if (!d) return d
   const parts = d.replace(/-/g, '/').split('/')
@@ -351,12 +354,17 @@ export const useStore = create(
       // ── Query ──────────────────────────────────────────
       getPostsDoMes: () => {
         const { posts, mesFiltro } = get()
-        if (!mesFiltro) return posts
-        return posts.filter((p) => {
+        if (
+          _postsDoMesCache.posts === posts &&
+          _postsDoMesCache.mesFiltro === mesFiltro
+        ) return _postsDoMesCache.result
+        const result = !mesFiltro ? posts : posts.filter((p) => {
           const parts = p.data_post?.split('/')
           if (!parts || parts.length < 3) return false
           return `${parts[1]}/${parts[2]}` === mesFiltro
         })
+        _postsDoMesCache = { posts, mesFiltro, result }
+        return result
       },
 
       // Meta mensal ajustada:

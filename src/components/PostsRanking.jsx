@@ -27,7 +27,11 @@ function parseDate(d) {
 }
 
 export default function PostsRanking() {
-  const { getPostsDoMes, posts: allPosts, updatePost, deletePost, isEditMode } = useStore()
+  const getPostsDoMes = useStore(s => s.getPostsDoMes)
+  const allPosts      = useStore(s => s.posts)
+  const updatePost    = useStore(s => s.updatePost)
+  const deletePost    = useStore(s => s.deletePost)
+  const isEditMode    = useStore(s => s.isEditMode)
   const mobile = useIsMobile()
 
   const [search, setSearch]         = useState('')

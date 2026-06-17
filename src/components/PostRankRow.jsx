@@ -2,6 +2,7 @@
  * Componentes reutilizáveis para rankings de posts.
  * Usados em TopPostsMes, ETFsView, AnnualView, etc.
  */
+import { memo } from 'react'
 import { Film, LayoutPanelLeft, Image } from 'lucide-react'
 
 function fmt(n) {
@@ -58,7 +59,7 @@ export function PositionPill({ i }) {
 }
 
 // Linha padrão de ranking de post
-export function PostRankRow({ post, i, maxVal, firstColor = '#F97316', onClick }) {
+export const PostRankRow = memo(function PostRankRow({ post, i, maxVal, firstColor = '#F97316', onClick }) {
   const color    = TIPO_COLOR[post.tipo] || '#0EA5E9'
   const pct      = maxVal > 0 ? ((post.contas_alcancadas || 0) / maxVal) * 100 : 0
   const barColor = i === 0 ? firstColor : color
@@ -102,4 +103,4 @@ export function PostRankRow({ post, i, maxVal, firstColor = '#F97316', onClick }
       </div>
     </div>
   )
-}
+})
