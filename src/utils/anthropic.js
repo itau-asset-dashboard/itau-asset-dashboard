@@ -234,7 +234,9 @@ Retorne APENAS JSON válido, sem markdown:
   { "icone": "📊", "titulo": "título direto", "texto": "análise com dados reais e recomendação" },
   { "icone": "📈", "titulo": "título direto", "texto": "análise com dados reais e recomendação" },
   { "icone": "💡", "titulo": "título direto", "texto": "análise com dados reais e recomendação" }
-]`
+]
+
+IMPORTANTE: títulos em sentence case — só a primeira palavra em maiúscula. Exemplo correto: "Carrossel lidera alcance em maio". Errado: "Carrossel Lidera Alcance Em Maio".`
       }]
     })
   })
