@@ -195,19 +195,15 @@ export async function generateInsights(posts, apiKey, stories = [], metaAnual = 
       'anthropic-dangerous-direct-browser-access': 'true',
     },
     body: JSON.stringify({
-      model: 'claude-sonnet-4-6',
-      max_tokens: 2000,
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: 1200,
       messages: [{
         role: 'user',
-        content: `Você é uma especialista sênior em redes sociais para o mercado financeiro, responsável pela performance do Instagram @itauasset da Itaú Asset Management.
+        content: `Você é uma analista de social media sênior para o mercado financeiro, avaliando a performance do Instagram @itauasset da Itaú Asset Management.
 
-Analise os dados abaixo e gere EXATAMENTE 3 insights estratégicos em português brasileiro, cada um com um ângulo diferente.
-
-DADOS COMPLETOS:
-- Total de posts cadastrados: ${posts.length}
-- Total de stories cadastrados: ${stories.length}
-- Meta anual: ${fmt(metaAnual)} contas alcançadas
-- Mês em foco: ${mesFiltro}
+DADOS:
+- Posts cadastrados: ${posts.length} | Stories: ${stories.length}
+- Meta anual: ${fmt(metaAnual)} contas | Mês de referência: ${mesFiltro}
 
 EVOLUÇÃO MENSAL DE POSTS:
 ${JSON.stringify(resumoMensal, null, 2)}
@@ -215,7 +211,7 @@ ${JSON.stringify(resumoMensal, null, 2)}
 EVOLUÇÃO MENSAL DE STORIES:
 ${JSON.stringify(resumoStoriesMensal, null, 2)}
 
-TODOS OS POSTS (dados individuais):
+POSTS INDIVIDUAIS:
 ${JSON.stringify(posts.map(p => ({
   nome: p.nome, data: p.data_post, tipo: p.tipo,
   temas: Array.isArray(p.tema) ? p.tema.join(', ') : p.tema,
@@ -224,19 +220,20 @@ ${JSON.stringify(posts.map(p => ({
   compartilhamentos: p.compartilhamentos,
 })), null, 2)}
 
-Cubra obrigatoriamente ângulos distintos entre:
-- Qual formato de post (Carrossel, Reels, Foto estática) traz mais resultado e por quê
-- Quais temas geram mais alcance ou engajamento
-- Tendência de crescimento ou queda ao longo dos meses
-- Comparação feed vs stories
-- Recomendação estratégica concreta para o próximo período
+Gere EXATAMENTE 3 insights analíticos, cada um com ângulo diferente (formato, tema, tendência ou comparação feed vs stories).
 
-Para cada insight: título direto + texto de 2 a 3 frases com dados reais e conclusão acionável.
+REGRAS DE TOM — siga à risca:
+- Tom calmo, analítico e construtivo — como um relatório executivo
+- PROIBIDO usar linguagem dramática ou alarmista: não use "colapso", "queda livre", "alarmante", "preocupante", "crítico", "urgente", "grave", "fracasso", ou equivalentes
+- Variações negativas são "oportunidade de melhoria", "resultado abaixo da média", "tendência de queda moderada" — nunca catástrofes
+- Cite números reais e termine com recomendação concreta e neutra
+- 2 a 3 frases por insight
 
-Retorne APENAS um JSON válido com exatamente 3 objetos:
+Retorne APENAS JSON válido, sem markdown:
 [
-  { "icone": "📈", "titulo": "título curto", "texto": "insight com dados reais e recomendação" },
-  ...
+  { "icone": "📊", "titulo": "título direto", "texto": "análise com dados reais e recomendação" },
+  { "icone": "📈", "titulo": "título direto", "texto": "análise com dados reais e recomendação" },
+  { "icone": "💡", "titulo": "título direto", "texto": "análise com dados reais e recomendação" }
 ]`
       }]
     })
