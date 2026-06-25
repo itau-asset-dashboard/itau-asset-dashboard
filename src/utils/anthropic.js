@@ -199,7 +199,7 @@ export async function generateInsights(posts, apiKey, stories = [], metaAnual = 
       max_tokens: 1200,
       messages: [{
         role: 'user',
-        content: `Você é uma analista de social media sênior para o mercado financeiro, avaliando a performance do Instagram @itauasset da Itaú Asset Management.
+        content: [{ type: 'text', cache_control: { type: 'ephemeral' }, text: `Você é uma analista de social media sênior para o mercado financeiro, avaliando a performance do Instagram @itauasset da Itaú Asset Management.
 
 DADOS:
 - Posts cadastrados: ${posts.length} | Stories: ${stories.length}
@@ -236,7 +236,7 @@ Retorne APENAS JSON válido, sem markdown:
   { "icone": "💡", "titulo": "título direto", "texto": "análise com dados reais e recomendação" }
 ]
 
-IMPORTANTE: títulos em sentence case — só a primeira palavra em maiúscula. Exemplo correto: "Carrossel lidera alcance em maio". Errado: "Carrossel Lidera Alcance Em Maio".`
+IMPORTANTE: títulos em sentence case — só a primeira palavra em maiúscula. Exemplo correto: "Carrossel lidera alcance em maio". Errado: "Carrossel Lidera Alcance Em Maio".` }]
       }]
     })
   })
@@ -469,9 +469,9 @@ INSTRUÇÕES DE RESPOSTA
       'anthropic-dangerous-direct-browser-access': 'true',
     },
     body: JSON.stringify({
-      model: 'claude-sonnet-4-6',
-      max_tokens: 2048,
-      system: systemPrompt,
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: 1024,
+      system: [{ type: 'text', text: systemPrompt, cache_control: { type: 'ephemeral' } }],
       messages: messages.map(m => ({ role: m.role, content: m.content })),
     })
   })
