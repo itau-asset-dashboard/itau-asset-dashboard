@@ -8,7 +8,7 @@ const TEMA_MIGRATION = {
 export const TEMAS_VALIDOS = [
   'Carreira','ETFs','Análises econômicas','Trends','Fundos',
   'Performance em destaque','ESG','Ring the bell','Dump','Live',
-  'Dividendos','Premiações','Mind Asset','Eventos','Educacional',
+  'Dividendos','Premiações','Mind Asset','Eventos','Educacional','Um dia com',
 ]
 
 /**
