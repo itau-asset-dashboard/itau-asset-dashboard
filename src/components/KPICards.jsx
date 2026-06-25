@@ -95,17 +95,6 @@ export default function KPICards() {
           }}>
             {sub}
           </p>
-          {/* Ícone — só desktop */}
-          {!mobile && (
-            <div style={{
-              position: 'absolute', top: 18, right: 18,
-              width: 30, height: 30, borderRadius: 8,
-              background: iconBg,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-            }}>
-              <Icon size={14} color={accent} strokeWidth={2.1} />
-            </div>
-          )}
         </div>
       ))}
     </div>
