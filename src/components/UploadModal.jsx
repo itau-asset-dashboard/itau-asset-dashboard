@@ -21,6 +21,7 @@ export const TEMAS = [
   'Premiações',
   'Mind Asset',
   'Eventos',
+  'Educacional',
 ]
 
 const NUM_FIELDS = [
