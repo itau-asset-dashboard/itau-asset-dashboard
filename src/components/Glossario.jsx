@@ -1,4 +1,4 @@
-import { Users, Eye, Heart, MessageCircle, Bookmark, Share2, Clock, UserPlus, AlertCircle, CheckCircle, Play, Zap, UserCheck } from 'lucide-react'
+import { Users, Eye, Heart, MessageCircle, Bookmark, Share2, Clock, UserPlus, AlertCircle, CheckCircle, Play, Zap, UserCheck, Monitor, PlayCircle, FileText } from 'lucide-react'
 
 const FEED = [
   { termo: 'Contas alcançadas',   icon: Users,         color: '#FF6200', bg: 'rgba(255,98,0,0.08)',    definicao: 'Número de contas únicas do Instagram que viram este post pelo menos uma vez. Essa métrica é estimada pelo Instagram.' },
@@ -17,6 +17,13 @@ const STORIES = [
   { termo: 'Visualizações',       icon: Play,      color: '#1C252E', bg: 'rgba(195,235,247,0.25)',  definicao: 'O número de vezes que seu story foi reproduzido ou exibido.' },
   { termo: 'Interações com stories', icon: Zap,    color: '#FF6200', bg: 'rgba(255,98,0,0.08)', definicao: 'O número de curtidas, respostas e compartilhamentos do seu story menos o número de descurtidas. Essa métrica está em desenvolvimento pelo Instagram.' },
   { termo: 'Atividade do perfil', icon: UserCheck, color: '#1C252E', bg: 'rgba(28,37,46,0.06)', definicao: 'O número de ações que as pessoas realizam quando visitam seu perfil depois de interagir com seu story. Essas ações incluem visitas ao perfil, cliques no link da bio e interações em outras publicações do feed.' },
+]
+
+const LINKEDIN = [
+  { termo: 'Impressões',             icon: Monitor,     color: '#0A66C2', bg: 'rgba(10,102,194,0.08)',  definicao: 'Número de vezes que a publicação foi exibida para membros do LinkedIn, independentemente de cliques ou interações.' },
+  { termo: 'Visualizações',          icon: Eye,         color: '#0A66C2', bg: 'rgba(10,102,194,0.06)',  definicao: 'Contabilizada quando a publicação estiver em pelo menos 50% da tela ou quando for clicada, o que ocorrer primeiro.' },
+  { termo: 'Visualizações de vídeo', icon: PlayCircle,  color: '#0A66C2', bg: 'rgba(10,102,194,0.08)',  definicao: 'Dois ou mais segundos de reprodução enquanto o vídeo estiver pelo menos 50% na tela, ou um clique no CTA de vídeos patrocinados, o que vier primeiro.' },
+  { termo: 'Visualizações de artigo',icon: FileText,    color: '#0A66C2', bg: 'rgba(10,102,194,0.06)',  definicao: 'Contada quando um usuário carrega a página do artigo completamente. Inclui qualquer site ou aplicativo a partir do qual ele clicou no link.' },
 ]
 
 function Section({ title, items }) {
@@ -48,10 +55,18 @@ export default function Glossario() {
     <div style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
       <div>
         <h2 style={{ color: '#1C252E', fontSize: 15, fontWeight: 700 }}>Glossário de métricas</h2>
-        <p style={{ color: '#8A9BB0', fontSize: 12, marginTop: 2 }}>Definições oficiais do Instagram para feed e stories</p>
+        <p style={{ color: '#8A9BB0', fontSize: 12, marginTop: 2 }}>Definições oficiais de métricas do Instagram e LinkedIn</p>
       </div>
-      <Section title="Feed" items={FEED} />
-      <Section title="Stories" items={STORIES} />
+      <div>
+        <p style={{ color:'#FF6200', fontSize:11, fontWeight:700, letterSpacing:'0.08em', textTransform:'uppercase', marginBottom:16 }}>Instagram</p>
+        <Section title="Feed" items={FEED} />
+        <div style={{ marginTop:24 }}/>
+        <Section title="Stories" items={STORIES} />
+      </div>
+      <div>
+        <p style={{ color:'#0A66C2', fontSize:11, fontWeight:700, letterSpacing:'0.08em', textTransform:'uppercase', marginBottom:16 }}>LinkedIn</p>
+        <Section title="Publicações" items={LINKEDIN} />
+      </div>
     </div>
   )
 }
