@@ -20,12 +20,11 @@ const STORIES = [
 ]
 
 const LINKEDIN = [
-  { termo: 'Impressões',             icon: Monitor,     color: '#0A66C2', bg: 'rgba(10,102,194,0.08)',  definicao: 'Número de vezes que a publicação foi exibida para membros do LinkedIn, independentemente de cliques ou interações.' },
-  { termo: 'Visualizações',          icon: Eye,         color: '#0A66C2', bg: 'rgba(10,102,194,0.06)',  definicao: 'Contabilizada quando a publicação estiver em pelo menos 50% da tela ou quando for clicada, o que ocorrer primeiro.' },
-  { termo: 'Visualizações de vídeo', icon: PlayCircle,  color: '#0A66C2', bg: 'rgba(10,102,194,0.08)',  definicao: 'Dois ou mais segundos de reprodução enquanto o vídeo estiver pelo menos 50% na tela, ou um clique no CTA de vídeos patrocinados, o que vier primeiro.' },
-  { termo: 'Visualizações de artigo',icon: FileText,          color: '#0A66C2', bg: 'rgba(10,102,194,0.06)',  definicao: 'Contada quando um usuário carrega a página do artigo completamente. Inclui qualquer site ou aplicativo a partir do qual ele clicou no link.' },
-  { termo: 'Cliques',                icon: MousePointerClick, color: '#0A66C2', bg: 'rgba(10,102,194,0.08)',  definicao: 'Cliques na publicação, incluindo cliques no conteúdo, no nome do autor ou na empresa.' },
-  { termo: 'CTR',                    icon: Percent,           color: '#0A66C2', bg: 'rgba(10,102,194,0.06)',  definicao: 'Taxa de cliques (Click-Through Rate). Calculado como cliques divididos por impressões.' },
+  { termo: 'Impressões',             icon: Monitor,          color: '#0A66C2', bg: 'rgba(10,102,194,0.08)', definicao: 'Visualizações quando a publicação estiver em pelo menos 50% da tela ou quando for clicada, o que ocorrer primeiro.' },
+  { termo: 'Visualizações de vídeo', icon: PlayCircle,       color: '#0A66C2', bg: 'rgba(10,102,194,0.08)', definicao: 'Dois ou mais segundos de reprodução enquanto o vídeo estiver pelo menos 50% na tela, ou um clique no CTA de vídeos patrocinados, o que vier primeiro.' },
+  { termo: 'Visualizações de artigo',icon: FileText,         color: '#0A66C2', bg: 'rgba(10,102,194,0.06)', definicao: 'Cada visualização de artigo é contada quando um usuário carrega a página do artigo completamente. Isso inclui qualquer site ou aplicativo a partir do qual ele clicou no link.' },
+  { termo: 'Cliques',                icon: MousePointerClick,color: '#0A66C2', bg: 'rgba(10,102,194,0.08)', definicao: 'Cliques na publicação, incluindo cliques no conteúdo, no nome do autor ou na empresa.' },
+  { termo: 'CTR',                    icon: Percent,          color: '#0A66C2', bg: 'rgba(10,102,194,0.06)', definicao: 'Taxa de cliques (Click-Through Rate). Calculado como cliques divididos por impressões.' },
 ]
 
 function Section({ title, items }) {
