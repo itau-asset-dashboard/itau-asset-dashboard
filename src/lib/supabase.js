@@ -206,9 +206,9 @@ export async function uploadLinkedinImage(postId, dataUrl) {
 const LINKEDIN_COLUMNS = ['id','nome','tema','data_post','impressoes','visualizacoes','cliques','ctr','reacoes','status','image_url']
 
 export async function upsertLinkedinPost(post) {
-  const { imageData, imageUrl, imagePreview, ...rest } = post
+  const { imageData, imageUrl, imagePreview, image_url, ...rest } = post
   const clean = Object.fromEntries(Object.entries(rest).filter(([k]) => LINKEDIN_COLUMNS.includes(k)))
-  const { error } = await supabase.from('linkedin_posts').upsert({ ...clean, image_url: imageUrl || null })
+  const { error } = await supabase.from('linkedin_posts').upsert({ ...clean, image_url: image_url || imageUrl || null })
   if (error) throw error
 }
 
