@@ -33,12 +33,12 @@ export default function LinkedinView() {
   const mobile = useIsMobile()
   const [viewMode, setViewMode] = useState('anual')
   const [mesSel, setMesSel] = useState(() => new Date().getMonth())
-  const mesFiltro = `${String(mesSel+1).padStart(2,'0')}/${ano}`
   const [uploadOpen, setUploadOpen] = useState(false)
   const [editPost, setEditPost]     = useState(null)
   const [confirmDel, setConfirmDel] = useState(null)
 
-  const ano = mesFiltro?.split('/')?.[1] || '2026'
+  const ano = new Date().getFullYear().toString()
+  const mesFiltro = `${String(mesSel+1).padStart(2,'0')}/${ano}`
 
   // Posts do ano
   const postsAno = linkedinPosts.filter(p => mesKey(p.data_post)?.endsWith(ano))
