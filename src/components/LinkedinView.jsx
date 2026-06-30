@@ -29,9 +29,13 @@ function mesKey(dateStr) {
 }
 
 export default function LinkedinView() {
-  const { linkedinPosts, addLinkedinPost, updateLinkedinPost, deleteLinkedinPost, mesFiltro, isEditMode } = useStore()
+  const { linkedinPosts, addLinkedinPost, updateLinkedinPost, deleteLinkedinPost, isEditMode } = useStore()
   const mobile = useIsMobile()
   const [viewMode, setViewMode] = useState('anual')
+  const [mesFiltro, setMesFiltro] = useState(() => {
+    const now = new Date()
+    return `${String(now.getMonth()+1).padStart(2,'0')}/${now.getFullYear()}`
+  })
   const [uploadOpen, setUploadOpen] = useState(false)
   const [editPost, setEditPost]     = useState(null)
   const [confirmDel, setConfirmDel] = useState(null)
@@ -98,19 +102,30 @@ export default function LinkedinView() {
   return (
     <div style={{ display:'flex', flexDirection:'column', gap:16 }}>
 
-      {/* Header com toggle + botão novo */}
+      {/* Header com toggle + filtro de mês + botão novo */}
       <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', gap:12, flexWrap:'wrap' }}>
-        <div style={{ display:'flex', background:'#F4F6F8', borderRadius:12, padding:3, gap:2 }}>
-          {['anual','mensal'].map(mode => (
-            <button key={mode} onClick={() => setViewMode(mode)} style={{
-              padding: mobile ? '5px 14px' : '6px 18px', borderRadius:10, border:'none', cursor:'pointer',
-              fontSize:13, fontWeight: viewMode===mode ? 700 : 400,
-              background: viewMode===mode ? '#1C252E' : 'transparent',
-              color: viewMode===mode ? '#C3EBF7' : '#5A7080', transition:'all 0.15s',
-            }}>
-              {mode === 'anual' ? 'Anual' : 'Mensal'}
-            </button>
-          ))}
+        <div style={{ display:'flex', alignItems:'center', gap:8 }}>
+          <div style={{ display:'flex', background:'#F4F6F8', borderRadius:12, padding:3, gap:2 }}>
+            {['anual','mensal'].map(mode => (
+              <button key={mode} onClick={() => setViewMode(mode)} style={{
+                padding: mobile ? '5px 14px' : '6px 18px', borderRadius:10, border:'none', cursor:'pointer',
+                fontSize:13, fontWeight: viewMode===mode ? 700 : 400,
+                background: viewMode===mode ? '#1C252E' : 'transparent',
+                color: viewMode===mode ? '#C3EBF7' : '#5A7080', transition:'all 0.15s',
+              }}>
+                {mode === 'anual' ? 'Anual' : 'Mensal'}
+              </button>
+            ))}
+          </div>
+          {viewMode === 'mensal' && (
+            <select value={mesFiltro} onChange={e => setMesFiltro(e.target.value)}
+              style={{ background:'#fff', border:'1.5px solid #EDEFF2', borderRadius:10, padding:'7px 10px', fontSize:13, color:'#1C252E', cursor:'pointer', outline:'none', fontFamily:'DM Sans, sans-serif' }}>
+              {MESES_FULL.map((label, i) => {
+                const val = `${String(i+1).padStart(2,'0')}/${ano}`
+                return <option key={val} value={val}>{label} {ano}</option>
+              })}
+            </select>
+          )}
         </div>
         {isEditMode && (
           <button onClick={() => setUploadOpen(true)} style={{
