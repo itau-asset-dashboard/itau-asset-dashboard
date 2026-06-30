@@ -4,6 +4,7 @@ import { TEMAS } from './UploadModal'
 import { extractLinkedinFromImage } from '../utils/anthropic'
 import { useStore } from '../store/useStore'
 import { uploadLinkedinImage } from '../lib/supabase'
+import ImageLightbox from './ImageLightbox'
 
 const TIPOS = ['Imagem', 'Vídeo', 'Artigo', 'Documento']
 
@@ -176,7 +177,7 @@ const SingleLinkedinModal = forwardRef(function SingleLinkedinModal(
   const [loading, setLoading]     = useState(false)
   const [saving, setSaving]       = useState(false)
   const [saved, setSaved]         = useState(false)
-  const [lightbox, setLightbox]   = useState(false)
+  const [lightbox, setLightbox]   = useState(null)
 
   useImperativeHandle(ref, () => ({
     getSnapshot: () => ({ form, preview }),
@@ -266,7 +267,7 @@ const SingleLinkedinModal = forwardRef(function SingleLinkedinModal(
           </label>
         ) : (
           <div style={{ position:'relative' }}>
-            <img src={preview} alt="preview" style={{ width:'100%', borderRadius:10, maxHeight:180, objectFit:'cover', cursor:'pointer' }} onClick={() => setLightbox(true)}/>
+            <img src={preview} alt="preview" style={{ width:'100%', borderRadius:10, maxHeight:180, objectFit:'cover', cursor:'pointer' }} onClick={() => setLightbox(preview)}/>
             <label style={{ position:'absolute', bottom:8, right:8, background:'rgba(0,0,0,0.55)', borderRadius:8, padding:'5px 10px', cursor:'pointer', display:'flex', alignItems:'center', gap:5 }}>
               <Upload size={12} color="#fff"/>
               <span style={{ color:'#fff', fontSize:11 }}>Trocar</span>
@@ -363,11 +364,7 @@ const SingleLinkedinModal = forwardRef(function SingleLinkedinModal(
         {saved ? <><Check size={16}/> {btnLabel}</> : btnLabel}
       </button>
 
-      {lightbox && (
-        <div onClick={() => setLightbox(false)} style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.85)', zIndex:600, display:'flex', alignItems:'center', justifyContent:'center' }}>
-          <img src={preview} alt="full" style={{ maxWidth:'95vw', maxHeight:'90vh', borderRadius:12 }}/>
-        </div>
-      )}
+      {lightbox && <ImageLightbox src={lightbox} onClose={() => setLightbox(null)} title={form.nome || 'LinkedIn'}/>}
     </div>
   )
 })
