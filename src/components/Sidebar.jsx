@@ -21,7 +21,7 @@ const NAV_GROUPS = [
   {
     label: 'PARCERIAS',
     items: [
-      { id: 'navarro', icon: LineChart, label: 'Navarro', disabled: true },
+      { id: 'navarro', icon: LineChart, label: 'Navarro (em breve)', disabled: true },
     ],
   },
   {
