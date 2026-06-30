@@ -103,14 +103,21 @@ export async function extractLinkedinFromImage(base64, mediaType, apiKey) {
           { type: 'image', source: { type: 'base64', media_type: mediaType, data: base64 } },
           {
             type: 'text',
-            text: `Você é um assistente que extrai métricas de prints de posts do LinkedIn.
+            text: `Você é um assistente que extrai métricas de prints de posts do LinkedIn Analytics.
 
-A tela de analytics de um post LinkedIn mostra métricas como:
-- Impressões — quantas vezes o post apareceu no feed
-- Visualizações — quantas vezes foi visualizado (pode aparecer como "views")
-- Cliques — cliques no post, link ou no perfil
-- CTR — taxa de cliques (click-through rate), em percentual como "1,23%" ou "1.23%"
-- Reações — curtidas, amei, parabéns, etc. (soma total)
+ATENÇÃO: A ordem padrão das métricas na tela do LinkedIn é:
+1. IMPRESSÕES (Impressions) — número MAIOR, geralmente milhares. É quantas vezes o post apareceu no feed. Aparece primeiro/mais destacado.
+2. VISUALIZAÇÕES (Views/Visualizações de vídeo) — número menor que impressões. Só existe em posts de vídeo ou artigo.
+3. CLIQUES (Clicks) — número de cliques no post, link ou perfil. Geralmente menor que impressões.
+4. CTR — percentual de cliques, ex: "1,91%" ou "1.91%". Sempre um número pequeno com casas decimais.
+5. REAÇÕES (Reactions/Curtidas) — soma de curtidas, amei, etc.
+
+REGRAS IMPORTANTES:
+- Impressões é SEMPRE o maior número absoluto.
+- CTR é SEMPRE um percentual pequeno (ex: 1,91 → retorne 1.91).
+- Não confunda impressões com visualizações. Leia o RÓTULO ao lado do número na imagem.
+- Se um rótulo diz "Impressões" ou "Impressions", mapeie para "impressoes".
+- Se um rótulo diz "Cliques" ou "Clicks", mapeie para "cliques".
 
 Retorne APENAS um JSON válido (sem markdown, sem texto fora do JSON):
 {
@@ -121,7 +128,7 @@ Retorne APENAS um JSON válido (sem markdown, sem texto fora do JSON):
   "ctr": número decimal ou null,
   "reacoes": número inteiro ou null
 }
-Use null para qualquer campo não encontrado. Não invente valores. CTR deve ser número decimal (ex: 1.23 para 1,23%).`
+Use null para qualquer campo não encontrado na imagem. Não invente valores.`
           }
         ]
       }]
