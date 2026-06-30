@@ -32,10 +32,8 @@ export default function LinkedinView() {
   const { linkedinPosts, addLinkedinPost, updateLinkedinPost, deleteLinkedinPost, isEditMode } = useStore()
   const mobile = useIsMobile()
   const [viewMode, setViewMode] = useState('anual')
-  const [mesFiltro, setMesFiltro] = useState(() => {
-    const now = new Date()
-    return `${String(now.getMonth()+1).padStart(2,'0')}/${now.getFullYear()}`
-  })
+  const [mesSel, setMesSel] = useState(() => new Date().getMonth())
+  const mesFiltro = `${String(mesSel+1).padStart(2,'0')}/${ano}`
   const [uploadOpen, setUploadOpen] = useState(false)
   const [editPost, setEditPost]     = useState(null)
   const [confirmDel, setConfirmDel] = useState(null)
@@ -102,14 +100,15 @@ export default function LinkedinView() {
   return (
     <div style={{ display:'flex', flexDirection:'column', gap:16 }}>
 
-      {/* Header com toggle + filtro de mês + botão novo */}
-      <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', gap:12, flexWrap:'wrap' }}>
-        <div style={{ display:'flex', alignItems:'center', gap:8 }}>
-          <div style={{ display:'flex', background:'#F4F6F8', borderRadius:12, padding:3, gap:2 }}>
+      {/* Header */}
+      <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
+        <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', gap:12, flexWrap:'wrap' }}>
+          {/* Toggle */}
+          <div style={{ display:'flex', background:'rgba(28,37,46,0.06)', borderRadius:12, padding:3, gap:2 }}>
             {['anual','mensal'].map(mode => (
               <button key={mode} onClick={() => setViewMode(mode)} style={{
                 padding: mobile ? '5px 14px' : '6px 18px', borderRadius:10, border:'none', cursor:'pointer',
-                fontSize:13, fontWeight: viewMode===mode ? 700 : 400,
+                fontSize: mobile ? 12 : 13, fontWeight: viewMode===mode ? 700 : 400,
                 background: viewMode===mode ? '#1C252E' : 'transparent',
                 color: viewMode===mode ? '#C3EBF7' : '#5A7080', transition:'all 0.15s',
               }}>
@@ -117,24 +116,36 @@ export default function LinkedinView() {
               </button>
             ))}
           </div>
-          {viewMode === 'mensal' && (
-            <select value={mesFiltro} onChange={e => setMesFiltro(e.target.value)}
-              style={{ background:'#fff', border:'1.5px solid #EDEFF2', borderRadius:10, padding:'7px 10px', fontSize:13, color:'#1C252E', cursor:'pointer', outline:'none', fontFamily:'DM Sans, sans-serif' }}>
-              {MESES_FULL.map((label, i) => {
-                const val = `${String(i+1).padStart(2,'0')}/${ano}`
-                return <option key={val} value={val}>{label} {ano}</option>
-              })}
-            </select>
+          {isEditMode && (
+            <button onClick={() => setUploadOpen(true)} style={{
+              background:'#0A66C2', color:'#fff', border:'none', borderRadius:10,
+              padding:'8px 14px', fontSize:13, fontWeight:600, cursor:'pointer',
+              display:'flex', alignItems:'center', gap:5,
+            }}>
+              <Plus size={15}/> Novo post
+            </button>
           )}
         </div>
-        {isEditMode && (
-          <button onClick={() => setUploadOpen(true)} style={{
-            background:'#0A66C2', color:'#fff', border:'none', borderRadius:10,
-            padding:'8px 14px', fontSize:13, fontWeight:600, cursor:'pointer',
-            display:'flex', alignItems:'center', gap:5,
+
+        {/* Grade de meses (só no modo mensal) */}
+        {viewMode === 'mensal' && (
+          <div style={{
+            display:'grid', gridTemplateColumns:'repeat(12, 1fr)', gap:6,
+            background:'rgba(10,102,194,0.06)', borderRadius:14, padding:6,
           }}>
-            <Plus size={15}/> Novo post
-          </button>
+            {MESES_LABEL.map((m, i) => (
+              <button key={i} onClick={() => setMesSel(i)}
+                style={{
+                  padding:'7px 4px', borderRadius:10, border:'none', cursor:'pointer',
+                  fontSize:12, fontWeight: mesSel===i ? 700 : 500,
+                  background: mesSel===i ? '#0A66C2' : 'transparent',
+                  color: mesSel===i ? '#fff' : '#1C252E',
+                  transition:'all 0.15s', textAlign:'center',
+                }}>
+                {m}
+              </button>
+            ))}
+          </div>
         )}
       </div>
 
