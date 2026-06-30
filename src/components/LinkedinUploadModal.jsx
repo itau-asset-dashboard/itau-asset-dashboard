@@ -161,7 +161,7 @@ const SingleLinkedinModal = forwardRef(function SingleLinkedinModal(
     if (!Array.isArray(base.tema)) base.tema = []
     return base
   })
-  const [preview, setPreview]     = useState(initialPreview || initial?.image_url || null)
+  const [preview, setPreview]     = useState(initialPreview || initial?.image_url || initial?.imageUrl || null)
   const [imageData, setImageData] = useState(() => {
     if (initialPreview?.startsWith('data:')) return initialPreview.split(',')[1]
     return null
