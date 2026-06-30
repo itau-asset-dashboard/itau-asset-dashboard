@@ -149,8 +149,17 @@ const SingleLinkedinModal = forwardRef(function SingleLinkedinModal(
     return base
   })
   const [preview, setPreview]     = useState(initialPreview || initial?.image_url || null)
-  const [imageData, setImageData] = useState(null)
-  const [mediaType, setMediaType] = useState('image/jpeg')
+  const [imageData, setImageData] = useState(() => {
+    if (initialPreview?.startsWith('data:')) return initialPreview.split(',')[1]
+    return null
+  })
+  const [mediaType, setMediaType] = useState(() => {
+    if (initialPreview?.startsWith('data:')) {
+      const m = initialPreview.match(/^data:([^;]+);/)
+      return m?.[1] || 'image/jpeg'
+    }
+    return 'image/jpeg'
+  })
   const [loading, setLoading]     = useState(false)
   const [saving, setSaving]       = useState(false)
   const [saved, setSaved]         = useState(false)
