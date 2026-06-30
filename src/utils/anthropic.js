@@ -103,23 +103,25 @@ export async function extractLinkedinFromImage(base64, mediaType, apiKey) {
           { type: 'image', source: { type: 'base64', media_type: mediaType, data: base64 } },
           {
             type: 'text',
-            text: `Você é um assistente que extrai métricas de prints de posts do LinkedIn Analytics.
+            text: `Você é um assistente que extrai métricas de prints do LinkedIn Analytics.
 
-ATENÇÃO: A ordem padrão das métricas na tela do LinkedIn é:
-1. IMPRESSÕES (Impressions) — número MAIOR, geralmente milhares. É quantas vezes o post apareceu no feed. Aparece primeiro/mais destacado.
-2. VISUALIZAÇÕES (Views/Visualizações de vídeo) — número menor que impressões. Só existe em posts de vídeo ou artigo.
-3. CLIQUES (Clicks) — número de cliques no post, link ou perfil. Geralmente menor que impressões.
-4. CTR — percentual de cliques, ex: "1,91%" ou "1.91%". Sempre um número pequeno com casas decimais.
-5. REAÇÕES (Reactions/Curtidas) — soma de curtidas, amei, etc.
+O LinkedIn exibe as métricas em uma LINHA HORIZONTAL nesta ordem exata:
+IMPRESSÕES | VISUALIZAÇÕES | CLIQUES | CTR | REAÇÕES
 
-REGRAS IMPORTANTES:
-- Impressões é SEMPRE o maior número absoluto.
-- CTR é SEMPRE um percentual pequeno (ex: 1,91 → retorne 1.91).
-- Não confunda impressões com visualizações. Leia o RÓTULO ao lado do número na imagem.
-- Se um rótulo diz "Impressões" ou "Impressions", mapeie para "impressoes".
-- Se um rótulo diz "Cliques" ou "Clicks", mapeie para "cliques".
+Exemplos reais de como aparecem:
+- "3.392  2.253  513  15,12%  182" → impressoes=3392, visualizacoes=2253, cliques=513, ctr=15.12, reacoes=182
+- "2.256  698  43  1,91%  —"     → impressoes=2256, visualizacoes=698, cliques=43, ctr=1.91, reacoes=null
 
-Retorne APENAS um JSON válido (sem markdown, sem texto fora do JSON):
+REGRAS:
+1. A PRIMEIRA coluna numérica (maior número) = impressoes.
+2. A SEGUNDA coluna = visualizacoes (pode não existir em posts sem vídeo/artigo).
+3. A coluna com "%" = ctr (retorne como decimal: 15,12% → 15.12).
+4. A ÚLTIMA coluna inteira = reacoes.
+5. Use pontos como separador de milhar (3.392 = 3392).
+6. Se um número estiver em azul/destaque, não muda sua posição — a ordem permanece igual.
+7. A data aparece geralmente como "24/06/2026" ou "jun 2026" — extraia no formato DD/MM/AAAA.
+
+Retorne APENAS JSON válido (sem markdown):
 {
   "data_post": "DD/MM/AAAA ou null",
   "impressoes": número inteiro ou null,
@@ -128,7 +130,7 @@ Retorne APENAS um JSON válido (sem markdown, sem texto fora do JSON):
   "ctr": número decimal ou null,
   "reacoes": número inteiro ou null
 }
-Use null para qualquer campo não encontrado na imagem. Não invente valores.`
+Não invente valores. Use null para campos não encontrados.`
           }
         ]
       }]
