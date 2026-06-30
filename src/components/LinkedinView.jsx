@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Plus, Edit2, Trash2, X, Check } from 'lucide-react'
+import { Plus, Trash2, ArrowUpDown, ArrowDown, ArrowUp } from 'lucide-react'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts'
 import { useStore } from '../store/useStore'
 import { useIsMobile } from '../utils/useIsMobile'
@@ -33,6 +33,8 @@ export default function LinkedinView() {
   const mobile = useIsMobile()
   const [viewMode, setViewMode] = useState('anual')
   const [mesSel, setMesSel] = useState(() => new Date().getMonth())
+  const [sortKey, setSortKey] = useState('impressoes')
+  const [sortDir, setSortDir] = useState(-1)
   const [uploadOpen, setUploadOpen] = useState(false)
   const [editPost, setEditPost]     = useState(null)
   const [confirmDel, setConfirmDel] = useState(null)
@@ -189,63 +191,98 @@ export default function LinkedinView() {
       )}
 
       {/* Ranking de posts */}
-      {basePosts.length > 0 && (
-        <div className="card" style={{ padding:0, overflow:'hidden' }}>
-          <div style={{ padding:'18px 20px 12px', borderBottom:'1px solid #F0F4F8' }}>
-            <p style={{ color:'#1C252E', fontSize:15, fontWeight:700 }}>
-              {viewMode === 'anual' ? `Posts ${ano}` : `Posts de ${mesFiltro}`} · ordenado por impressões
-            </p>
-          </div>
-          <div style={{ overflowX:'auto' }}>
-            <table style={{ width:'100%', borderCollapse:'collapse', minWidth: mobile ? 500 : 'auto' }}>
-              <thead>
-                <tr style={{ background:'#FAFBFC' }}>
-                  {['Post','Tipo','Data','Impressões','Visual.','Cliques','CTR','Reações',''].map(h => (
-                    <th key={h} style={{ padding:'10px 16px', color:'#8A9BB0', fontSize:10, fontWeight:600,
-                      textTransform:'uppercase', letterSpacing:'0.05em', textAlign:'left', whiteSpace:'nowrap' }}>{h}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {[...basePosts].sort((a,b)=>(b.impressoes||0)-(a.impressoes||0)).map((p,i) => (
-                  <tr key={p.id} style={{ borderTop:'1px solid #F5F7FA' }}>
-                    <td style={{ padding:'12px 16px', maxWidth:200 }}>
-                      <p style={{ color:'#1C252E', fontSize:13, fontWeight:600, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
-                        {i===0 && <span style={{ background:'rgba(255,98,0,0.1)', color:'#FF6200', borderRadius:4, padding:'1px 6px', fontSize:10, fontWeight:700, marginRight:6 }}>Top</span>}
-                        {p.nome || '—'}
-                      </p>
-                      {Array.isArray(p.tema) && p.tema.length > 0 && (
-                        <p style={{ color:'#B0BEC5', fontSize:11, marginTop:2 }}>{p.tema.join(' · ')}</p>
-                      )}
-                    </td>
-                    <td style={{ padding:'12px 16px', whiteSpace:'nowrap' }}>
-                      {p.tipo && <span style={{ background:'#F0F4F8', color:'#4A6272', borderRadius:6, padding:'2px 8px', fontSize:11, fontWeight:600 }}>{p.tipo}</span>}
-                    </td>
-                    <td style={{ padding:'12px 16px', color:'#9AAAB8', fontSize:12, whiteSpace:'nowrap' }}>{p.data_post || '—'}</td>
-                    <td style={{ padding:'12px 16px', color:'#0A66C2', fontSize:13, fontWeight:700, whiteSpace:'nowrap' }}>{fmtExato(p.impressoes)}</td>
-                    <td style={{ padding:'12px 16px', color:'#1C252E', fontSize:13, whiteSpace:'nowrap' }}>{fmtExato(p.visualizacoes)}</td>
-                    <td style={{ padding:'12px 16px', color:'#1C252E', fontSize:13, whiteSpace:'nowrap' }}>{fmtExato(p.cliques)}</td>
-                    <td style={{ padding:'12px 16px', color:'#1C252E', fontSize:13, whiteSpace:'nowrap' }}>{fmtCtr(p.ctr)}</td>
-                    <td style={{ padding:'12px 16px', color:'#1C252E', fontSize:13, whiteSpace:'nowrap' }}>{fmtExato(p.reacoes)}</td>
-                    <td style={{ padding:'12px 12px', whiteSpace:'nowrap' }}>
+      {basePosts.length > 0 && (() => {
+        function parseDate(d) {
+          if (!d) return 0
+          const [dd,mm,yyyy] = d.split('/'); return new Date(`${yyyy}-${mm}-${dd}`).getTime() || 0
+        }
+        function toggleSort(k) {
+          if (sortKey === k) setSortDir(d => -d)
+          else { setSortKey(k); setSortDir(-1) }
+        }
+        const SortIcon = ({ k }) => sortKey !== k
+          ? <ArrowUpDown size={11} color="#D0D8E0"/>
+          : sortDir === -1 ? <ArrowDown size={11} color="#0A66C2"/> : <ArrowUp size={11} color="#0A66C2"/>
+
+        const sorted = [...basePosts].sort((a,b) => {
+          if (sortKey === 'data_post') return sortDir * (parseDate(a.data_post) - parseDate(b.data_post))
+          return sortDir * ((a[sortKey]||0) - (b[sortKey]||0))
+        })
+        const topId = [...basePosts].sort((a,b)=>(b.impressoes||0)-(a.impressoes||0))[0]?.id
+
+        const Th = ({ k, children }) => (
+          <th onClick={() => toggleSort(k)} style={{ padding:'10px 16px', color: sortKey===k ? '#0A66C2' : '#8A9BB0',
+            fontSize:10, fontWeight:600, textTransform:'uppercase', letterSpacing:'0.05em',
+            cursor:'pointer', whiteSpace:'nowrap', textAlign:'left', userSelect:'none', background:'#FAFBFC' }}>
+            <div style={{ display:'flex', alignItems:'center', gap:4 }}>{children}<SortIcon k={k}/></div>
+          </th>
+        )
+
+        return (
+          <div className="card" style={{ padding:0, overflow:'hidden' }}>
+            <div style={{ padding:'18px 20px 12px', borderBottom:'1px solid #F0F4F8', display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+              <p style={{ color:'#1C252E', fontSize:15, fontWeight:700 }}>
+                {viewMode === 'anual' ? `Posts ${ano}` : `Posts de ${mesFiltro}`}
+                <span style={{ color:'#9AAAB8', fontWeight:400, fontSize:13 }}> · {sorted.length} publicações</span>
+              </p>
+            </div>
+            <div style={{ overflowX:'auto' }}>
+              <table style={{ width:'100%', borderCollapse:'collapse', minWidth: mobile ? 500 : 'auto' }}>
+                <thead>
+                  <tr>
+                    <th style={{ padding:'10px 16px', color:'#8A9BB0', fontSize:10, fontWeight:600, textTransform:'uppercase', letterSpacing:'0.05em', textAlign:'left', background:'#FAFBFC' }}>Post</th>
+                    <th style={{ padding:'10px 16px', color:'#8A9BB0', fontSize:10, fontWeight:600, textTransform:'uppercase', letterSpacing:'0.05em', textAlign:'left', background:'#FAFBFC' }}>Tipo</th>
+                    <Th k="data_post">Data</Th>
+                    <Th k="impressoes">Impressões</Th>
+                    <Th k="visualizacoes">Visual.</Th>
+                    <Th k="cliques">Cliques</Th>
+                    <Th k="ctr">CTR</Th>
+                    <Th k="reacoes">Reações</Th>
+                    {isEditMode && <th style={{ background:'#FAFBFC' }}/>}
+                  </tr>
+                </thead>
+                <tbody>
+                  {sorted.map(p => (
+                    <tr key={p.id}
+                      onClick={() => isEditMode && setEditPost(p)}
+                      style={{ borderTop:'1px solid #F5F7FA', cursor: isEditMode ? 'pointer' : 'default',
+                        transition:'background 0.1s' }}
+                      onMouseEnter={e => { if (isEditMode) e.currentTarget.style.background = '#F8FAFC' }}
+                      onMouseLeave={e => { e.currentTarget.style.background = '' }}>
+                      <td style={{ padding:'12px 16px', maxWidth:200 }}>
+                        <p style={{ color:'#1C252E', fontSize:13, fontWeight:600, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
+                          {p.id === topId && <span style={{ background:'rgba(255,98,0,0.1)', color:'#FF6200', borderRadius:4, padding:'1px 6px', fontSize:10, fontWeight:700, marginRight:6 }}>Top</span>}
+                          {p.nome || '—'}
+                        </p>
+                        {Array.isArray(p.tema) && p.tema.length > 0 && (
+                          <p style={{ color:'#B0BEC5', fontSize:11, marginTop:2 }}>{p.tema.join(' · ')}</p>
+                        )}
+                      </td>
+                      <td style={{ padding:'12px 16px', whiteSpace:'nowrap' }}>
+                        {p.tipo && <span style={{ background:'#F0F4F8', color:'#4A6272', borderRadius:6, padding:'2px 8px', fontSize:11, fontWeight:600 }}>{p.tipo}</span>}
+                      </td>
+                      <td style={{ padding:'12px 16px', color:'#9AAAB8', fontSize:12, whiteSpace:'nowrap' }}>{p.data_post || '—'}</td>
+                      <td style={{ padding:'12px 16px', color:'#0A66C2', fontSize:13, fontWeight:700, whiteSpace:'nowrap' }}>{fmtExato(p.impressoes)}</td>
+                      <td style={{ padding:'12px 16px', color:'#1C252E', fontSize:13, whiteSpace:'nowrap' }}>{fmtExato(p.visualizacoes)}</td>
+                      <td style={{ padding:'12px 16px', color:'#1C252E', fontSize:13, whiteSpace:'nowrap' }}>{fmtExato(p.cliques)}</td>
+                      <td style={{ padding:'12px 16px', color:'#1C252E', fontSize:13, whiteSpace:'nowrap' }}>{fmtCtr(p.ctr)}</td>
+                      <td style={{ padding:'12px 16px', color:'#1C252E', fontSize:13, whiteSpace:'nowrap' }}>{fmtExato(p.reacoes)}</td>
                       {isEditMode && (
-                        <div style={{ display:'flex', gap:6 }}>
-                          <button onClick={() => setEditPost(p)} style={{ background:'#F4F6F8', border:'none', borderRadius:8, padding:'5px 8px', cursor:'pointer', display:'flex', alignItems:'center', gap:4, color:'#6B7A8D', fontSize:12 }}>
-                            <Edit2 size={12}/> Editar
-                          </button>
-                          <button onClick={() => setConfirmDel(p.id)} style={{ background:'rgba(239,68,68,0.08)', border:'none', borderRadius:8, padding:'5px 8px', cursor:'pointer', display:'flex', alignItems:'center', color:'#ef4444', fontSize:12 }}>
+                        <td style={{ padding:'12px 12px', whiteSpace:'nowrap' }} onClick={e => e.stopPropagation()}>
+                          <button onClick={() => setConfirmDel(p.id)}
+                            style={{ background:'rgba(239,68,68,0.08)', border:'none', borderRadius:8, padding:'5px 8px', cursor:'pointer', display:'flex', alignItems:'center', color:'#ef4444' }}>
                             <Trash2 size={12}/>
                           </button>
-                        </div>
+                        </td>
                       )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
-        </div>
-      )}
+        )
+      })()}
 
       {basePosts.length === 0 && (
         <div className="card" style={{ padding:'48px 20px', textAlign:'center' }}>
