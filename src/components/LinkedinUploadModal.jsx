@@ -125,8 +125,8 @@ function MultiLinkedinModal({ onClose, onSave }) {
           isLast={isLast}
           totalFiles={files.length}
           onClose={onClose}
-          onSave={post => {
-            onSave(post)
+          onSave={async post => {
+            await onSave(post)
             if (isLast) onClose()
             else navigateTo(current + 1)
           }}
@@ -209,7 +209,7 @@ const SingleLinkedinModal = forwardRef(function SingleLinkedinModal(
     if (!form.data_post) { alert('Informe a data do post.'); return }
     setSaving(true)
     try {
-      const id = initial?.id || String(Date.now())
+      const id = initial?.id || `${Date.now()}-${Math.random().toString(36).slice(2,7)}`
       let imageUrl = initial?.image_url || null
       if (imageData) {
         const dataUrl = `data:${mediaType};base64,${imageData}`
