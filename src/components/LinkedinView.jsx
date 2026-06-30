@@ -174,7 +174,7 @@ export default function LinkedinView() {
             <table style={{ width:'100%', borderCollapse:'collapse', minWidth: mobile ? 500 : 'auto' }}>
               <thead>
                 <tr style={{ background:'#FAFBFC' }}>
-                  {['Post','Data','Impressões','Visual.','Cliques','CTR','Reações',''].map(h => (
+                  {['Post','Tipo','Data','Impressões','Visual.','Cliques','CTR','Reações',''].map(h => (
                     <th key={h} style={{ padding:'10px 16px', color:'#8A9BB0', fontSize:10, fontWeight:600,
                       textTransform:'uppercase', letterSpacing:'0.05em', textAlign:'left', whiteSpace:'nowrap' }}>{h}</th>
                   ))}
@@ -191,6 +191,9 @@ export default function LinkedinView() {
                       {Array.isArray(p.tema) && p.tema.length > 0 && (
                         <p style={{ color:'#B0BEC5', fontSize:11, marginTop:2 }}>{p.tema.join(' · ')}</p>
                       )}
+                    </td>
+                    <td style={{ padding:'12px 16px', whiteSpace:'nowrap' }}>
+                      {p.tipo && <span style={{ background:'#F0F4F8', color:'#4A6272', borderRadius:6, padding:'2px 8px', fontSize:11, fontWeight:600 }}>{p.tipo}</span>}
                     </td>
                     <td style={{ padding:'12px 16px', color:'#9AAAB8', fontSize:12, whiteSpace:'nowrap' }}>{p.data_post || '—'}</td>
                     <td style={{ padding:'12px 16px', color:'#0A66C2', fontSize:13, fontWeight:700, whiteSpace:'nowrap' }}>{fmtExato(p.impressoes)}</td>

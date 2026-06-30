@@ -6,10 +6,12 @@ import { useStore } from '../store/useStore'
 import { uploadLinkedinImage } from '../lib/supabase'
 
 const EMPTY = {
-  nome: '', tema: [], data_post: '', tipo: 'Post',
+  nome: '', tema: [], data_post: '', tipo: 'Imagem',
   impressoes: '', visualizacoes: '', cliques: '', ctr: '', reacoes: '',
   status: 'parcial',
 }
+
+const TIPOS = ['Imagem', 'Vídeo', 'Artigo', 'Documento']
 
 export default function LinkedinUploadModal({ mode = 'new', initial = null, onClose, onSave }) {
   const { apiKey } = useStore()
@@ -160,6 +162,21 @@ export default function LinkedinUploadModal({ mode = 'new', initial = null, onCl
           <p style={{ color:'#6B7A8D', fontSize:12, fontWeight:600, marginBottom:4 }}>Data da publicação</p>
           <input value={form.data_post} onChange={e => set('data_post', e.target.value)} placeholder="DD/MM/AAAA"
             style={{ width:'100%', border:'1.5px solid #E8ECF0', borderRadius:10, padding:'9px 12px', fontSize:13, outline:'none', fontFamily:'DM Sans, sans-serif' }}/>
+        </div>
+
+        {/* Tipo */}
+        <div style={{ marginBottom:12 }}>
+          <p style={{ color:'#6B7A8D', fontSize:12, fontWeight:600, marginBottom:6 }}>Tipo de conteúdo</p>
+          <div style={{ display:'flex', gap:6, flexWrap:'wrap' }}>
+            {TIPOS.map(t => (
+              <button key={t} onClick={() => set('tipo', t)}
+                style={{ padding:'5px 14px', borderRadius:20, fontSize:12, cursor:'pointer', fontFamily:'DM Sans, sans-serif',
+                  fontWeight: form.tipo===t ? 700 : 400, background: form.tipo===t ? '#0A66C2' : '#F0F4F8',
+                  color: form.tipo===t ? '#fff' : '#4A6272', border: form.tipo===t ? '1.5px solid #0A66C2' : '1.5px solid #E0E7EF', transition:'all 0.12s' }}>
+                {t}
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Temas */}
