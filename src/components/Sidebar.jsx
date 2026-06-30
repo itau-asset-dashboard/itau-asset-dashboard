@@ -1,40 +1,40 @@
 import { BarChart2, Calendar, List, Lightbulb, Upload, TrendingUp, LineChart, BookOpen, PlaySquare } from 'lucide-react'
 import { useStore } from '../store/useStore'
 
-// ANÁLISE primeiro, depois CONTEÚDO, depois PRODUTOS
 const NAV_GROUPS = [
   {
-    label: 'ANÁLISE',
+    label: 'INSTAGRAM',
     items: [
-      { id: 'visao-anual', icon: Calendar,  label: 'Visão Anual' },
-      { id: 'visao-geral', icon: BarChart2, label: 'Visão Mensal' },
-      { id: 'insights',    icon: Lightbulb, label: 'Insights' },
-      { id: 'oliver',      icon: LineChart,  label: 'Dados Oliver' },
+      { id: 'visao-anual', icon: Calendar,    label: 'Visão Anual' },
+      { id: 'visao-geral', icon: BarChart2,   label: 'Visão Mensal' },
+      { id: 'posts',       icon: List,        label: 'Posts' },
+      { id: 'stories',     icon: PlaySquare,  label: 'Stories' },
+      { id: 'etfs',        icon: TrendingUp,  label: 'ETFs' },
     ],
   },
   {
-    label: 'CONTEÚDO',
+    label: 'LINKEDIN',
     items: [
-      { id: 'posts',    icon: List,       label: 'Todos os Posts' },
-      { id: 'stories',  icon: PlaySquare, label: 'Stories' },
       { id: 'linkedin', icon: LinkedinIcon, label: 'LinkedIn' },
     ],
   },
   {
-    label: 'PRODUTOS',
+    label: 'PARCERIAS',
     items: [
-      { id: 'etfs', icon: TrendingUp, label: 'ETFs' },
+      { id: 'navarro', icon: Upload, label: 'Gabriel Navarro', disabled: true },
     ],
   },
   {
-    label: 'AJUDA',
+    label: 'RECURSOS',
     items: [
-      { id: 'glossario', icon: BookOpen, label: 'Glossário' },
+      { id: 'insights',  icon: Lightbulb, label: 'Insights' },
+      { id: 'oliver',    icon: LineChart,  label: 'Dados Oliver' },
+      { id: 'glossario', icon: BookOpen,   label: 'Glossário' },
     ],
   },
 ]
 
-const NAV_FLAT = NAV_GROUPS.flatMap(g => g.items)
+const NAV_FLAT = NAV_GROUPS.flatMap(g => g.items).filter(i => !i.disabled)
 
 function LinkedinIcon({ size = 14, color = '#5A6A7A' }) {
   return (
@@ -135,9 +135,9 @@ export default function Sidebar() {
                 {label}
               </p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                {items.map(({ id, icon: Icon, label: itemLabel }) => {
+                {items.map(({ id, icon: Icon, label: itemLabel, disabled }) => {
                   const active = activeSection === id
-                  const blocked = id === 'upload' && !isEditMode
+                  const blocked = (id === 'upload' && !isEditMode) || disabled
                   return (
                     <button key={id} onClick={() => !blocked && setActiveSection(id)}
                       style={{
@@ -146,11 +146,11 @@ export default function Sidebar() {
                         border: 'none',
                         borderLeft: `2.5px solid ${active ? ORANGE : 'transparent'}`,
                         cursor: blocked ? 'not-allowed' : 'pointer',
-                        opacity: blocked ? 0.4 : 1,
+                        opacity: blocked ? 0.35 : 1,
                         display: 'flex', alignItems: 'center', gap: 9,
                         transition: 'background 0.15s', textAlign: 'left',
                       }}
-                      onMouseEnter={e => { if (!active) e.currentTarget.style.background = '#F0F2F4' }}
+                      onMouseEnter={e => { if (!active && !blocked) e.currentTarget.style.background = '#F0F2F4' }}
                       onMouseLeave={e => { if (!active) e.currentTarget.style.background = 'transparent' }}
                     >
                       <Icon
@@ -165,6 +165,7 @@ export default function Sidebar() {
                       }}>
                         {itemLabel}
                       </span>
+                      {disabled && <span style={{ marginLeft:'auto', fontSize:9, color:'#C0CCD8', fontWeight:600, textTransform:'uppercase', letterSpacing:'0.05em' }}>em breve</span>}
                     </button>
                   )
                 })}
