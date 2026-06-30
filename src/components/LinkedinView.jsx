@@ -86,7 +86,7 @@ export default function LinkedinView() {
 
   async function handleSaveNew(post) {
     await addLinkedinPost(post)
-    setUploadOpen(false)
+    // fechamento é controlado pelo MultiLinkedinModal (só fecha no último)
   }
   async function handleSaveEdit(post) {
     await updateLinkedinPost(post)
