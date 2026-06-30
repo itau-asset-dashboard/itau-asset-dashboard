@@ -223,7 +223,7 @@ const SingleLinkedinModal = forwardRef(function SingleLinkedinModal(
     setSaving(true)
     try {
       const id = initial?.id || `${Date.now()}-${Math.random().toString(36).slice(2,7)}`
-      let imageUrl = initial?.image_url || null
+      let imageUrl = initial?.image_url || initial?.imageUrl || null
       if (imageData) {
         const dataUrl = `data:${mediaType};base64,${imageData}`
         imageUrl = await uploadLinkedinImage(id, dataUrl).catch(() => null)
