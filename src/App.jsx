@@ -19,6 +19,7 @@ import OliverView from './components/OliverView'
 import Glossario from './components/Glossario'
 import StoriesView from './components/StoriesView'
 import MetaMensalBanner from './components/MetaMensalBanner'
+import LinkedinView from './components/LinkedinView'
 
 // Limpa dados pesados do localStorage logo na inicialização (roda antes do React montar).
 // Remove imageData de posts, e limpa stories/insights que não precisam mais ser persistidos.
@@ -114,6 +115,7 @@ export default function App() {
           {activeSection === 'etfs'        && <ETFsView />}
           {activeSection === 'glossario'   && <Glossario />}
           {activeSection === 'stories'     && <StoriesView />}
+          {activeSection === 'linkedin'    && <LinkedinView />}
           {activeSection === 'visao-anual' && <AnnualView />}
           {activeSection === 'visao-geral' && (
             <>

@@ -174,3 +174,45 @@ export async function saveSetting(key, value) {
     .from('dashboard_settings')
     .upsert({ key, value: String(value) })
 }
+
+// ── LinkedIn Posts ─────────────────────────────────────
+
+export async function fetchLinkedinPosts() {
+  const { data, error } = await supabase
+    .from('linkedin_posts')
+    .select('*')
+    .order('created_at', { ascending: true })
+  if (error) throw error
+  return (data || []).map(({ image_url, ...rest }) => ({ ...rest, imageUrl: image_url || null }))
+}
+
+export async function uploadLinkedinImage(postId, dataUrl) {
+  if (!dataUrl) return null
+  const [header, base64] = dataUrl.split(',')
+  const mime = header.match(/:(.*?);/)?.[1] || 'image/jpeg'
+  const binary = atob(base64)
+  const bytes = new Uint8Array(binary.length)
+  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i)
+  const blob = new Blob([bytes], { type: mime })
+  const ext = mime.includes('png') ? 'png' : 'jpg'
+  const { error } = await supabase.storage
+    .from('linkedin-images')
+    .upload(`${postId}.${ext}`, blob, { upsert: true, contentType: mime })
+  if (error) throw error
+  const { data } = supabase.storage.from('linkedin-images').getPublicUrl(`${postId}.${ext}`)
+  return data.publicUrl
+}
+
+const LINKEDIN_COLUMNS = ['id','nome','tema','data_post','impressoes','visualizacoes','cliques','ctr','reacoes','status','image_url']
+
+export async function upsertLinkedinPost(post) {
+  const { imageData, imageUrl, imagePreview, ...rest } = post
+  const clean = Object.fromEntries(Object.entries(rest).filter(([k]) => LINKEDIN_COLUMNS.includes(k)))
+  const { error } = await supabase.from('linkedin_posts').upsert({ ...clean, image_url: imageUrl || null })
+  if (error) throw error
+}
+
+export async function removeLinkedinPost(id) {
+  const { error } = await supabase.from('linkedin_posts').delete().eq('id', id)
+  if (error) throw error
+}

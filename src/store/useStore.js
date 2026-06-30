@@ -1,7 +1,8 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { fetchPosts, upsertPost, removePost, fetchSetting, saveSetting, uploadImage, deleteImage,
-         fetchStories, upsertStory, removeStory, uploadStoryImage, deleteStoryImage } from '../lib/supabase'
+         fetchStories, upsertStory, removeStory, uploadStoryImage, deleteStoryImage,
+         fetchLinkedinPosts, upsertLinkedinPost, removeLinkedinPost } from '../lib/supabase'
 import { normalizeTema } from '../utils/temas'
 
 // Posts com save em andamento — protege contra sync sobrescrever antes do upsert terminar
@@ -23,6 +24,7 @@ export const useStore = create(
     (set, get) => ({
       posts: [],
       stories: [],
+      linkedinPosts: [],
       metaMensal: 200000,
       metaAnual: 743000,
       mesFiltro: '01/2026',
@@ -44,7 +46,7 @@ export const useStore = create(
       syncFromCloud: async () => {
         set({ syncing: true, syncError: null })
         try {
-          const [cloudPosts, metaMensal, metaAnual, oliverRaw, evidenciasRaw, cloudStoriesRaw, insightsRaw] = await Promise.all([
+          const [cloudPosts, metaMensal, metaAnual, oliverRaw, evidenciasRaw, cloudStoriesRaw, insightsRaw, cloudLinkedin] = await Promise.all([
             fetchPosts(),
             fetchSetting('meta_mensal'),
             fetchSetting('meta_anual'),
@@ -52,6 +54,7 @@ export const useStore = create(
             fetchSetting('data_evidencias'),
             fetchStories().catch(() => null),
             fetchSetting('insights').catch(() => null),
+            fetchLinkedinPosts().catch(() => []),
           ])
           const localPosts = get().posts
 
@@ -132,10 +135,19 @@ export const useStore = create(
             } catch (_) {}
           }
 
+          // Normaliza temas do LinkedIn (podem vir como string JSON do Supabase)
+          const linkedinNorm = (cloudLinkedin || []).map(p => {
+            let tema = p.tema
+            if (typeof tema === 'string') { try { tema = JSON.parse(tema) } catch (_) { tema = tema ? [tema] : [] } }
+            if (!Array.isArray(tema)) tema = []
+            return { ...p, tema }
+          })
+
           set({
             posts,
             stories: mergedStories,
             insights: savedInsights,
+            linkedinPosts: linkedinNorm.length > 0 ? linkedinNorm : get().linkedinPosts,
             metaMensal: metaMensal ? Number(metaMensal) : get().metaMensal,
             metaAnual:  metaAnual  ? Number(metaAnual)  : get().metaAnual,
             oliverData: newOliver,
@@ -303,6 +315,23 @@ export const useStore = create(
         return antigos.length
       },
 
+      // ── LinkedIn ───────────────────────────────────────
+      addLinkedinPost: async (post) => {
+        const novo = { ...post, id: post.id || String(Date.now()) }
+        set(s => ({ linkedinPosts: [...s.linkedinPosts, novo] }))
+        try { await upsertLinkedinPost(novo) } catch (e) { console.error('[linkedin add]', e) }
+      },
+
+      updateLinkedinPost: async (post) => {
+        set(s => ({ linkedinPosts: s.linkedinPosts.map(p => p.id !== post.id ? p : { ...p, ...post }) }))
+        try { await upsertLinkedinPost(post) } catch (e) { console.error('[linkedin update]', e) }
+      },
+
+      deleteLinkedinPost: async (id) => {
+        set(s => ({ linkedinPosts: s.linkedinPosts.filter(p => p.id !== id) }))
+        try { await removeLinkedinPost(id) } catch (e) { console.error('[linkedin delete]', e) }
+      },
+
       // ── Stories ────────────────────────────────────────
       addStory: async (story) => {
         const id = Date.now().toString()
@@ -442,6 +471,7 @@ export const useStore = create(
         // stories e insights NÃO são persistidos: stories vêm do Supabase no sync,
         // insights são gerados sob demanda — não precisam ocupar espaço no localStorage.
         posts:          s.posts.map(({ imageData, ...p }) => p),
+        linkedinPosts:  s.linkedinPosts,
         metaMensal:     s.metaMensal,
         metaAnual:      s.metaAnual,
         mesFiltro:      s.mesFiltro,

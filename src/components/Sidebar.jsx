@@ -15,8 +15,9 @@ const NAV_GROUPS = [
   {
     label: 'CONTEÚDO',
     items: [
-      { id: 'posts',   icon: List,       label: 'Todos os Posts' },
-      { id: 'stories', icon: PlaySquare, label: 'Stories' },
+      { id: 'posts',    icon: List,       label: 'Todos os Posts' },
+      { id: 'stories',  icon: PlaySquare, label: 'Stories' },
+      { id: 'linkedin', icon: LinkedinIcon, label: 'LinkedIn' },
     ],
   },
   {
@@ -34,6 +35,17 @@ const NAV_GROUPS = [
 ]
 
 const NAV_FLAT = NAV_GROUPS.flatMap(g => g.items)
+
+function LinkedinIcon({ size = 14, color = '#5A6A7A' }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="2" y="2" width="20" height="20" rx="4" stroke={color} strokeWidth="2"/>
+      <line x1="8" y1="10" x2="8" y2="17" stroke={color} strokeWidth="2" strokeLinecap="round"/>
+      <circle cx="8" cy="7" r="1" fill={color}/>
+      <path d="M12 10v7M12 13c0-2 6-2 6 1v3" stroke={color} strokeWidth="2" strokeLinecap="round"/>
+    </svg>
+  )
+}
 
 function InstagramIcon({ size = 12, color = '#5A6A7A' }) {
   return (

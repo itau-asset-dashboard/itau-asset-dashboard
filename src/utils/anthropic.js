@@ -85,6 +85,56 @@ Use null para qualquer campo não encontrado. Não invente valores.`
   return parseJsonResponse(data.content?.[0]?.text || '')
 }
 
+export async function extractLinkedinFromImage(base64, mediaType, apiKey) {
+  const response = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': apiKey,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true',
+    },
+    body: JSON.stringify({
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: 600,
+      messages: [{
+        role: 'user',
+        content: [
+          { type: 'image', source: { type: 'base64', media_type: mediaType, data: base64 } },
+          {
+            type: 'text',
+            text: `Você é um assistente que extrai métricas de prints de posts do LinkedIn.
+
+A tela de analytics de um post LinkedIn mostra métricas como:
+- Impressões — quantas vezes o post apareceu no feed
+- Visualizações — quantas vezes foi visualizado (pode aparecer como "views")
+- Cliques — cliques no post, link ou no perfil
+- CTR — taxa de cliques (click-through rate), em percentual como "1,23%" ou "1.23%"
+- Reações — curtidas, amei, parabéns, etc. (soma total)
+
+Retorne APENAS um JSON válido (sem markdown, sem texto fora do JSON):
+{
+  "data_post": "DD/MM/AAAA ou null",
+  "impressoes": número inteiro ou null,
+  "visualizacoes": número inteiro ou null,
+  "cliques": número inteiro ou null,
+  "ctr": número decimal ou null,
+  "reacoes": número inteiro ou null
+}
+Use null para qualquer campo não encontrado. Não invente valores. CTR deve ser número decimal (ex: 1.23 para 1,23%).`
+          }
+        ]
+      }]
+    })
+  })
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({}))
+    throw new Error(err?.error?.message || `Erro ${response.status}`)
+  }
+  const data = await response.json()
+  return parseJsonResponse(data.content?.[0]?.text || '')
+}
+
 export async function extractStoryFromImage(base64, mediaType, apiKey) {
   const response = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
