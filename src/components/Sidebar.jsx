@@ -21,7 +21,7 @@ const NAV_GROUPS = [
   {
     label: 'PARCERIAS',
     items: [
-      { id: 'navarro', icon: Upload, label: 'Gabriel Navarro', disabled: true },
+      { id: 'navarro', icon: LineChart, label: 'Navarro', disabled: true },
     ],
   },
   {
@@ -165,7 +165,6 @@ export default function Sidebar() {
                       }}>
                         {itemLabel}
                       </span>
-                      {disabled && <span style={{ marginLeft:'auto', fontSize:9, color:'#C0CCD8', fontWeight:600, textTransform:'uppercase', letterSpacing:'0.05em' }}>em breve</span>}
                     </button>
                   )
                 })}
