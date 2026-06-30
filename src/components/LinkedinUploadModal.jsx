@@ -24,7 +24,20 @@ const NUM_FIELDS = [
 // ─── Modal principal (entry point) ───────────────────────────────────────────
 export default function LinkedinUploadModal({ mode = 'new', initial = null, onClose, onSave }) {
   if (mode === 'edit') {
-    return <SingleLinkedinModal mode="edit" initial={initial} onClose={onClose} onSave={onSave} />
+    return (
+      <div style={{ position:'fixed', inset:0, background:'rgba(28,37,46,0.65)', zIndex:1000, display:'flex', alignItems:'center', justifyContent:'center', padding:16 }}
+        onClick={e => e.target === e.currentTarget && onClose()}>
+        <div style={{ background:'#fff', borderRadius:20, width:'100%', maxWidth:520, maxHeight:'92vh', overflow:'auto', boxShadow:'0 16px 56px rgba(0,0,0,0.22)' }}>
+          <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'16px 20px', borderBottom:'1px solid #F0F4F8' }}>
+            <h2 style={{ color:'#1C252E', fontSize:15, fontWeight:700 }}>Editar post LinkedIn</h2>
+            <button onClick={onClose} style={{ background:'#F4F6F8', border:'none', borderRadius:8, padding:7, cursor:'pointer', display:'flex' }}>
+              <X size={16} color="#8A9BB0"/>
+            </button>
+          </div>
+          <SingleLinkedinModal mode="edit" initial={initial} onClose={onClose} onSave={onSave} isLast={true} totalFiles={1}/>
+        </div>
+      </div>
+    )
   }
   return <MultiLinkedinModal onClose={onClose} onSave={onSave} />
 }
