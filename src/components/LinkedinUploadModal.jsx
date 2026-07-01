@@ -10,6 +10,7 @@ const TIPOS = ['Imagem', 'Vídeo', 'Artigo', 'Documento']
 
 const EMPTY = {
   nome: '', tema: [], data_post: '', tipo: 'Imagem',
+  autor: '', campanha: '', serie: '',
   impressoes: '', visualizacoes: '', cliques: '', ctr: '', reacoes: '',
   status: 'parcial',
 }
@@ -327,6 +328,25 @@ const SingleLinkedinModal = forwardRef(function SingleLinkedinModal(
               </button>
             )
           })}
+        </div>
+      </div>
+
+      {/* Autor / Campanha / Série */}
+      <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:8, marginBottom:10 }}>
+        <div>
+          <p style={{ color:'#6B7A8D', fontSize:12, fontWeight:600, marginBottom:4 }}>Autor</p>
+          <input value={form.autor || ''} onChange={e => set('autor', e.target.value)} placeholder="Ex: João Silva"
+            style={{ width:'100%', border:'1.5px solid #E8ECF0', borderRadius:10, padding:'9px 12px', fontSize:13, outline:'none', fontFamily:'DM Sans, sans-serif' }}/>
+        </div>
+        <div>
+          <p style={{ color:'#6B7A8D', fontSize:12, fontWeight:600, marginBottom:4 }}>Campanha</p>
+          <input value={form.campanha || ''} onChange={e => set('campanha', e.target.value)} placeholder="Ex: Semana do Investidor"
+            style={{ width:'100%', border:'1.5px solid #E8ECF0', borderRadius:10, padding:'9px 12px', fontSize:13, outline:'none', fontFamily:'DM Sans, sans-serif' }}/>
+        </div>
+        <div style={{ gridColumn:'1 / -1' }}>
+          <p style={{ color:'#6B7A8D', fontSize:12, fontWeight:600, marginBottom:4 }}>Série</p>
+          <input value={form.serie || ''} onChange={e => set('serie', e.target.value)} placeholder="Ex: Minuto ETF, Educação Financeira..."
+            style={{ width:'100%', border:'1.5px solid #E8ECF0', borderRadius:10, padding:'9px 12px', fontSize:13, outline:'none', fontFamily:'DM Sans, sans-serif' }}/>
         </div>
       </div>
 

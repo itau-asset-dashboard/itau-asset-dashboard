@@ -203,7 +203,7 @@ export async function uploadLinkedinImage(postId, dataUrl) {
   return data.publicUrl
 }
 
-const LINKEDIN_COLUMNS = ['id','nome','tema','data_post','impressoes','visualizacoes','cliques','ctr','reacoes','status','image_url']
+const LINKEDIN_COLUMNS = ['id','nome','tema','tipo','autor','campanha','serie','data_post','impressoes','visualizacoes','cliques','ctr','reacoes','status','image_url']
 
 export async function upsertLinkedinPost(post) {
   const { imageData, imageUrl, imagePreview, image_url, ...rest } = post

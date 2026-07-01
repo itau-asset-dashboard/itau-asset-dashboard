@@ -15,7 +15,7 @@ const NAV_GROUPS = [
   {
     label: 'LINKEDIN',
     items: [
-      { id: 'linkedin', icon: LinkedinIcon, label: 'LinkedIn (em breve)', muted: true },
+      { id: 'linkedin', icon: LinkedinIcon, label: 'LinkedIn' },
     ],
   },
   {
