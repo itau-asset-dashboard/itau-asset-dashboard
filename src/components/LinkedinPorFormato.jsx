@@ -1,10 +1,10 @@
-import { BarChart, Bar, XAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts'
+import { useState } from 'react'
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts'
 import { useIsMobile } from '../utils/useIsMobile'
 
 const MESES_LABEL = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez']
 const MESES_FULL  = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro']
 
-// Configuração fixa por formato — apenas as métricas que fazem sentido
 const CONFIGS = [
   {
     id: 'Imagem',
@@ -19,7 +19,7 @@ const CONFIGS = [
   {
     id: 'Documento',
     label: 'Documento',
-    color: '#475569',
+    color: '#1C252E',
     metricas: [
       { key: 'impressoes', label: 'Impressões', role: 'Distribuição' },
       { key: 'cliques',    label: 'Cliques',    role: 'Ação' },
@@ -40,7 +40,7 @@ const CONFIGS = [
   {
     id: 'Artigo',
     label: 'Artigo / Newsletter',
-    color: '#16a34a',
+    color: '#5A7080',
     metricas: [
       { key: 'impressoes',    label: 'Impressões',    role: 'Distribuição' },
       { key: 'visualizacoes', label: 'Visualizações', role: 'Consumo' },
@@ -50,16 +50,7 @@ const CONFIGS = [
   },
 ]
 
-// Cores consistentes por papel — iguais em todos os formatos
-const ROLE_BADGE = {
-  Distribuição: { bg: '#EFF6FF', color: '#1D4ED8' },
-  Consumo:      { bg: '#FFF7ED', color: '#C2410C' },
-  Ação:         { bg: '#F5F3FF', color: '#7C3AED' },
-  Engajamento:  { bg: '#F0FDF4', color: '#15803D' },
-}
-
-// Opacidade de preenchimento da barra por papel (funil visual)
-const ROLE_OPACITY = { Distribuição: 1, Consumo: 0.72, Ação: 0.48, Engajamento: 0.28 }
+const FUNIL_OPACITY = { Distribuição: 1, Consumo: 0.65, Ação: 0.4, Engajamento: 0.2 }
 
 function fmtN(n) {
   if (n == null || isNaN(n) || n === '') return '—'
@@ -70,123 +61,127 @@ function fmtN(n) {
 
 function FormatoCard({ cfg, posts, ano, mobile }) {
   const ps = posts.filter(p => p.tipo === cfg.id)
+  const [sel, setSel] = useState(cfg.metricas[0].key)
 
-  // Dados anuais
+  if (ps.length === 0) {
+    return (
+      <div className="card" style={{ padding: '18px 20px', opacity: 0.45, borderTop: `3px solid ${cfg.color}30` }}>
+        <p style={{ color: cfg.color, fontSize: 13, fontWeight: 700 }}>{cfg.label}</p>
+        <p style={{ color: '#C0CEDA', fontSize: 12, marginTop: 4 }}>Sem posts em {ano}</p>
+      </div>
+    )
+  }
+
+  // Totais anuais
   const totals = {}
   cfg.metricas.forEach(m => {
     totals[m.key] = ps.reduce((s, p) => s + (Number(p[m.key]) || 0), 0)
   })
   const maxVal = totals.impressoes || 1
 
-  // Dados mensais para o gráfico
+  // Dados mensais para a métrica selecionada
+  const metricaSel = cfg.metricas.find(m => m.key === sel) || cfg.metricas[0]
   const monthData = MESES_LABEL.map((mes, i) => {
     const mm = String(i + 1).padStart(2, '0')
     const mps = ps.filter(p => p.data_post?.split('/')?.[1] === mm)
     return {
       mes,
       mesFull: MESES_FULL[i],
-      impressoes: mps.reduce((s, p) => s + (p.impressoes || 0), 0),
+      value: mps.reduce((s, p) => s + (Number(p[sel]) || 0), 0),
       count: mps.length,
     }
   })
-
-  if (ps.length === 0) {
-    return (
-      <div className="card" style={{ padding: '20px 18px', borderTop: `3px solid ${cfg.color}25`, opacity: 0.6 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <div style={{ width: 8, height: 8, borderRadius: '50%', background: `${cfg.color}60` }}/>
-          <p style={{ color: `${cfg.color}80`, fontSize: 14, fontWeight: 700 }}>{cfg.label}</p>
-          <span style={{ color: '#C0CEDA', fontSize: 13 }}>— sem posts em {ano}</span>
-        </div>
-      </div>
-    )
-  }
 
   return (
     <div className="card" style={{ padding: 0, overflow: 'hidden', borderTop: `3px solid ${cfg.color}` }}>
 
       {/* Cabeçalho */}
-      <div style={{ padding: '14px 18px 12px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <div style={{ width: 9, height: 9, borderRadius: '50%', background: cfg.color }}/>
-          <p style={{ color: cfg.color, fontSize: 14, fontWeight: 700 }}>{cfg.label}</p>
-        </div>
-        <span style={{ background: `${cfg.color}15`, color: cfg.color, borderRadius: 8, padding: '3px 10px', fontSize: 12, fontWeight: 700 }}>
+      <div style={{ padding: '14px 18px 10px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <p style={{ color: cfg.color, fontSize: 14, fontWeight: 700 }}>{cfg.label}</p>
+        <span style={{ background: `${cfg.color}12`, color: cfg.color, borderRadius: 8, padding: '3px 10px', fontSize: 12, fontWeight: 700 }}>
           {ps.length} post{ps.length > 1 ? 's' : ''}
         </span>
       </div>
 
-      <div style={{ padding: '0 18px 18px', display: 'flex', flexDirection: 'column', gap: 14 }}>
+      {/* Funil clicável */}
+      <div style={{ padding: '0 18px', display: 'flex', flexDirection: 'column', gap: 6 }}>
+        {cfg.metricas.map(m => {
+          const val = totals[m.key] || 0
+          const pct = Math.max((val / maxVal) * 100, val > 0 ? 3 : 0)
+          const ativo = sel === m.key
 
-        {/* Funil de métricas */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-          {cfg.metricas.map(m => {
-            const val = totals[m.key] || 0
-            const pct = maxVal > 0 ? Math.max((val / maxVal) * 100, val > 0 ? 2 : 0) : 0
-            const badge = ROLE_BADGE[m.role]
-            const opacity = ROLE_OPACITY[m.role]
-            return (
-              <div key={m.key}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 5 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <span style={{
-                      background: badge.bg, color: badge.color,
-                      borderRadius: 4, padding: '2px 7px', fontSize: 10,
-                      fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em',
-                      flexShrink: 0,
-                    }}>
-                      {m.role}
-                    </span>
-                    <span style={{ color: '#6B7A8D', fontSize: 12 }}>{m.label}</span>
-                  </div>
-                  <span style={{ color: '#1C252E', fontSize: mobile ? 15 : 17, fontWeight: 800, flexShrink: 0, marginLeft: 8 }}>
-                    {fmtN(val)}
+          return (
+            <button key={m.key} onClick={() => setSel(m.key)}
+              style={{
+                background: ativo ? `${cfg.color}08` : 'transparent',
+                border: `1.5px solid ${ativo ? cfg.color + '30' : 'transparent'}`,
+                borderRadius: 10, padding: '8px 10px', cursor: 'pointer',
+                textAlign: 'left', transition: 'all 0.15s',
+              }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <span style={{
+                    background: ativo ? cfg.color : '#EAECF0',
+                    color: ativo ? '#fff' : '#6B7A8D',
+                    borderRadius: 4, padding: '2px 7px',
+                    fontSize: 10, fontWeight: 700,
+                    textTransform: 'uppercase', letterSpacing: '0.04em',
+                    transition: 'all 0.15s',
+                  }}>
+                    {m.role}
+                  </span>
+                  <span style={{ color: ativo ? '#1C252E' : '#8A9BB0', fontSize: 12, fontWeight: ativo ? 600 : 400 }}>
+                    {m.label}
                   </span>
                 </div>
-                <div style={{ background: '#F0F4F8', borderRadius: 6, height: 7, overflow: 'hidden' }}>
-                  <div style={{
-                    background: cfg.color,
-                    opacity,
-                    borderRadius: 6,
-                    height: '100%',
-                    width: `${pct}%`,
-                    transition: 'width 0.6s cubic-bezier(0.34, 1.3, 0.64, 1)',
-                  }}/>
-                </div>
+                <span style={{ color: ativo ? cfg.color : '#1C252E', fontSize: mobile ? 15 : 16, fontWeight: 800, flexShrink: 0, marginLeft: 8 }}>
+                  {fmtN(val)}
+                </span>
               </div>
-            )
-          })}
-        </div>
-
-        {/* Gráfico mensal */}
-        <div>
-          <p style={{ color: '#9AAAB8', fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 6 }}>
-            Impressões por mês
-          </p>
-          <ResponsiveContainer width="100%" height={65}>
-            <BarChart data={monthData} barSize={mobile ? 8 : 13} margin={{ top: 2, right: 0, left: 0, bottom: 0 }}>
-              <XAxis dataKey="mes" tick={{ fill: '#C0CEDA', fontSize: 9 }} axisLine={false} tickLine={false}/>
-              <Tooltip content={({ active, payload }) => {
-                if (!active || !payload?.length) return null
-                const d = payload[0].payload
-                return (
-                  <div style={{ background: '#fff', border: '1px solid #EAECF0', borderRadius: 8, padding: '6px 10px', fontSize: 11 }}>
-                    <p style={{ fontWeight: 700, color: '#1C252E', marginBottom: 2 }}>{d.mesFull}</p>
-                    <p style={{ color: cfg.color, fontWeight: 700 }}>{fmtN(d.impressoes)} impressões</p>
-                    {d.count > 0 && <p style={{ color: '#9AAAB8' }}>{d.count} post{d.count > 1 ? 's' : ''}</p>}
-                  </div>
-                )
-              }} cursor={{ fill: 'rgba(0,0,0,0.03)' }}/>
-              <Bar dataKey="impressoes" radius={[4,4,0,0]}>
-                {monthData.map((e, i) => (
-                  <Cell key={i} fill={e.impressoes === 0 ? '#F0F2F5' : cfg.color}/>
-                ))}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-
+              {/* Barra de funil */}
+              <div style={{ background: '#F0F4F8', borderRadius: 4, height: 5, overflow: 'hidden' }}>
+                <div style={{
+                  background: cfg.color,
+                  opacity: FUNIL_OPACITY[m.role],
+                  borderRadius: 4, height: '100%',
+                  width: `${pct}%`,
+                  transition: 'width 0.5s ease',
+                }}/>
+              </div>
+            </button>
+          )
+        })}
       </div>
+
+      {/* Gráfico da métrica selecionada */}
+      <div style={{ padding: '14px 18px 16px' }}>
+        <p style={{ color: '#8A9BB0', fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 8 }}>
+          {metricaSel.label} por mês
+        </p>
+        <ResponsiveContainer width="100%" height={80}>
+          <BarChart data={monthData} barSize={mobile ? 8 : 14} margin={{ top: 2, right: 0, left: 0, bottom: 0 }}>
+            <XAxis dataKey="mes" tick={{ fill: '#C0CEDA', fontSize: 9 }} axisLine={false} tickLine={false}/>
+            <YAxis hide/>
+            <Tooltip content={({ active, payload }) => {
+              if (!active || !payload?.length) return null
+              const d = payload[0].payload
+              return (
+                <div style={{ background: '#fff', border: '1px solid #EAECF0', borderRadius: 8, padding: '6px 10px', fontSize: 11 }}>
+                  <p style={{ fontWeight: 700, color: '#1C252E', marginBottom: 2 }}>{d.mesFull}</p>
+                  <p style={{ color: cfg.color, fontWeight: 700 }}>{fmtN(d.value)} {metricaSel.label.toLowerCase()}</p>
+                  {d.count > 0 && <p style={{ color: '#9AAAB8' }}>{d.count} post{d.count > 1 ? 's' : ''}</p>}
+                </div>
+              )
+            }} cursor={{ fill: 'rgba(0,0,0,0.03)' }}/>
+            <Bar dataKey="value" radius={[4,4,0,0]}>
+              {monthData.map((e, i) => (
+                <Cell key={i} fill={e.value === 0 ? '#F0F2F5' : cfg.color}/>
+              ))}
+            </Bar>
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+
     </div>
   )
 }
@@ -202,34 +197,11 @@ export default function LinkedinPorFormato({ posts, ano }) {
     )
   }
 
-  // Legenda de papéis
-  const papeis = ['Distribuição', 'Consumo', 'Ação', 'Engajamento']
-
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-
-      {/* Legenda de papéis — consistente entre formatos */}
-      <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center' }}>
-        <p style={{ color: '#9AAAB8', fontSize: 12, marginRight: 2 }}>Legenda:</p>
-        {papeis.map(r => (
-          <div key={r} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-            <span style={{
-              background: ROLE_BADGE[r].bg, color: ROLE_BADGE[r].color,
-              borderRadius: 4, padding: '2px 7px', fontSize: 10, fontWeight: 700,
-              textTransform: 'uppercase', letterSpacing: '0.04em',
-            }}>
-              {r}
-            </span>
-          </div>
-        ))}
-      </div>
-
-      {/* Grade 2×2: Imagem + Documento | Vídeo + Artigo */}
-      <div style={{ display: 'grid', gridTemplateColumns: mobile ? '1fr' : '1fr 1fr', gap: 14 }}>
-        {CONFIGS.map(cfg => (
-          <FormatoCard key={cfg.id} cfg={cfg} posts={posts} ano={ano} mobile={mobile}/>
-        ))}
-      </div>
+    <div style={{ display: 'grid', gridTemplateColumns: mobile ? '1fr' : '1fr 1fr', gap: 14 }}>
+      {CONFIGS.map(cfg => (
+        <FormatoCard key={cfg.id} cfg={cfg} posts={posts} ano={ano} mobile={mobile}/>
+      ))}
     </div>
   )
 }
