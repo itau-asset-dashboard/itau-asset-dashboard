@@ -13,11 +13,11 @@ const NAV_GROUPS = [
     ],
   },
   {
-    label: 'LINKEDIN',
+    label: 'LINKEDIN · em breve',
     items: [
-      { id: 'linkedin-geral',       icon: BarChart2,   label: 'Visão Geral' },
-      { id: 'linkedin-posts',       icon: List,        label: 'Posts' },
-      { id: 'linkedin-performance', icon: TrendingUp,  label: 'Performance' },
+      { id: 'linkedin-geral',       icon: BarChart2,  label: 'Visão Geral',  muted: true },
+      { id: 'linkedin-posts',       icon: List,       label: 'Posts',        muted: true },
+      { id: 'linkedin-performance', icon: TrendingUp, label: 'Performance',  muted: true },
     ],
   },
   {
