@@ -19,10 +19,6 @@ function fmtN(n) {
   if (n >= 1000)    return (n/1000).toFixed(1).replace('.',',') + 'K'
   return Math.round(n).toLocaleString('pt-BR')
 }
-function fmtCtr(n) {
-  if (n == null || n === '') return '—'
-  return Number(n).toFixed(2).replace('.',',') + '%'
-}
 
 export default function LinkedinVisaoGeral({ posts, ano, isEditMode, onEditPost }) {
   const mobile = useIsMobile()
@@ -33,8 +29,6 @@ export default function LinkedinVisaoGeral({ posts, ano, isEditMode, onEditPost 
   const totalReacoes    = posts.reduce((s, p) => s + (p.reacoes    || 0), 0)
   const totalCliques    = posts.reduce((s, p) => s + (p.cliques    || 0), 0)
   const totalPosts      = posts.length
-  const ctrPosts        = posts.filter(p => p.ctr != null && p.ctr !== '')
-  const mediaCtr        = ctrPosts.length ? ctrPosts.reduce((s, p) => s + (p.ctr || 0), 0) / ctrPosts.length : null
 
   const byMonth = Array.from({ length: 12 }, (_, i) => {
     const mm = String(i + 1).padStart(2, '0')
@@ -76,38 +70,22 @@ export default function LinkedinVisaoGeral({ posts, ano, isEditMode, onEditPost 
   }
 
   const KPIS = [
-    { label: 'Impressões',  value: fmtN(totalImpressoes),                     sub: 'total distribuição' },
-    { label: 'Reações',     value: fmtN(totalReacoes),                        sub: 'curtidas e reações' },
-    { label: 'Cliques',     value: fmtN(totalCliques),                        sub: 'no conteúdo' },
-    { label: 'CTR médio',   value: fmtCtr(mediaCtr),                          sub: 'taxa de cliques' },
-    { label: 'Publicações', value: String(totalPosts),                        sub: `posts em ${ano}` },
-  ]
-  const EFF = [
-    { label: 'Impressões / post', value: fmtN(Math.round(totalPosts > 0 ? totalImpressoes / totalPosts : 0)) },
-    { label: 'Reações / post',    value: fmtN(Math.round(totalPosts > 0 ? totalReacoes    / totalPosts : 0)) },
-    { label: 'Cliques / post',    value: fmtN(Math.round(totalPosts > 0 ? totalCliques    / totalPosts : 0)) },
+    { label: 'Impressões',  value: fmtN(totalImpressoes), sub: 'total distribuição' },
+    { label: 'Reações',     value: fmtN(totalReacoes),    sub: 'curtidas e reações' },
+    { label: 'Cliques',     value: fmtN(totalCliques),    sub: 'no conteúdo' },
+    { label: 'Publicações', value: String(totalPosts),    sub: `posts em ${ano}` },
   ]
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
 
       {/* KPI cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: mobile ? 'repeat(2,1fr)' : 'repeat(5,1fr)', gap: mobile ? 8 : 12 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: mobile ? 'repeat(2,1fr)' : 'repeat(4,1fr)', gap: mobile ? 8 : 12 }}>
         {KPIS.map(({ label, value, sub }) => (
           <div key={label} className="card" style={{ padding: mobile ? '12px 14px' : '16px 20px' }}>
             <p style={{ color: '#8A9BB0', fontSize: mobile ? 9 : 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 8 }}>{label}</p>
             <p style={{ color: '#1C252E', fontSize: mobile ? 20 : 24, fontWeight: 800, lineHeight: 1, marginBottom: 4 }}>{value}</p>
             <p style={{ color: '#A8B5C0', fontSize: mobile ? 9 : 11 }}>{sub}</p>
-          </div>
-        ))}
-      </div>
-
-      {/* Eficiência */}
-      <div style={{ display: 'grid', gridTemplateColumns: mobile ? '1fr' : 'repeat(3,1fr)', gap: mobile ? 8 : 12 }}>
-        {EFF.map(({ label, value }) => (
-          <div key={label} className="card" style={{ padding: mobile ? '10px 14px' : '12px 18px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
-            <p style={{ color: '#6B7A8D', fontSize: mobile ? 11 : 13 }}>{label}</p>
-            <p style={{ color: '#0A66C2', fontSize: mobile ? 16 : 20, fontWeight: 800, flexShrink: 0 }}>{value}</p>
           </div>
         ))}
       </div>

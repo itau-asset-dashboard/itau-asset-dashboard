@@ -1,21 +1,38 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { Plus } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import LinkedinVisaoGeral from './LinkedinVisaoGeral'
 import LinkedinBiblioteca from './LinkedinBiblioteca'
-import LinkedinPorFormato from './LinkedinPorFormato'
+import LinkedinVisaoMensal from './LinkedinVisaoMensal'
 import LinkedinUploadModal from './LinkedinUploadModal'
 
-const ANOS = ['2024', '2025', '2026', '2027']
+const MESES_LABEL = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez']
+const MESES_FULL  = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro']
 
 export default function LinkedinView({ tab = 'geral' }) {
   const { linkedinPosts, addLinkedinPost, updateLinkedinPost, deleteLinkedinPost, isEditMode } = useStore()
-  const [ano, setAno]               = useState(String(new Date().getFullYear()))
   const [uploadOpen, setUploadOpen] = useState(false)
   const [editPost, setEditPost]     = useState(null)
   const [confirmDel, setConfirmDel] = useState(null)
 
+  // Anos com posts reais
+  const anosComPosts = useMemo(() => {
+    const set = new Set(linkedinPosts.map(p => p.data_post?.split('/')?.[2]).filter(Boolean))
+    return [...set].sort()
+  }, [linkedinPosts])
+
+  const defaultAno = String(new Date().getFullYear())
+  const [ano, setAno] = useState(anosComPosts.includes(defaultAno) ? defaultAno : (anosComPosts[anosComPosts.length - 1] || defaultAno))
+
+  // Mês para a aba mensal
+  const mesAtual = String(new Date().getMonth() + 1).padStart(2, '0')
+  const [mes, setMes] = useState(mesAtual)
+
   const postsAno = linkedinPosts.filter(p => p.data_post?.split('/')?.[2] === ano)
+  const postsMes = linkedinPosts.filter(p => {
+    const parts = p.data_post?.split('/')
+    return parts?.[1] === mes
+  })
 
   async function handleSaveNew(post)  { await addLinkedinPost(post) }
   async function handleSaveEdit(post) { await updateLinkedinPost(post); setEditPost(null) }
@@ -24,12 +41,38 @@ export default function LinkedinView({ tab = 'geral' }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
 
-      {/* Controles de ano + novo post */}
+      {/* Controles de filtro */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 8 }}>
-        <select value={ano} onChange={e => setAno(e.target.value)}
-          style={{ background: '#fff', border: '1.5px solid #EDEFF2', borderRadius: 10, padding: '7px 10px', fontSize: 13, color: '#1C252E', cursor: 'pointer', outline: 'none', fontFamily: 'DM Sans, sans-serif' }}>
-          {ANOS.map(a => <option key={a} value={a}>{a}</option>)}
-        </select>
+
+        {/* Filtro de ano — só na aba anual */}
+        {tab === 'geral' && anosComPosts.length > 0 && (
+          <select value={ano} onChange={e => setAno(e.target.value)}
+            style={{ background: '#fff', border: '1.5px solid #EDEFF2', borderRadius: 10, padding: '7px 10px', fontSize: 13, color: '#1C252E', cursor: 'pointer', outline: 'none', fontFamily: 'DM Sans, sans-serif' }}>
+            {anosComPosts.map(a => <option key={a} value={a}>{a}</option>)}
+          </select>
+        )}
+
+        {/* Filtro de mês — só na aba mensal */}
+        {tab === 'formato' && (
+          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+            {MESES_LABEL.map((label, i) => {
+              const mm = String(i + 1).padStart(2, '0')
+              const ativo = mes === mm
+              return (
+                <button key={mm} onClick={() => setMes(mm)} style={{
+                  padding: '5px 12px', borderRadius: 20, border: 'none', cursor: 'pointer',
+                  fontSize: 12, fontWeight: ativo ? 700 : 400,
+                  background: ativo ? '#1C252E' : '#F0F4F8',
+                  color: ativo ? '#C3EBF7' : '#6B7A8D',
+                  transition: 'all 0.12s',
+                }}>
+                  {label}
+                </button>
+              )
+            })}
+          </div>
+        )}
+
         {isEditMode && (
           <button onClick={() => setUploadOpen(true)} style={{
             background: '#0A66C2', color: '#fff', border: 'none', borderRadius: 10,
@@ -41,10 +84,10 @@ export default function LinkedinView({ tab = 'geral' }) {
         )}
       </div>
 
-      {/* Conteúdo da aba (controlado pela sidebar) */}
+      {/* Conteúdo da aba */}
       {tab === 'geral'      && <LinkedinVisaoGeral posts={postsAno} ano={ano} isEditMode={isEditMode} onEditPost={setEditPost}/>}
       {tab === 'biblioteca' && <LinkedinBiblioteca allPosts={linkedinPosts} ano={ano} isEditMode={isEditMode} onEditPost={setEditPost} onDeletePost={setConfirmDel}/>}
-      {tab === 'formato'    && <LinkedinPorFormato posts={postsAno} ano={ano}/>}
+      {tab === 'formato'    && <LinkedinVisaoMensal posts={postsMes} mes={mes} isEditMode={isEditMode} onEditPost={setEditPost}/>}
 
       {/* Modais */}
       {uploadOpen && isEditMode && (

@@ -2,10 +2,8 @@ import { useState } from 'react'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts'
 import { useIsMobile } from '../utils/useIsMobile'
 
-const MESES_LABEL = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez']
-const MESES_FULL  = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro']
+const MESES_FULL = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro']
 
-// Borda lateral sutil por formato — a única diferença visual entre os cards
 const BORDA = {
   Imagem:    '#0A66C2',
   Vídeo:     '#FF6200',
@@ -61,16 +59,15 @@ function fmtN(n) {
   return Math.round(n).toLocaleString('pt-BR')
 }
 
-function FormatoCard({ cfg, posts, ano, mobile }) {
+function FormatoCard({ cfg, posts, mobile }) {
   const ps = posts.filter(p => p.tipo === cfg.id)
   const [sel, setSel] = useState(cfg.metricas[0].key)
-  const borda = BORDA[cfg.id]
 
   if (ps.length === 0) {
     return (
-      <div className="card" style={{ padding: '18px 20px', opacity: 0.4, borderLeft: `3px solid #EAECF0` }}>
+      <div className="card" style={{ padding: '18px 20px', opacity: 0.35, borderLeft: `3px solid #EAECF0` }}>
         <p style={{ color: '#1C252E', fontSize: 13, fontWeight: 700 }}>{cfg.label}</p>
-        <p style={{ color: '#C0CEDA', fontSize: 12, marginTop: 4 }}>Sem posts em {ano}</p>
+        <p style={{ color: '#C0CEDA', fontSize: 12, marginTop: 4 }}>Sem posts neste mês</p>
       </div>
     )
   }
@@ -80,22 +77,17 @@ function FormatoCard({ cfg, posts, ano, mobile }) {
     totals[m.key] = ps.reduce((s, p) => s + (Number(p[m.key]) || 0), 0)
   })
   const maxVal = totals.impressoes || 1
-
   const metricaSel = cfg.metricas.find(m => m.key === sel) || cfg.metricas[0]
 
-  const monthData = MESES_LABEL.map((mes, i) => {
-    const mm = String(i + 1).padStart(2, '0')
-    const mps = ps.filter(p => p.data_post?.split('/')?.[1] === mm)
-    return {
-      mes,
-      mesFull: MESES_FULL[i],
-      value: mps.reduce((s, p) => s + (Number(p[sel]) || 0), 0),
-      count: mps.length,
-    }
-  })
+  // Gráfico: posts do mês por dia (ou lista simples já que é um mês)
+  const postsDados = ps.map((p, i) => ({
+    label: p.data_post?.split('/')?.[0] ? `${p.data_post.split('/')[0]}` : `Post ${i+1}`,
+    nome: p.nome || `Post ${i+1}`,
+    value: Number(p[sel]) || 0,
+  }))
 
   return (
-    <div className="card" style={{ padding: 0, overflow: 'hidden', borderLeft: `3px solid ${borda}` }}>
+    <div className="card" style={{ padding: 0, overflow: 'hidden', borderLeft: `3px solid ${BORDA[cfg.id] || '#EAECF0'}` }}>
 
       {/* Cabeçalho */}
       <div style={{ padding: '14px 20px 12px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid #F5F7FA' }}>
@@ -105,7 +97,7 @@ function FormatoCard({ cfg, posts, ano, mobile }) {
         </span>
       </div>
 
-      {/* Funil */}
+      {/* Métricas funil */}
       <div style={{ padding: '12px 16px 8px', display: 'flex', flexDirection: 'column', gap: 4 }}>
         {cfg.metricas.map(m => {
           const val = totals[m.key] || 0
@@ -122,7 +114,6 @@ function FormatoCard({ cfg, posts, ano, mobile }) {
               }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                  {/* Badge do papel */}
                   <span style={{
                     background: ativo ? '#1C252E' : '#EAECF0',
                     color: ativo ? '#C3EBF7' : '#5A6A7A',
@@ -137,7 +128,6 @@ function FormatoCard({ cfg, posts, ano, mobile }) {
                     {m.label}
                   </span>
                 </div>
-                {/* Valor — laranja quando ativo, navy secundário quando não */}
                 <span style={{
                   color: ativo ? '#FF6200' : '#8A9BB0',
                   fontSize: mobile ? 15 : 17, fontWeight: ativo ? 800 : 600,
@@ -146,13 +136,10 @@ function FormatoCard({ cfg, posts, ano, mobile }) {
                   {fmtN(val)}
                 </span>
               </div>
-
-              {/* Barra */}
               <div style={{ background: '#F0F4F8', borderRadius: 3, height: 4, overflow: 'hidden' }}>
                 <div style={{
                   background: ativo ? '#1C252E' : '#BCC8D4',
-                  borderRadius: 3, height: '100%',
-                  width: `${pct}%`,
+                  borderRadius: 3, height: '100%', width: `${pct}%`,
                   transition: 'width 0.5s ease, background 0.12s',
                 }}/>
               </div>
@@ -164,55 +151,85 @@ function FormatoCard({ cfg, posts, ano, mobile }) {
       {/* Divisor */}
       <div style={{ height: 1, background: '#F5F7FA', margin: '4px 0' }}/>
 
-      {/* Gráfico mensal */}
+      {/* Gráfico por post */}
       <div style={{ padding: '10px 20px 16px' }}>
         <p style={{ color: '#9AAAB8', fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 8 }}>
-          {metricaSel.label} · mês a mês
+          {metricaSel.label} · por post
         </p>
-        <ResponsiveContainer width="100%" height={75}>
-          <BarChart data={monthData} barSize={mobile ? 8 : 13} margin={{ top: 2, right: 0, left: 0, bottom: 0 }}>
-            <XAxis dataKey="mes" tick={{ fill: '#C0CEDA', fontSize: 9 }} axisLine={false} tickLine={false}/>
+        <ResponsiveContainer width="100%" height={70}>
+          <BarChart data={postsDados} barSize={mobile ? 10 : 16} margin={{ top: 2, right: 0, left: 0, bottom: 0 }}>
+            <XAxis dataKey="label" tick={{ fill: '#C0CEDA', fontSize: 9 }} axisLine={false} tickLine={false}/>
             <YAxis hide/>
             <Tooltip content={({ active, payload }) => {
               if (!active || !payload?.length) return null
               const d = payload[0].payload
               return (
-                <div style={{ background: '#fff', border: '1px solid #EAECF0', borderRadius: 8, padding: '6px 10px', fontSize: 11 }}>
-                  <p style={{ fontWeight: 700, color: '#1C252E', marginBottom: 2 }}>{d.mesFull}</p>
+                <div style={{ background: '#fff', border: '1px solid #EAECF0', borderRadius: 8, padding: '6px 10px', fontSize: 11, maxWidth: 200 }}>
+                  <p style={{ fontWeight: 700, color: '#1C252E', marginBottom: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{d.nome}</p>
                   <p style={{ color: '#FF6200', fontWeight: 700 }}>{fmtN(d.value)} {metricaSel.label.toLowerCase()}</p>
-                  {d.count > 0 && <p style={{ color: '#9AAAB8' }}>{d.count} post{d.count > 1 ? 's' : ''}</p>}
                 </div>
               )
             }} cursor={{ fill: 'rgba(0,0,0,0.02)' }}/>
             <Bar dataKey="value" radius={[3,3,0,0]}>
-              {monthData.map((e, i) => (
+              {postsDados.map((e, i) => (
                 <Cell key={i} fill={e.value === 0 ? '#F0F2F5' : '#C3EBF7'}/>
               ))}
             </Bar>
           </BarChart>
         </ResponsiveContainer>
       </div>
-
     </div>
   )
 }
 
-export default function LinkedinPorFormato({ posts, ano }) {
+export default function LinkedinVisaoMensal({ posts, mes, isEditMode, onEditPost }) {
   const mobile = useIsMobile()
+  const mesNome = MESES_FULL[parseInt(mes, 10) - 1] || mes
+
+  const totalImpressoes   = posts.reduce((s, p) => s + (Number(p.impressoes)    || 0), 0)
+  const totalVisualizacoes= posts.reduce((s, p) => s + (Number(p.visualizacoes) || 0), 0)
+  const totalCliques      = posts.reduce((s, p) => s + (Number(p.cliques)       || 0), 0)
+  const totalReacoes      = posts.reduce((s, p) => s + (Number(p.reacoes)       || 0), 0)
+  const totalPosts        = posts.length
+
+  const KPIS = [
+    { label: 'Impressões',    value: fmtN(totalImpressoes),    sub: 'alcance total' },
+    { label: 'Visualizações', value: fmtN(totalVisualizacoes), sub: 'vídeos e artigos' },
+    { label: 'Cliques',       value: fmtN(totalCliques),       sub: 'no conteúdo' },
+    { label: 'Reações',       value: fmtN(totalReacoes),       sub: 'curtidas e reações' },
+    { label: 'Posts',         value: String(totalPosts),       sub: `publicações em ${mesNome}` },
+  ]
 
   if (posts.length === 0) {
     return (
       <div className="card" style={{ padding: '48px 20px', textAlign: 'center' }}>
-        <p style={{ color: '#9AAAB8', fontSize: 14 }}>Nenhum post LinkedIn em {ano}.</p>
+        <p style={{ color: '#9AAAB8', fontSize: 14 }}>Nenhum post em {mesNome}.</p>
+        <p style={{ color: '#C0CEDA', fontSize: 12, marginTop: 6 }}>Selecione outro mês ou adicione posts.</p>
       </div>
     )
   }
 
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: mobile ? '1fr' : '1fr 1fr', gap: 14 }}>
-      {CONFIGS.map(cfg => (
-        <FormatoCard key={cfg.id} cfg={cfg} posts={posts} ano={ano} mobile={mobile}/>
-      ))}
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+
+      {/* KPIs do mês */}
+      <div style={{ display: 'grid', gridTemplateColumns: mobile ? 'repeat(2,1fr)' : 'repeat(5,1fr)', gap: mobile ? 8 : 12 }}>
+        {KPIS.map(({ label, value, sub }) => (
+          <div key={label} className="card" style={{ padding: mobile ? '12px 14px' : '16px 20px' }}>
+            <p style={{ color: '#8A9BB0', fontSize: mobile ? 9 : 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 8 }}>{label}</p>
+            <p style={{ color: '#1C252E', fontSize: mobile ? 20 : 24, fontWeight: 800, lineHeight: 1, marginBottom: 4 }}>{value}</p>
+            <p style={{ color: '#A8B5C0', fontSize: mobile ? 9 : 11 }}>{sub}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* Cards por formato */}
+      <div style={{ display: 'grid', gridTemplateColumns: mobile ? '1fr' : '1fr 1fr', gap: 14 }}>
+        {CONFIGS.map(cfg => (
+          <FormatoCard key={cfg.id} cfg={cfg} posts={posts} mobile={mobile}/>
+        ))}
+      </div>
+
     </div>
   )
 }

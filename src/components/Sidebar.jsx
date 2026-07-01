@@ -15,9 +15,9 @@ const NAV_GROUPS = [
   {
     label: 'LINKEDIN · em breve',
     items: [
-      { id: 'linkedin-geral',       icon: BarChart2,  label: 'Visão Geral',  muted: true },
-      { id: 'linkedin-posts',       icon: List,       label: 'Posts',        muted: true },
-      { id: 'linkedin-performance', icon: TrendingUp, label: 'Performance',  muted: true },
+      { id: 'linkedin-geral',       icon: Calendar,  label: 'Visão Anual',  muted: true },
+      { id: 'linkedin-performance', icon: BarChart2, label: 'Visão Mensal', muted: true },
+      { id: 'linkedin-posts',       icon: List,      label: 'Posts',        muted: true },
     ],
   },
   {
