@@ -20,9 +20,10 @@ const TITLES = {
   'insights':     { title: 'Insights',           sub: 'Análise inteligente de performance' },
   'upload':       { title: 'Upload',             sub: 'Adicionar post com extração automática' },
   'glossario':    { title: 'Glossário',          sub: 'Definições oficiais do Instagram' },
-  'linkedin-geral':       { title: 'Visão Anual',   sub: 'Performance consolidada do ano no LinkedIn' },
-  'linkedin-posts':       { title: 'Posts',         sub: 'Biblioteca completa de publicações LinkedIn' },
-  'linkedin-performance': { title: 'Visão Mensal',  sub: 'Métricas e performance por formato no mês' },
+  'linkedin-geral':       { title: 'Visão Anual',    sub: 'Performance consolidada do ano no LinkedIn' },
+  'linkedin-posts':       { title: 'Posts',          sub: 'Biblioteca completa de publicações LinkedIn' },
+  'linkedin-performance': { title: 'Visão Mensal',   sub: 'Métricas e performance por formato no mês' },
+  'linkedin-pilula':      { title: 'Pílula de ETFs', sub: 'Evolução e termômetro de performance das newsletters' },
 }
 
 const EDIT_PASSWORD = import.meta.env.VITE_EDIT_PASSWORD || 'itauasset2026'

@@ -4,6 +4,7 @@ import { useStore } from '../store/useStore'
 import LinkedinVisaoGeral from './LinkedinVisaoGeral'
 import LinkedinBiblioteca from './LinkedinBiblioteca'
 import LinkedinVisaoMensal from './LinkedinVisaoMensal'
+import LinkedinPilula from './LinkedinPilula'
 import LinkedinUploadModal from './LinkedinUploadModal'
 
 const MESES_LABEL = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez']
@@ -44,8 +45,8 @@ export default function LinkedinView({ tab = 'geral' }) {
       {/* Controles de filtro */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 8 }}>
 
-        {/* Filtro de ano — só na aba anual */}
-        {tab === 'geral' && anosComPosts.length > 0 && (
+        {/* Filtro de ano — na aba anual e pílula */}
+        {(tab === 'geral' || tab === 'pilula') && anosComPosts.length > 0 && (
           <select value={ano} onChange={e => setAno(e.target.value)}
             style={{ background: '#fff', border: '1.5px solid #EDEFF2', borderRadius: 10, padding: '7px 10px', fontSize: 13, color: '#1C252E', cursor: 'pointer', outline: 'none', fontFamily: 'DM Sans, sans-serif' }}>
             {anosComPosts.map(a => <option key={a} value={a}>{a}</option>)}
@@ -88,6 +89,7 @@ export default function LinkedinView({ tab = 'geral' }) {
       {tab === 'geral'      && <LinkedinVisaoGeral posts={postsAno} ano={ano} isEditMode={isEditMode} onEditPost={setEditPost}/>}
       {tab === 'biblioteca' && <LinkedinBiblioteca allPosts={linkedinPosts} ano={ano} isEditMode={isEditMode} onEditPost={setEditPost} onDeletePost={setConfirmDel}/>}
       {tab === 'formato'    && <LinkedinVisaoMensal posts={postsMes} mes={mes} isEditMode={isEditMode} onEditPost={setEditPost}/>}
+      {tab === 'pilula'     && <LinkedinPilula posts={postsAno} ano={ano}/>}
 
       {/* Modais */}
       {uploadOpen && isEditMode && (

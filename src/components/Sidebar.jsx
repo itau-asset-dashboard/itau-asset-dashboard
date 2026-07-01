@@ -15,9 +15,10 @@ const NAV_GROUPS = [
   {
     label: 'LINKEDIN · em breve',
     items: [
-      { id: 'linkedin-geral',       icon: Calendar,  label: 'Visão Anual',  muted: true },
-      { id: 'linkedin-performance', icon: BarChart2, label: 'Visão Mensal', muted: true },
-      { id: 'linkedin-posts',       icon: List,      label: 'Posts',        muted: true },
+      { id: 'linkedin-geral',       icon: Calendar,  label: 'Visão Anual',    muted: true },
+      { id: 'linkedin-performance', icon: BarChart2, label: 'Visão Mensal',   muted: true },
+      { id: 'linkedin-pilula',      icon: TrendingUp,label: 'Pílula de ETFs', muted: true },
+      { id: 'linkedin-posts',       icon: List,      label: 'Posts',          muted: true },
     ],
   },
   {

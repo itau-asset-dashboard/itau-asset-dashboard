@@ -118,6 +118,7 @@ export default function App() {
           {activeSection === 'linkedin-geral'       && <LinkedinView tab="geral" />}
           {activeSection === 'linkedin-posts'       && <LinkedinView tab="biblioteca" />}
           {activeSection === 'linkedin-performance' && <LinkedinView tab="formato" />}
+          {activeSection === 'linkedin-pilula'      && <LinkedinView tab="pilula" />}
           {activeSection === 'visao-anual' && <AnnualView />}
           {activeSection === 'visao-geral' && (
             <>
