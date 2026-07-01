@@ -1,5 +1,5 @@
 import { useState, useRef, useImperativeHandle, forwardRef } from 'react'
-import { X, Upload, Sparkles, Check } from 'lucide-react'
+import { X, Upload, Sparkles, Check, Trash2 } from 'lucide-react'
 import { TEMAS } from './UploadModal'
 import { extractLinkedinFromImage } from '../utils/anthropic'
 import { useStore } from '../store/useStore'
@@ -155,6 +155,11 @@ const SingleLinkedinModal = forwardRef(function SingleLinkedinModal(
   { mode = 'new', initial = null, initialPreview = null, onClose, onSave, onDelete, isLast = true, totalFiles = 1 },
   ref
 ) {
+  const [confirmDelete, setConfirmDelete] = useState(false)
+  function handleDelete() {
+    if (!confirmDelete) { setConfirmDelete(true); return }
+    onDelete(form.id)
+  }
   const { apiKey } = useStore()
   const [form, setForm] = useState(() => {
     const base = { ...EMPTY, ...(initial || {}) }
@@ -359,19 +364,26 @@ const SingleLinkedinModal = forwardRef(function SingleLinkedinModal(
         </div>
       </div>
 
-      <button onClick={save} disabled={saving}
-        style={{ width:'100%', background: saved ? '#16a34a' : '#1C252E', color:'#C3EBF7', border:'none', borderRadius:12, padding:'13px', fontSize:14, fontWeight:700, cursor:saving?'wait':'pointer', display:'flex', alignItems:'center', justifyContent:'center', gap:8, transition:'background 0.2s' }}>
-        {saved ? <><Check size={16}/> {btnLabel}</> : btnLabel}
-      </button>
-
-      {mode === 'edit' && onDelete && (
-        <button onClick={() => onDelete(form.id)}
-          style={{ width:'100%', background:'none', border:'none', color:'#e11d48', fontSize:12, fontWeight:600, cursor:'pointer', padding:'10px', marginTop:2, opacity:0.7 }}
-          onMouseEnter={e => e.currentTarget.style.opacity = '1'}
-          onMouseLeave={e => e.currentTarget.style.opacity = '0.7'}>
-          Remover post
+      <div style={{ display:'flex', gap:8 }}>
+        <button onClick={save} disabled={saving}
+          style={{ flex:1, background: saved ? '#16a34a' : '#1C252E', color:'#C3EBF7', border:'none', borderRadius:12, padding:'13px', fontSize:14, fontWeight:700, cursor:saving?'wait':'pointer', display:'flex', alignItems:'center', justifyContent:'center', gap:8, transition:'background 0.2s' }}>
+          {saved ? <><Check size={16}/> {btnLabel}</> : btnLabel}
         </button>
-      )}
+
+        {mode === 'edit' && onDelete && (
+          <button onClick={handleDelete} style={{
+            background: confirmDelete ? '#ef4444' : '#FEF2F2',
+            color: confirmDelete ? '#fff' : '#ef4444',
+            border: `1px solid ${confirmDelete ? '#ef4444' : '#fecaca'}`,
+            borderRadius:12, padding:'13px 14px', cursor:'pointer',
+            display:'flex', alignItems:'center', justifyContent:'center', gap:6,
+            fontSize:13, fontWeight:600, transition:'all 0.15s', flexShrink:0,
+          }}>
+            <Trash2 size={15}/>
+            {confirmDelete ? 'Confirmar?' : 'Excluir'}
+          </button>
+        )}
+      </div>
 
       {lightbox && <ImageLightbox src={lightbox} onClose={() => setLightbox(null)} title={form.nome || 'LinkedIn'}/>}
     </div>
