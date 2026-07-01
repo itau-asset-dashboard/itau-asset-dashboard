@@ -38,26 +38,30 @@ const TIPO_COLOR = {
   Artigo:    { bg: 'rgba(22,163,74,0.1)',   color: '#16a34a' },
 }
 
-export default function LinkedinBiblioteca({ allPosts, ano, isEditMode, onEditPost, onDeletePost }) {
+export default function LinkedinBiblioteca({ allPosts, mesFiltro, isEditMode, onEditPost, onDeletePost }) {
   const mobile = useIsMobile()
   const [search, setSearch] = useState('')
   const [sortKey, setSortKey] = useState('data_post')
   const [sortDir, setSortDir] = useState(-1)
   const [page, setPage]       = useState(0)
 
-  const postsAno = allPosts.filter(p => p.data_post?.split('/')?.[2] === ano)
+  // mesFiltro = "MM/YYYY"
+  const [mmF, yyyyF] = (mesFiltro || '').split('/')
+  const postsMes = allPosts.filter(p => {
+    const pts = p.data_post?.split('/')
+    return pts?.[1] === mmF && pts?.[2] === yyyyF
+  })
   const q = search.trim().toLowerCase()
 
   const filtered = useMemo(() => {
-    if (!q) return postsAno
+    if (!q) return postsMes
     return allPosts.filter(p =>
       (p.nome      || '').toLowerCase().includes(q) ||
       (p.data_post || '').toLowerCase().includes(q) ||
       (p.tipo      || '').toLowerCase().includes(q) ||
-      (p.autor     || '').toLowerCase().includes(q) ||
       (Array.isArray(p.tema) ? p.tema.join(' ') : '').toLowerCase().includes(q)
     )
-  }, [allPosts, postsAno, q])
+  }, [allPosts, postsMes, q])
 
   const sorted = useMemo(() => [...filtered].sort((a, b) => {
     if (sortKey === 'data_post') return sortDir * (parseDate(a.data_post) - parseDate(b.data_post))
@@ -98,7 +102,7 @@ export default function LinkedinBiblioteca({ allPosts, ano, isEditMode, onEditPo
         <div>
           <h2 style={{ color: '#1C252E', fontSize: 15, fontWeight: 700, margin: 0 }}>Posts LinkedIn</h2>
           <p style={{ color: '#8A9BB0', fontSize: 12, marginTop: 2 }}>
-            {q ? `${sorted.length} resultado${sorted.length !== 1 ? 's' : ''} em todos os posts` : `${filtered.length} publicações em ${ano}`}
+            {q ? `${sorted.length} resultado${sorted.length !== 1 ? 's' : ''} em todos os posts` : `${filtered.length} publicação${filtered.length !== 1 ? 'ões' : ''} no mês`}
           </p>
         </div>
         <div style={{

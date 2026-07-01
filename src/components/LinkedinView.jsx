@@ -25,9 +25,28 @@ export default function LinkedinView({ tab = 'geral' }) {
   const defaultAno = String(new Date().getFullYear())
   const [ano, setAno] = useState(anosComPosts.includes(defaultAno) ? defaultAno : (anosComPosts[anosComPosts.length - 1] || defaultAno))
 
-  // Mês para a aba mensal
+  // Mês para a aba mensal (pills)
   const mesAtual = String(new Date().getMonth() + 1).padStart(2, '0')
   const [mes, setMes] = useState(mesAtual)
+
+  // Mês/ano para a aba biblioteca (select dropdown) — "MM/YYYY"
+  const mesesComPosts = useMemo(() => {
+    const set = new Set(
+      linkedinPosts
+        .map(p => { const pts = p.data_post?.split('/'); return pts?.[1] && pts?.[2] ? `${pts[1]}/${pts[2]}` : null })
+        .filter(Boolean)
+    )
+    return [...set].sort((a, b) => {
+      const [ma, ya] = a.split('/'); const [mb, yb] = b.split('/')
+      return ya !== yb ? Number(ya) - Number(yb) : Number(ma) - Number(mb)
+    })
+  }, [linkedinPosts])
+
+  const defaultMesFiltro = (() => {
+    const cur = `${String(new Date().getMonth()+1).padStart(2,'0')}/${new Date().getFullYear()}`
+    return mesesComPosts.includes(cur) ? cur : (mesesComPosts[mesesComPosts.length - 1] || cur)
+  })()
+  const [mesBiblioteca, setMesBiblioteca] = useState(defaultMesFiltro)
 
   const postsAno = linkedinPosts.filter(p => p.data_post?.split('/')?.[2] === ano)
   const postsMes = linkedinPosts.filter(p => {
@@ -44,6 +63,17 @@ export default function LinkedinView({ tab = 'geral' }) {
 
       {/* Controles de filtro */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 8 }}>
+
+        {/* Filtro de mês — aba biblioteca (select dropdown) */}
+        {tab === 'biblioteca' && mesesComPosts.length > 0 && (
+          <select value={mesBiblioteca} onChange={e => setMesBiblioteca(e.target.value)}
+            style={{ background: '#fff', border: '1.5px solid #EDEFF2', borderRadius: 10, padding: '7px 10px', fontSize: 13, color: '#1C252E', cursor: 'pointer', outline: 'none', fontFamily: 'DM Sans, sans-serif' }}>
+            {mesesComPosts.map(mv => {
+              const [mm, yyyy] = mv.split('/')
+              return <option key={mv} value={mv}>{MESES_FULL[parseInt(mm,10)-1]} {yyyy}</option>
+            })}
+          </select>
+        )}
 
         {/* Filtro de ano — na aba anual e pílula */}
         {(tab === 'geral' || tab === 'pilula') && anosComPosts.length > 0 && (
@@ -87,7 +117,7 @@ export default function LinkedinView({ tab = 'geral' }) {
 
       {/* Conteúdo da aba */}
       {tab === 'geral'      && <LinkedinVisaoGeral posts={postsAno} ano={ano} isEditMode={isEditMode} onEditPost={setEditPost}/>}
-      {tab === 'biblioteca' && <LinkedinBiblioteca allPosts={linkedinPosts} ano={ano} isEditMode={isEditMode} onEditPost={setEditPost} onDeletePost={setConfirmDel}/>}
+      {tab === 'biblioteca' && <LinkedinBiblioteca allPosts={linkedinPosts} mesFiltro={mesBiblioteca} isEditMode={isEditMode} onEditPost={setEditPost} onDeletePost={setConfirmDel}/>}
       {tab === 'formato'    && <LinkedinVisaoMensal posts={postsMes} mes={mes} isEditMode={isEditMode} onEditPost={setEditPost}/>}
       {tab === 'pilula'     && <LinkedinPilula posts={postsAno} ano={ano}/>}
 
