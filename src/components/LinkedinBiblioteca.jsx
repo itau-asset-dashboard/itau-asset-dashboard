@@ -170,15 +170,9 @@ export default function LinkedinBiblioteca({ allPosts, ano, isEditMode, onEditPo
                       )}
                     </td>
                     <td style={{ padding: '11px 14px', color: '#0A66C2', fontSize: 13, fontWeight: 700, whiteSpace: 'nowrap' }}>{fmtN(p.impressoes)}</td>
-                    <td style={{ padding: '11px 14px', fontSize: 13, whiteSpace: 'nowrap', color: applies(p.tipo,'visualizacoes') ? '#1C252E' : '#E0E7EF' }}>
-                      {applies(p.tipo,'visualizacoes') ? fmtN(p.visualizacoes) : '—'}
-                    </td>
-                    <td style={{ padding: '11px 14px', fontSize: 13, whiteSpace: 'nowrap', color: applies(p.tipo,'cliques') ? '#1C252E' : '#E0E7EF' }}>
-                      {applies(p.tipo,'cliques') ? fmtN(p.cliques) : '—'}
-                    </td>
-                    <td style={{ padding: '11px 14px', fontSize: 13, whiteSpace: 'nowrap', color: applies(p.tipo,'ctr') ? '#1C252E' : '#E0E7EF' }}>
-                      {applies(p.tipo,'ctr') ? fmtCtr(p.ctr) : '—'}
-                    </td>
+                    <td style={{ padding: '11px 14px', color: '#1C252E', fontSize: 13, whiteSpace: 'nowrap' }}>{fmtN(p.visualizacoes)}</td>
+                    <td style={{ padding: '11px 14px', color: '#1C252E', fontSize: 13, whiteSpace: 'nowrap' }}>{fmtN(p.cliques)}</td>
+                    <td style={{ padding: '11px 14px', color: '#1C252E', fontSize: 13, whiteSpace: 'nowrap' }}>{fmtCtr(p.ctr)}</td>
                     <td style={{ padding: '11px 14px', color: '#1C252E', fontSize: 13, whiteSpace: 'nowrap' }}>{fmtN(p.reacoes)}</td>
                     {isEditMode && (
                       <td style={{ padding: '11px 10px', whiteSpace: 'nowrap' }} onClick={e => e.stopPropagation()}>
