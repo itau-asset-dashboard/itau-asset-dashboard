@@ -71,7 +71,7 @@ export default function LinkedinBiblioteca({ allPosts, mesFiltro, isEditMode, on
 
   const pages = Math.ceil(sorted.length / PAGE_SIZE)
   const visible = sorted.slice(page * PAGE_SIZE, page * PAGE_SIZE + PAGE_SIZE)
-  const topId = postsAno.length ? [...postsAno].sort((a,b)=>(b.impressoes||0)-(a.impressoes||0))[0]?.id : null
+  const topId = postsMes.length ? [...postsMes].sort((a,b)=>(b.impressoes||0)-(a.impressoes||0))[0]?.id : null
 
   function toggleSort(k) {
     if (sortKey === k) setSortDir(d => -d)
