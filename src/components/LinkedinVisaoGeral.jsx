@@ -212,8 +212,15 @@ export default function LinkedinVisaoGeral({ posts, ano, isEditMode, onEditPost 
                   style={{ borderTop: '1px solid #F5F7FA', cursor: isEditMode ? 'pointer' : 'default' }}
                   onMouseEnter={e => { if (isEditMode) e.currentTarget.style.background = '#F8FAFC' }}
                   onMouseLeave={e => { e.currentTarget.style.background = '' }}>
-                  <td style={{ padding: '10px 14px', color: '#C0CEDA', fontSize: 13 }}>
-                    {i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i + 1}º`}
+                  <td style={{ padding: '10px 14px' }}>
+                    <span style={{
+                      background: i < 3 ? '#1C252E' : '#F0F2F5',
+                      color: i < 3 ? '#C3EBF7' : '#9AAAB8',
+                      borderRadius: 6, padding: '2px 7px',
+                      fontSize: 10, fontWeight: 700,
+                    }}>
+                      {i + 1}
+                    </span>
                   </td>
                   <td style={{ padding: '10px 14px', maxWidth: 200 }}>
                     <p style={{ color: '#1C252E', fontSize: 13, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.nome || '—'}</p>

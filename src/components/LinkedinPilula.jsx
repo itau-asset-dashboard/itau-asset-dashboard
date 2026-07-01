@@ -164,20 +164,6 @@ export default function LinkedinPilula({ posts, ano }) {
           </div>
         </div>
 
-        {/* Legenda */}
-        <div style={{ padding: '10px 20px 6px', display: 'flex', gap: 16, flexWrap: 'wrap' }}>
-          {[
-            { color: '#16a34a', label: 'Destaque — 40%+ acima da média' },
-            { color: '#FF6200', label: 'Na média — dentro do esperado' },
-            { color: '#e11d48', label: 'A melhorar — abaixo da média' },
-          ].map(({ color, label }) => (
-            <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-              <div style={{ width: 8, height: 8, borderRadius: '50%', background: color, flexShrink: 0 }}/>
-              <span style={{ color: '#9AAAB8', fontSize: 10 }}>{label}</span>
-            </div>
-          ))}
-        </div>
-
         {/* Lista */}
         <div style={{ padding: '6px 16px 16px', display: 'flex', flexDirection: 'column', gap: 6 }}>
           {sorted.map((p, i) => {
@@ -198,8 +184,13 @@ export default function LinkedinPilula({ posts, ano }) {
               }}>
                 <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
                   {/* Posição */}
-                  <span style={{ color: '#C0CEDA', fontSize: 11, fontWeight: 700, minWidth: 20, paddingTop: 1, flexShrink: 0 }}>
-                    {i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i+1}º`}
+                  <span style={{
+                    background: i < 3 ? '#1C252E' : '#F0F2F5',
+                    color: i < 3 ? '#C3EBF7' : '#9AAAB8',
+                    borderRadius: 6, padding: '2px 7px',
+                    fontSize: 10, fontWeight: 700, flexShrink: 0, minWidth: 28, textAlign: 'center',
+                  }}>
+                    {i + 1}
                   </span>
 
                   <div style={{ flex: 1, minWidth: 0 }}>
