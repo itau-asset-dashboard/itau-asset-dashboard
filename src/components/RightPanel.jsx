@@ -64,7 +64,7 @@ export default function RightPanel() {
   // Anel SVG
   const R = 54, CIRC = 2 * Math.PI * R
   const dash = (pctMensal / 100) * CIRC
-  const ringColor = superou ? '#0A66C2' : atingiu ? '#16a34a' : '#FF6200'
+  const ringColor = atingiu ? '#16a34a' : '#FF6200'
 
   return (
     <aside className="right-panel-desktop" style={{
@@ -94,7 +94,7 @@ export default function RightPanel() {
         {/* Glow sutil atrás do anel */}
         <div style={{
           position: 'absolute', inset: 12, borderRadius: '50%',
-          background: superou ? 'rgba(10,102,194,0.07)' : atingiu ? 'rgba(22,163,74,0.06)' : 'rgba(255,98,0,0.06)',
+          background: atingiu ? 'rgba(22,163,74,0.06)' : 'rgba(255,98,0,0.06)',
           filter: 'blur(8px)',
         }} />
         <svg width="140" height="140" viewBox="0 0 140 140" style={{ position: 'relative' }}>
@@ -170,13 +170,13 @@ export default function RightPanel() {
         )}
         {superou && (
           <div style={{
-            background: 'rgba(10,102,194,0.06)', borderRadius: 12,
-            border: '1px solid rgba(10,102,194,0.2)',
+            background: 'rgba(22,163,74,0.06)', borderRadius: 12,
+            border: '1px solid rgba(22,163,74,0.2)',
             padding: '12px 16px',
             display: 'flex', justifyContent: 'space-between', alignItems: 'center',
           }}>
-            <span style={{ color: '#0A66C2', fontSize: 12, fontWeight: 700 }}>↑ Meta superada</span>
-            <span style={{ color: '#0A66C2', fontSize: 13, fontWeight: 800 }}>+{fmt(excesso)}</span>
+            <span style={{ color: '#16a34a', fontSize: 12, fontWeight: 700 }}>↑ Meta superada</span>
+            <span style={{ color: '#16a34a', fontSize: 13, fontWeight: 800 }}>+{fmt(excesso)}</span>
           </div>
         )}
       </div>
