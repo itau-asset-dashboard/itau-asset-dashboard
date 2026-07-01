@@ -185,10 +185,8 @@ export default function LinkedinPilula({ posts, ano }) {
                 <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
                   {/* Posição */}
                   <span style={{
-                    background: i < 3 ? '#1C252E' : '#F0F2F5',
-                    color: i < 3 ? '#C3EBF7' : '#9AAAB8',
-                    borderRadius: 6, padding: '2px 7px',
-                    fontSize: 10, fontWeight: 700, flexShrink: 0, minWidth: 28, textAlign: 'center',
+                    color: i === 0 ? '#FF6200' : i < 3 ? '#0A66C2' : '#C0CEDA',
+                    fontSize: 13, fontWeight: 700, flexShrink: 0, minWidth: 20, textAlign: 'center',
                   }}>
                     {i + 1}
                   </span>

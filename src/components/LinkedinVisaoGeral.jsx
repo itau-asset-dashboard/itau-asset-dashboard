@@ -214,10 +214,8 @@ export default function LinkedinVisaoGeral({ posts, ano, isEditMode, onEditPost 
                   onMouseLeave={e => { e.currentTarget.style.background = '' }}>
                   <td style={{ padding: '10px 14px' }}>
                     <span style={{
-                      background: i < 3 ? '#1C252E' : '#F0F2F5',
-                      color: i < 3 ? '#C3EBF7' : '#9AAAB8',
-                      borderRadius: 6, padding: '2px 7px',
-                      fontSize: 10, fontWeight: 700,
+                      color: i === 0 ? '#FF6200' : i < 3 ? '#0A66C2' : '#C0CEDA',
+                      fontSize: 13, fontWeight: 700,
                     }}>
                       {i + 1}
                     </span>
