@@ -23,7 +23,7 @@ const NUM_FIELDS = [
 ]
 
 // ─── Modal principal (entry point) ───────────────────────────────────────────
-export default function LinkedinUploadModal({ mode = 'new', initial = null, onClose, onSave }) {
+export default function LinkedinUploadModal({ mode = 'new', initial = null, onClose, onSave, onDelete }) {
   if (mode === 'edit') {
     return (
       <div style={{ position:'fixed', inset:0, background:'rgba(28,37,46,0.65)', zIndex:1000, display:'flex', alignItems:'center', justifyContent:'center', padding:16 }}
@@ -35,7 +35,7 @@ export default function LinkedinUploadModal({ mode = 'new', initial = null, onCl
               <X size={16} color="#8A9BB0"/>
             </button>
           </div>
-          <SingleLinkedinModal mode="edit" initial={initial} onClose={onClose} onSave={onSave} isLast={true} totalFiles={1}/>
+          <SingleLinkedinModal mode="edit" initial={initial} onClose={onClose} onSave={onSave} onDelete={onDelete} isLast={true} totalFiles={1}/>
         </div>
       </div>
     )
@@ -152,7 +152,7 @@ function MultiLinkedinModal({ onClose, onSave }) {
 
 // ─── Formulário individual ────────────────────────────────────────────────────
 const SingleLinkedinModal = forwardRef(function SingleLinkedinModal(
-  { mode = 'new', initial = null, initialPreview = null, onClose, onSave, isLast = true, totalFiles = 1 },
+  { mode = 'new', initial = null, initialPreview = null, onClose, onSave, onDelete, isLast = true, totalFiles = 1 },
   ref
 ) {
   const { apiKey } = useStore()
@@ -363,6 +363,15 @@ const SingleLinkedinModal = forwardRef(function SingleLinkedinModal(
         style={{ width:'100%', background: saved ? '#16a34a' : '#1C252E', color:'#C3EBF7', border:'none', borderRadius:12, padding:'13px', fontSize:14, fontWeight:700, cursor:saving?'wait':'pointer', display:'flex', alignItems:'center', justifyContent:'center', gap:8, transition:'background 0.2s' }}>
         {saved ? <><Check size={16}/> {btnLabel}</> : btnLabel}
       </button>
+
+      {mode === 'edit' && onDelete && (
+        <button onClick={() => onDelete(form.id)}
+          style={{ width:'100%', background:'none', border:'none', color:'#e11d48', fontSize:12, fontWeight:600, cursor:'pointer', padding:'10px', marginTop:2, opacity:0.7 }}
+          onMouseEnter={e => e.currentTarget.style.opacity = '1'}
+          onMouseLeave={e => e.currentTarget.style.opacity = '0.7'}>
+          Remover post
+        </button>
+      )}
 
       {lightbox && <ImageLightbox src={lightbox} onClose={() => setLightbox(null)} title={form.nome || 'LinkedIn'}/>}
     </div>

@@ -126,7 +126,7 @@ export default function LinkedinView({ tab = 'geral' }) {
         <LinkedinUploadModal mode="new" onClose={() => setUploadOpen(false)} onSave={handleSaveNew}/>
       )}
       {editPost && isEditMode && (
-        <LinkedinUploadModal mode="edit" initial={editPost} onClose={() => setEditPost(null)} onSave={handleSaveEdit}/>
+        <LinkedinUploadModal mode="edit" initial={editPost} onClose={() => setEditPost(null)} onSave={handleSaveEdit} onDelete={id => { handleDelete(id); setEditPost(null) }}/>
       )}
       {confirmDel && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', zIndex: 500, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
