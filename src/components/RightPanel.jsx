@@ -51,17 +51,20 @@ export default function RightPanel() {
   const totalMensal = postsMes.reduce((s,p) => s+(p.contas_alcancadas||0), 0)
   const [mmFiltro, yyyyFiltro] = (mesFiltro || '').split('/')
   const metaAjustada = calcMetaMesProgressiva({ posts: allPosts, metaAnual, mm: mmFiltro, yyyy: yyyyFiltro })
-  const pctMensal = metaAjustada > 0 ? Math.min((totalMensal/metaAjustada)*100, 100) : 0
+  const pctReal   = metaAjustada > 0 ? (totalMensal / metaAjustada) * 100 : 0
+  const pctMensal = Math.min(pctReal, 100)   // usado só para o anel (não passa de 100%)
   const metaMesOriginal = Math.round(metaAnual/12)
-  const falta = Math.max(metaAjustada - totalMensal, 0)
-  const dias = diasRestantes(mesFiltro)
-  const mesNome = MESES_NOMES[(parseInt(mmFiltro, 10)||1) - 1]
-  const atingiu = pctMensal >= 100
+  const falta    = Math.max(metaAjustada - totalMensal, 0)
+  const excesso  = Math.max(totalMensal - metaAjustada, 0)
+  const dias     = diasRestantes(mesFiltro)
+  const mesNome  = MESES_NOMES[(parseInt(mmFiltro, 10)||1) - 1]
+  const atingiu  = pctReal >= 100
+  const superou  = pctReal > 100
 
   // Anel SVG
   const R = 54, CIRC = 2 * Math.PI * R
   const dash = (pctMensal / 100) * CIRC
-  const ringColor = atingiu ? '#16a34a' : '#FF6200'
+  const ringColor = superou ? '#0A66C2' : atingiu ? '#16a34a' : '#FF6200'
 
   return (
     <aside className="right-panel-desktop" style={{
@@ -91,7 +94,7 @@ export default function RightPanel() {
         {/* Glow sutil atrás do anel */}
         <div style={{
           position: 'absolute', inset: 12, borderRadius: '50%',
-          background: atingiu ? 'rgba(22,163,74,0.06)' : 'rgba(255,98,0,0.06)',
+          background: superou ? 'rgba(10,102,194,0.07)' : atingiu ? 'rgba(22,163,74,0.06)' : 'rgba(255,98,0,0.06)',
           filter: 'blur(8px)',
         }} />
         <svg width="140" height="140" viewBox="0 0 140 140" style={{ position: 'relative' }}>
@@ -112,7 +115,7 @@ export default function RightPanel() {
           display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
         }}>
           <span style={{ color: ringColor, fontSize: 28, fontWeight: 800, lineHeight: 1 }}>
-            {pctMensal.toFixed(0)}%
+            {pctReal.toFixed(0)}%
           </span>
           <span style={{ color: '#8A9BB0', fontSize: 10, marginTop: 3 }}>do mês</span>
         </div>
@@ -156,13 +159,24 @@ export default function RightPanel() {
             <span style={{ color: '#C05010', fontSize: 14, fontWeight: 700 }}>{fmt(falta)}</span>
           </div>
         )}
-        {atingiu && (
+        {atingiu && !superou && (
           <div style={{
             background: 'rgba(22,163,74,0.06)', borderRadius: 12,
             border: '1px solid rgba(22,163,74,0.2)',
             padding: '12px 16px', textAlign: 'center',
           }}>
             <span style={{ color: '#16a34a', fontSize: 12, fontWeight: 700 }}>✓ Meta atingida</span>
+          </div>
+        )}
+        {superou && (
+          <div style={{
+            background: 'rgba(10,102,194,0.06)', borderRadius: 12,
+            border: '1px solid rgba(10,102,194,0.2)',
+            padding: '12px 16px',
+            display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+          }}>
+            <span style={{ color: '#0A66C2', fontSize: 12, fontWeight: 700 }}>↑ Meta superada</span>
+            <span style={{ color: '#0A66C2', fontSize: 13, fontWeight: 800 }}>+{fmt(excesso)}</span>
           </div>
         )}
       </div>
