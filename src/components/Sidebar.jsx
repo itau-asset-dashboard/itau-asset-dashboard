@@ -15,7 +15,7 @@ const NAV_GROUPS = [
   {
     label: 'LINKEDIN',
     items: [
-      { id: 'linkedin', icon: LinkedinIcon, label: 'LinkedIn' },
+      { id: 'linkedin', icon: LinkedinIcon, label: 'LinkedIn (em construção)', muted: true },
     ],
   },
   {
@@ -135,7 +135,7 @@ export default function Sidebar() {
                 {label}
               </p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                {items.map(({ id, icon: Icon, label: itemLabel, disabled }) => {
+                {items.map(({ id, icon: Icon, label: itemLabel, disabled, muted }) => {
                   const active = activeSection === id
                   const blocked = (id === 'upload' && !isEditMode) || disabled
                   return (
@@ -159,7 +159,7 @@ export default function Sidebar() {
                         strokeWidth={active ? 2.2 : 1.8}
                       />
                       <span style={{
-                        color: active ? ORANGE : '#4A5568',
+                        color: active ? ORANGE : muted ? '#B0BEC5' : '#4A5568',
                         fontSize: 13, fontWeight: active ? 600 : 400,
                         letterSpacing: '-0.01em',
                       }}>
