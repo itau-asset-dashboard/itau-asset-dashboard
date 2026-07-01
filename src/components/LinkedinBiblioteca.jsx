@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react'
-import { Trash2, ArrowDown, ArrowUp, ArrowUpDown, Search, X, ChevronLeft, ChevronRight } from 'lucide-react'
+import { ArrowDown, ArrowUp, ArrowUpDown, Search, X, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useIsMobile } from '../utils/useIsMobile'
 
 const PAGE_SIZE = 10
@@ -140,7 +140,6 @@ export default function LinkedinBiblioteca({ allPosts, ano, isEditMode, onEditPo
                 <Th k="cliques">Cliques</Th>
                 <Th k="ctr">CTR</Th>
                 <Th k="reacoes">Reações</Th>
-                {isEditMode && <th style={{ background: '#FAFBFC', width: 40 }}/>}
               </tr>
             </thead>
             <tbody>
@@ -174,14 +173,6 @@ export default function LinkedinBiblioteca({ allPosts, ano, isEditMode, onEditPo
                     <td style={{ padding: '11px 14px', color: '#1C252E', fontSize: 13, whiteSpace: 'nowrap' }}>{fmtN(p.cliques)}</td>
                     <td style={{ padding: '11px 14px', color: '#1C252E', fontSize: 13, whiteSpace: 'nowrap' }}>{fmtCtr(p.ctr)}</td>
                     <td style={{ padding: '11px 14px', color: '#1C252E', fontSize: 13, whiteSpace: 'nowrap' }}>{fmtN(p.reacoes)}</td>
-                    {isEditMode && (
-                      <td style={{ padding: '11px 10px', whiteSpace: 'nowrap' }} onClick={e => e.stopPropagation()}>
-                        <button onClick={() => onDeletePost(p.id)}
-                          style={{ background: 'rgba(239,68,68,0.08)', border: 'none', borderRadius: 8, padding: '5px 8px', cursor: 'pointer', display: 'flex', alignItems: 'center', color: '#ef4444' }}>
-                          <Trash2 size={12}/>
-                        </button>
-                      </td>
-                    )}
                   </tr>
                 )
               })}
