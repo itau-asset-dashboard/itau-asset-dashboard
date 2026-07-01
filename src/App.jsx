@@ -115,7 +115,9 @@ export default function App() {
           {activeSection === 'etfs'        && <ETFsView />}
           {activeSection === 'glossario'   && <Glossario />}
           {activeSection === 'stories'     && <StoriesView />}
-          {activeSection === 'linkedin'    && <LinkedinView />}
+          {activeSection === 'linkedin-geral'       && <LinkedinView tab="geral" />}
+          {activeSection === 'linkedin-posts'       && <LinkedinView tab="biblioteca" />}
+          {activeSection === 'linkedin-performance' && <LinkedinView tab="formato" />}
           {activeSection === 'visao-anual' && <AnnualView />}
           {activeSection === 'visao-geral' && (
             <>

@@ -15,7 +15,9 @@ const NAV_GROUPS = [
   {
     label: 'LINKEDIN',
     items: [
-      { id: 'linkedin', icon: LinkedinIcon, label: 'LinkedIn' },
+      { id: 'linkedin-geral',       icon: BarChart2,   label: 'Visão Geral' },
+      { id: 'linkedin-posts',       icon: List,        label: 'Posts' },
+      { id: 'linkedin-performance', icon: TrendingUp,  label: 'Performance' },
     ],
   },
   {

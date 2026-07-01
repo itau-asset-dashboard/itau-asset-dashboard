@@ -1,24 +1,15 @@
 import { useState } from 'react'
 import { Plus } from 'lucide-react'
 import { useStore } from '../store/useStore'
-import { useIsMobile } from '../utils/useIsMobile'
 import LinkedinVisaoGeral from './LinkedinVisaoGeral'
 import LinkedinBiblioteca from './LinkedinBiblioteca'
 import LinkedinPorFormato from './LinkedinPorFormato'
 import LinkedinUploadModal from './LinkedinUploadModal'
 
-const TABS = [
-  { id: 'geral',      label: 'Visão Geral' },
-  { id: 'biblioteca', label: 'Biblioteca de Conteúdo' },
-  { id: 'formato',    label: 'Performance por Formato' },
-]
-
 const ANOS = ['2024', '2025', '2026', '2027']
 
-export default function LinkedinView() {
+export default function LinkedinView({ tab = 'geral' }) {
   const { linkedinPosts, addLinkedinPost, updateLinkedinPost, deleteLinkedinPost, isEditMode } = useStore()
-  const mobile = useIsMobile()
-  const [tab, setTab]               = useState('geral')
   const [ano, setAno]               = useState(String(new Date().getFullYear()))
   const [uploadOpen, setUploadOpen] = useState(false)
   const [editPost, setEditPost]     = useState(null)
@@ -33,42 +24,24 @@ export default function LinkedinView() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
 
-      {/* Header row */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, flexWrap: 'wrap' }}>
-        <div style={{ display: 'flex', background: 'rgba(28,37,46,0.06)', borderRadius: 12, padding: 3, gap: 2 }}>
-          {TABS.map(t => {
-            const shortLabel = t.id === 'biblioteca' ? 'Biblioteca' : t.id === 'formato' ? 'Por Formato' : t.label
-            return (
-              <button key={t.id} onClick={() => setTab(t.id)} style={{
-                padding: mobile ? '5px 10px' : '6px 16px', borderRadius: 10, border: 'none', cursor: 'pointer',
-                fontSize: mobile ? 11 : 13, fontWeight: tab === t.id ? 700 : 400,
-                background: tab === t.id ? '#1C252E' : 'transparent',
-                color: tab === t.id ? '#C3EBF7' : '#5A7080', transition: 'all 0.15s', whiteSpace: 'nowrap',
-              }}>
-                {mobile ? shortLabel : t.label}
-              </button>
-            )
-          })}
-        </div>
-
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <select value={ano} onChange={e => setAno(e.target.value)}
-            style={{ background: '#fff', border: '1.5px solid #EDEFF2', borderRadius: 10, padding: '7px 10px', fontSize: 13, color: '#1C252E', cursor: 'pointer', outline: 'none', fontFamily: 'DM Sans, sans-serif' }}>
-            {ANOS.map(a => <option key={a} value={a}>{a}</option>)}
-          </select>
-          {isEditMode && (
-            <button onClick={() => setUploadOpen(true)} style={{
-              background: '#0A66C2', color: '#fff', border: 'none', borderRadius: 10,
-              padding: '8px 14px', fontSize: 13, fontWeight: 600, cursor: 'pointer',
-              display: 'flex', alignItems: 'center', gap: 5, whiteSpace: 'nowrap',
-            }}>
-              <Plus size={15}/> Novo post
-            </button>
-          )}
-        </div>
+      {/* Controles de ano + novo post */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 8 }}>
+        <select value={ano} onChange={e => setAno(e.target.value)}
+          style={{ background: '#fff', border: '1.5px solid #EDEFF2', borderRadius: 10, padding: '7px 10px', fontSize: 13, color: '#1C252E', cursor: 'pointer', outline: 'none', fontFamily: 'DM Sans, sans-serif' }}>
+          {ANOS.map(a => <option key={a} value={a}>{a}</option>)}
+        </select>
+        {isEditMode && (
+          <button onClick={() => setUploadOpen(true)} style={{
+            background: '#0A66C2', color: '#fff', border: 'none', borderRadius: 10,
+            padding: '8px 14px', fontSize: 13, fontWeight: 600, cursor: 'pointer',
+            display: 'flex', alignItems: 'center', gap: 5, whiteSpace: 'nowrap',
+          }}>
+            <Plus size={15}/> Novo post
+          </button>
+        )}
       </div>
 
-      {/* Conteúdo da aba */}
+      {/* Conteúdo da aba (controlado pela sidebar) */}
       {tab === 'geral'      && <LinkedinVisaoGeral posts={postsAno} ano={ano} isEditMode={isEditMode} onEditPost={setEditPost}/>}
       {tab === 'biblioteca' && <LinkedinBiblioteca allPosts={linkedinPosts} ano={ano} isEditMode={isEditMode} onEditPost={setEditPost} onDeletePost={setConfirmDel}/>}
       {tab === 'formato'    && <LinkedinPorFormato posts={postsAno} ano={ano}/>}

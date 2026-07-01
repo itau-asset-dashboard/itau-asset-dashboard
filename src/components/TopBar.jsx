@@ -20,7 +20,9 @@ const TITLES = {
   'insights':     { title: 'Insights',           sub: 'Análise inteligente de performance' },
   'upload':       { title: 'Upload',             sub: 'Adicionar post com extração automática' },
   'glossario':    { title: 'Glossário',          sub: 'Definições oficiais do Instagram' },
-  'linkedin':     { title: 'LinkedIn',           sub: 'Performance no LinkedIn da Asset' },
+  'linkedin-geral':       { title: 'LinkedIn — Visão Geral',  sub: 'KPIs, gráficos e ranking de posts' },
+  'linkedin-posts':       { title: 'LinkedIn — Posts',        sub: 'Biblioteca completa de conteúdo' },
+  'linkedin-performance': { title: 'LinkedIn — Performance',  sub: 'Análise por formato de publicação' },
 }
 
 const EDIT_PASSWORD = import.meta.env.VITE_EDIT_PASSWORD || 'itauasset2026'
@@ -98,7 +100,7 @@ export default function TopBar() {
         )}
 
         {/* Novo post — só no modo edição e fora da aba de stories */}
-        {isEditMode && activeSection !== 'stories' && activeSection !== 'linkedin' && (
+        {isEditMode && activeSection !== 'stories' && !activeSection.startsWith('linkedin') && (
           <button onClick={() => setUploadOpen(true)} style={{
             background: '#FF6200', color: '#fff', border: 'none', borderRadius: 10,
             padding: '8px 12px', fontSize: 13, fontWeight: 600, cursor: 'pointer',
