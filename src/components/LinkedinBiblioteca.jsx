@@ -22,10 +22,10 @@ function parseDate(d) {
 }
 
 const TIPO_COLOR = {
-  Imagem:    { bg: 'rgba(10,102,194,0.1)',  color: '#0A66C2' },
-  Vídeo:     { bg: 'rgba(255,98,0,0.1)',    color: '#FF6200' },
-  Documento: { bg: 'rgba(28,37,46,0.1)',    color: '#1C252E' },
-  Artigo:    { bg: 'rgba(22,163,74,0.1)',   color: '#16a34a' },
+  Imagem:    { bg: '#F0F4F8', color: '#8A9BB0' },
+  Vídeo:     { bg: '#F0F4F8', color: '#8A9BB0' },
+  Documento: { bg: '#F0F4F8', color: '#8A9BB0' },
+  Artigo:    { bg: '#F0F4F8', color: '#8A9BB0' },
 }
 
 export default function LinkedinBiblioteca({ allPosts, mesFiltro, isEditMode, onEditPost, onDeletePost, onDeleteMany }) {
