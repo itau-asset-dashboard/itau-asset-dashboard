@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback } from 'react'
-import { X, Upload, Check, AlertCircle, ChevronDown, Sparkles } from 'lucide-react'
+import { X, Upload, Check, AlertCircle, ChevronDown, Loader } from 'lucide-react'
 import * as XLSX from 'xlsx'
 import { useStore } from '../store/useStore'
 
@@ -22,17 +22,11 @@ function fmtN(n) {
 function parseDate(raw) {
   if (!raw) return ''
   if (raw instanceof Date) {
-    const d = String(raw.getDate()).padStart(2,'0')
-    const m = String(raw.getMonth()+1).padStart(2,'0')
-    return `${d}/${m}/${raw.getFullYear()}`
+    return `${String(raw.getDate()).padStart(2,'0')}/${String(raw.getMonth()+1).padStart(2,'0')}/${raw.getFullYear()}`
   }
-  // LinkedIn exporta como MM/DD/YYYY — inverte para DD/MM/YYYY
-  const s = String(raw).trim()
-  const parts = s.split('/')
-  if (parts.length === 3 && parts[0].length <= 2 && parts[1].length <= 2) {
-    return `${parts[1].padStart(2,'0')}/${parts[0].padStart(2,'0')}/${parts[2]}`
-  }
-  return s
+  const parts = String(raw).trim().split('/')
+  if (parts.length === 3) return `${parts[1].padStart(2,'0')}/${parts[0].padStart(2,'0')}/${parts[2]}`
+  return String(raw).trim()
 }
 
 function parseLinkedinXLS(buffer) {
@@ -43,7 +37,6 @@ function parseLinkedinXLS(buffer) {
   const rows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: null })
   const header = rows[1]
   const dataRows = rows.slice(2).filter(r => r.some(c => c != null))
-
   const idx = (name) => header.findIndex(h => h && String(h).trim() === name)
 
   const iNome = idx('Título da publicação')
@@ -59,80 +52,80 @@ function parseLinkedinXLS(buffer) {
   return dataRows.map((row, i) => {
     const textoCompleto = row[iNome] ? String(row[iNome]).trim() : ''
     const nomeCurto = textoCompleto.split('\n')[0].slice(0, 100).trim()
-
     const tipoRaw = row[iTipo] ? String(row[iTipo]).trim() : null
     const ctrRaw  = row[iCtr]
-
     return {
-      _id:           `import_${i}_${Date.now()}`,
+      _id:            `import_${i}_${Date.now()}`,
       _textoCompleto: textoCompleto,
-      nome:          nomeCurto,
-      tipo:          tipoRaw || null,
-      data_post:     parseDate(row[iData]),
-      impressoes:    row[iImp]  != null ? Number(row[iImp])  : null,
-      visualizacoes: row[iVis]  != null ? Number(row[iVis])  : null,
-      cliques:       row[iCli]  != null ? Number(row[iCli])  : null,
-      ctr:           ctrRaw != null && !isNaN(Number(ctrRaw))
-                       ? Number((Number(ctrRaw) * 100).toFixed(2)) : null,
-      reacoes:       row[iGost] != null ? Number(row[iGost]) : null,
-      tema:          [],
-      status:        'final',
-      link:          row[iLink] ? String(row[iLink]).trim() : '',
+      nome:           nomeCurto,
+      tipo:           tipoRaw || null,
+      data_post:      parseDate(row[iData]),
+      impressoes:     row[iImp]  != null ? Number(row[iImp])  : null,
+      visualizacoes:  row[iVis]  != null ? Number(row[iVis])  : null,
+      cliques:        row[iCli]  != null ? Number(row[iCli])  : null,
+      ctr:            ctrRaw != null && !isNaN(Number(ctrRaw))
+                        ? Number((Number(ctrRaw) * 100).toFixed(2)) : null,
+      reacoes:        row[iGost] != null ? Number(row[iGost]) : null,
+      tema:           [],
+      status:         'final',
+      link:           row[iLink] ? String(row[iLink]).trim() : '',
     }
   })
 }
 
+// Chama em batches de 30 para evitar resposta cortada
 async function sugerirNomesIA(posts, apiKey) {
-  const lista = posts.map((p, i) =>
-    `${i+1}. ${p._textoCompleto.slice(0, 300)}`
-  ).join('\n\n---\n\n')
+  const BATCH = 30
+  const nomes = []
+  for (let start = 0; start < posts.length; start += BATCH) {
+    const batch = posts.slice(start, start + BATCH)
+    const lista = batch.map((p, i) =>
+      `${start + i + 1}. ${p._textoCompleto.slice(0, 250).replace(/\n/g, ' ')}`
+    ).join('\n')
 
-  const resp = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': apiKey,
-      'anthropic-version': '2023-06-01',
-      'anthropic-dangerous-direct-browser-access': 'true',
-    },
-    body: JSON.stringify({
-      model: 'claude-haiku-4-5-20251001',
-      max_tokens: 2048,
-      messages: [{
-        role: 'user',
-        content: `Você é um especialista em conteúdo de finanças. Para cada post do LinkedIn abaixo, gere um título curto e descritivo em português (máximo 80 caracteres) que capture o tema principal. Retorne APENAS um array JSON com os títulos na mesma ordem, sem explicações.
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true',
+      },
+      body: JSON.stringify({
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 1024,
+        messages: [{
+          role: 'user',
+          content: `Você é especialista em conteúdo financeiro. Para cada post abaixo, escreva um título curto e descritivo em português (máximo 70 caracteres). Retorne APENAS uma linha por post, sem numeração, sem explicações, na mesma ordem.
 
-Exemplo de formato: ["Título do post 1", "Título do post 2"]
-
-Posts:
 ${lista}`,
-      }],
-    }),
-  })
-
-  const data = await resp.json()
-  const text = data.content?.[0]?.text || ''
-  const match = text.match(/\[[\s\S]*\]/)
-  if (!match) throw new Error('IA não retornou um array válido.')
-  return JSON.parse(match[0])
+        }],
+      }),
+    })
+    const data = await resp.json()
+    const text = data.content?.[0]?.text || ''
+    const linhas = text.trim().split('\n').map(l => l.replace(/^\d+[\.\)]\s*/, '').trim()).filter(Boolean)
+    nomes.push(...linhas)
+  }
+  return nomes
 }
 
 export default function LinkedinImportModal({ onClose, onImport }) {
   const { apiKey } = useStore()
-  const [posts, setPosts]           = useState(null)
-  const [dragging, setDragging]     = useState(false)
-  const [error, setError]           = useState(null)
-  const [saving, setSaving]         = useState(false)
-  const [done, setDone]             = useState(false)
-  const [page, setPage]             = useState(0)
-  const [suggestingAI, setSuggAI]   = useState(false)
+  const [posts, setPosts]         = useState(null)
+  const [dragging, setDragging]   = useState(false)
+  const [error, setError]         = useState(null)
+  const [saving, setSaving]       = useState(false)
+  const [done, setDone]           = useState(false)
+  const [loadingAI, setLoadingAI] = useState(false)
+  const [page, setPage]           = useState(0)
   const fileRef = useRef()
   const PAGE = 20
 
-  const semTipo     = posts ? posts.filter(p => !p.tipo).length : 0
-  const podeSalvar  = posts && posts.every(p => p.tipo)
+  const semTipo    = posts ? posts.filter(p => !p.tipo).length : 0
+  const podeSalvar = posts && posts.every(p => p.tipo)
 
-  function handleFile(file) {
+  async function handleFile(file) {
     setError(null)
     if (!file) return
     const ext = file.name.split('.').pop().toLowerCase()
@@ -141,12 +134,25 @@ export default function LinkedinImportModal({ onClose, onImport }) {
       return
     }
     const reader = new FileReader()
-    reader.onload = (e) => {
+    reader.onload = async (e) => {
       try {
         const parsed = parseLinkedinXLS(new Uint8Array(e.target.result))
         if (!parsed.length) throw new Error('Nenhum post encontrado no arquivo.')
         setPosts(parsed)
         setPage(0)
+
+        // Sugestão automática de nomes se tiver API key
+        if (apiKey) {
+          setLoadingAI(true)
+          try {
+            const nomes = await sugerirNomesIA(parsed, apiKey)
+            setPosts(prev => prev.map((p, i) => nomes[i] ? { ...p, nome: nomes[i] } : p))
+          } catch (_) {
+            // Falha silenciosa — mantém o nome da 1ª linha
+          } finally {
+            setLoadingAI(false)
+          }
+        }
       } catch (err) {
         setError(`Erro ao ler o arquivo: ${err.message}`)
       }
@@ -157,27 +163,13 @@ export default function LinkedinImportModal({ onClose, onImport }) {
   const onDrop = useCallback((e) => {
     e.preventDefault(); setDragging(false)
     handleFile(e.dataTransfer.files[0])
-  }, [])
+  }, [apiKey])
 
   function setTipo(id, tipo) {
     setPosts(prev => prev.map(p => p._id === id ? { ...p, tipo: tipo || null } : p))
   }
-
   function setNome(id, nome) {
     setPosts(prev => prev.map(p => p._id === id ? { ...p, nome } : p))
-  }
-
-  async function handleSugestaoIA() {
-    if (!apiKey) { setError('Configure a chave da API Anthropic primeiro (ícone 🔑 no topo).'); return }
-    setSuggAI(true); setError(null)
-    try {
-      const nomes = await sugerirNomesIA(posts, apiKey)
-      setPosts(prev => prev.map((p, i) => nomes[i] ? { ...p, nome: nomes[i] } : p))
-    } catch (err) {
-      setError(`Erro ao gerar sugestões: ${err.message}`)
-    } finally {
-      setSuggAI(false)
-    }
   }
 
   async function handleSave() {
@@ -214,24 +206,13 @@ export default function LinkedinImportModal({ onClose, onImport }) {
               <p style={{ color:'#8A9BB0', fontSize:12, marginTop:2 }}>
                 {posts.length} posts detectados
                 {semTipo > 0 && <span style={{ color:'#FF6200', fontWeight:600 }}> · {semTipo} sem tipo</span>}
+                {loadingAI && <span style={{ color:'#1a7a96' }}> · gerando nomes com IA…</span>}
               </p>
             )}
           </div>
-          <div style={{ display:'flex', alignItems:'center', gap:8 }}>
-            {posts && (
-              <button onClick={handleSugestaoIA} disabled={suggestingAI}
-                style={{ display:'flex', alignItems:'center', gap:6, padding:'7px 12px',
-                  background: suggestingAI ? '#F0F4F8' : 'rgba(195,235,247,0.3)',
-                  border:'1.5px solid rgba(195,235,247,0.8)', borderRadius:10,
-                  color:'#1a7a96', fontSize:12, fontWeight:600, cursor: suggestingAI ? 'wait' : 'pointer' }}>
-                <Sparkles size={13}/>
-                {suggestingAI ? 'Gerando nomes...' : 'Sugerir nomes com IA'}
-              </button>
-            )}
-            <button onClick={onClose} style={{ background:'#F4F6F8', border:'none', borderRadius:8, padding:7, cursor:'pointer', display:'flex' }}>
-              <X size={16} color="#8A9BB0"/>
-            </button>
-          </div>
+          <button onClick={onClose} style={{ background:'#F4F6F8', border:'none', borderRadius:8, padding:7, cursor:'pointer', display:'flex' }}>
+            <X size={16} color="#8A9BB0"/>
+          </button>
         </div>
 
         <div style={{ padding:20, flex:1, overflow:'auto' }}>
@@ -274,18 +255,6 @@ export default function LinkedinImportModal({ onClose, onImport }) {
             </div>
           )}
 
-          {/* Aviso tipo faltando */}
-          {posts && semTipo > 0 && (
-            <div style={{ display:'flex', gap:8, alignItems:'flex-start', background:'rgba(255,98,0,0.05)',
-              border:'1px solid rgba(255,98,0,0.18)', borderRadius:10, padding:'10px 14px', marginBottom:14 }}>
-              <AlertCircle size={14} color="#FF6200" style={{ flexShrink:0, marginTop:1 }}/>
-              <p style={{ color:'#FF6200', fontSize:12 }}>
-                <strong>{semTipo} posts</strong> sem tipo de conteúdo — selecione abaixo antes de importar.
-                Você pode voltar atrás clicando no badge já selecionado.
-              </p>
-            </div>
-          )}
-
           {/* Tabela de preview */}
           {posts && (
             <div style={{ overflowX:'auto' }}>
@@ -304,28 +273,35 @@ export default function LinkedinImportModal({ onClose, onImport }) {
                 <tbody>
                   {visible.map(p => {
                     const tc = p.tipo ? TIPO_COLOR[p.tipo] : null
+                    const globalIdx = posts.indexOf(p)
+                    const isLoading = loadingAI
                     return (
                       <tr key={p._id} style={{ borderTop:'1px solid #F5F7FA' }}>
                         <td style={TD}><span style={{ color:'#9AAAB8', whiteSpace:'nowrap' }}>{p.data_post}</span></td>
-                        <td style={{ ...TD, maxWidth:240 }}>
-                          <input
-                            value={p.nome}
-                            onChange={e => setNome(p._id, e.target.value)}
-                            style={{ width:'100%', border:'none', background:'transparent', outline:'none',
-                              color:'#1C252E', fontWeight:600, fontSize:12, fontFamily:'DM Sans, sans-serif',
-                              cursor:'text' }}
-                          />
+                        <td style={{ ...TD, maxWidth:260 }}>
+                          {isLoading ? (
+                            <div style={{ display:'flex', alignItems:'center', gap:6 }}>
+                              <Loader size={11} color="#C3EBF7" style={{ animation:'spin 1s linear infinite' }}/>
+                              <span style={{ color:'#C0CEDA', fontSize:11 }}>gerando…</span>
+                            </div>
+                          ) : (
+                            <input
+                              value={p.nome}
+                              onChange={e => setNome(p._id, e.target.value)}
+                              style={{ width:'100%', border:'none', background:'transparent', outline:'none',
+                                color:'#1C252E', fontWeight:600, fontSize:12,
+                                fontFamily:'DM Sans, sans-serif', cursor:'text' }}
+                            />
+                          )}
                         </td>
                         <td style={TD}>
                           {p.tipo ? (
-                            // Badge clicável para resetar
                             <button onClick={() => setTipo(p._id, null)}
-                              title="Clique para alterar o tipo"
+                              title="Clique para alterar"
                               style={{ background: tc?.bg, color: tc?.color, borderRadius:6,
                                 padding:'3px 8px', fontSize:11, fontWeight:600, border:'none',
-                                cursor:'pointer', display:'flex', alignItems:'center', gap:5 }}>
-                              {p.tipo}
-                              <X size={9}/>
+                                cursor:'pointer', display:'inline-flex', alignItems:'center', gap:4 }}>
+                              {p.tipo} <X size={9}/>
                             </button>
                           ) : (
                             <TipoSelect onChange={v => setTipo(p._id, v)}/>
@@ -380,14 +356,15 @@ export default function LinkedinImportModal({ onClose, onImport }) {
                   padding:'12px 18px', fontSize:13, cursor:'pointer', color:'#4A5568', fontWeight:500 }}>
                   Cancelar
                 </button>
-                <button onClick={handleSave} disabled={!podeSalvar || saving}
-                  style={{ flex:1, background: podeSalvar ? '#0A66C2' : '#D0D8E4',
-                    color: podeSalvar ? '#fff' : '#9AAAB8', border:'none', borderRadius:12,
-                    padding:'12px', fontSize:14, fontWeight:700,
-                    cursor: podeSalvar && !saving ? 'pointer' : 'not-allowed',
+                <button onClick={handleSave} disabled={!podeSalvar || saving || loadingAI}
+                  style={{ flex:1, background: podeSalvar && !loadingAI ? '#0A66C2' : '#D0D8E4',
+                    color: podeSalvar && !loadingAI ? '#fff' : '#9AAAB8',
+                    border:'none', borderRadius:12, padding:'12px', fontSize:14, fontWeight:700,
+                    cursor: podeSalvar && !saving && !loadingAI ? 'pointer' : 'not-allowed',
                     transition:'all 0.15s' }}>
-                  {saving ? 'Importando...' : !podeSalvar
-                    ? `Defina o tipo dos ${semTipo} posts restantes`
+                  {loadingAI ? 'Gerando nomes com IA…'
+                    : saving ? 'Importando…'
+                    : !podeSalvar ? `Defina o tipo dos ${semTipo} posts`
                     : `Importar ${posts.length} posts`}
                 </button>
               </div>
@@ -403,14 +380,11 @@ function TipoSelect({ onChange }) {
   return (
     <div style={{ position:'relative', display:'inline-flex', alignItems:'center' }}>
       <select defaultValue="" onChange={e => { if (e.target.value) onChange(e.target.value) }}
-        style={{
-          appearance:'none', background:'rgba(255,98,0,0.07)',
+        style={{ appearance:'none', background:'rgba(255,98,0,0.07)',
           border:'1.5px solid rgba(255,98,0,0.3)', borderRadius:8,
           padding:'3px 24px 3px 8px', fontSize:11, fontWeight:600,
-          color:'#FF6200', cursor:'pointer', outline:'none',
-          fontFamily:'DM Sans, sans-serif',
-        }}>
-        <option value="" disabled>Selecionar tipo</option>
+          color:'#FF6200', cursor:'pointer', outline:'none', fontFamily:'DM Sans, sans-serif' }}>
+        <option value="" disabled>Selecionar</option>
         {TIPOS.map(t => <option key={t} value={t}>{t}</option>)}
       </select>
       <ChevronDown size={11} color="#FF6200" style={{ position:'absolute', right:6, pointerEvents:'none' }}/>
@@ -418,8 +392,6 @@ function TipoSelect({ onChange }) {
   )
 }
 
-const TH = {
-  padding:'9px 12px', color:'#8A9BB0', fontSize:10, fontWeight:600,
-  textTransform:'uppercase', letterSpacing:'0.05em', textAlign:'left', whiteSpace:'nowrap',
-}
+const TH = { padding:'9px 12px', color:'#8A9BB0', fontSize:10, fontWeight:600,
+  textTransform:'uppercase', letterSpacing:'0.05em', textAlign:'left', whiteSpace:'nowrap' }
 const TD = { padding:'10px 12px', verticalAlign:'middle' }
