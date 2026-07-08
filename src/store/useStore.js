@@ -339,7 +339,7 @@ export const useStore = create(
       },
 
       importLinkedinPosts: async (posts) => {
-        const novos = posts.map(p => ({ ...p, id: p.id || String(Date.now() + Math.random()) }))
+        const novos = posts.map(p => ({ ...p, id: p.id || crypto.randomUUID() }))
         set(s => ({ linkedinPosts: [...s.linkedinPosts, ...novos] }))
         await batchInsertLinkedinPosts(novos)
       },

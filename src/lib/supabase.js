@@ -221,6 +221,6 @@ export async function batchInsertLinkedinPosts(posts) {
   const rows = posts.map(({ imageData, imageUrl, imagePreview, image_url, _id, link, ...rest }) =>
     Object.fromEntries(Object.entries(rest).filter(([k]) => LINKEDIN_COLUMNS.includes(k)))
   )
-  const { error } = await supabase.from('linkedin_posts').insert(rows)
+  const { error } = await supabase.from('linkedin_posts').upsert(rows, { onConflict: 'id' })
   if (error) throw error
 }
