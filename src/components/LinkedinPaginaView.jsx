@@ -104,34 +104,29 @@ export default function LinkedinPaginaView({ data, seguidores, ano, isEditMode, 
   return (
     <div style={{ display:'flex', flexDirection:'column', gap:16 }}>
 
-      {/* Card seguidores — base editável + total acumulado no mês */}
-      <div className="card" style={{ padding:'16px 20px', display:'flex', alignItems:'center', justifyContent:'space-between', gap:16, flexWrap:'wrap' }}>
-        <div style={{ display:'flex', gap:32, flexWrap:'wrap' }}>
-          <div>
-            <p style={{ color:'#8A9BB0', fontSize:11, fontWeight:600, textTransform:'uppercase', letterSpacing:'0.04em', marginBottom:6 }}>Base inicial</p>
-            {editSeg ? (
-              <div style={{ display:'flex', alignItems:'center', gap:8 }}>
-                <input autoFocus type="text" inputMode="numeric" value={segForm}
-                  onChange={e => setSegForm(e.target.value)}
-                  onKeyDown={e => e.key === 'Enter' && handleSaveSeg()}
-                  placeholder="Ex: 216.560"
-                  style={{ border:'1.5px solid #0A66C2', borderRadius:8, padding:'6px 10px', fontSize:15, fontFamily:'DM Sans, sans-serif', outline:'none', width:140 }}/>
-                <button onClick={handleSaveSeg} style={{ background:'#1C252E', color:'#C3EBF7', border:'none', borderRadius:8, padding:'7px 10px', cursor:'pointer', display:'flex' }}><Check size={14}/></button>
-                <button onClick={() => setEditSeg(false)} style={{ background:'#F4F6F8', border:'none', borderRadius:8, padding:'7px 10px', cursor:'pointer', display:'flex' }}><X size={14} color="#8A9BB0"/></button>
-              </div>
-            ) : (
-              <p style={{ color:'#8A9BB0', fontSize:20, fontWeight:700 }}>{fmtN(seguidores) !== '—' ? fmtN(seguidores) : '—'}</p>
-            )}
-          </div>
-          <div>
-            <p style={{ color:'#8A9BB0', fontSize:11, fontWeight:600, textTransform:'uppercase', letterSpacing:'0.04em', marginBottom:6 }}>Seguidores em {MESES_FULL[mesIdx]}</p>
-            <p style={{ color:'#1C252E', fontSize:26, fontWeight:800 }}>{fmtN(seguidoresNoMes)}</p>
-          </div>
+      {/* Card seguidores */}
+      <div className="card" style={{ padding:'12px 16px', display:'inline-flex', alignItems:'center', gap:12, alignSelf:'flex-start' }}>
+        <div>
+          <p style={{ color:'#8A9BB0', fontSize:10, fontWeight:600, textTransform:'uppercase', letterSpacing:'0.05em', marginBottom:4 }}>Seguidores em {MESES_FULL[mesIdx]}</p>
+          {editSeg ? (
+            <div style={{ display:'flex', alignItems:'center', gap:6 }}>
+              <input autoFocus type="text" inputMode="numeric" value={segForm}
+                onChange={e => setSegForm(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && handleSaveSeg()}
+                placeholder="Ex: 216.560"
+                style={{ border:'1.5px solid #0A66C2', borderRadius:8, padding:'5px 9px', fontSize:14, fontFamily:'DM Sans, sans-serif', outline:'none', width:120 }}/>
+              <button onClick={handleSaveSeg} style={{ background:'#1C252E', color:'#C3EBF7', border:'none', borderRadius:7, padding:'6px 8px', cursor:'pointer', display:'flex' }}><Check size={13}/></button>
+              <button onClick={() => setEditSeg(false)} style={{ background:'#F4F6F8', border:'none', borderRadius:7, padding:'6px 8px', cursor:'pointer', display:'flex' }}><X size={13} color="#8A9BB0"/></button>
+            </div>
+          ) : (
+            <p style={{ color:'#1C252E', fontSize:20, fontWeight:800 }}>{fmtN(seguidoresNoMes)}</p>
+          )}
         </div>
         {isEditMode && !editSeg && (
           <button onClick={() => { setSegForm(seguidores ?? ''); setEditSeg(true) }}
-            style={{ display:'flex', alignItems:'center', gap:6, background:'#F0F4F8', border:'1.5px solid #EDEFF2', borderRadius:10, padding:'7px 12px', fontSize:12, fontWeight:600, cursor:'pointer', color:'#1C252E', flexShrink:0 }}>
-            <Edit2 size={12}/> Definir base
+            style={{ background:'none', border:'none', cursor:'pointer', padding:4, display:'flex', color:'#C0CEDA' }}
+            title="Definir base">
+            <Edit2 size={13}/>
           </button>
         )}
       </div>
