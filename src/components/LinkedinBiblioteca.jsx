@@ -1,6 +1,7 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import { ArrowDown, ArrowUp, ArrowUpDown, Search, X, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useIsMobile } from '../utils/useIsMobile'
+import LinkedinUploadModal from './LinkedinUploadModal'
 
 const PAGE_SIZE = 10
 
@@ -57,9 +58,9 @@ export default function LinkedinBiblioteca({ allPosts, mesFiltro, isEditMode, on
     return sortDir * ((a[sortKey] || 0) - (b[sortKey] || 0))
   }), [filtered, sortKey, sortDir])
 
-  const pages = Math.ceil(sorted.length / PAGE_SIZE)
+  const pages   = Math.ceil(sorted.length / PAGE_SIZE)
   const visible = sorted.slice(page * PAGE_SIZE, page * PAGE_SIZE + PAGE_SIZE)
-  const topId = postsMes.length ? [...postsMes].sort((a,b)=>(b.impressoes||0)-(a.impressoes||0))[0]?.id : null
+  const topId   = postsMes.length ? [...postsMes].sort((a,b)=>(b.impressoes||0)-(a.impressoes||0))[0]?.id : null
 
   function toggleSort(k) {
     if (sortKey === k) setSortDir(d => -d)
@@ -83,14 +84,14 @@ export default function LinkedinBiblioteca({ allPosts, mesFiltro, isEditMode, on
   )
 
   return (
-    <div className="card" style={{ overflow: 'hidden' }}>
+    <div className="card" style={{ overflow: 'hidden', marginBottom: 18 }}>
 
       {/* Header */}
       <div style={{ padding: '16px 20px 12px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
         <div>
-          <h2 style={{ color: '#1C252E', fontSize: 15, fontWeight: 700, margin: 0 }}>Posts LinkedIn</h2>
+          <h2 style={{ color: '#1C252E', fontSize: 15, fontWeight: 700, margin: 0 }}>Ranking de posts</h2>
           <p style={{ color: '#8A9BB0', fontSize: 12, marginTop: 2 }}>
-            {q ? `${sorted.length} resultado${sorted.length !== 1 ? 's' : ''} em todos os posts` : `${filtered.length} publicação${filtered.length !== 1 ? 'ões' : ''} no mês`}
+            {q ? `${sorted.length} resultado${sorted.length !== 1 ? 's' : ''} em todos os posts` : `${filtered.length} publicações`}
           </p>
         </div>
         <div style={{
@@ -114,57 +115,82 @@ export default function LinkedinBiblioteca({ allPosts, mesFiltro, isEditMode, on
         </div>
       </div>
 
+      {/* Resumo quando há busca ativa */}
+      {q && sorted.length > 0 && (
+        <div style={{ padding: '12px 20px', borderTop: '1px solid #F0F2F5', borderBottom: '1px solid #F0F2F5', background: '#FAFBFC', display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 10 }}>
+          {[
+            { label: 'Posts',      value: sorted.length, color: '#1C252E', fmt: v => v },
+            { label: 'Impressões', value: sorted.reduce((s,p)=>s+(Number(p.impressoes)||0),0), color: '#0A66C2', fmt: fmtN },
+            { label: 'Cliques',    value: sorted.reduce((s,p)=>s+(Number(p.cliques)||0),0),    color: '#1C252E', fmt: fmtN },
+            { label: 'Reações',    value: sorted.reduce((s,p)=>s+(Number(p.reacoes)||0),0),    color: '#1C252E', fmt: fmtN },
+          ].map(({ label, value, color, fmt }) => (
+            <div key={label}>
+              <p style={{ fontSize: 10, fontWeight: 600, color: '#B0BEC5', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 3 }}>{label}</p>
+              <p style={{ fontSize: 18, fontWeight: 800, color, lineHeight: 1, letterSpacing: '-0.02em' }}>{fmt(value)}</p>
+            </div>
+          ))}
+        </div>
+      )}
+
       {/* Tabela */}
       {sorted.length === 0 ? (
         <div style={{ padding: '40px 20px', textAlign: 'center', borderTop: '1px solid #F0F4F8' }}>
-          <p style={{ color: '#9AAAB8', fontSize: 14 }}>Nenhum post encontrado.</p>
+          <p style={{ color: '#9AAAB8', fontSize: 13 }}>Nenhum post encontrado para este período.</p>
         </div>
       ) : (
-        <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 680 }}>
+        <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }} className="scrollbar-thin">
+          <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: mobile ? 0 : 680 }}>
             <thead>
               <tr>
                 <Th k="data_post">Data</Th>
-                <Th k="nome">Post / Tema</Th>
-                <th style={{ padding: '11px 14px', color: '#8A9BB0', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', textAlign: 'left', background: '#FAFBFC', whiteSpace: 'nowrap' }}>Tipo</th>
+                <th style={{ padding: '11px 14px', color: '#8A9BB0', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', textAlign: 'left', background: '#FAFBFC', whiteSpace: 'nowrap' }}>
+                  {mobile ? 'Post' : 'Post / Tema'}
+                </th>
+                {!mobile && <th style={{ padding: '11px 14px', color: '#8A9BB0', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', textAlign: 'left', background: '#FAFBFC', whiteSpace: 'nowrap' }}>Tipo</th>}
                 <Th k="impressoes">Impressões</Th>
-                <Th k="visualizacoes">Visual.</Th>
-                <Th k="cliques">Cliques</Th>
-                <Th k="ctr">CTR</Th>
-                <Th k="reacoes">Reações</Th>
+                {!mobile && <Th k="visualizacoes">Visual.</Th>}
+                {!mobile && <Th k="cliques">Cliques</Th>}
+                {!mobile && <Th k="ctr">CTR</Th>}
+                {!mobile && <Th k="reacoes">Reações</Th>}
               </tr>
             </thead>
             <tbody>
               {visible.map(p => {
                 const tc = TIPO_COLOR[p.tipo]
+                const isTop = p.id === topId && !q
                 return (
                   <tr key={p.id}
                     onClick={() => isEditMode && onEditPost(p)}
-                    style={{ borderTop: '1px solid #F5F7FA', cursor: isEditMode ? 'pointer' : 'default' }}
-                    onMouseEnter={e => { if (isEditMode) e.currentTarget.style.background = '#F8FAFC' }}
-                    onMouseLeave={e => { e.currentTarget.style.background = '' }}>
-                    <td style={{ padding: '11px 14px', color: '#9AAAB8', fontSize: 12, whiteSpace: 'nowrap' }}>{p.data_post || '—'}</td>
-                    <td style={{ padding: '11px 14px', maxWidth: 240 }}>
-                      <p style={{ color: '#1C252E', fontSize: 13, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                        {p.id === topId && !q && (
-                          <span style={{ background: 'rgba(255,98,0,0.1)', color: '#FF6200', borderRadius: 4, padding: '1px 5px', fontSize: 10, fontWeight: 700, marginRight: 5 }}>Top</span>
-                        )}
+                    style={{ borderTop: '1px solid #F5F7FA', cursor: isEditMode ? 'pointer' : 'default', background: 'transparent' }}
+                    onMouseEnter={e => { e.currentTarget.style.background = '#FAFBFC' }}
+                    onMouseLeave={e => { e.currentTarget.style.background = 'transparent' }}>
+                    <td style={{ padding: '12px 14px', color: '#8A9BB0', fontSize: 12, whiteSpace: 'nowrap' }}>{p.data_post || '—'}</td>
+                    <td style={{ padding: '12px 14px', overflow: 'hidden' }}>
+                      <p style={{ color: '#1C252E', fontSize: mobile ? 12 : 13, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: mobile ? 160 : 260 }}>
+                        {isTop && <span style={{ marginRight: 4 }}>⭐</span>}
                         {p.nome || '—'}
                       </p>
-                      {Array.isArray(p.tema) && p.tema.length > 0 && (
-                        <p style={{ color: '#B0BEC5', fontSize: 11, marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.tema.join(' · ')}</p>
-                      )}
+                      {mobile
+                        ? tc && <span style={{ background: tc.bg, color: tc.color, borderRadius: 5, padding: '1px 6px', fontSize: 10, fontWeight: 600 }}>{p.tipo}</span>
+                        : Array.isArray(p.tema) && p.tema.length > 0 && (
+                            <p style={{ color: '#8A9BB0', fontSize: 11, marginTop: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.tema.join(' · ')}</p>
+                          )
+                      }
                     </td>
-                    <td style={{ padding: '11px 14px', whiteSpace: 'nowrap' }}>
-                      {p.tipo && (
-                        <span style={{ background: tc?.bg || '#F0F4F8', color: tc?.color || '#4A6272', borderRadius: 6, padding: '2px 8px', fontSize: 11, fontWeight: 600 }}>{p.tipo}</span>
-                      )}
+                    {!mobile && (
+                      <td style={{ padding: '12px 14px', whiteSpace: 'nowrap' }}>
+                        {p.tipo && (
+                          <span style={{ background: tc?.bg || '#F0F4F8', color: tc?.color || '#4A6272', borderRadius: 6, padding: '2px 8px', fontSize: 11, fontWeight: 600 }}>{p.tipo}</span>
+                        )}
+                      </td>
+                    )}
+                    <td style={{ padding: '12px 14px', whiteSpace: 'nowrap' }}>
+                      <span style={{ color: '#0A66C2', fontWeight: 700, fontSize: mobile ? 13 : 14 }}>{fmtN(p.impressoes)}</span>
                     </td>
-                    <td style={{ padding: '11px 14px', color: '#0A66C2', fontSize: 13, fontWeight: 700, whiteSpace: 'nowrap' }}>{fmtN(p.impressoes)}</td>
-                    <td style={{ padding: '11px 14px', color: '#1C252E', fontSize: 13, whiteSpace: 'nowrap' }}>{fmtN(p.visualizacoes)}</td>
-                    <td style={{ padding: '11px 14px', color: '#1C252E', fontSize: 13, whiteSpace: 'nowrap' }}>{fmtN(p.cliques)}</td>
-                    <td style={{ padding: '11px 14px', color: '#1C252E', fontSize: 13, whiteSpace: 'nowrap' }}>{fmtCtr(p.ctr)}</td>
-                    <td style={{ padding: '11px 14px', color: '#1C252E', fontSize: 13, whiteSpace: 'nowrap' }}>{fmtN(p.reacoes)}</td>
+                    {!mobile && <td style={{ padding: '12px 14px', color: '#1C252E', fontSize: 13, whiteSpace: 'nowrap' }}>{fmtN(p.visualizacoes)}</td>}
+                    {!mobile && <td style={{ padding: '12px 14px', color: '#1C252E', fontSize: 13, whiteSpace: 'nowrap' }}>{fmtN(p.cliques)}</td>}
+                    {!mobile && <td style={{ padding: '12px 14px', color: '#1C252E', fontSize: 13, whiteSpace: 'nowrap' }}>{fmtCtr(p.ctr)}</td>}
+                    {!mobile && <td style={{ padding: '12px 14px', color: '#1C252E', fontSize: 13, whiteSpace: 'nowrap' }}>{fmtN(p.reacoes)}</td>}
                   </tr>
                 )
               })}
@@ -175,18 +201,16 @@ export default function LinkedinBiblioteca({ allPosts, mesFiltro, isEditMode, on
 
       {/* Paginação */}
       {pages > 1 && (
-        <div style={{ padding: '12px 20px', borderTop: '1px solid #F0F4F8', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <p style={{ color: '#9AAAB8', fontSize: 12 }}>
-            {page * PAGE_SIZE + 1}–{Math.min((page + 1) * PAGE_SIZE, sorted.length)} de {sorted.length}
-          </p>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 20px', borderTop: '1px solid #F5F7FA' }}>
+          <span style={{ color: '#8A9BB0', fontSize: 12 }}>Página {page + 1} de {pages}</span>
           <div style={{ display: 'flex', gap: 6 }}>
             <button onClick={() => setPage(p => Math.max(0, p - 1))} disabled={page === 0}
-              style={{ background: '#F5F7FA', border: '1.5px solid #EDEFF2', borderRadius: 8, padding: '5px 8px', cursor: page === 0 ? 'not-allowed' : 'pointer', opacity: page === 0 ? 0.4 : 1, display: 'flex' }}>
-              <ChevronLeft size={14} color="#6B7A8D"/>
+              style={{ background: '#F4F6F8', border: 'none', borderRadius: 8, padding: '5px 9px', cursor: 'pointer', opacity: page === 0 ? 0.4 : 1 }}>
+              <ChevronLeft size={15} color="#1C252E"/>
             </button>
             <button onClick={() => setPage(p => Math.min(pages - 1, p + 1))} disabled={page === pages - 1}
-              style={{ background: '#F5F7FA', border: '1.5px solid #EDEFF2', borderRadius: 8, padding: '5px 8px', cursor: page === pages - 1 ? 'not-allowed' : 'pointer', opacity: page === pages - 1 ? 0.4 : 1, display: 'flex' }}>
-              <ChevronRight size={14} color="#6B7A8D"/>
+              style={{ background: '#F4F6F8', border: 'none', borderRadius: 8, padding: '5px 9px', cursor: 'pointer', opacity: page === pages - 1 ? 0.4 : 1 }}>
+              <ChevronRight size={15} color="#1C252E"/>
             </button>
           </div>
         </div>
