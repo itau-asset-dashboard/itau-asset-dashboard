@@ -8,6 +8,9 @@ import { normalizeTema } from '../utils/temas'
 // Posts com save em andamento — protege contra sync sobrescrever antes do upsert terminar
 const pendingUpdates = new Map() // id → { imageUrl }
 
+// LinkedIn posts com save em andamento
+const pendingLinkedinUpdates = new Map() // id → partial post data
+
 // Cache para getPostsDoMes — evita re-filtrar o array inteiro em cada render
 let _postsDoMesCache = { posts: null, mesFiltro: null, result: null }
 
@@ -145,12 +148,19 @@ export const useStore = create(
           }
 
           // Normaliza temas do LinkedIn (podem vir como string JSON do Supabase)
+          // Protege posts com save em andamento: mantém dados locais se upsert ainda não chegou ao servidor
+          const localLinkedin = get().linkedinPosts
           const linkedinNorm = (cloudLinkedin || []).map(p => {
             let tema = p.tema
             if (typeof tema === 'string') { try { tema = JSON.parse(tema) } catch (_) { tema = tema ? [tema] : [] } }
             if (!Array.isArray(tema)) tema = []
-            return { ...p, tema }
+            const norm = { ...p, tema }
+            const pending = pendingLinkedinUpdates.get(p.id)
+            if (pending) return { ...norm, ...pending }
+            return norm
           })
+          // Mantém posts locais que ainda não foram confirmados pelo servidor
+          const localOnly = localLinkedin.filter(lp => !linkedinNorm.find(cp => cp.id === lp.id) && pendingLinkedinUpdates.has(lp.id))
 
           let linkedinPageData = get().linkedinPageData
           if (linkedinPageRaw) { try { linkedinPageData = { ...linkedinPageData, ...JSON.parse(linkedinPageRaw) } } catch (_) {} }
@@ -160,7 +170,7 @@ export const useStore = create(
             posts,
             stories: mergedStories,
             insights: savedInsights,
-            linkedinPosts: linkedinNorm.length > 0 ? linkedinNorm : get().linkedinPosts,
+            linkedinPosts: linkedinNorm.length > 0 ? [...linkedinNorm, ...localOnly] : get().linkedinPosts,
             linkedinPageData,
             linkedinSeguidores,
             navarroLinks: navarroRaw ? (() => { try { return JSON.parse(navarroRaw) } catch (_) { return get().navarroLinks } })() : get().navarroLinks,
@@ -337,16 +347,23 @@ export const useStore = create(
       // ── LinkedIn ───────────────────────────────────────
       addLinkedinPost: async (post) => {
         const novo = { ...post, id: post.id || String(Date.now()) }
+        pendingLinkedinUpdates.set(novo.id, novo)
         set(s => ({ linkedinPosts: [...s.linkedinPosts, novo] }))
-        upsertLinkedinPost(novo).catch(e => console.error('[linkedin add]', e))
+        upsertLinkedinPost(novo)
+          .then(() => pendingLinkedinUpdates.delete(novo.id))
+          .catch(e => { console.error('[linkedin add]', e); pendingLinkedinUpdates.delete(novo.id) })
       },
 
       updateLinkedinPost: async (post) => {
+        pendingLinkedinUpdates.set(post.id, post)
         set(s => ({ linkedinPosts: s.linkedinPosts.map(p => p.id !== post.id ? p : { ...p, ...post }) }))
-        upsertLinkedinPost(post).catch(e => console.error('[linkedin update]', e))
+        upsertLinkedinPost(post)
+          .then(() => pendingLinkedinUpdates.delete(post.id))
+          .catch(e => { console.error('[linkedin update]', e); pendingLinkedinUpdates.delete(post.id) })
       },
 
       deleteLinkedinPost: async (id) => {
+        pendingLinkedinUpdates.delete(id)
         set(s => ({ linkedinPosts: s.linkedinPosts.filter(p => p.id !== id) }))
         removeLinkedinPost(id).catch(e => console.error('[linkedin delete]', e))
       },
