@@ -177,7 +177,7 @@ export default function LinkedinPaginaView({ data, seguidores, ano, isEditMode, 
               <button key={mm} onClick={() => setMes(mm)} style={{
                 padding:'5px 12px', borderRadius:20, border:'none', cursor:'pointer',
                 fontSize:12, fontWeight: ativo ? 700 : 400,
-                background: ativo ? '#1C252E' : '#F0F4F8',
+                background: ativo ? '#1C252E' : 'transparent',
                 color: ativo ? '#C3EBF7' : '#6B7A8D',
               }}>{label}</button>
             )
