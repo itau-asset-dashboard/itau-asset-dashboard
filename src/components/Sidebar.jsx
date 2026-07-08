@@ -1,4 +1,4 @@
-import { BarChart2, Calendar, List, Lightbulb, Upload, TrendingUp, LineChart, BookOpen, PlaySquare, Globe } from 'lucide-react'
+import { BarChart2, Calendar, List, Lightbulb, Upload, TrendingUp, LineChart, BookOpen, PlaySquare } from 'lucide-react'
 import { useStore } from '../store/useStore'
 
 const NAV_GROUPS = [
@@ -15,11 +15,11 @@ const NAV_GROUPS = [
   {
     label: 'LINKEDIN · em breve',
     items: [
+      { id: 'linkedin-pagina',      icon: 'linkedin', label: 'Visão da página',muted: true },
       { id: 'linkedin-geral',       icon: Calendar,  label: 'Visão Anual',    muted: true },
       { id: 'linkedin-performance', icon: BarChart2, label: 'Visão Mensal',   muted: true },
       { id: 'linkedin-posts',       icon: List,      label: 'Posts',          muted: true },
       { id: 'linkedin-pilula',      icon: TrendingUp,label: 'Pílula de ETFs', muted: true },
-      { id: 'linkedin-pagina',      icon: Globe,     label: 'Visão da página',muted: true },
     ],
   },
   {
@@ -157,11 +157,10 @@ export default function Sidebar() {
                       onMouseEnter={e => { if (!active && !blocked) e.currentTarget.style.background = '#F0F2F4' }}
                       onMouseLeave={e => { if (!active) e.currentTarget.style.background = 'transparent' }}
                     >
-                      <Icon
-                        size={14}
-                        color={active ? ORANGE : '#6B7A8D'}
-                        strokeWidth={active ? 2.2 : 1.8}
-                      />
+                      {Icon === 'linkedin'
+                        ? <LinkedinIcon size={14} color={active ? ORANGE : '#6B7A8D'}/>
+                        : <Icon size={14} color={active ? ORANGE : '#6B7A8D'} strokeWidth={active ? 2.2 : 1.8}/>
+                      }
                       <span style={{
                         color: active ? ORANGE : muted ? '#B0BEC5' : '#4A5568',
                         fontSize: 13, fontWeight: active ? 600 : 400,
