@@ -184,7 +184,7 @@ export default function LinkedinVisaoGeral({ posts, ano, isEditMode, onEditPost 
           </div>
         </div>
         <div style={{ overflowX: 'auto' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 500 }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: mobile ? 0 : 500 }}>
             <thead>
               <tr style={{ background: '#FAFBFC' }}>
                 <th style={{ padding: '9px 14px', color: '#8A9BB0', fontSize: 10, fontWeight: 600, textTransform: 'uppercase', textAlign: 'left' }}>#</th>

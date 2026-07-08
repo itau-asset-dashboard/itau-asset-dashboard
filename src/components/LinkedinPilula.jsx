@@ -144,16 +144,16 @@ export default function LinkedinPilula({ posts, ano }) {
             <p style={{ color: '#1C252E', fontSize: 14, fontWeight: 700 }}>Termômetro de Pílulas</p>
             <p style={{ color: '#9AAAB8', fontSize: 11, marginTop: 2 }}>Compara cada pílula com a média do período</p>
           </div>
-          <div style={{ display: 'flex', gap: 6 }}>
+          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
             {[
-              { k: 'visualizacoes', label: 'Visualizações' },
+              { k: 'visualizacoes', label: mobile ? 'Visual.' : 'Visualizações' },
               { k: 'impressoes',    label: 'Impressões' },
               { k: 'cliques',       label: 'Cliques' },
               { k: 'reacoes',       label: 'Reações' },
             ].map(({ k, label }) => (
               <button key={k} onClick={() => setSortKey(k)} style={{
-                padding: '4px 10px', borderRadius: 8, border: 'none', cursor: 'pointer',
-                fontSize: 11, fontWeight: sortKey === k ? 700 : 400,
+                padding: mobile ? '4px 8px' : '4px 10px', borderRadius: 8, border: 'none', cursor: 'pointer',
+                fontSize: mobile ? 10 : 11, fontWeight: sortKey === k ? 700 : 400,
                 background: sortKey === k ? '#1C252E' : '#F0F4F8',
                 color: sortKey === k ? '#C3EBF7' : '#6B7A8D',
                 transition: 'all 0.12s',

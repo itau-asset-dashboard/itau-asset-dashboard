@@ -117,7 +117,7 @@ export default function LinkedinBiblioteca({ allPosts, mesFiltro, isEditMode, on
 
       {/* Resumo quando há busca ativa */}
       {q && sorted.length > 0 && (
-        <div style={{ padding: '12px 20px', borderTop: '1px solid #F0F2F5', borderBottom: '1px solid #F0F2F5', background: '#FAFBFC', display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 10 }}>
+        <div style={{ padding: '12px 20px', borderTop: '1px solid #F0F2F5', borderBottom: '1px solid #F0F2F5', background: '#FAFBFC', display: 'grid', gridTemplateColumns: mobile ? 'repeat(2,1fr)' : 'repeat(4,1fr)', gap: 10 }}>
           {[
             { label: 'Posts',      value: sorted.length, color: '#1C252E', fmt: v => v },
             { label: 'Impressões', value: sorted.reduce((s,p)=>s+(Number(p.impressoes)||0),0), color: '#0A66C2', fmt: fmtN },

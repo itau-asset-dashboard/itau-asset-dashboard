@@ -261,9 +261,9 @@ export default function LinkedinPaginaView({ data, seguidores, ano, isEditMode, 
 
       {/* Modal edição mensal */}
       {editOpen && (
-        <div style={{ position:'fixed', inset:0, background:'rgba(28,37,46,0.65)', zIndex:1000, display:'flex', alignItems:'center', justifyContent:'center', padding:16 }}
+        <div style={{ position:'fixed', inset:0, background:'rgba(28,37,46,0.65)', zIndex:1000, display:'flex', alignItems: mobile ? 'flex-end' : 'center', justifyContent:'center', padding: mobile ? 0 : 16 }}
           onClick={e => e.target === e.currentTarget && setEditOpen(false)}>
-          <div style={{ background:'#fff', borderRadius:20, width:'100%', maxWidth:420, maxHeight:'90vh', overflow:'auto', boxShadow:'0 16px 56px rgba(0,0,0,0.22)' }}>
+          <div style={{ background:'#fff', borderRadius: mobile ? '20px 20px 0 0' : 20, width:'100%', maxWidth: mobile ? '100%' : 420, maxHeight:'90vh', overflow:'auto', boxShadow:'0 16px 56px rgba(0,0,0,0.22)' }}>
             <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'16px 20px', borderBottom:'1px solid #F0F4F8' }}>
               <h2 style={{ color:'#1C252E', fontSize:15, fontWeight:700 }}>Dados de {MESES_FULL[mesIdx]} {ano}</h2>
               <button onClick={() => setEditOpen(false)} style={{ background:'#F4F6F8', border:'none', borderRadius:8, padding:7, cursor:'pointer', display:'flex' }}>

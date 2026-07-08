@@ -1,5 +1,6 @@
 import { useState, useMemo, useEffect } from 'react'
 import { useStore } from '../store/useStore'
+import { useIsMobile } from '../utils/useIsMobile'
 import LinkedinVisaoGeral from './LinkedinVisaoGeral'
 import LinkedinBiblioteca from './LinkedinBiblioteca'
 import LinkedinVisaoMensal from './LinkedinVisaoMensal'
@@ -15,6 +16,7 @@ export default function LinkedinView({ tab = 'geral' }) {
     linkedinPosts, addLinkedinPost, updateLinkedinPost, deleteLinkedinPost, deleteManyLinkedinPosts, importLinkedinPosts, isEditMode,
     linkedinAction, setLinkedinAction, linkedinAnoFiltro, linkedinMesBiblioteca,
   } = useStore()
+  const mobile = useIsMobile()
   const [uploadOpen, setUploadOpen] = useState(false)
   const [importOpen, setImportOpen] = useState(false)
   const [editPost, setEditPost]     = useState(null)
@@ -48,25 +50,35 @@ export default function LinkedinView({ tab = 'geral' }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
 
-      {/* Pills de mês — só na aba mensal (permanecem inline) */}
+      {/* Seletor de mês — só na aba mensal */}
       {tab === 'formato' && (
-        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-          {MESES_LABEL.map((label, i) => {
-            const mm = String(i + 1).padStart(2, '0')
-            const ativo = mes === mm
-            return (
-              <button key={mm} onClick={() => setMes(mm)} style={{
-                padding: '5px 12px', borderRadius: 20, border: 'none', cursor: 'pointer',
-                fontSize: 12, fontWeight: ativo ? 700 : 400,
-                background: ativo ? '#1C252E' : '#F0F4F8',
-                color: ativo ? '#C3EBF7' : '#6B7A8D',
-                transition: 'all 0.12s',
-              }}>
-                {label}
-              </button>
-            )
-          })}
-        </div>
+        mobile ? (
+          <select value={mes} onChange={e => setMes(e.target.value)}
+            style={{ background:'#fff', border:'1.5px solid #EDEFF2', borderRadius:10, padding:'8px 12px', fontSize:13, color:'#1C252E', cursor:'pointer', outline:'none', fontFamily:'DM Sans, sans-serif', width:'100%' }}>
+            {MESES_FULL.map((label, i) => {
+              const mm = String(i+1).padStart(2,'0')
+              return <option key={mm} value={mm}>{label}</option>
+            })}
+          </select>
+        ) : (
+          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+            {MESES_LABEL.map((label, i) => {
+              const mm = String(i + 1).padStart(2, '0')
+              const ativo = mes === mm
+              return (
+                <button key={mm} onClick={() => setMes(mm)} style={{
+                  padding: '5px 12px', borderRadius: 20, border: 'none', cursor: 'pointer',
+                  fontSize: 12, fontWeight: ativo ? 700 : 400,
+                  background: ativo ? '#1C252E' : '#F0F4F8',
+                  color: ativo ? '#C3EBF7' : '#6B7A8D',
+                  transition: 'all 0.12s',
+                }}>
+                  {label}
+                </button>
+              )
+            })}
+          </div>
+        )
       )}
 
       {/* Conteúdo da aba */}

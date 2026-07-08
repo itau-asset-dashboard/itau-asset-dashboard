@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { X, Check, Trash2 } from 'lucide-react'
 import { TEMAS } from './UploadModal'
 import { useStore } from '../store/useStore'
+import { useIsMobile } from '../utils/useIsMobile'
 
 const TIPOS = ['Imagem', 'Vídeo', 'Artigo', 'Documento']
 
@@ -20,6 +21,7 @@ const NUM_FIELDS = [
 ]
 
 export default function LinkedinUploadModal({ mode = 'new', initial = null, onClose, onSave, onDelete }) {
+  const mobile = useIsMobile()
   const [confirmDelete, setConfirmDelete] = useState(false)
   const [form, setForm] = useState(() => {
     const base = { ...EMPTY, ...(initial || {}) }
@@ -66,9 +68,9 @@ export default function LinkedinUploadModal({ mode = 'new', initial = null, onCl
   const btnLabel = saved ? 'Salvo!' : saving ? 'Salvando...' : mode === 'edit' ? 'Salvar alterações' : 'Adicionar post'
 
   return (
-    <div style={{ position:'fixed', inset:0, background:'rgba(28,37,46,0.65)', zIndex:1000, display:'flex', alignItems:'center', justifyContent:'center', padding:16 }}
+    <div style={{ position:'fixed', inset:0, background:'rgba(28,37,46,0.65)', zIndex:1000, display:'flex', alignItems: mobile ? 'flex-end' : 'center', justifyContent:'center', padding: mobile ? 0 : 16 }}
       onClick={e => e.target === e.currentTarget && onClose()}>
-      <div style={{ background:'#fff', borderRadius:20, width:'100%', maxWidth:520, maxHeight:'92vh', overflow:'auto', boxShadow:'0 16px 56px rgba(0,0,0,0.22)' }}>
+      <div style={{ background:'#fff', borderRadius: mobile ? '20px 20px 0 0' : 20, width:'100%', maxWidth: mobile ? '100%' : 520, maxHeight: mobile ? '92vh' : '92vh', overflow:'auto', boxShadow:'0 16px 56px rgba(0,0,0,0.22)' }}>
 
         {/* Header */}
         <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'16px 20px', borderBottom:'1px solid #F0F4F8' }}>
@@ -131,7 +133,7 @@ export default function LinkedinUploadModal({ mode = 'new', initial = null, onCl
           {/* Métricas */}
           <div style={{ marginBottom:12 }}>
             <p style={{ color:'#6B7A8D', fontSize:12, fontWeight:600, marginBottom:8 }}>Métricas</p>
-            <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:8 }}>
+            <div style={{ display:'grid', gridTemplateColumns: mobile ? '1fr' : '1fr 1fr', gap:8 }}>
               {NUM_FIELDS.map(({ key, label, decimal }) => (
                 <div key={key}>
                   <p style={{ color:'#9AAAB8', fontSize:11, marginBottom:3 }}>{label}</p>
