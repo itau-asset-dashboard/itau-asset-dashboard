@@ -52,10 +52,16 @@ export default function LinkedinPaginaView({ data, ano, isEditMode, onSave }) {
     setEditOpen(true)
   }
 
+  function parseInput(v) {
+    if (v === '' || v == null) return null
+    // Remove pontos e espaços (separadores de milhar BR) antes de converter
+    const clean = String(v).replace(/\./g, '').replace(/\s/g, '').replace(',', '.')
+    const n = Number(clean)
+    return isNaN(n) ? null : n
+  }
+
   async function handleSave() {
-    const parsed = Object.fromEntries(
-      FIELDS.map(f => [f.key, form[f.key] !== '' ? Number(form[f.key]) : null])
-    )
+    const parsed = Object.fromEntries(FIELDS.map(f => [f.key, parseInput(form[f.key])]))
     await onSave(chave, parsed)
     setEditOpen(false)
   }
@@ -144,7 +150,8 @@ export default function LinkedinPaginaView({ data, ano, isEditMode, onSave }) {
                 <div key={f.key}>
                   <p style={{ color:'#6B7A8D', fontSize:12, fontWeight:600, marginBottom:4 }}>{f.label}</p>
                   <input
-                    type="number"
+                    type="text"
+                    inputMode="numeric"
                     value={form[f.key] ?? ''}
                     onChange={e => setForm(prev => ({ ...prev, [f.key]: e.target.value }))}
                     placeholder="—"
