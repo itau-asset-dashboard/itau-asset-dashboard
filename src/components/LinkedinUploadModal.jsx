@@ -7,7 +7,7 @@ import { useIsMobile } from '../utils/useIsMobile'
 const TIPOS = ['Imagem', 'Vídeo', 'Artigo', 'Documento']
 
 const EMPTY = {
-  nome: '', tema: [], data_post: '', tipo: 'Imagem',
+  nome: '', link_post: '', tema: [], data_post: '', tipo: 'Imagem',
   impressoes: '', visualizacoes: '', cliques: '', ctr: '', reacoes: '',
   status: 'parcial',
 }
@@ -89,6 +89,13 @@ export default function LinkedinUploadModal({ mode = 'new', initial = null, onCl
               style={{ width:'100%', border:'1.5px solid #E8ECF0', borderRadius:10, padding:'9px 12px', fontSize:13, outline:'none', fontFamily:'DM Sans, sans-serif', boxSizing:'border-box' }}/>
           </div>
 
+          {/* Link do post */}
+          <div style={{ marginBottom:10 }}>
+            <p style={{ color:'#6B7A8D', fontSize:12, fontWeight:600, marginBottom:4 }}>Link do post</p>
+            <input value={form.link_post || ''} onChange={e => set('link_post', e.target.value)} placeholder="https://www.linkedin.com/posts/..."
+              style={{ width:'100%', border:'1.5px solid #E8ECF0', borderRadius:10, padding:'9px 12px', fontSize:13, outline:'none', fontFamily:'DM Sans, sans-serif', boxSizing:'border-box' }}/>
+          </div>
+
           {/* Data */}
           <div style={{ marginBottom:10 }}>
             <p style={{ color:'#6B7A8D', fontSize:12, fontWeight:600, marginBottom:4 }}>Data da publicação</p>
@@ -102,10 +109,10 @@ export default function LinkedinUploadModal({ mode = 'new', initial = null, onCl
             <div style={{ display:'flex', gap:6, flexWrap:'wrap' }}>
               {TIPOS.map(t => (
                 <button key={t} onClick={() => set('tipo', t)}
-                  style={{ padding:'4px 12px', borderRadius:20, fontSize:12, cursor:'pointer', fontFamily:'DM Sans, sans-serif',
+                  style={{ padding:'4px 12px', borderRadius:20, fontSize:11, cursor:'pointer', fontFamily:'DM Sans, sans-serif',
                     fontWeight: form.tipo===t ? 700 : 400, background: form.tipo===t ? '#0A66C2' : '#F0F4F8',
                     color: form.tipo===t ? '#fff' : '#4A6272', border: form.tipo===t ? '1.5px solid #0A66C2' : '1.5px solid #E0E7EF', transition:'all 0.12s' }}>
-                  {t}
+                  {form.tipo===t ? '✓ ' : ''}{t}
                 </button>
               ))}
             </div>
@@ -114,7 +121,6 @@ export default function LinkedinUploadModal({ mode = 'new', initial = null, onCl
           {/* Temas */}
           <div style={{ marginBottom:10 }}>
             <p style={{ color:'#6B7A8D', fontSize:12, fontWeight:600, marginBottom:6 }}>Temas</p>
-            {form.tema?.length > 0 && <p style={{ color:'#FF6200', fontSize:11, marginBottom:6 }}>{form.tema.join(' · ')}</p>}
             <div style={{ display:'flex', flexWrap:'wrap', gap:5 }}>
               {TEMAS.map(t => {
                 const sel = Array.isArray(form.tema) && form.tema.includes(t)
@@ -123,7 +129,7 @@ export default function LinkedinUploadModal({ mode = 'new', initial = null, onCl
                     style={{ padding:'3px 10px', borderRadius:20, fontSize:11, cursor:'pointer', fontFamily:'DM Sans, sans-serif',
                       fontWeight: sel ? 700 : 400, background: sel ? '#1C252E' : '#F0F4F8',
                       color: sel ? '#C3EBF7' : '#4A6272', border: sel ? '1.5px solid #1C252E' : '1.5px solid #E0E7EF', transition:'all 0.12s' }}>
-                    {t}
+                    {sel ? '✓ ' : ''}{t}
                   </button>
                 )
               })}
@@ -138,7 +144,7 @@ export default function LinkedinUploadModal({ mode = 'new', initial = null, onCl
                 <div key={key}>
                   <p style={{ color:'#9AAAB8', fontSize:11, marginBottom:3 }}>{label}</p>
                   <input type="number" step={decimal ? '0.01' : '1'} value={form[key]} onChange={e => set(key, e.target.value)} placeholder="—"
-                    style={{ width:'100%', border:'1.5px solid #E8ECF0', borderRadius:8, padding:'8px 10px', fontSize:13, outline:'none', fontFamily:'DM Sans, sans-serif', boxSizing:'border-box' }}/>
+                    style={{ width:'100%', border:'1.5px solid #E8ECF0', borderRadius:8, padding:'9px 12px', fontSize:13, outline:'none', fontFamily:'DM Sans, sans-serif', boxSizing:'border-box' }}/>
                 </div>
               ))}
             </div>

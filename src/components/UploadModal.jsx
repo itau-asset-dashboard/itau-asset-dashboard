@@ -105,7 +105,7 @@ async function compressImage(dataUrl, maxPx = 1400, quality = 0.90) {
 }
 
 const EMPTY = {
-  nome: '', tema: [], data_post: '', data_evidencia: '', tipo: 'Reels', descricao: '',
+  nome: '', link_post: '', tema: [], data_post: '', data_evidencia: '', tipo: 'Reels', descricao: '',
   contas_alcancadas: '', visualizacoes: '',
   curtidas: '', comentarios: '', salvamentos: '', compartilhamentos: '',
   status: 'parcial', imageData: null,
@@ -310,26 +310,31 @@ const SinglePostModal = forwardRef(function SinglePostModal({ initialPost, initi
 
       {/* Nome */}
       <div>
-        <label style={{ color: '#1C252E', fontSize: 12, fontWeight: 700, display: 'block', marginBottom: 5 }}>
-          Nome do post <span style={{ color: '#8A9BB0', fontWeight: 400 }}>(título para identificação)</span>
+        <label style={{ color: '#6B7A8D', fontSize: 12, fontWeight: 600, display: 'block', marginBottom: 4 }}>
+          Nome do post
         </label>
         <input value={form.nome || ''} onChange={e => set('nome', e.target.value)}
           placeholder="Ex: Caique Cardoso — ETFs Itaú Asset"
-          style={{ ...inp(false), fontSize: 14, padding: '10px 12px', border: '1.5px solid #1C252E30' }}
+          style={{ ...inp(false), fontSize: 13, padding: '9px 12px' }}
           autoFocus={!isUpdate} />
+      </div>
+
+      {/* Link do post */}
+      <div>
+        <label style={{ color: '#6B7A8D', fontSize: 12, fontWeight: 600, display: 'block', marginBottom: 4 }}>
+          Link do post
+        </label>
+        <input value={form.link_post || ''} onChange={e => set('link_post', e.target.value)}
+          placeholder="https://www.instagram.com/p/..."
+          style={{ ...inp(false), fontSize: 13, padding: '9px 12px' }} />
       </div>
 
       {/* Tema — pills multi-select */}
       <div>
-        <label style={{ color: '#8A9BB0', fontSize: 11, fontWeight: 600, display: 'block', marginBottom: 2, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+        <label style={{ color: '#6B7A8D', fontSize: 12, fontWeight: 600, display: 'block', marginBottom: 6 }}>
           Tema
         </label>
-        {form.tema?.length > 0 && (
-          <p style={{ color: '#1C252E', fontSize: 11, marginBottom: 6 }}>
-            {form.tema.length} selecionado{form.tema.length > 1 ? 's' : ''}: {form.tema.join(' · ')}
-          </p>
-        )}
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5 }}>
           {TEMAS.map(t => {
             const sel = Array.isArray(form.tema) && form.tema.includes(t)
             return (
@@ -346,8 +351,7 @@ const SinglePostModal = forwardRef(function SinglePostModal({ initialPost, initi
                   border: sel ? '1.5px solid #1C252E' : '1.5px solid #E0E7EF',
                   transition: 'all 0.12s',
                 }}>
-                {sel && <span style={{ marginRight: 4, fontSize: 10 }}>✓</span>}
-                {t}
+                {sel ? '✓ ' : ''}{t}
               </button>
             )
           })}
@@ -356,7 +360,7 @@ const SinglePostModal = forwardRef(function SinglePostModal({ initialPost, initi
 
       {/* Descrição */}
       <div>
-        <label style={{ color: '#8A9BB0', fontSize: 11, fontWeight: 600, display: 'block', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+        <label style={{ color: '#6B7A8D', fontSize: 12, fontWeight: 600, display: 'block', marginBottom: 4 }}>
           Descrição / Observações
         </label>
         <textarea value={form.descricao || ''} onChange={e => set('descricao', e.target.value)}
@@ -367,12 +371,12 @@ const SinglePostModal = forwardRef(function SinglePostModal({ initialPost, initi
       {/* Data + Tipo */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
         <div>
-          <label style={{ color: '#8A9BB0', fontSize: 11, fontWeight: 600, display: 'block', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Data</label>
+          <label style={{ color: '#6B7A8D', fontSize: 12, fontWeight: 600, display: 'block', marginBottom: 4 }}>Data</label>
           <input value={form.data_post || ''} onChange={e => set('data_post', e.target.value)}
             placeholder="DD/MM/AAAA" style={inp(false)} />
         </div>
         <div>
-          <label style={{ color: '#8A9BB0', fontSize: 11, fontWeight: 600, display: 'block', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Tipo</label>
+          <label style={{ color: '#6B7A8D', fontSize: 12, fontWeight: 600, display: 'block', marginBottom: 4 }}>Tipo</label>
           <select value={form.tipo || 'Reels'} onChange={e => set('tipo', e.target.value)}
             style={{ ...inp(false), background: '#fff' }}>
             {TIPOS.map(t => <option key={t}>{t}</option>)}
@@ -382,17 +386,17 @@ const SinglePostModal = forwardRef(function SinglePostModal({ initialPost, initi
 
       {/* Métricas */}
       <div>
-        <p style={{ color: '#8A9BB0', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 10 }}>
+        <p style={{ color: '#6B7A8D', fontSize: 12, fontWeight: 600, marginBottom: 8 }}>
           Métricas
         </p>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
           {NUM_FIELDS.map(({ key, label, highlight, tooltip }) => (
             <div key={key} style={highlight ? { gridColumn: '1 / -1' } : {}}>
               <label style={{
-                color: highlight ? '#1a7a96' : '#8A9BB0',
-                fontSize: 11, fontWeight: highlight ? 700 : 600,
+                color: highlight ? '#1a7a96' : '#9AAAB8',
+                fontSize: 11,
                 display: 'flex', alignItems: 'center', gap: 5,
-                marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.04em',
+                marginBottom: 3,
               }}>
                 {label}
                 {tooltip && (
@@ -401,7 +405,7 @@ const SinglePostModal = forwardRef(function SinglePostModal({ initialPost, initi
                     width: 14, height: 14, borderRadius: '50%',
                     background: 'rgba(138,155,176,0.2)', color: '#8A9BB0',
                     fontSize: 9, fontWeight: 700, cursor: 'help', flexShrink: 0,
-                    lineHeight: 1, letterSpacing: 0,
+                    lineHeight: 1,
                   }}>?</span>
                 )}
               </label>
@@ -409,26 +413,30 @@ const SinglePostModal = forwardRef(function SinglePostModal({ initialPost, initi
                 value={form[key] === null || form[key] === undefined ? '' : form[key]}
                 onChange={e => set(key, e.target.value)}
                 placeholder="—"
-                style={{ ...inp(!!highlight), fontSize: highlight ? 15 : 13, fontWeight: highlight ? 700 : 400 }} />
+                style={{ ...inp(!!highlight), fontSize: 13 }} />
             </div>
           ))}
         </div>
       </div>
 
       {/* Status */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-        <span style={{ color: '#8A9BB0', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Status:</span>
-        {['parcial', 'final'].map(s => (
-          <button key={s} onClick={() => set('status', s)} style={{
-            padding: '6px 14px', borderRadius: 8, border: 'none', cursor: 'pointer',
-            fontSize: 12, fontWeight: 600,
-            background: form.status === s ? (s === 'final' ? '#1C252E' : 'rgba(195,235,247,0.35)') : '#F4F6F8',
-            color: form.status === s ? (s === 'final' ? '#C3EBF7' : '#1a7a96') : '#8A9BB0',
-            border: form.status === s && s === 'parcial' ? '1px solid rgba(195,235,247,0.7)' : '1px solid transparent',
-          }}>
-            {s === 'parcial' ? '🕐 Dado parcial' : '✓ Dado final'}
-          </button>
-        ))}
+      <div>
+        <p style={{ color: '#6B7A8D', fontSize: 12, fontWeight: 600, marginBottom: 6 }}>Status dos dados</p>
+        <div style={{ display: 'flex', gap: 8 }}>
+          {['parcial', 'final'].map(s => (
+            <button key={s} onClick={() => set('status', s)} style={{
+              flex: 1, padding: '8px', borderRadius: 10, cursor: 'pointer',
+              fontSize: 13, fontWeight: form.status === s ? 700 : 400,
+              fontFamily: 'DM Sans, sans-serif',
+              background: form.status === s ? '#1C252E' : '#fff',
+              color: form.status === s ? '#C3EBF7' : '#8A9BB0',
+              border: `1.5px solid ${form.status === s ? '#1C252E' : '#E8ECF0'}`,
+              transition: 'all 0.15s',
+            }}>
+              {s === 'parcial' ? 'Parcial' : 'Final'}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Salvar + Excluir */}
