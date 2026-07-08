@@ -27,6 +27,9 @@ export const useStore = create(
       linkedinPosts: [],
       linkedinPageData: {}, // { 'MM/YYYY': { impressoes, usuarios_alcancados, ... } }
       linkedinSeguidores: null,
+      linkedinAction: null, // 'upload' | 'import' | null — trigger modal from TopBar
+      linkedinAnoFiltro: String(new Date().getFullYear()),
+      linkedinMesBiblioteca: `${String(new Date().getMonth()+1).padStart(2,'0')}/${new Date().getFullYear()}`,
       metaMensal: 200000,
       metaAnual: 743000,
       mesFiltro: '01/2026',
@@ -214,6 +217,9 @@ export const useStore = create(
       },
 
       setMesFiltro: (mes) => set({ mesFiltro: mes }),
+      setLinkedinAction: (action) => set({ linkedinAction: action }),
+      setLinkedinAnoFiltro: (ano) => set({ linkedinAnoFiltro: ano }),
+      setLinkedinMesBiblioteca: (mes) => set({ linkedinMesBiblioteca: mes }),
 
       setOliverData: (mes, valores) => {
         const updated = {

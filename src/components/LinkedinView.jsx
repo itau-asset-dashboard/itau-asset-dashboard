@@ -1,5 +1,4 @@
-import { useState, useMemo } from 'react'
-import { Plus, Upload } from 'lucide-react'
+import { useState, useMemo, useEffect } from 'react'
 import { useStore } from '../store/useStore'
 import LinkedinVisaoGeral from './LinkedinVisaoGeral'
 import LinkedinBiblioteca from './LinkedinBiblioteca'
@@ -12,43 +11,29 @@ const MESES_LABEL = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out'
 const MESES_FULL  = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro']
 
 export default function LinkedinView({ tab = 'geral' }) {
-  const { linkedinPosts, addLinkedinPost, updateLinkedinPost, deleteLinkedinPost, deleteManyLinkedinPosts, importLinkedinPosts, isEditMode } = useStore()
-  const [uploadOpen, setUploadOpen]       = useState(false)
-  const [importOpen, setImportOpen]       = useState(false)
-  const [editPost, setEditPost]           = useState(null)
-  const [confirmDel, setConfirmDel]       = useState(null)
+  const {
+    linkedinPosts, addLinkedinPost, updateLinkedinPost, deleteLinkedinPost, deleteManyLinkedinPosts, importLinkedinPosts, isEditMode,
+    linkedinAction, setLinkedinAction, linkedinAnoFiltro, linkedinMesBiblioteca,
+  } = useStore()
+  const [uploadOpen, setUploadOpen] = useState(false)
+  const [importOpen, setImportOpen] = useState(false)
+  const [editPost, setEditPost]     = useState(null)
+  const [confirmDel, setConfirmDel] = useState(null)
 
-  // Anos com posts reais
-  const anosComPosts = useMemo(() => {
-    const set = new Set(linkedinPosts.map(p => p.data_post?.split('/')?.[2]).filter(Boolean))
-    return [...set].sort()
-  }, [linkedinPosts])
-
-  const defaultAno = String(new Date().getFullYear())
-  const [ano, setAno] = useState(anosComPosts.includes(defaultAno) ? defaultAno : (anosComPosts[anosComPosts.length - 1] || defaultAno))
-
-  // Mês para a aba mensal (pills)
+  // Mês para a aba mensal (pills) — permanece local
   const mesAtual = String(new Date().getMonth() + 1).padStart(2, '0')
   const [mes, setMes] = useState(mesAtual)
 
-  // Mês/ano para a aba biblioteca (select dropdown) — "MM/YYYY"
-  const mesesComPosts = useMemo(() => {
-    const set = new Set(
-      linkedinPosts
-        .map(p => { const pts = p.data_post?.split('/'); return pts?.[1] && pts?.[2] ? `${pts[1]}/${pts[2]}` : null })
-        .filter(Boolean)
-    )
-    return [...set].sort((a, b) => {
-      const [ma, ya] = a.split('/'); const [mb, yb] = b.split('/')
-      return ya !== yb ? Number(ya) - Number(yb) : Number(ma) - Number(mb)
-    })
-  }, [linkedinPosts])
+  // Reage ao trigger do TopBar
+  useEffect(() => {
+    if (!linkedinAction) return
+    if (linkedinAction === 'upload') setUploadOpen(true)
+    if (linkedinAction === 'import') setImportOpen(true)
+    setLinkedinAction(null)
+  }, [linkedinAction])
 
-  const defaultMesFiltro = (() => {
-    const cur = `${String(new Date().getMonth()+1).padStart(2,'0')}/${new Date().getFullYear()}`
-    return mesesComPosts.includes(cur) ? cur : (mesesComPosts[mesesComPosts.length - 1] || cur)
-  })()
-  const [mesBiblioteca, setMesBiblioteca] = useState(defaultMesFiltro)
+  const ano         = linkedinAnoFiltro
+  const mesBiblioteca = linkedinMesBiblioteca
 
   const postsAno = linkedinPosts.filter(p => p.data_post?.split('/')?.[2] === ano)
   const postsMes = linkedinPosts.filter(p => {
@@ -63,68 +48,26 @@ export default function LinkedinView({ tab = 'geral' }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
 
-      {/* Controles de filtro */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 8 }}>
-
-        {/* Filtro de mês — aba biblioteca (select dropdown) */}
-        {tab === 'biblioteca' && mesesComPosts.length > 0 && (
-          <select value={mesBiblioteca} onChange={e => setMesBiblioteca(e.target.value)}
-            style={{ background: '#fff', border: '1.5px solid #EDEFF2', borderRadius: 10, padding: '7px 10px', fontSize: 13, color: '#1C252E', cursor: 'pointer', outline: 'none', fontFamily: 'DM Sans, sans-serif' }}>
-            {mesesComPosts.map(mv => {
-              const [mm, yyyy] = mv.split('/')
-              return <option key={mv} value={mv}>{MESES_FULL[parseInt(mm,10)-1]} {yyyy}</option>
-            })}
-          </select>
-        )}
-
-        {/* Filtro de ano — na aba anual e pílula */}
-        {(tab === 'geral' || tab === 'pilula') && anosComPosts.length > 0 && (
-          <select value={ano} onChange={e => setAno(e.target.value)}
-            style={{ background: '#fff', border: '1.5px solid #EDEFF2', borderRadius: 10, padding: '7px 10px', fontSize: 13, color: '#1C252E', cursor: 'pointer', outline: 'none', fontFamily: 'DM Sans, sans-serif' }}>
-            {anosComPosts.map(a => <option key={a} value={a}>{a}</option>)}
-          </select>
-        )}
-
-        {/* Filtro de mês — só na aba mensal */}
-        {tab === 'formato' && (
-          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-            {MESES_LABEL.map((label, i) => {
-              const mm = String(i + 1).padStart(2, '0')
-              const ativo = mes === mm
-              return (
-                <button key={mm} onClick={() => setMes(mm)} style={{
-                  padding: '5px 12px', borderRadius: 20, border: 'none', cursor: 'pointer',
-                  fontSize: 12, fontWeight: ativo ? 700 : 400,
-                  background: ativo ? '#1C252E' : '#F0F4F8',
-                  color: ativo ? '#C3EBF7' : '#6B7A8D',
-                  transition: 'all 0.12s',
-                }}>
-                  {label}
-                </button>
-              )
-            })}
-          </div>
-        )}
-
-{isEditMode && tab === 'biblioteca' && (
-          <button onClick={() => setImportOpen(true)} style={{
-            background: '#F0F4F8', color: '#1C252E', border: '1.5px solid #EDEFF2', borderRadius: 10,
-            padding: '8px 14px', fontSize: 13, fontWeight: 600, cursor: 'pointer',
-            display: 'flex', alignItems: 'center', gap: 5, whiteSpace: 'nowrap',
-          }}>
-            <Upload size={15}/> Importar XLS
-          </button>
-        )}
-        {isEditMode && (
-          <button onClick={() => setUploadOpen(true)} style={{
-            background: '#0A66C2', color: '#fff', border: 'none', borderRadius: 10,
-            padding: '8px 14px', fontSize: 13, fontWeight: 600, cursor: 'pointer',
-            display: 'flex', alignItems: 'center', gap: 5, whiteSpace: 'nowrap',
-          }}>
-            <Plus size={15}/> Novo post
-          </button>
-        )}
-      </div>
+      {/* Pills de mês — só na aba mensal (permanecem inline) */}
+      {tab === 'formato' && (
+        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+          {MESES_LABEL.map((label, i) => {
+            const mm = String(i + 1).padStart(2, '0')
+            const ativo = mes === mm
+            return (
+              <button key={mm} onClick={() => setMes(mm)} style={{
+                padding: '5px 12px', borderRadius: 20, border: 'none', cursor: 'pointer',
+                fontSize: 12, fontWeight: ativo ? 700 : 400,
+                background: ativo ? '#1C252E' : '#F0F4F8',
+                color: ativo ? '#C3EBF7' : '#6B7A8D',
+                transition: 'all 0.12s',
+              }}>
+                {label}
+              </button>
+            )
+          })}
+        </div>
+      )}
 
       {/* Conteúdo da aba */}
       {tab === 'geral'      && <LinkedinVisaoGeral posts={postsAno} ano={ano} isEditMode={isEditMode} onEditPost={setEditPost}/>}

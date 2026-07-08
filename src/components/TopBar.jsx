@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { Key, Plus, Lock, Unlock, Eye } from 'lucide-react'
+import { useState, useMemo } from 'react'
+import { Key, Plus, Lock, Unlock, Eye, Upload } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import UploadModal from './UploadModal'
 import { useIsMobile } from '../utils/useIsMobile'
@@ -34,7 +34,10 @@ const TITLES = {
 const EDIT_PASSWORD = import.meta.env.VITE_EDIT_PASSWORD || 'itauasset2026'
 
 export default function TopBar() {
-  const { mesFiltro, setMesFiltro, apiKey, setApiKey, getPostsDoMes, activeSection, addPost, isEditMode, setEditMode } = useStore()
+  const {
+    mesFiltro, setMesFiltro, apiKey, setApiKey, getPostsDoMes, activeSection, addPost, isEditMode, setEditMode,
+    linkedinPosts, linkedinAnoFiltro, setLinkedinAnoFiltro, linkedinMesBiblioteca, setLinkedinMesBiblioteca, setLinkedinAction,
+  } = useStore()
   const mobile = useIsMobile()
   const [showApi, setShowApi]         = useState(false)
   const [keyInput, setKeyInput]       = useState(apiKey)
@@ -46,6 +49,20 @@ export default function TopBar() {
   const posts = getPostsDoMes()
   const section = TITLES[activeSection] || TITLES['visao-anual']
   const showMesFiltro = activeSection === 'visao-geral' || activeSection === 'posts'
+  const isLinkedin = activeSection.startsWith('linkedin')
+
+  // Anos e meses disponíveis com posts LinkedIn
+  const linkedinAnosComPosts = useMemo(() => {
+    const set = new Set(linkedinPosts.map(p => p.data_post?.split('/')?.[2]).filter(Boolean))
+    return [...set].sort()
+  }, [linkedinPosts])
+
+  const linkedinMesesComPosts = useMemo(() => {
+    const set = new Set(
+      linkedinPosts.map(p => { const pts = p.data_post?.split('/'); return pts?.[1] && pts?.[2] ? `${pts[1]}/${pts[2]}` : null }).filter(Boolean)
+    )
+    return [...set].sort((a,b) => { const [ma,ya]=a.split('/'); const [mb,yb]=b.split('/'); return ya!==yb?Number(ya)-Number(yb):Number(ma)-Number(mb) })
+  }, [linkedinPosts])
 
   function exportCSV() {
     const headers = ['Data','Tipo','Tema','Contas Alcançadas','Visualizações','Curtidas','Comentários','Salvamentos','Compartilhamentos','Status']
@@ -98,21 +115,56 @@ export default function TopBar() {
       </div>
 
       <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
+
+        {/* ── Controles Instagram ── */}
         {showMesFiltro && (
           <select value={mesFiltro} onChange={e => setMesFiltro(e.target.value)}
             style={{ background: '#fff', border: '1.5px solid #EDEFF2', borderRadius: 10, padding: '7px 10px', fontSize: 13, color: '#1C252E', cursor: 'pointer', outline: 'none', fontFamily: 'DM Sans, sans-serif', maxWidth: 140 }}>
             {MESES.map(m => <option key={m.value} value={m.value}>{m.label}</option>)}
           </select>
         )}
-
-        {/* Novo post — só no modo edição e fora da aba de stories */}
-        {isEditMode && activeSection !== 'stories' && !activeSection.startsWith('linkedin') && (
+        {isEditMode && activeSection !== 'stories' && !isLinkedin && (
           <button onClick={() => setUploadOpen(true)} style={{
             background: '#FF6200', color: '#fff', border: 'none', borderRadius: 10,
             padding: '8px 12px', fontSize: 13, fontWeight: 600, cursor: 'pointer',
             display: 'flex', alignItems: 'center', gap: 5, fontFamily: 'DM Sans, sans-serif', whiteSpace: 'nowrap',
           }}>
             <Plus size={15} /> <span className="hide-mobile">Novo post</span>
+          </button>
+        )}
+
+        {/* ── Controles LinkedIn ── */}
+        {isLinkedin && (activeSection === 'linkedin-geral' || activeSection === 'linkedin-pilula') && linkedinAnosComPosts.length > 0 && (
+          <select value={linkedinAnoFiltro} onChange={e => setLinkedinAnoFiltro(e.target.value)}
+            style={{ background: '#fff', border: '1.5px solid #EDEFF2', borderRadius: 10, padding: '7px 10px', fontSize: 13, color: '#1C252E', cursor: 'pointer', outline: 'none', fontFamily: 'DM Sans, sans-serif' }}>
+            {linkedinAnosComPosts.map(a => <option key={a} value={a}>{a}</option>)}
+          </select>
+        )}
+        {isLinkedin && activeSection === 'linkedin-posts' && linkedinMesesComPosts.length > 0 && (
+          <select value={linkedinMesBiblioteca} onChange={e => setLinkedinMesBiblioteca(e.target.value)}
+            style={{ background: '#fff', border: '1.5px solid #EDEFF2', borderRadius: 10, padding: '7px 10px', fontSize: 13, color: '#1C252E', cursor: 'pointer', outline: 'none', fontFamily: 'DM Sans, sans-serif' }}>
+            {linkedinMesesComPosts.map(mv => {
+              const [mm, yyyy] = mv.split('/')
+              return <option key={mv} value={mv}>{MESES_NOMES[parseInt(mm,10)-1]} {yyyy}</option>
+            })}
+          </select>
+        )}
+        {isEditMode && isLinkedin && activeSection === 'linkedin-posts' && (
+          <button onClick={() => setLinkedinAction('import')} style={{
+            background: '#F0F4F8', color: '#1C252E', border: '1.5px solid #EDEFF2', borderRadius: 10,
+            padding: '8px 12px', fontSize: 13, fontWeight: 600, cursor: 'pointer',
+            display: 'flex', alignItems: 'center', gap: 5, whiteSpace: 'nowrap', fontFamily: 'DM Sans, sans-serif',
+          }}>
+            <Upload size={15}/> <span className="hide-mobile">Importar XLS</span>
+          </button>
+        )}
+        {isEditMode && isLinkedin && activeSection !== 'linkedin-pagina' && (
+          <button onClick={() => setLinkedinAction('upload')} style={{
+            background: '#0A66C2', color: '#fff', border: 'none', borderRadius: 10,
+            padding: '8px 12px', fontSize: 13, fontWeight: 600, cursor: 'pointer',
+            display: 'flex', alignItems: 'center', gap: 5, fontFamily: 'DM Sans, sans-serif', whiteSpace: 'nowrap',
+          }}>
+            <Plus size={15}/> <span className="hide-mobile">Novo post</span>
           </button>
         )}
 
