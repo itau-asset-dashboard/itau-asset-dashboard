@@ -149,7 +149,14 @@ export default function LinkedinPilula({ posts, ano }) {
         <div style={{ padding: '16px 20px 12px', borderBottom: '1px solid #F0F4F8', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 10 }}>
           <div>
             <p style={{ color: '#1C252E', fontSize: 14, fontWeight: 700 }}>Termômetro de Pílulas</p>
-            <p style={{ color: '#9AAAB8', fontSize: 11, marginTop: 2 }}>Compara cada pílula com a média do período</p>
+            <div style={{ display: 'flex', gap: 12, marginTop: 4, flexWrap: 'wrap' }}>
+              <span style={{ color: '#9AAAB8', fontSize: 11 }}>
+                Média de visualizações: <strong style={{ color: '#0A66C2' }}>{fmtN(Math.round(mediaVis))}</strong>
+              </span>
+              <span style={{ color: '#9AAAB8', fontSize: 11 }}>
+                Média de impressões: <strong style={{ color: '#1C252E' }}>{fmtN(Math.round(mediaImp))}</strong>
+              </span>
+            </div>
           </div>
           <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
             {[
