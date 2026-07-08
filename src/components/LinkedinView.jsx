@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react'
-import { Plus, Upload } from 'lucide-react'
+import { Plus, Upload, Trash2 } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import LinkedinVisaoGeral from './LinkedinVisaoGeral'
 import LinkedinBiblioteca from './LinkedinBiblioteca'
@@ -13,10 +13,16 @@ const MESES_FULL  = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julh
 
 export default function LinkedinView({ tab = 'geral' }) {
   const { linkedinPosts, addLinkedinPost, updateLinkedinPost, deleteLinkedinPost, deleteManyLinkedinPosts, importLinkedinPosts, isEditMode } = useStore()
-  const [uploadOpen, setUploadOpen]   = useState(false)
-  const [importOpen, setImportOpen]   = useState(false)
-  const [editPost, setEditPost]       = useState(null)
-  const [confirmDel, setConfirmDel]   = useState(null)
+  const [uploadOpen, setUploadOpen]       = useState(false)
+  const [importOpen, setImportOpen]       = useState(false)
+  const [editPost, setEditPost]           = useState(null)
+  const [confirmDel, setConfirmDel]       = useState(null)
+  const [confirmLimpar, setConfirmLimpar] = useState(false)
+
+  async function handleLimparTudo() {
+    await deleteManyLinkedinPosts(linkedinPosts.map(p => p.id))
+    setConfirmLimpar(false)
+  }
 
   // Anos com posts reais
   const anosComPosts = useMemo(() => {
@@ -106,6 +112,16 @@ export default function LinkedinView({ tab = 'geral' }) {
           </div>
         )}
 
+        {isEditMode && tab === 'biblioteca' && linkedinPosts.length > 0 && (
+          <button onClick={() => setConfirmLimpar(true)} style={{
+            background: 'rgba(239,68,68,0.07)', color: '#ef4444',
+            border: '1.5px solid rgba(239,68,68,0.2)', borderRadius: 10,
+            padding: '8px 14px', fontSize: 13, fontWeight: 600, cursor: 'pointer',
+            display: 'flex', alignItems: 'center', gap: 5, whiteSpace: 'nowrap',
+          }}>
+            <Trash2 size={14}/> Limpar tudo
+          </button>
+        )}
         {isEditMode && tab === 'biblioteca' && (
           <button onClick={() => setImportOpen(true)} style={{
             background: '#F0F4F8', color: '#1C252E', border: '1.5px solid #EDEFF2', borderRadius: 10,
@@ -155,6 +171,18 @@ export default function LinkedinView({ tab = 'geral' }) {
             <div style={{ display: 'flex', gap: 8 }}>
               <button onClick={() => setConfirmDel(null)} style={{ flex: 1, background: '#F4F6F8', border: 'none', borderRadius: 8, padding: '9px', fontSize: 13, cursor: 'pointer', color: '#4A5568' }}>Cancelar</button>
               <button onClick={() => handleDelete(confirmDel)} style={{ flex: 1, background: '#ef4444', color: '#fff', border: 'none', borderRadius: 8, padding: '9px', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>Remover</button>
+            </div>
+          </div>
+        </div>
+      )}
+      {confirmLimpar && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', zIndex: 500, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ background: '#fff', borderRadius: 16, padding: 24, maxWidth: 320, width: '90%' }}>
+            <p style={{ color: '#1C252E', fontWeight: 700, fontSize: 14, marginBottom: 8 }}>Limpar todos os posts do LinkedIn?</p>
+            <p style={{ color: '#8A9BB0', fontSize: 13, marginBottom: 20 }}>Isso remove os {linkedinPosts.length} posts. Você poderá importar novamente depois.</p>
+            <div style={{ display: 'flex', gap: 8 }}>
+              <button onClick={() => setConfirmLimpar(false)} style={{ flex: 1, background: '#F4F6F8', border: 'none', borderRadius: 8, padding: '9px', fontSize: 13, cursor: 'pointer', color: '#4A5568' }}>Cancelar</button>
+              <button onClick={handleLimparTudo} style={{ flex: 1, background: '#ef4444', color: '#fff', border: 'none', borderRadius: 8, padding: '9px', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>Limpar tudo</button>
             </div>
           </div>
         </div>
