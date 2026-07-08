@@ -112,7 +112,7 @@ export default function LinkedinPilula({ posts, ano, isEditMode, onEditPost }) {
               <span style={{ color: '#6B7A8D', fontSize: 11 }}>Visualizações</span>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-              <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#A0BDD8' }}/>
+              <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#C3EBF7' }}/>
               <span style={{ color: '#6B7A8D', fontSize: 11 }}>Impressões</span>
             </div>
           </div>
@@ -135,7 +135,7 @@ export default function LinkedinPilula({ posts, ano, isEditMode, onEditPost }) {
               )
             }} cursor={{ fill: 'rgba(0,0,0,0.02)' }}/>
             <Bar dataKey="impressoes" radius={[3,3,0,0]}>
-              {byMonth.map((e, i) => <Cell key={i} fill={e.impressoes === 0 ? '#F0F2F5' : '#A0BDD8'}/>)}
+              {byMonth.map((e, i) => <Cell key={i} fill={e.impressoes === 0 ? '#F0F2F5' : '#C3EBF7'}/>)}
             </Bar>
             <Bar dataKey="visualizacoes" radius={[3,3,0,0]}>
               {byMonth.map((e, i) => <Cell key={i} fill={e.visualizacoes === 0 ? '#F0F2F5' : '#0A66C2'}/>)}
