@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { ChevronDown, ChevronUp } from 'lucide-react'
 import { useIsMobile } from '../utils/useIsMobile'
 
@@ -152,6 +152,10 @@ function FormatoCard({ cfg, posts, mobile, isEditMode, onEditPost }) {
 export default function LinkedinVisaoMensal({ posts, mes, isEditMode, onEditPost }) {
   const mobile = useIsMobile()
   const mesNome = MESES_FULL[parseInt(mes, 10) - 1] || mes
+  const [formatoFiltro, setFormatoFiltro] = useState(null)
+
+  // Só mostra formatos que têm posts
+  const formatosComPosts = useMemo(() => CONFIGS.filter(cfg => posts.some(p => p.tipo === cfg.id)), [posts])
 
   const totalImpressoes   = posts.reduce((s, p) => s + (Number(p.impressoes)    || 0), 0)
   const totalVisualizacoes= posts.reduce((s, p) => s + (Number(p.visualizacoes) || 0), 0)
@@ -190,9 +194,31 @@ export default function LinkedinVisaoMensal({ posts, mes, isEditMode, onEditPost
         ))}
       </div>
 
+      {/* Filtro de formato — só no mobile */}
+      {mobile && formatosComPosts.length > 1 && (
+        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+          <button onClick={() => setFormatoFiltro(null)} style={{
+            padding: '4px 12px', borderRadius: 20, fontSize: 11, cursor: 'pointer',
+            fontFamily: 'DM Sans, sans-serif', fontWeight: !formatoFiltro ? 700 : 400,
+            background: !formatoFiltro ? '#1C252E' : '#F0F4F8',
+            color: !formatoFiltro ? '#C3EBF7' : '#4A6272',
+            border: !formatoFiltro ? '1.5px solid #1C252E' : '1.5px solid #E0E7EF',
+          }}>Todos</button>
+          {formatosComPosts.map(cfg => (
+            <button key={cfg.id} onClick={() => setFormatoFiltro(cfg.id === formatoFiltro ? null : cfg.id)} style={{
+              padding: '4px 12px', borderRadius: 20, fontSize: 11, cursor: 'pointer',
+              fontFamily: 'DM Sans, sans-serif', fontWeight: formatoFiltro === cfg.id ? 700 : 400,
+              background: formatoFiltro === cfg.id ? BORDA[cfg.id] : '#F0F4F8',
+              color: formatoFiltro === cfg.id ? '#fff' : '#4A6272',
+              border: formatoFiltro === cfg.id ? `1.5px solid ${BORDA[cfg.id]}` : '1.5px solid #E0E7EF',
+            }}>{cfg.label}</button>
+          ))}
+        </div>
+      )}
+
       {/* Cards por formato */}
       <div style={{ display: 'grid', gridTemplateColumns: mobile ? '1fr' : '1fr 1fr', gap: 14 }}>
-        {CONFIGS.map(cfg => (
+        {CONFIGS.filter(cfg => !mobile || !formatoFiltro || cfg.id === formatoFiltro).map(cfg => (
           <FormatoCard key={cfg.id} cfg={cfg} posts={posts} mobile={mobile} isEditMode={isEditMode} onEditPost={onEditPost}/>
         ))}
       </div>

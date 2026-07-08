@@ -15,9 +15,9 @@ const NAV_GROUPS = [
   {
     label: 'LINKEDIN',
     items: [
-      { id: 'linkedin-pagina',      icon: 'linkedin', label: 'Visão da página' },
-      { id: 'linkedin-geral',       icon: Calendar,  label: 'Visão Anual'    },
-      { id: 'linkedin-performance', icon: BarChart2, label: 'Visão Mensal'   },
+      { id: 'linkedin-pagina',      icon: 'linkedin', label: 'Visão da página', mobileLabel: 'Página'  },
+      { id: 'linkedin-geral',       icon: Calendar,  label: 'Visão Anual',    mobileLabel: 'Anual'   },
+      { id: 'linkedin-performance', icon: BarChart2, label: 'Visão Mensal',   mobileLabel: 'Mensal'  },
       { id: 'linkedin-posts',       icon: List,      label: 'Posts'          },
       { id: 'linkedin-pilula',      icon: TrendingUp,label: 'Pílula de ETFs' },
     ],
@@ -185,9 +185,10 @@ export default function Sidebar() {
 
       {/* ── Bottom nav mobile ── */}
       <nav className="bottom-nav">
-        {NAV_FLAT.map(({ id, icon: Icon, label }) => {
+        {NAV_FLAT.map(({ id, icon: Icon, label, mobileLabel }) => {
           const active = activeSection === id
           const blocked = id === 'upload' && !isEditMode
+          const color = active ? ORANGE : '#4A6272'
           return (
             <button key={id} onClick={() => !blocked && setActiveSection(id)}
               style={{
@@ -197,9 +198,12 @@ export default function Sidebar() {
                 opacity: blocked ? 0.4 : 1,
                 padding: '6px 2px',
               }}>
-              <Icon size={19} color={active ? ORANGE : '#4A6272'} strokeWidth={active ? 2.2 : 1.8} />
+              {Icon === 'linkedin'
+                ? <LinkedinIcon size={19} color={color}/>
+                : <Icon size={19} color={color} strokeWidth={active ? 2.2 : 1.8}/>
+              }
               <span style={{ fontSize: 9, color: active ? ORANGE : '#8AAAB8', fontWeight: active ? 700 : 400, whiteSpace: 'nowrap' }}>
-                {label.split(' ')[0]}
+                {mobileLabel || label.split(' ')[0]}
               </span>
             </button>
           )
