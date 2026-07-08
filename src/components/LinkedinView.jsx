@@ -12,7 +12,7 @@ const MESES_LABEL = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out'
 const MESES_FULL  = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro']
 
 export default function LinkedinView({ tab = 'geral' }) {
-  const { linkedinPosts, addLinkedinPost, updateLinkedinPost, deleteLinkedinPost, importLinkedinPosts, isEditMode } = useStore()
+  const { linkedinPosts, addLinkedinPost, updateLinkedinPost, deleteLinkedinPost, deleteManyLinkedinPosts, importLinkedinPosts, isEditMode } = useStore()
   const [uploadOpen, setUploadOpen]   = useState(false)
   const [importOpen, setImportOpen]   = useState(false)
   const [editPost, setEditPost]       = useState(null)
@@ -128,7 +128,7 @@ export default function LinkedinView({ tab = 'geral' }) {
 
       {/* Conteúdo da aba */}
       {tab === 'geral'      && <LinkedinVisaoGeral posts={postsAno} ano={ano} isEditMode={isEditMode} onEditPost={setEditPost}/>}
-      {tab === 'biblioteca' && <LinkedinBiblioteca allPosts={linkedinPosts} mesFiltro={mesBiblioteca} isEditMode={isEditMode} onEditPost={setEditPost} onDeletePost={setConfirmDel}/>}
+      {tab === 'biblioteca' && <LinkedinBiblioteca allPosts={linkedinPosts} mesFiltro={mesBiblioteca} isEditMode={isEditMode} onEditPost={setEditPost} onDeletePost={setConfirmDel} onDeleteMany={deleteManyLinkedinPosts}/>}
       {tab === 'formato'    && <LinkedinVisaoMensal posts={postsMes} mes={mes} isEditMode={isEditMode} onEditPost={setEditPost}/>}
       {tab === 'pilula'     && <LinkedinPilula posts={postsAno} ano={ano}/>}
 

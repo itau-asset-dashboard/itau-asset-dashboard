@@ -332,6 +332,12 @@ export const useStore = create(
         try { await removeLinkedinPost(id) } catch (e) { console.error('[linkedin delete]', e) }
       },
 
+      deleteManyLinkedinPosts: async (ids) => {
+        const idSet = new Set(ids)
+        set(s => ({ linkedinPosts: s.linkedinPosts.filter(p => !idSet.has(p.id)) }))
+        await Promise.allSettled(ids.map(id => removeLinkedinPost(id).catch(() => {})))
+      },
+
       importLinkedinPosts: async (posts) => {
         const novos = posts.map(p => ({ ...p, id: p.id || String(Date.now() + Math.random()) }))
         set(s => ({ linkedinPosts: [...s.linkedinPosts, ...novos] }))
