@@ -129,7 +129,7 @@ export default function Sidebar() {
         <div style={{ height: 1, background: '#EAECF0', marginBottom: 18, marginLeft: 4, marginRight: 4 }} />
 
         {/* ── Nav por grupos ── */}
-        <nav style={{ display: 'flex', flexDirection: 'column', gap: 22, flex: 1, overflowY: 'auto', minHeight: 0 }}>
+        <nav className="scrollbar-thin" style={{ display: 'flex', flexDirection: 'column', gap: 22, flex: 1, overflowY: 'auto', minHeight: 0 }}>
           {NAV_GROUPS.map(({ label, items }) => (
             <div key={label}>
               <p style={{
