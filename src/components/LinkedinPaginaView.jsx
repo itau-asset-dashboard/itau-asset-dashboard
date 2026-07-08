@@ -219,12 +219,12 @@ export default function LinkedinPaginaView({ data, seguidores, ano, isEditMode, 
             <XAxis dataKey="label" tick={{ fontSize:11, fill:'#9AAAB8' }} axisLine={false} tickLine={false}/>
             <YAxis tick={{ fontSize:11, fill:'#9AAAB8' }} axisLine={false} tickLine={false} tickFormatter={v => v >= 1000 ? (v/1000).toFixed(0)+'K' : v} width={44}/>
             <Tooltip formatter={(v, name) => [fmtN(v), FIELDS.find(f=>f.key===name)?.label || name]} labelStyle={{ color:'#1C252E', fontWeight:700 }} contentStyle={{ borderRadius:10, border:'1px solid #F0F4F8', fontSize:12 }}/>
-            <Line dataKey="impressoes"          stroke="#C3EBF7" strokeWidth={2.5} dot={{ r:3, fill:'#C3EBF7' }} activeDot={{ r:5 }} connectNulls={false}/>
+            <Line dataKey="impressoes"          stroke="#0A66C2" strokeWidth={2.5} dot={{ r:3, fill:'#0A66C2' }} activeDot={{ r:5 }} connectNulls={false}/>
             <Line dataKey="usuarios_alcancados" stroke="#FF6200" strokeWidth={2.5} dot={{ r:3, fill:'#FF6200' }} activeDot={{ r:5 }} connectNulls={false}/>
           </LineChart>
         </ResponsiveContainer>
         <div style={{ display:'flex', gap:16, marginTop:8, flexWrap:'wrap' }}>
-          {[['#C3EBF7','Impressões'],['#FF6200','Usuários alcançados']].map(([color,label]) => (
+          {[['#0A66C2','Impressões'],['#FF6200','Usuários alcançados']].map(([color,label]) => (
             <div key={label} style={{ display:'flex', alignItems:'center', gap:6 }}>
               <div style={{ width:22, height:3, borderRadius:2, background:color }}/>
               <span style={{ fontSize:11, color:'#8A9BB0' }}>{label}</span>
