@@ -85,7 +85,7 @@ export default function LinkedinView({ tab = 'geral' }) {
       {tab === 'geral'      && <LinkedinVisaoGeral posts={postsAno} ano={ano} isEditMode={isEditMode} onEditPost={setEditPost}/>}
       {tab === 'biblioteca' && <LinkedinBiblioteca allPosts={linkedinPosts} mesFiltro={mesBiblioteca} isEditMode={isEditMode} onEditPost={setEditPost} onDeletePost={setConfirmDel} onDeleteMany={deleteManyLinkedinPosts}/>}
       {tab === 'formato'    && <LinkedinVisaoMensal posts={postsMes} mes={mes} isEditMode={isEditMode} onEditPost={setEditPost}/>}
-      {tab === 'pilula'     && <LinkedinPilula posts={postsAno} ano={ano}/>}
+      {tab === 'pilula'     && <LinkedinPilula posts={postsAno} ano={ano} isEditMode={isEditMode} onEditPost={setEditPost}/>}
 
       {/* Modal importação XLS */}
       {importOpen && isEditMode && (

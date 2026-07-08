@@ -30,7 +30,7 @@ function getPerf(val, media) {
 
 const PER_PAGE = 5
 
-export default function LinkedinPilula({ posts, ano }) {
+export default function LinkedinPilula({ posts, ano, isEditMode, onEditPost }) {
   const mobile = useIsMobile()
   const artigos = posts.filter(p => p.tipo === 'Artigo')
   const [sortKey, setSortKey] = useState('visualizacoes')
@@ -192,11 +192,18 @@ export default function LinkedinPilula({ posts, ano }) {
             const barPct = Math.max((valSel / (Math.max(...artigos.map(x => Number(x[sortKey]) || 0), 1))) * 100, valSel > 0 ? 2 : 0)
 
             return (
-              <div key={p.id} style={{
-                background: rank === 0 ? 'rgba(10,102,194,0.04)' : '#FAFBFC',
-                border: `1px solid ${rank === 0 ? 'rgba(10,102,194,0.12)' : '#F0F2F5'}`,
-                borderRadius: 10, padding: '12px 14px',
-              }}>
+              <div key={p.id}
+                onClick={() => isEditMode && onEditPost(p)}
+                style={{
+                  background: rank === 0 ? 'rgba(10,102,194,0.04)' : '#FAFBFC',
+                  border: `1px solid ${rank === 0 ? 'rgba(10,102,194,0.12)' : '#F0F2F5'}`,
+                  borderRadius: 10, padding: '12px 14px',
+                  cursor: isEditMode ? 'pointer' : 'default',
+                  transition: 'background 0.12s',
+                }}
+                onMouseEnter={e => { if (isEditMode) e.currentTarget.style.background = rank === 0 ? 'rgba(10,102,194,0.08)' : '#F0F4F8' }}
+                onMouseLeave={e => { e.currentTarget.style.background = rank === 0 ? 'rgba(10,102,194,0.04)' : '#FAFBFC' }}
+              >
                 <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
                   <span style={{
                     color: rank === 0 ? '#0A66C2' : rank < 3 ? '#1C252E' : '#C0CEDA',
