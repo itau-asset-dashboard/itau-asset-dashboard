@@ -83,8 +83,8 @@ export default function LinkedinImportModal({ onClose, onImport }) {
   const fileRef = useRef()
   const PAGE = 20
 
-  const semTipo    = posts ? posts.filter(p => !p.tipo).length : 0
-  const podeSalvar = posts && posts.every(p => p.tipo)
+  const semTipo = posts ? posts.filter(p => !p.tipo).length : 0
+  const podeSalvar = !!posts
 
   async function handleFile(file) {
     setError(null)
@@ -291,9 +291,7 @@ export default function LinkedinImportModal({ onClose, onImport }) {
                     border:'none', borderRadius:12, padding:'12px', fontSize:14, fontWeight:700,
                     cursor: podeSalvar && !saving ? 'pointer' : 'not-allowed',
                     transition:'all 0.15s' }}>
-                  {saving ? 'Importando…'
-                    : !podeSalvar ? `Defina o tipo dos ${semTipo} posts`
-                    : `Importar ${posts.length} posts`}
+                  {saving ? 'Importando…' : `Importar ${posts.length} posts`}
                 </button>
               </div>
             )}
