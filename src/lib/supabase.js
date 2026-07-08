@@ -216,3 +216,11 @@ export async function removeLinkedinPost(id) {
   const { error } = await supabase.from('linkedin_posts').delete().eq('id', id)
   if (error) throw error
 }
+
+export async function batchInsertLinkedinPosts(posts) {
+  const rows = posts.map(({ imageData, imageUrl, imagePreview, image_url, _id, link, ...rest }) =>
+    Object.fromEntries(Object.entries(rest).filter(([k]) => LINKEDIN_COLUMNS.includes(k)))
+  )
+  const { error } = await supabase.from('linkedin_posts').insert(rows)
+  if (error) throw error
+}

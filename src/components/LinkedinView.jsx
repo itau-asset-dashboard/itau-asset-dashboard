@@ -1,20 +1,22 @@
 import { useState, useMemo } from 'react'
-import { Plus } from 'lucide-react'
+import { Plus, Upload } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import LinkedinVisaoGeral from './LinkedinVisaoGeral'
 import LinkedinBiblioteca from './LinkedinBiblioteca'
 import LinkedinVisaoMensal from './LinkedinVisaoMensal'
 import LinkedinPilula from './LinkedinPilula'
 import LinkedinUploadModal from './LinkedinUploadModal'
+import LinkedinImportModal from './LinkedinImportModal'
 
 const MESES_LABEL = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez']
 const MESES_FULL  = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro']
 
 export default function LinkedinView({ tab = 'geral' }) {
-  const { linkedinPosts, addLinkedinPost, updateLinkedinPost, deleteLinkedinPost, isEditMode } = useStore()
-  const [uploadOpen, setUploadOpen] = useState(false)
-  const [editPost, setEditPost]     = useState(null)
-  const [confirmDel, setConfirmDel] = useState(null)
+  const { linkedinPosts, addLinkedinPost, updateLinkedinPost, deleteLinkedinPost, importLinkedinPosts, isEditMode } = useStore()
+  const [uploadOpen, setUploadOpen]   = useState(false)
+  const [importOpen, setImportOpen]   = useState(false)
+  const [editPost, setEditPost]       = useState(null)
+  const [confirmDel, setConfirmDel]   = useState(null)
 
   // Anos com posts reais
   const anosComPosts = useMemo(() => {
@@ -104,6 +106,15 @@ export default function LinkedinView({ tab = 'geral' }) {
           </div>
         )}
 
+        {isEditMode && tab === 'biblioteca' && (
+          <button onClick={() => setImportOpen(true)} style={{
+            background: '#F0F4F8', color: '#1C252E', border: '1.5px solid #EDEFF2', borderRadius: 10,
+            padding: '8px 14px', fontSize: 13, fontWeight: 600, cursor: 'pointer',
+            display: 'flex', alignItems: 'center', gap: 5, whiteSpace: 'nowrap',
+          }}>
+            <Upload size={15}/> Importar XLS
+          </button>
+        )}
         {isEditMode && (
           <button onClick={() => setUploadOpen(true)} style={{
             background: '#0A66C2', color: '#fff', border: 'none', borderRadius: 10,
@@ -120,6 +131,14 @@ export default function LinkedinView({ tab = 'geral' }) {
       {tab === 'biblioteca' && <LinkedinBiblioteca allPosts={linkedinPosts} mesFiltro={mesBiblioteca} isEditMode={isEditMode} onEditPost={setEditPost} onDeletePost={setConfirmDel}/>}
       {tab === 'formato'    && <LinkedinVisaoMensal posts={postsMes} mes={mes} isEditMode={isEditMode} onEditPost={setEditPost}/>}
       {tab === 'pilula'     && <LinkedinPilula posts={postsAno} ano={ano}/>}
+
+      {/* Modal importação XLS */}
+      {importOpen && isEditMode && (
+        <LinkedinImportModal
+          onClose={() => setImportOpen(false)}
+          onImport={async (posts) => { await importLinkedinPosts(posts) }}
+        />
+      )}
 
       {/* Modais */}
       {uploadOpen && isEditMode && (

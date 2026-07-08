@@ -2,7 +2,7 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { fetchPosts, upsertPost, removePost, fetchSetting, saveSetting, uploadImage, deleteImage,
          fetchStories, upsertStory, removeStory, uploadStoryImage, deleteStoryImage,
-         fetchLinkedinPosts, upsertLinkedinPost, removeLinkedinPost } from '../lib/supabase'
+         fetchLinkedinPosts, upsertLinkedinPost, removeLinkedinPost, batchInsertLinkedinPosts } from '../lib/supabase'
 import { normalizeTema } from '../utils/temas'
 
 // Posts com save em andamento — protege contra sync sobrescrever antes do upsert terminar
@@ -330,6 +330,12 @@ export const useStore = create(
       deleteLinkedinPost: async (id) => {
         set(s => ({ linkedinPosts: s.linkedinPosts.filter(p => p.id !== id) }))
         try { await removeLinkedinPost(id) } catch (e) { console.error('[linkedin delete]', e) }
+      },
+
+      importLinkedinPosts: async (posts) => {
+        const novos = posts.map(p => ({ ...p, id: p.id || String(Date.now() + Math.random()) }))
+        set(s => ({ linkedinPosts: [...s.linkedinPosts, ...novos] }))
+        await batchInsertLinkedinPosts(novos)
       },
 
       // ── Stories ────────────────────────────────────────
