@@ -1,18 +1,17 @@
 import { useState, useMemo } from 'react'
-import { Edit2, Check, X } from 'lucide-react'
+import { Edit2, Check, X, ArrowUp, ArrowDown } from 'lucide-react'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts'
 
 const MESES_LABEL = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez']
 const MESES_FULL  = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro']
 
 const FIELDS = [
-  { key: 'impressoes',          label: 'Impressões',        color: '#0A66C2' },
+  { key: 'impressoes',          label: 'Impressões',          color: '#0A66C2' },
   { key: 'usuarios_alcancados', label: 'Usuários alcançados', color: '#FF6200' },
-  { key: 'novos_seguidores',    label: 'Novos seguidores',  color: '#16a34a' },
-  { key: 'seguidores',          label: 'Seguidores (total)', color: '#1C252E' },
-  { key: 'reacoes',             label: 'Reações',           color: '#C3EBF7' },
-  { key: 'comentarios',         label: 'Comentários',       color: '#8A9BB0' },
-  { key: 'compartilhamentos',   label: 'Compartilhamentos', color: '#8A9BB0' },
+  { key: 'novos_seguidores',    label: 'Novos seguidores',    color: '#16a34a' },
+  { key: 'reacoes',             label: 'Reações',             color: '#0A66C2' },
+  { key: 'comentarios',         label: 'Comentários',         color: '#1C252E' },
+  { key: 'compartilhamentos',   label: 'Compartilhamentos',   color: '#1C252E' },
 ]
 
 function fmtN(n) {
@@ -22,18 +21,44 @@ function fmtN(n) {
   return Math.round(n).toLocaleString('pt-BR')
 }
 
-const EMPTY_MES = { impressoes:'', usuarios_alcancados:'', novos_seguidores:'', seguidores:'', reacoes:'', comentarios:'', compartilhamentos:'' }
+function delta(curr, prev) {
+  if (!curr || !prev) return null
+  return ((curr - prev) / prev) * 100
+}
 
-export default function LinkedinPaginaView({ data, ano, isEditMode, onSave }) {
+function parseInput(v) {
+  if (v === '' || v == null) return null
+  const clean = String(v).replace(/\./g, '').replace(/\s/g, '').replace(',', '.')
+  const n = Number(clean)
+  return isNaN(n) ? null : n
+}
+
+function DeltaBadge({ pct }) {
+  if (pct == null) return null
+  const up = pct >= 0
+  return (
+    <span style={{ display:'inline-flex', alignItems:'center', gap:2, fontSize:11, fontWeight:700,
+      color: up ? '#16a34a' : '#ef4444', marginTop:4 }}>
+      {up ? <ArrowUp size={11}/> : <ArrowDown size={11}/>}
+      {Math.abs(pct).toFixed(1)}%
+    </span>
+  )
+}
+
+export default function LinkedinPaginaView({ data, seguidores, ano, isEditMode, onSave, onSaveSeguidores }) {
   const mesAtual = String(new Date().getMonth() + 1).padStart(2, '0')
-  const [mes, setMes] = useState(mesAtual)
+  const [mes, setMes]           = useState(mesAtual)
   const [editOpen, setEditOpen] = useState(false)
   const [form, setForm]         = useState({})
+  const [editSeg, setEditSeg]   = useState(false)
+  const [segForm, setSegForm]   = useState('')
 
   const chave = `${mes}/${ano}`
-  const mesData = data[chave] || {}
+  const mesIdx = parseInt(mes, 10) - 1
+  const prevMes = String(mesIdx).padStart(2, '0')
+  const mesData  = data[chave] || {}
+  const prevData = data[`${prevMes}/${ano}`] || {}
 
-  // Dados do ano para o gráfico
   const chartData = useMemo(() => {
     return MESES_LABEL.map((label, i) => {
       const mm = String(i + 1).padStart(2, '0')
@@ -52,24 +77,47 @@ export default function LinkedinPaginaView({ data, ano, isEditMode, onSave }) {
     setEditOpen(true)
   }
 
-  function parseInput(v) {
-    if (v === '' || v == null) return null
-    // Remove pontos e espaços (separadores de milhar BR) antes de converter
-    const clean = String(v).replace(/\./g, '').replace(/\s/g, '').replace(',', '.')
-    const n = Number(clean)
-    return isNaN(n) ? null : n
-  }
-
   async function handleSave() {
     const parsed = Object.fromEntries(FIELDS.map(f => [f.key, parseInput(form[f.key])]))
     await onSave(chave, parsed)
     setEditOpen(false)
   }
 
+  async function handleSaveSeg() {
+    await onSaveSeguidores(parseInput(segForm))
+    setEditSeg(false)
+  }
+
   return (
     <div style={{ display:'flex', flexDirection:'column', gap:16 }}>
 
-      {/* Seletor de mês */}
+      {/* Card seguidores total — fixo, não por mês */}
+      <div className="card" style={{ padding:'16px 20px', display:'flex', alignItems:'center', justifyContent:'space-between', gap:12 }}>
+        <div>
+          <p style={{ color:'#8A9BB0', fontSize:11, fontWeight:600, textTransform:'uppercase', letterSpacing:'0.04em', marginBottom:6 }}>Seguidores (total atual)</p>
+          {editSeg ? (
+            <div style={{ display:'flex', alignItems:'center', gap:8 }}>
+              <input autoFocus type="text" inputMode="numeric" value={segForm}
+                onChange={e => setSegForm(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && handleSaveSeg()}
+                placeholder="Ex: 216.598"
+                style={{ border:'1.5px solid #0A66C2', borderRadius:8, padding:'6px 10px', fontSize:15, fontFamily:'DM Sans, sans-serif', outline:'none', width:140 }}/>
+              <button onClick={handleSaveSeg} style={{ background:'#1C252E', color:'#C3EBF7', border:'none', borderRadius:8, padding:'7px 10px', cursor:'pointer', display:'flex' }}><Check size={14}/></button>
+              <button onClick={() => setEditSeg(false)} style={{ background:'#F4F6F8', border:'none', borderRadius:8, padding:'7px 10px', cursor:'pointer', display:'flex' }}><X size={14} color="#8A9BB0"/></button>
+            </div>
+          ) : (
+            <p style={{ color:'#1C252E', fontSize:26, fontWeight:800 }}>{fmtN(seguidores) !== '—' ? fmtN(seguidores) : '—'}</p>
+          )}
+        </div>
+        {isEditMode && !editSeg && (
+          <button onClick={() => { setSegForm(seguidores ?? ''); setEditSeg(true) }}
+            style={{ display:'flex', alignItems:'center', gap:6, background:'#F0F4F8', border:'1.5px solid #EDEFF2', borderRadius:10, padding:'7px 12px', fontSize:12, fontWeight:600, cursor:'pointer', color:'#1C252E', flexShrink:0 }}>
+            <Edit2 size={12}/> Atualizar
+          </button>
+        )}
+      </div>
+
+      {/* Seletor de mês + botão editar */}
       <div style={{ display:'flex', gap:6, flexWrap:'wrap', alignItems:'center', justifyContent:'space-between' }}>
         <div style={{ display:'flex', gap:6, flexWrap:'wrap' }}>
           {MESES_LABEL.map((label, i) => {
@@ -91,21 +139,25 @@ export default function LinkedinPaginaView({ data, ano, isEditMode, onSave }) {
             background:'#F0F4F8', border:'1.5px solid #EDEFF2', borderRadius:10,
             padding:'7px 12px', fontSize:13, fontWeight:600, cursor:'pointer', color:'#1C252E',
           }}>
-            <Edit2 size={13}/> Editar {MESES_FULL[parseInt(mes,10)-1]}
+            <Edit2 size={13}/> Editar {MESES_FULL[mesIdx]}
           </button>
         )}
       </div>
 
-      {/* KPIs do mês */}
-      <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(150px, 1fr))', gap:12 }}>
-        {FIELDS.map(f => (
-          <div key={f.key} className="card" style={{ padding:'16px 18px' }}>
-            <p style={{ color:'#8A9BB0', fontSize:11, fontWeight:600, textTransform:'uppercase', letterSpacing:'0.04em', marginBottom:8 }}>{f.label}</p>
-            <p style={{ color: f.color === '#C3EBF7' ? '#0A66C2' : f.color, fontSize:22, fontWeight:800 }}>
-              {fmtN(mesData[f.key])}
-            </p>
-          </div>
-        ))}
+      {/* KPIs mensais com delta */}
+      <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(160px, 1fr))', gap:12 }}>
+        {FIELDS.map(f => {
+          const curr = mesData[f.key]
+          const prev = prevData[f.key]
+          const pct  = delta(curr, prev)
+          return (
+            <div key={f.key} className="card" style={{ padding:'16px 18px' }}>
+              <p style={{ color:'#8A9BB0', fontSize:11, fontWeight:600, textTransform:'uppercase', letterSpacing:'0.04em', marginBottom:8 }}>{f.label}</p>
+              <p style={{ color: f.color, fontSize:22, fontWeight:800 }}>{fmtN(curr)}</p>
+              <DeltaBadge pct={pct}/>
+            </div>
+          )
+        })}
       </div>
 
       {/* Gráfico anual */}
@@ -123,7 +175,6 @@ export default function LinkedinPaginaView({ data, ano, isEditMode, onSave }) {
             <Bar dataKey="novos_seguidores"    fill="#16a34a" radius={[4,4,0,0]}/>
           </BarChart>
         </ResponsiveContainer>
-        {/* Legenda */}
         <div style={{ display:'flex', gap:16, marginTop:8, flexWrap:'wrap' }}>
           {[['#0A66C2','Impressões'],['#FF6200','Usuários alcançados'],['#16a34a','Novos seguidores']].map(([color,label]) => (
             <div key={label} style={{ display:'flex', alignItems:'center', gap:6 }}>
@@ -134,13 +185,13 @@ export default function LinkedinPaginaView({ data, ano, isEditMode, onSave }) {
         </div>
       </div>
 
-      {/* Modal de edição */}
+      {/* Modal de edição mensal */}
       {editOpen && (
         <div style={{ position:'fixed', inset:0, background:'rgba(28,37,46,0.65)', zIndex:1000, display:'flex', alignItems:'center', justifyContent:'center', padding:16 }}
           onClick={e => e.target === e.currentTarget && setEditOpen(false)}>
-          <div style={{ background:'#fff', borderRadius:20, width:'100%', maxWidth:420, boxShadow:'0 16px 56px rgba(0,0,0,0.22)' }}>
+          <div style={{ background:'#fff', borderRadius:20, width:'100%', maxWidth:420, maxHeight:'90vh', overflow:'auto', boxShadow:'0 16px 56px rgba(0,0,0,0.22)' }}>
             <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'16px 20px', borderBottom:'1px solid #F0F4F8' }}>
-              <h2 style={{ color:'#1C252E', fontSize:15, fontWeight:700 }}>Dados de {MESES_FULL[parseInt(mes,10)-1]} {ano}</h2>
+              <h2 style={{ color:'#1C252E', fontSize:15, fontWeight:700 }}>Dados de {MESES_FULL[mesIdx]} {ano}</h2>
               <button onClick={() => setEditOpen(false)} style={{ background:'#F4F6F8', border:'none', borderRadius:8, padding:7, cursor:'pointer', display:'flex' }}>
                 <X size={16} color="#8A9BB0"/>
               </button>
@@ -149,14 +200,10 @@ export default function LinkedinPaginaView({ data, ano, isEditMode, onSave }) {
               {FIELDS.map(f => (
                 <div key={f.key}>
                   <p style={{ color:'#6B7A8D', fontSize:12, fontWeight:600, marginBottom:4 }}>{f.label}</p>
-                  <input
-                    type="text"
-                    inputMode="numeric"
-                    value={form[f.key] ?? ''}
+                  <input type="text" inputMode="numeric" value={form[f.key] ?? ''}
                     onChange={e => setForm(prev => ({ ...prev, [f.key]: e.target.value }))}
                     placeholder="—"
-                    style={{ width:'100%', border:'1.5px solid #E8ECF0', borderRadius:10, padding:'9px 12px', fontSize:13, outline:'none', fontFamily:'DM Sans, sans-serif', boxSizing:'border-box' }}
-                  />
+                    style={{ width:'100%', border:'1.5px solid #E8ECF0', borderRadius:10, padding:'9px 12px', fontSize:13, outline:'none', fontFamily:'DM Sans, sans-serif', boxSizing:'border-box' }}/>
                 </div>
               ))}
               <button onClick={handleSave} style={{ marginTop:6, background:'#1C252E', color:'#C3EBF7', border:'none', borderRadius:12, padding:'13px', fontSize:14, fontWeight:700, cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', gap:8 }}>

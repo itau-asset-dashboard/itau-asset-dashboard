@@ -59,7 +59,7 @@ import LinkedinPaginaView from './components/LinkedinPaginaView'
 })()
 
 export default function App() {
-  const { activeSection, syncFromCloud, hasSynced, linkedinPageData, setLinkedinPageData, isEditMode } = useStore()
+  const { activeSection, syncFromCloud, hasSynced, linkedinPageData, setLinkedinPageData, linkedinSeguidores, setLinkedinSeguidores, isEditMode } = useStore()
 
   // Mantém hash sincronizado com a seção ativa (persiste no refresh)
   useEffect(() => {
@@ -120,7 +120,7 @@ export default function App() {
           {activeSection === 'linkedin-posts'       && <LinkedinView tab="biblioteca" />}
           {activeSection === 'linkedin-performance' && <LinkedinView tab="formato" />}
           {activeSection === 'linkedin-pilula'      && <LinkedinView tab="pilula" />}
-          {activeSection === 'linkedin-pagina'      && <LinkedinPaginaView data={linkedinPageData} ano={String(new Date().getFullYear())} isEditMode={isEditMode} onSave={setLinkedinPageData}/>}
+          {activeSection === 'linkedin-pagina'      && <LinkedinPaginaView data={linkedinPageData} seguidores={linkedinSeguidores} ano={String(new Date().getFullYear())} isEditMode={isEditMode} onSave={setLinkedinPageData} onSaveSeguidores={setLinkedinSeguidores}/>}
           {activeSection === 'visao-anual' && <AnnualView />}
           {activeSection === 'visao-geral' && (
             <>

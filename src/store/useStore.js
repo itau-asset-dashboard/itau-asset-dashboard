@@ -26,6 +26,7 @@ export const useStore = create(
       stories: [],
       linkedinPosts: [],
       linkedinPageData: {}, // { 'MM/YYYY': { impressoes, usuarios_alcancados, ... } }
+      linkedinSeguidores: null,
       metaMensal: 200000,
       metaAnual: 743000,
       mesFiltro: '01/2026',
@@ -47,7 +48,7 @@ export const useStore = create(
       syncFromCloud: async () => {
         set({ syncing: true, syncError: null })
         try {
-          const [cloudPosts, metaMensal, metaAnual, oliverRaw, evidenciasRaw, cloudStoriesRaw, insightsRaw, cloudLinkedin, linkedinPageRaw] = await Promise.all([
+          const [cloudPosts, metaMensal, metaAnual, oliverRaw, evidenciasRaw, cloudStoriesRaw, insightsRaw, cloudLinkedin, linkedinPageRaw, linkedinSegRaw] = await Promise.all([
             fetchPosts(),
             fetchSetting('meta_mensal'),
             fetchSetting('meta_anual'),
@@ -57,6 +58,7 @@ export const useStore = create(
             fetchSetting('insights').catch(() => null),
             fetchLinkedinPosts().catch(() => []),
             fetchSetting('linkedin_page_data').catch(() => null),
+            fetchSetting('linkedin_seguidores').catch(() => null),
           ])
           const localPosts = get().posts
 
@@ -147,6 +149,7 @@ export const useStore = create(
 
           let linkedinPageData = get().linkedinPageData
           if (linkedinPageRaw) { try { linkedinPageData = { ...linkedinPageData, ...JSON.parse(linkedinPageRaw) } } catch (_) {} }
+          const linkedinSeguidores = linkedinSegRaw != null ? Number(linkedinSegRaw) : get().linkedinSeguidores
 
           set({
             posts,
@@ -154,6 +157,7 @@ export const useStore = create(
             insights: savedInsights,
             linkedinPosts: linkedinNorm.length > 0 ? linkedinNorm : get().linkedinPosts,
             linkedinPageData,
+            linkedinSeguidores,
             metaMensal: metaMensal ? Number(metaMensal) : get().metaMensal,
             metaAnual:  metaAnual  ? Number(metaAnual)  : get().metaAnual,
             oliverData: newOliver,
@@ -344,6 +348,11 @@ export const useStore = create(
         try { await saveSetting('linkedin_page_data', JSON.stringify(updated)) } catch (_) {}
       },
 
+      setLinkedinSeguidores: async (n) => {
+        set({ linkedinSeguidores: n })
+        try { await saveSetting('linkedin_seguidores', String(n)) } catch (_) {}
+      },
+
       deleteManyLinkedinPosts: async (ids) => {
         const idSet = new Set(ids)
         set(s => ({ linkedinPosts: s.linkedinPosts.filter(p => !idSet.has(p.id)) }))
@@ -497,6 +506,7 @@ export const useStore = create(
         posts:          s.posts.map(({ imageData, ...p }) => p),
         linkedinPosts:  s.linkedinPosts,
         linkedinPageData: s.linkedinPageData,
+        linkedinSeguidores: s.linkedinSeguidores,
         metaMensal:     s.metaMensal,
         metaAnual:      s.metaAnual,
         mesFiltro:      s.mesFiltro,
