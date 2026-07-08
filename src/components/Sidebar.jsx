@@ -1,4 +1,4 @@
-import { BarChart2, Calendar, List, Lightbulb, Upload, TrendingUp, LineChart, BookOpen, PlaySquare } from 'lucide-react'
+import { BarChart2, Calendar, List, Lightbulb, Upload, TrendingUp, LineChart, BookOpen, PlaySquare, Globe } from 'lucide-react'
 import { useStore } from '../store/useStore'
 
 const NAV_GROUPS = [
@@ -19,6 +19,7 @@ const NAV_GROUPS = [
       { id: 'linkedin-performance', icon: BarChart2, label: 'Visão Mensal',   muted: true },
       { id: 'linkedin-posts',       icon: List,      label: 'Posts',          muted: true },
       { id: 'linkedin-pilula',      icon: TrendingUp,label: 'Pílula de ETFs', muted: true },
+      { id: 'linkedin-pagina',      icon: Globe,     label: 'Visão da página',muted: true },
     ],
   },
   {

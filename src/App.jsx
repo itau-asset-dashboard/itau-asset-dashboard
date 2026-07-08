@@ -20,6 +20,7 @@ import Glossario from './components/Glossario'
 import StoriesView from './components/StoriesView'
 import MetaMensalBanner from './components/MetaMensalBanner'
 import LinkedinView from './components/LinkedinView'
+import LinkedinPaginaView from './components/LinkedinPaginaView'
 
 // Limpa dados pesados do localStorage logo na inicialização (roda antes do React montar).
 // Remove imageData de posts, e limpa stories/insights que não precisam mais ser persistidos.
@@ -58,7 +59,7 @@ import LinkedinView from './components/LinkedinView'
 })()
 
 export default function App() {
-  const { activeSection, syncFromCloud, hasSynced } = useStore()
+  const { activeSection, syncFromCloud, hasSynced, linkedinPageData, setLinkedinPageData, isEditMode } = useStore()
 
   // Mantém hash sincronizado com a seção ativa (persiste no refresh)
   useEffect(() => {
@@ -119,6 +120,7 @@ export default function App() {
           {activeSection === 'linkedin-posts'       && <LinkedinView tab="biblioteca" />}
           {activeSection === 'linkedin-performance' && <LinkedinView tab="formato" />}
           {activeSection === 'linkedin-pilula'      && <LinkedinView tab="pilula" />}
+          {activeSection === 'linkedin-pagina'      && <LinkedinPaginaView data={linkedinPageData} ano={String(new Date().getFullYear())} isEditMode={isEditMode} onSave={setLinkedinPageData}/>}
           {activeSection === 'visao-anual' && <AnnualView />}
           {activeSection === 'visao-geral' && (
             <>
