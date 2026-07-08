@@ -5,7 +5,7 @@ import { useIsMobile } from '../utils/useIsMobile'
 const PAGE_SIZE = 10
 
 function fmtN(n) {
-  if (n == null || n === '') return '—'
+  if (n == null || n === '' || n === 0) return '—'
   if (n >= 1000000) return (n/1000000).toFixed(1).replace('.',',') + 'M'
   if (n >= 1000)    return (n/1000).toFixed(1).replace('.',',') + 'K'
   return Math.round(n).toLocaleString('pt-BR')
