@@ -24,6 +24,9 @@ export default function LinkedinVisaoGeral({ posts, ano, isEditMode, onEditPost 
   const mobile = useIsMobile()
   const [rankKey, setRankKey] = useState('impressoes')
   const [rankDir, setRankDir] = useState(-1)
+  const [tipoFiltro, setTipoFiltro] = useState(null)
+
+  const tiposDisponiveis = [...new Set(posts.map(p => p.tipo).filter(Boolean))]
 
   const totalImpressoes = posts.reduce((s, p) => s + (p.impressoes || 0), 0)
   const totalReacoes    = posts.reduce((s, p) => s + (p.reacoes    || 0), 0)
@@ -58,6 +61,7 @@ export default function LinkedinVisaoGeral({ posts, ano, isEditMode, onEditPost 
     : rankDir === -1 ? <ArrowDown size={10} color="#0A66C2"/> : <ArrowUp size={10} color="#0A66C2"/>
 
   const top10 = [...posts]
+    .filter(p => !tipoFiltro || p.tipo === tipoFiltro)
     .sort((a, b) => rankDir * ((a[rankKey] || 0) - (b[rankKey] || 0)))
     .slice(0, 10)
 
@@ -168,20 +172,43 @@ export default function LinkedinVisaoGeral({ posts, ano, isEditMode, onEditPost 
 
       {/* Ranking de posts */}
       <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
-        <div style={{ padding: '16px 20px 12px', borderBottom: '1px solid #F0F4F8', display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap' }}>
-          <p style={{ color: '#1C252E', fontSize: 14, fontWeight: 700 }}>Ranking de posts</p>
-          <div style={{ display: 'flex', gap: 6 }}>
-            {['impressoes', 'cliques', 'reacoes'].map(k => (
-              <button key={k} onClick={() => toggleRank(k)} style={{
-                padding: '4px 10px', borderRadius: 8, border: 'none', cursor: 'pointer',
-                fontSize: 11, fontWeight: rankKey === k ? 700 : 400,
-                background: rankKey === k ? '#0A66C2' : '#F0F4F8',
-                color: rankKey === k ? '#fff' : '#6B7A8D',
-              }}>
-                {k === 'impressoes' ? 'Impressões' : k === 'cliques' ? 'Cliques' : 'Reações'}
-              </button>
-            ))}
+        <div style={{ padding: '16px 20px 12px', borderBottom: '1px solid #F0F4F8' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap', marginBottom: tiposDisponiveis.length > 1 ? 10 : 0 }}>
+            <p style={{ color: '#1C252E', fontSize: 14, fontWeight: 700 }}>Ranking de posts</p>
+            <div style={{ display: 'flex', gap: 6 }}>
+              {['impressoes', 'cliques', 'reacoes'].map(k => (
+                <button key={k} onClick={() => toggleRank(k)} style={{
+                  padding: '4px 10px', borderRadius: 8, border: 'none', cursor: 'pointer',
+                  fontSize: 11, fontWeight: rankKey === k ? 700 : 400,
+                  background: rankKey === k ? '#0A66C2' : '#F0F4F8',
+                  color: rankKey === k ? '#fff' : '#6B7A8D',
+                }}>
+                  {k === 'impressoes' ? 'Impressões' : k === 'cliques' ? 'Cliques' : 'Reações'}
+                </button>
+              ))}
+            </div>
           </div>
+          {/* Filtro de formato */}
+          {tiposDisponiveis.length > 1 && (
+            <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap' }}>
+              <button onClick={() => setTipoFiltro(null)} style={{
+                padding: '3px 10px', borderRadius: 20, fontSize: 11, cursor: 'pointer',
+                fontFamily: 'DM Sans, sans-serif', fontWeight: !tipoFiltro ? 700 : 400,
+                background: !tipoFiltro ? '#1C252E' : '#F0F4F8',
+                color: !tipoFiltro ? '#C3EBF7' : '#4A6272',
+                border: !tipoFiltro ? '1.5px solid #1C252E' : '1.5px solid #E0E7EF',
+              }}>Todos</button>
+              {tiposDisponiveis.map(t => (
+                <button key={t} onClick={() => setTipoFiltro(tipoFiltro === t ? null : t)} style={{
+                  padding: '3px 10px', borderRadius: 20, fontSize: 11, cursor: 'pointer',
+                  fontFamily: 'DM Sans, sans-serif', fontWeight: tipoFiltro === t ? 700 : 400,
+                  background: tipoFiltro === t ? (FORMATO_COLORS[t] || '#1C252E') : '#F0F4F8',
+                  color: tipoFiltro === t ? '#fff' : '#4A6272',
+                  border: tipoFiltro === t ? `1.5px solid ${FORMATO_COLORS[t] || '#1C252E'}` : '1.5px solid #E0E7EF',
+                }}>{t}</button>
+              ))}
+            </div>
+          )}
         </div>
         <div style={{ overflowX: 'auto' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: mobile ? 0 : 500 }}>
@@ -189,20 +216,26 @@ export default function LinkedinVisaoGeral({ posts, ano, isEditMode, onEditPost 
               <tr style={{ background: '#FAFBFC' }}>
                 <th style={{ padding: '9px 14px', color: '#8A9BB0', fontSize: 10, fontWeight: 600, textTransform: 'uppercase', textAlign: 'left' }}>#</th>
                 <th style={{ padding: '9px 14px', color: '#8A9BB0', fontSize: 10, fontWeight: 600, textTransform: 'uppercase', textAlign: 'left' }}>Post</th>
-                <th style={{ padding: '9px 14px', color: '#8A9BB0', fontSize: 10, fontWeight: 600, textTransform: 'uppercase', textAlign: 'left' }}>Tipo</th>
-                {['impressoes', 'cliques', 'reacoes'].map(k => (
-                  <th key={k} onClick={() => toggleRank(k)} style={{
-                    padding: '9px 14px', color: rankKey === k ? '#0A66C2' : '#8A9BB0',
-                    fontSize: 10, fontWeight: 600, textTransform: 'uppercase',
-                    textAlign: 'left', cursor: 'pointer', whiteSpace: 'nowrap', userSelect: 'none',
-                  }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
-                      {k === 'impressoes' ? 'Impressões' : k === 'cliques' ? 'Cliques' : 'Reações'}
-                      <SortIcon k={k}/>
-                    </div>
+                {!mobile && <th style={{ padding: '9px 14px', color: '#8A9BB0', fontSize: 10, fontWeight: 600, textTransform: 'uppercase', textAlign: 'left' }}>Tipo</th>}
+                {mobile ? (
+                  <th onClick={() => {}} style={{ padding: '9px 14px', color: '#0A66C2', fontSize: 10, fontWeight: 600, textTransform: 'uppercase', textAlign: 'right' }}>
+                    {rankKey === 'impressoes' ? 'Impr.' : rankKey === 'cliques' ? 'Cliques' : 'Reações'}
                   </th>
-                ))}
-                <th style={{ padding: '9px 14px', color: '#8A9BB0', fontSize: 10, fontWeight: 600, textTransform: 'uppercase', textAlign: 'left' }}>Data</th>
+                ) : (
+                  ['impressoes', 'cliques', 'reacoes'].map(k => (
+                    <th key={k} onClick={() => toggleRank(k)} style={{
+                      padding: '9px 14px', color: rankKey === k ? '#0A66C2' : '#8A9BB0',
+                      fontSize: 10, fontWeight: 600, textTransform: 'uppercase',
+                      textAlign: 'left', cursor: 'pointer', whiteSpace: 'nowrap', userSelect: 'none',
+                    }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+                        {k === 'impressoes' ? 'Impressões' : k === 'cliques' ? 'Cliques' : 'Reações'}
+                        <SortIcon k={k}/>
+                      </div>
+                    </th>
+                  ))
+                )}
+                {!mobile && <th style={{ padding: '9px 14px', color: '#8A9BB0', fontSize: 10, fontWeight: 600, textTransform: 'uppercase', textAlign: 'left' }}>Data</th>}
               </tr>
             </thead>
             <tbody>
@@ -213,23 +246,31 @@ export default function LinkedinVisaoGeral({ posts, ano, isEditMode, onEditPost 
                   onMouseEnter={e => { if (isEditMode) e.currentTarget.style.background = '#F8FAFC' }}
                   onMouseLeave={e => { e.currentTarget.style.background = '' }}>
                   <td style={{ padding: '10px 14px' }}>
-                    <span style={{
-                      color: i === 0 ? '#FF6200' : i < 3 ? '#0A66C2' : '#C0CEDA',
-                      fontSize: 13, fontWeight: 700,
-                    }}>
+                    <span style={{ color: i === 0 ? '#FF6200' : i < 3 ? '#0A66C2' : '#C0CEDA', fontSize: 13, fontWeight: 700 }}>
                       {i + 1}
                     </span>
                   </td>
-                  <td style={{ padding: '10px 14px', maxWidth: 200 }}>
-                    <p style={{ color: '#1C252E', fontSize: 13, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.nome || '—'}</p>
+                  <td style={{ padding: '10px 14px', maxWidth: mobile ? 160 : 200 }}>
+                    <p style={{ color: '#1C252E', fontSize: mobile ? 12 : 13, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.nome || '—'}</p>
+                    {mobile && p.tipo && (
+                      <span style={{ background: '#F0F4F8', color: '#4A6272', borderRadius: 5, padding: '1px 6px', fontSize: 10, fontWeight: 600 }}>{p.tipo}</span>
+                    )}
                   </td>
-                  <td style={{ padding: '10px 14px', whiteSpace: 'nowrap' }}>
-                    {p.tipo && <span style={{ background: '#F0F4F8', color: '#4A6272', borderRadius: 5, padding: '2px 7px', fontSize: 11, fontWeight: 600 }}>{p.tipo}</span>}
-                  </td>
-                  <td style={{ padding: '10px 14px', color: rankKey === 'impressoes' ? '#0A66C2' : '#1C252E', fontSize: 13, fontWeight: rankKey === 'impressoes' ? 700 : 400, whiteSpace: 'nowrap' }}>{fmtN(p.impressoes)}</td>
-                  <td style={{ padding: '10px 14px', color: rankKey === 'cliques' ? '#0A66C2' : '#1C252E', fontSize: 13, fontWeight: rankKey === 'cliques' ? 700 : 400, whiteSpace: 'nowrap' }}>{fmtN(p.cliques)}</td>
-                  <td style={{ padding: '10px 14px', color: rankKey === 'reacoes' ? '#0A66C2' : '#1C252E', fontSize: 13, fontWeight: rankKey === 'reacoes' ? 700 : 400, whiteSpace: 'nowrap' }}>{fmtN(p.reacoes)}</td>
-                  <td style={{ padding: '10px 14px', color: '#9AAAB8', fontSize: 12, whiteSpace: 'nowrap' }}>{p.data_post || '—'}</td>
+                  {!mobile && (
+                    <td style={{ padding: '10px 14px', whiteSpace: 'nowrap' }}>
+                      {p.tipo && <span style={{ background: '#F0F4F8', color: '#4A6272', borderRadius: 5, padding: '2px 7px', fontSize: 11, fontWeight: 600 }}>{p.tipo}</span>}
+                    </td>
+                  )}
+                  {mobile ? (
+                    <td style={{ padding: '10px 14px', color: '#0A66C2', fontSize: 13, fontWeight: 700, whiteSpace: 'nowrap', textAlign: 'right' }}>{fmtN(p[rankKey])}</td>
+                  ) : (
+                    <>
+                      <td style={{ padding: '10px 14px', color: rankKey === 'impressoes' ? '#0A66C2' : '#1C252E', fontSize: 13, fontWeight: rankKey === 'impressoes' ? 700 : 400, whiteSpace: 'nowrap' }}>{fmtN(p.impressoes)}</td>
+                      <td style={{ padding: '10px 14px', color: rankKey === 'cliques' ? '#0A66C2' : '#1C252E', fontSize: 13, fontWeight: rankKey === 'cliques' ? 700 : 400, whiteSpace: 'nowrap' }}>{fmtN(p.cliques)}</td>
+                      <td style={{ padding: '10px 14px', color: rankKey === 'reacoes' ? '#0A66C2' : '#1C252E', fontSize: 13, fontWeight: rankKey === 'reacoes' ? 700 : 400, whiteSpace: 'nowrap' }}>{fmtN(p.reacoes)}</td>
+                      <td style={{ padding: '10px 14px', color: '#9AAAB8', fontSize: 12, whiteSpace: 'nowrap' }}>{p.data_post || '—'}</td>
+                    </>
+                  )}
                 </tr>
               ))}
             </tbody>
