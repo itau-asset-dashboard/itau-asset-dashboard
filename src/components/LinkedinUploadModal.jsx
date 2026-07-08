@@ -70,7 +70,7 @@ export default function LinkedinUploadModal({ mode = 'new', initial = null, onCl
   return (
     <div style={{ position:'fixed', inset:0, background:'rgba(28,37,46,0.65)', zIndex:1000, display:'flex', alignItems: mobile ? 'flex-end' : 'center', justifyContent:'center', padding: mobile ? 0 : 16 }}
       onClick={e => e.target === e.currentTarget && onClose()}>
-      <div style={{ background:'#fff', borderRadius: mobile ? '20px 20px 0 0' : 20, width:'100%', maxWidth: mobile ? '100%' : 520, maxHeight: mobile ? '92vh' : '92vh', overflow:'auto', boxShadow:'0 16px 56px rgba(0,0,0,0.22)' }}>
+      <div style={{ background:'#fff', borderRadius: mobile ? '20px 20px 0 0' : 20, width:'100%', maxWidth: mobile ? '100%' : 560, maxHeight: mobile ? '92vh' : '92vh', overflow:'auto', boxShadow:'0 16px 56px rgba(0,0,0,0.22)' }} className="scrollbar-thin modal-inner">
 
         {/* Header */}
         <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'16px 20px', borderBottom:'1px solid #F0F4F8' }}>
@@ -83,30 +83,30 @@ export default function LinkedinUploadModal({ mode = 'new', initial = null, onCl
         <div style={{ padding:'16px 20px 28px' }}>
 
           {/* Nome */}
-          <div style={{ marginBottom:10 }}>
+          <div style={{ marginBottom:14 }}>
             <p style={{ color:'#6B7A8D', fontSize:12, fontWeight:600, marginBottom:4 }}>Nome / título</p>
             <input value={form.nome} onChange={e => set('nome', e.target.value)} placeholder="Ex: Resultado Q1 2026"
               style={{ width:'100%', border:'1.5px solid #E8ECF0', borderRadius:10, padding:'9px 12px', fontSize:13, outline:'none', fontFamily:'DM Sans, sans-serif', boxSizing:'border-box' }}/>
           </div>
 
           {/* Link do post */}
-          <div style={{ marginBottom:10 }}>
+          <div style={{ marginBottom:14 }}>
             <p style={{ color:'#6B7A8D', fontSize:12, fontWeight:600, marginBottom:4 }}>Link do post</p>
             <input value={form.link_post || ''} onChange={e => set('link_post', e.target.value)} placeholder="https://www.linkedin.com/posts/..."
               style={{ width:'100%', border:'1.5px solid #E8ECF0', borderRadius:10, padding:'9px 12px', fontSize:13, outline:'none', fontFamily:'DM Sans, sans-serif', boxSizing:'border-box' }}/>
           </div>
 
           {/* Data */}
-          <div style={{ marginBottom:10 }}>
+          <div style={{ marginBottom:14 }}>
             <p style={{ color:'#6B7A8D', fontSize:12, fontWeight:600, marginBottom:4 }}>Data da publicação</p>
             <input value={form.data_post} onChange={e => set('data_post', e.target.value)} placeholder="DD/MM/AAAA"
               style={{ width:'100%', border:'1.5px solid #E8ECF0', borderRadius:10, padding:'9px 12px', fontSize:13, outline:'none', fontFamily:'DM Sans, sans-serif', boxSizing:'border-box' }}/>
           </div>
 
           {/* Tipo */}
-          <div style={{ marginBottom:10 }}>
+          <div style={{ marginBottom:14 }}>
             <p style={{ color:'#6B7A8D', fontSize:12, fontWeight:600, marginBottom:6 }}>Tipo de conteúdo</p>
-            <div style={{ display:'flex', gap:6, flexWrap:'wrap' }}>
+            <div style={{ display:'flex', gap:5, flexWrap:'wrap' }}>
               {TIPOS.map(t => (
                 <button key={t} onClick={() => set('tipo', t)}
                   style={{ padding:'4px 12px', borderRadius:20, fontSize:11, cursor:'pointer', fontFamily:'DM Sans, sans-serif',
@@ -119,7 +119,7 @@ export default function LinkedinUploadModal({ mode = 'new', initial = null, onCl
           </div>
 
           {/* Temas */}
-          <div style={{ marginBottom:10 }}>
+          <div style={{ marginBottom:14 }}>
             <p style={{ color:'#6B7A8D', fontSize:12, fontWeight:600, marginBottom:6 }}>Temas</p>
             <div style={{ display:'flex', flexWrap:'wrap', gap:5 }}>
               {TEMAS.map(t => {
