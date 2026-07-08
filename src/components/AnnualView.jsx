@@ -133,9 +133,6 @@ export default function AnnualView() {
               <p className="kpi-label-js" style={{ color:'#8A9BB0', fontSize: mobile ? 10 : 11, fontWeight:600, textTransform:'uppercase', letterSpacing:'0.04em', marginBottom: mobile ? 8 : 14, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>{mLabel}</p>
               <p className="kpi-number-js" style={{ color:'#182638', fontSize: mobile ? 20 : 28, fontWeight:800, lineHeight:1, letterSpacing:'-0.02em', marginBottom: mobile ? 4 : 6 }}>{value}</p>
               <p className="kpi-sub-js" style={{ color:'#A8B5C0', fontSize: mobile ? 10 : 12, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{sub}</p>
-              <div className="kpi-icon-js" style={{ position:'absolute', top:18, right:18, width:30, height:30, borderRadius:8, background:bg, display:'flex', alignItems:'center', justifyContent:'center' }}>
-                <Icon size={14} color={color} strokeWidth={2.1}/>
-              </div>
             </div>
           )
         })}
