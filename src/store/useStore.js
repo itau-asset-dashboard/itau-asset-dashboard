@@ -335,17 +335,17 @@ export const useStore = create(
       addLinkedinPost: async (post) => {
         const novo = { ...post, id: post.id || String(Date.now()) }
         set(s => ({ linkedinPosts: [...s.linkedinPosts, novo] }))
-        try { await upsertLinkedinPost(novo) } catch (e) { console.error('[linkedin add]', e) }
+        upsertLinkedinPost(novo).catch(e => console.error('[linkedin add]', e))
       },
 
       updateLinkedinPost: async (post) => {
         set(s => ({ linkedinPosts: s.linkedinPosts.map(p => p.id !== post.id ? p : { ...p, ...post }) }))
-        try { await upsertLinkedinPost(post) } catch (e) { console.error('[linkedin update]', e) }
+        upsertLinkedinPost(post).catch(e => console.error('[linkedin update]', e))
       },
 
       deleteLinkedinPost: async (id) => {
         set(s => ({ linkedinPosts: s.linkedinPosts.filter(p => p.id !== id) }))
-        try { await removeLinkedinPost(id) } catch (e) { console.error('[linkedin delete]', e) }
+        removeLinkedinPost(id).catch(e => console.error('[linkedin delete]', e))
       },
 
       setLinkedinPageData: async (chave, valores) => {
