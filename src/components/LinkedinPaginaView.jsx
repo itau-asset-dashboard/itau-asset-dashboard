@@ -53,11 +53,24 @@ export default function LinkedinPaginaView({ data, seguidores, ano, isEditMode, 
   const [editSeg, setEditSeg]   = useState(false)
   const [segForm, setSegForm]   = useState('')
 
-  const chave = `${mes}/${ano}`
+  const chave  = `${mes}/${ano}`
   const mesIdx = parseInt(mes, 10) - 1
   const prevMes = String(mesIdx).padStart(2, '0')
   const mesData  = data[chave] || {}
   const prevData = data[`${prevMes}/${ano}`] || {}
+
+  // Seguidores acumulado: base + soma de novos_seguidores até o mês selecionado
+  const seguidoresNoMes = useMemo(() => {
+    if (seguidores == null) return null
+    const mesN = parseInt(mes, 10)
+    let total = Number(seguidores)
+    for (let m = 1; m <= mesN; m++) {
+      const mm = String(m).padStart(2, '0')
+      const novos = Number(data[`${mm}/${ano}`]?.novos_seguidores) || 0
+      total += novos
+    }
+    return total
+  }, [seguidores, data, mes, ano])
 
   const chartData = useMemo(() => {
     return MESES_LABEL.map((label, i) => {
@@ -91,28 +104,34 @@ export default function LinkedinPaginaView({ data, seguidores, ano, isEditMode, 
   return (
     <div style={{ display:'flex', flexDirection:'column', gap:16 }}>
 
-      {/* Card seguidores total — fixo, não por mês */}
-      <div className="card" style={{ padding:'16px 20px', display:'flex', alignItems:'center', justifyContent:'space-between', gap:12 }}>
-        <div>
-          <p style={{ color:'#8A9BB0', fontSize:11, fontWeight:600, textTransform:'uppercase', letterSpacing:'0.04em', marginBottom:6 }}>Seguidores (total atual)</p>
-          {editSeg ? (
-            <div style={{ display:'flex', alignItems:'center', gap:8 }}>
-              <input autoFocus type="text" inputMode="numeric" value={segForm}
-                onChange={e => setSegForm(e.target.value)}
-                onKeyDown={e => e.key === 'Enter' && handleSaveSeg()}
-                placeholder="Ex: 216.598"
-                style={{ border:'1.5px solid #0A66C2', borderRadius:8, padding:'6px 10px', fontSize:15, fontFamily:'DM Sans, sans-serif', outline:'none', width:140 }}/>
-              <button onClick={handleSaveSeg} style={{ background:'#1C252E', color:'#C3EBF7', border:'none', borderRadius:8, padding:'7px 10px', cursor:'pointer', display:'flex' }}><Check size={14}/></button>
-              <button onClick={() => setEditSeg(false)} style={{ background:'#F4F6F8', border:'none', borderRadius:8, padding:'7px 10px', cursor:'pointer', display:'flex' }}><X size={14} color="#8A9BB0"/></button>
-            </div>
-          ) : (
-            <p style={{ color:'#1C252E', fontSize:26, fontWeight:800 }}>{fmtN(seguidores) !== '—' ? fmtN(seguidores) : '—'}</p>
-          )}
+      {/* Card seguidores — base editável + total acumulado no mês */}
+      <div className="card" style={{ padding:'16px 20px', display:'flex', alignItems:'center', justifyContent:'space-between', gap:16, flexWrap:'wrap' }}>
+        <div style={{ display:'flex', gap:32, flexWrap:'wrap' }}>
+          <div>
+            <p style={{ color:'#8A9BB0', fontSize:11, fontWeight:600, textTransform:'uppercase', letterSpacing:'0.04em', marginBottom:6 }}>Base inicial</p>
+            {editSeg ? (
+              <div style={{ display:'flex', alignItems:'center', gap:8 }}>
+                <input autoFocus type="text" inputMode="numeric" value={segForm}
+                  onChange={e => setSegForm(e.target.value)}
+                  onKeyDown={e => e.key === 'Enter' && handleSaveSeg()}
+                  placeholder="Ex: 216.560"
+                  style={{ border:'1.5px solid #0A66C2', borderRadius:8, padding:'6px 10px', fontSize:15, fontFamily:'DM Sans, sans-serif', outline:'none', width:140 }}/>
+                <button onClick={handleSaveSeg} style={{ background:'#1C252E', color:'#C3EBF7', border:'none', borderRadius:8, padding:'7px 10px', cursor:'pointer', display:'flex' }}><Check size={14}/></button>
+                <button onClick={() => setEditSeg(false)} style={{ background:'#F4F6F8', border:'none', borderRadius:8, padding:'7px 10px', cursor:'pointer', display:'flex' }}><X size={14} color="#8A9BB0"/></button>
+              </div>
+            ) : (
+              <p style={{ color:'#8A9BB0', fontSize:20, fontWeight:700 }}>{fmtN(seguidores) !== '—' ? fmtN(seguidores) : '—'}</p>
+            )}
+          </div>
+          <div>
+            <p style={{ color:'#8A9BB0', fontSize:11, fontWeight:600, textTransform:'uppercase', letterSpacing:'0.04em', marginBottom:6 }}>Seguidores em {MESES_FULL[mesIdx]}</p>
+            <p style={{ color:'#1C252E', fontSize:26, fontWeight:800 }}>{fmtN(seguidoresNoMes)}</p>
+          </div>
         </div>
         {isEditMode && !editSeg && (
           <button onClick={() => { setSegForm(seguidores ?? ''); setEditSeg(true) }}
             style={{ display:'flex', alignItems:'center', gap:6, background:'#F0F4F8', border:'1.5px solid #EDEFF2', borderRadius:10, padding:'7px 12px', fontSize:12, fontWeight:600, cursor:'pointer', color:'#1C252E', flexShrink:0 }}>
-            <Edit2 size={12}/> Atualizar
+            <Edit2 size={12}/> Definir base
           </button>
         )}
       </div>
