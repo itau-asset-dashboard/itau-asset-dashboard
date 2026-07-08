@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, LineChart, Line, CartesianGrid } from 'recharts'
 import { useIsMobile } from '../utils/useIsMobile'
 
@@ -19,18 +20,21 @@ function parseDate(d) {
 }
 
 // Termômetro: retorna nível de performance relativo à média
-function getPerf(val, media, max) {
+function getPerf(val, media) {
   if (val == null || val === 0) return { nivel: 'sem', label: 'Sem dados', color: '#E8EDF2', bg: '#F5F7FA', score: 0 }
   const ratio = val / (media || 1)
-  if (ratio >= 1.4)  return { nivel: 'top',   label: 'Destaque',    color: '#16a34a', bg: 'rgba(22,163,74,0.08)',  score: ratio }
-  if (ratio >= 0.8)  return { nivel: 'medio', label: 'Na média',    color: '#FF6200', bg: 'rgba(255,98,0,0.07)',   score: ratio }
-  return               { nivel: 'baixo',  label: 'A melhorar',  color: '#e11d48', bg: 'rgba(225,29,72,0.07)',  score: ratio }
+  if (ratio >= 1.4)  return { nivel: 'top',   label: 'Destaque',   color: '#16a34a', bg: 'rgba(22,163,74,0.08)', score: ratio }
+  if (ratio >= 0.8)  return { nivel: 'medio', label: 'Na média',   color: '#0A66C2', bg: 'rgba(10,102,194,0.08)', score: ratio }
+  return               { nivel: 'baixo',  label: 'A melhorar', color: '#e11d48', bg: 'rgba(225,29,72,0.07)',  score: ratio }
 }
+
+const PER_PAGE = 5
 
 export default function LinkedinPilula({ posts, ano }) {
   const mobile = useIsMobile()
   const artigos = posts.filter(p => p.tipo === 'Artigo')
   const [sortKey, setSortKey] = useState('visualizacoes')
+  const [page, setPage] = useState(0)
 
   if (artigos.length === 0) {
     return (
@@ -77,6 +81,9 @@ export default function LinkedinPilula({ posts, ano }) {
     const vb = Number(b[sortKey]) || 0
     return vb - va
   })
+  const totalPages = Math.ceil(sorted.length / PER_PAGE)
+  const paginated = sorted.slice(page * PER_PAGE, (page + 1) * PER_PAGE)
+  const globalOffset = page * PER_PAGE
 
   const maxVis = Math.max(...artigos.map(p => Number(p.visualizacoes) || 0), 1)
   const maxImp = Math.max(...artigos.map(p => Number(p.impressoes)    || 0), 1)
@@ -89,7 +96,7 @@ export default function LinkedinPilula({ posts, ano }) {
         {KPIS.map(({ label, value, sub, accent }) => (
           <div key={label} className="card" style={{ padding: mobile ? '12px 14px' : '16px 20px' }}>
             <p style={{ color: '#8A9BB0', fontSize: mobile ? 9 : 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 8 }}>{label}</p>
-            <p style={{ color: accent ? '#FF6200' : '#1C252E', fontSize: mobile ? 20 : 24, fontWeight: 800, lineHeight: 1, marginBottom: 4 }}>{value}</p>
+            <p style={{ color: accent ? '#0A66C2' : '#1C252E', fontSize: mobile ? 20 : 24, fontWeight: 800, lineHeight: 1, marginBottom: 4 }}>{value}</p>
             <p style={{ color: '#A8B5C0', fontSize: mobile ? 9 : 11 }}>{sub}</p>
           </div>
         ))}
@@ -101,7 +108,7 @@ export default function LinkedinPilula({ posts, ano }) {
           <p style={{ color: '#1C252E', fontSize: 14, fontWeight: 700 }}>Evolução mensal</p>
           <div style={{ display: 'flex', gap: 14 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-              <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#FF6200' }}/>
+              <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#0A66C2' }}/>
               <span style={{ color: '#6B7A8D', fontSize: 11 }}>Visualizações</span>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
@@ -121,7 +128,7 @@ export default function LinkedinPilula({ posts, ano }) {
               return (
                 <div style={{ background: '#fff', border: '1px solid #EAECF0', borderRadius: 10, padding: '8px 12px', fontSize: 12 }}>
                   <p style={{ fontWeight: 700, color: '#1C252E', marginBottom: 4 }}>{d.mesFull}</p>
-                  <p style={{ color: '#FF6200', fontWeight: 700 }}>{fmtN(d.visualizacoes)} visualizações</p>
+                  <p style={{ color: '#0A66C2', fontWeight: 700 }}>{fmtN(d.visualizacoes)} visualizações</p>
                   <p style={{ color: '#5A7A8A' }}>{fmtN(d.impressoes)} impressões</p>
                   {d.count > 0 && <p style={{ color: '#9AAAB8', marginTop: 2 }}>{d.count} pílula{d.count > 1 ? 's' : ''}</p>}
                 </div>
@@ -131,7 +138,7 @@ export default function LinkedinPilula({ posts, ano }) {
               {byMonth.map((e, i) => <Cell key={i} fill={e.impressoes === 0 ? '#F0F2F5' : '#C3EBF7'}/>)}
             </Bar>
             <Bar dataKey="visualizacoes" radius={[3,3,0,0]}>
-              {byMonth.map((e, i) => <Cell key={i} fill={e.visualizacoes === 0 ? '#F0F2F5' : '#FF6200'}/>)}
+              {byMonth.map((e, i) => <Cell key={i} fill={e.visualizacoes === 0 ? '#F0F2F5' : '#0A66C2'}/>)}
             </Bar>
           </BarChart>
         </ResponsiveContainer>
@@ -151,7 +158,7 @@ export default function LinkedinPilula({ posts, ano }) {
               { k: 'cliques',       label: 'Cliques' },
               { k: 'reacoes',       label: 'Reações' },
             ].map(({ k, label }) => (
-              <button key={k} onClick={() => setSortKey(k)} style={{
+              <button key={k} onClick={() => { setSortKey(k); setPage(0) }} style={{
                 padding: mobile ? '4px 8px' : '4px 10px', borderRadius: 8, border: 'none', cursor: 'pointer',
                 fontSize: mobile ? 10 : 11, fontWeight: sortKey === k ? 700 : 400,
                 background: sortKey === k ? '#1C252E' : '#F0F4F8',
@@ -165,8 +172,9 @@ export default function LinkedinPilula({ posts, ano }) {
         </div>
 
         {/* Lista */}
-        <div style={{ padding: '6px 16px 16px', display: 'flex', flexDirection: 'column', gap: 6 }}>
-          {sorted.map((p, i) => {
+        <div style={{ padding: '6px 16px 12px', display: 'flex', flexDirection: 'column', gap: 6 }}>
+          {paginated.map((p, i) => {
+            const rank = globalOffset + i
             const valVis = Number(p.visualizacoes) || 0
             const valImp = Number(p.impressoes)    || 0
             const valSel = Number(p[sortKey])      || 0
@@ -178,21 +186,19 @@ export default function LinkedinPilula({ posts, ano }) {
 
             return (
               <div key={p.id} style={{
-                background: i === 0 ? 'rgba(255,98,0,0.04)' : '#FAFBFC',
-                border: `1px solid ${i === 0 ? 'rgba(255,98,0,0.12)' : '#F0F2F5'}`,
+                background: rank === 0 ? 'rgba(10,102,194,0.04)' : '#FAFBFC',
+                border: `1px solid ${rank === 0 ? 'rgba(10,102,194,0.12)' : '#F0F2F5'}`,
                 borderRadius: 10, padding: '12px 14px',
               }}>
                 <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
-                  {/* Posição */}
                   <span style={{
-                    color: i === 0 ? '#FF6200' : i < 3 ? '#0A66C2' : '#C0CEDA',
+                    color: rank === 0 ? '#0A66C2' : rank < 3 ? '#1C252E' : '#C0CEDA',
                     fontSize: 13, fontWeight: 700, flexShrink: 0, minWidth: 20, textAlign: 'center',
                   }}>
-                    {i + 1}
+                    {rank + 1}
                   </span>
 
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    {/* Título + badge */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 6 }}>
                       <span style={{
                         color: '#1C252E', fontSize: 13, fontWeight: 600,
@@ -208,11 +214,10 @@ export default function LinkedinPilula({ posts, ano }) {
                         {perf.label}
                       </span>
                       {p.data_post && (
-                        <span style={{ color: '#C0CEDA', fontSize: 11, flexShrink: 0 }}>{p.data_post}</span>
+                        <span style={{ color: '#6B7A8D', fontSize: 11, fontWeight: 500, flexShrink: 0 }}>{p.data_post}</span>
                       )}
                     </div>
 
-                    {/* Barra de performance */}
                     <div style={{ background: '#EAECF0', borderRadius: 4, height: 5, overflow: 'hidden', marginBottom: 8 }}>
                       <div style={{
                         background: perf.color, borderRadius: 4, height: '100%',
@@ -220,26 +225,25 @@ export default function LinkedinPilula({ posts, ano }) {
                       }}/>
                     </div>
 
-                    {/* Métricas */}
                     <div style={{ display: 'flex', gap: mobile ? 12 : 20, flexWrap: 'wrap' }}>
                       <div>
                         <p style={{ color: '#9AAAB8', fontSize: 9, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Visualizações</p>
-                        <p style={{ color: sortKey === 'visualizacoes' ? '#FF6200' : '#4A5568', fontSize: 14, fontWeight: sortKey === 'visualizacoes' ? 800 : 600, marginTop: 1 }}>{fmtN(valVis)}</p>
+                        <p style={{ color: sortKey === 'visualizacoes' ? '#0A66C2' : '#4A5568', fontSize: 14, fontWeight: sortKey === 'visualizacoes' ? 800 : 600, marginTop: 1 }}>{fmtN(valVis)}</p>
                       </div>
                       <div>
                         <p style={{ color: '#9AAAB8', fontSize: 9, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Impressões</p>
-                        <p style={{ color: sortKey === 'impressoes' ? '#FF6200' : '#4A5568', fontSize: 14, fontWeight: sortKey === 'impressoes' ? 800 : 600, marginTop: 1 }}>{fmtN(valImp)}</p>
+                        <p style={{ color: sortKey === 'impressoes' ? '#0A66C2' : '#4A5568', fontSize: 14, fontWeight: sortKey === 'impressoes' ? 800 : 600, marginTop: 1 }}>{fmtN(valImp)}</p>
                       </div>
                       {Number(p.cliques) > 0 && (
                         <div>
                           <p style={{ color: '#9AAAB8', fontSize: 9, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Cliques</p>
-                          <p style={{ color: sortKey === 'cliques' ? '#FF6200' : '#4A5568', fontSize: 14, fontWeight: sortKey === 'cliques' ? 800 : 600, marginTop: 1 }}>{fmtN(Number(p.cliques))}</p>
+                          <p style={{ color: sortKey === 'cliques' ? '#0A66C2' : '#4A5568', fontSize: 14, fontWeight: sortKey === 'cliques' ? 800 : 600, marginTop: 1 }}>{fmtN(Number(p.cliques))}</p>
                         </div>
                       )}
                       {Number(p.reacoes) > 0 && (
                         <div>
                           <p style={{ color: '#9AAAB8', fontSize: 9, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Reações</p>
-                          <p style={{ color: sortKey === 'reacoes' ? '#FF6200' : '#4A5568', fontSize: 14, fontWeight: sortKey === 'reacoes' ? 800 : 600, marginTop: 1 }}>{fmtN(Number(p.reacoes))}</p>
+                          <p style={{ color: sortKey === 'reacoes' ? '#0A66C2' : '#4A5568', fontSize: 14, fontWeight: sortKey === 'reacoes' ? 800 : 600, marginTop: 1 }}>{fmtN(Number(p.reacoes))}</p>
                         </div>
                       )}
                     </div>
@@ -249,6 +253,42 @@ export default function LinkedinPilula({ posts, ano }) {
             )
           })}
         </div>
+
+        {/* Paginação */}
+        {totalPages > 1 && (
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 16px 14px', borderTop: '1px solid #F0F4F8' }}>
+            <span style={{ color: '#9AAAB8', fontSize: 12 }}>
+              {page * PER_PAGE + 1}–{Math.min((page + 1) * PER_PAGE, sorted.length)} de {sorted.length} pílulas
+            </span>
+            <div style={{ display: 'flex', gap: 6 }}>
+              <button onClick={() => setPage(p => p - 1)} disabled={page === 0} style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                width: 32, height: 32, borderRadius: 8, border: '1.5px solid #E8ECF0',
+                background: page === 0 ? '#F5F7FA' : '#fff', cursor: page === 0 ? 'default' : 'pointer',
+                color: page === 0 ? '#C0CEDA' : '#1C252E',
+              }}>
+                <ChevronLeft size={15}/>
+              </button>
+              {Array.from({ length: totalPages }, (_, i) => (
+                <button key={i} onClick={() => setPage(i)} style={{
+                  width: 32, height: 32, borderRadius: 8, border: `1.5px solid ${page === i ? '#0A66C2' : '#E8ECF0'}`,
+                  background: page === i ? '#0A66C2' : '#fff', cursor: 'pointer',
+                  color: page === i ? '#fff' : '#6B7A8D', fontSize: 12, fontWeight: page === i ? 700 : 400,
+                }}>
+                  {i + 1}
+                </button>
+              ))}
+              <button onClick={() => setPage(p => p + 1)} disabled={page === totalPages - 1} style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                width: 32, height: 32, borderRadius: 8, border: '1.5px solid #E8ECF0',
+                background: page === totalPages - 1 ? '#F5F7FA' : '#fff', cursor: page === totalPages - 1 ? 'default' : 'pointer',
+                color: page === totalPages - 1 ? '#C0CEDA' : '#1C252E',
+              }}>
+                <ChevronRight size={15}/>
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )
