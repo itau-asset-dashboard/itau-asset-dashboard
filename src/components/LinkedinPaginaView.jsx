@@ -211,13 +211,13 @@ export default function LinkedinPaginaView({ data, seguidores, ano, isEditMode, 
             <XAxis dataKey="label" tick={{ fontSize:11, fill:'#9AAAB8' }} axisLine={false} tickLine={false}/>
             <YAxis tick={{ fontSize:11, fill:'#9AAAB8' }} axisLine={false} tickLine={false} tickFormatter={v => v >= 1000 ? (v/1000).toFixed(0)+'K' : v} width={44}/>
             <Tooltip formatter={(v, name) => [fmtN(v), FIELDS.find(f=>f.key===name)?.label || name]} labelStyle={{ color:'#1C252E', fontWeight:700 }} contentStyle={{ borderRadius:10, border:'1px solid #F0F4F8', fontSize:12 }}/>
-            <Bar dataKey="impressoes"          fill="#0A66C2" radius={[4,4,0,0]}/>
+            <Bar dataKey="impressoes"          fill="#C3EBF7" radius={[4,4,0,0]}/>
             <Bar dataKey="usuarios_alcancados" fill="#FF6200" radius={[4,4,0,0]}/>
-            <Bar dataKey="novos_seguidores"    fill="#16a34a" radius={[4,4,0,0]}/>
+            <Bar dataKey="novos_seguidores"    fill="#1C252E" radius={[4,4,0,0]}/>
           </BarChart>
         </ResponsiveContainer>
         <div style={{ display:'flex', gap:16, marginTop:8, flexWrap:'wrap' }}>
-          {[['#0A66C2','Impressões'],['#FF6200','Usuários alcançados'],['#16a34a','Novos seguidores']].map(([color,label]) => (
+          {[['#C3EBF7','Impressões'],['#FF6200','Usuários alcançados'],['#1C252E','Novos seguidores']].map(([color,label]) => (
             <div key={label} style={{ display:'flex', alignItems:'center', gap:6 }}>
               <div style={{ width:10, height:10, borderRadius:3, background:color }}/>
               <span style={{ fontSize:11, color:'#8A9BB0' }}>{label}</span>
