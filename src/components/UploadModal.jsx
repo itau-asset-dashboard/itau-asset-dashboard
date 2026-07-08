@@ -339,7 +339,7 @@ const SinglePostModal = forwardRef(function SinglePostModal({ initialPost, initi
                   : [...(form.tema || []), t]
                 )}
                 style={{
-                  padding: '5px 12px', borderRadius: 20, fontSize: 12, cursor: 'pointer',
+                  padding: '3px 10px', borderRadius: 20, fontSize: 11, cursor: 'pointer',
                   fontFamily: 'DM Sans, sans-serif', fontWeight: sel ? 700 : 400,
                   background: sel ? '#1C252E' : '#F0F4F8',
                   color: sel ? '#C3EBF7' : '#4A6272',
