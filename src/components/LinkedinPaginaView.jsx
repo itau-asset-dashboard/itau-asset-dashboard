@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react'
 import { Edit2, Check, X, ArrowUp, ArrowDown } from 'lucide-react'
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts'
+import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend } from 'recharts'
 import { useIsMobile } from '../utils/useIsMobile'
 
 const MESES_LABEL = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez']
@@ -74,7 +74,15 @@ export default function LinkedinPaginaView({ data, seguidores, ano, isEditMode, 
   const chartData = useMemo(() => MESES_LABEL.map((label, i) => {
     const mm = String(i+1).padStart(2,'0')
     const d  = data[`${mm}/${ano}`] || {}
-    return { label, impressoes: Number(d.impressoes)||0, usuarios_alcancados: Number(d.usuarios_alcancados)||0, novos_seguidores: Number(d.novos_seguidores)||0 }
+    return {
+      label,
+      impressoes:          Number(d.impressoes)          || null,
+      usuarios_alcancados: Number(d.usuarios_alcancados) || null,
+      novos_seguidores:    Number(d.novos_seguidores)    || null,
+      reacoes:             Number(d.reacoes)             || null,
+      comentarios:         Number(d.comentarios)         || null,
+      compartilhamentos:   Number(d.compartilhamentos)   || null,
+    }
   }), [data, ano])
 
   function openEdit() {
@@ -201,25 +209,50 @@ export default function LinkedinPaginaView({ data, seguidores, ano, isEditMode, 
         })}
       </div>
 
-      {/* Gráfico evolução anual */}
+      {/* Gráfico 1 — Volume */}
       <div className="card" style={{ padding: mobile ? 14 : 20 }}>
-        <p style={{ color:'#1C252E', fontSize:14, fontWeight:700, marginBottom:4 }}>Evolução anual — {ano}</p>
-        <p style={{ color:'#8A9BB0', fontSize:12, marginBottom:16 }}>Impressões, usuários alcançados e novos seguidores por mês</p>
-        <ResponsiveContainer width="100%" height={mobile ? 140 : 200}>
-          <BarChart data={chartData} barCategoryGap="30%" margin={{ top:8, right:4, left:0, bottom:0 }}>
+        <p style={{ color:'#1C252E', fontSize:14, fontWeight:700, marginBottom:2 }}>Alcance — {ano}</p>
+        <p style={{ color:'#8A9BB0', fontSize:12, marginBottom:16 }}>Impressões e usuários alcançados por mês</p>
+        <ResponsiveContainer width="100%" height={mobile ? 130 : 180}>
+          <LineChart data={chartData} margin={{ top:8, right:8, left:0, bottom:0 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#F0F4F8" vertical={false}/>
             <XAxis dataKey="label" tick={{ fontSize:11, fill:'#9AAAB8' }} axisLine={false} tickLine={false}/>
             <YAxis tick={{ fontSize:11, fill:'#9AAAB8' }} axisLine={false} tickLine={false} tickFormatter={v => v >= 1000 ? (v/1000).toFixed(0)+'K' : v} width={44}/>
             <Tooltip formatter={(v, name) => [fmtN(v), FIELDS.find(f=>f.key===name)?.label || name]} labelStyle={{ color:'#1C252E', fontWeight:700 }} contentStyle={{ borderRadius:10, border:'1px solid #F0F4F8', fontSize:12 }}/>
-            <Bar dataKey="impressoes"          fill="#C3EBF7" radius={[4,4,0,0]}/>
-            <Bar dataKey="usuarios_alcancados" fill="#FF6200" radius={[4,4,0,0]}/>
-            <Bar dataKey="novos_seguidores"    fill="#1C252E" radius={[4,4,0,0]}/>
-          </BarChart>
+            <Line dataKey="impressoes"          stroke="#C3EBF7" strokeWidth={2.5} dot={{ r:3, fill:'#C3EBF7' }} activeDot={{ r:5 }} connectNulls={false}/>
+            <Line dataKey="usuarios_alcancados" stroke="#FF6200" strokeWidth={2.5} dot={{ r:3, fill:'#FF6200' }} activeDot={{ r:5 }} connectNulls={false}/>
+          </LineChart>
         </ResponsiveContainer>
         <div style={{ display:'flex', gap:16, marginTop:8, flexWrap:'wrap' }}>
-          {[['#C3EBF7','Impressões'],['#FF6200','Usuários alcançados'],['#1C252E','Novos seguidores']].map(([color,label]) => (
+          {[['#C3EBF7','Impressões'],['#FF6200','Usuários alcançados']].map(([color,label]) => (
             <div key={label} style={{ display:'flex', alignItems:'center', gap:6 }}>
-              <div style={{ width:10, height:10, borderRadius:3, background:color }}/>
+              <div style={{ width:22, height:3, borderRadius:2, background:color }}/>
+              <span style={{ fontSize:11, color:'#8A9BB0' }}>{label}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Gráfico 2 — Engajamento */}
+      <div className="card" style={{ padding: mobile ? 14 : 20 }}>
+        <p style={{ color:'#1C252E', fontSize:14, fontWeight:700, marginBottom:2 }}>Engajamento — {ano}</p>
+        <p style={{ color:'#8A9BB0', fontSize:12, marginBottom:16 }}>Reações, comentários, compartilhamentos e novos seguidores por mês</p>
+        <ResponsiveContainer width="100%" height={mobile ? 130 : 180}>
+          <LineChart data={chartData} margin={{ top:8, right:8, left:0, bottom:0 }}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#F0F4F8" vertical={false}/>
+            <XAxis dataKey="label" tick={{ fontSize:11, fill:'#9AAAB8' }} axisLine={false} tickLine={false}/>
+            <YAxis tick={{ fontSize:11, fill:'#9AAAB8' }} axisLine={false} tickLine={false} tickFormatter={v => v >= 1000 ? (v/1000).toFixed(0)+'K' : v} width={44}/>
+            <Tooltip formatter={(v, name) => [fmtN(v), FIELDS.find(f=>f.key===name)?.label || name]} labelStyle={{ color:'#1C252E', fontWeight:700 }} contentStyle={{ borderRadius:10, border:'1px solid #F0F4F8', fontSize:12 }}/>
+            <Line dataKey="reacoes"           stroke="#0A66C2" strokeWidth={2.5} dot={{ r:3, fill:'#0A66C2' }} activeDot={{ r:5 }} connectNulls={false}/>
+            <Line dataKey="comentarios"       stroke="#FF6200" strokeWidth={2.5} dot={{ r:3, fill:'#FF6200' }} activeDot={{ r:5 }} connectNulls={false}/>
+            <Line dataKey="compartilhamentos" stroke="#1C252E" strokeWidth={2.5} dot={{ r:3, fill:'#1C252E' }} activeDot={{ r:5 }} connectNulls={false}/>
+            <Line dataKey="novos_seguidores"  stroke="#16a34a" strokeWidth={2.5} dot={{ r:3, fill:'#16a34a' }} activeDot={{ r:5 }} connectNulls={false}/>
+          </LineChart>
+        </ResponsiveContainer>
+        <div style={{ display:'flex', gap:16, marginTop:8, flexWrap:'wrap' }}>
+          {[['#0A66C2','Reações'],['#FF6200','Comentários'],['#1C252E','Compartilhamentos'],['#16a34a','Novos seguidores']].map(([color,label]) => (
+            <div key={label} style={{ display:'flex', alignItems:'center', gap:6 }}>
+              <div style={{ width:22, height:3, borderRadius:2, background:color }}/>
               <span style={{ fontSize:11, color:'#8A9BB0' }}>{label}</span>
             </div>
           ))}
