@@ -91,6 +91,50 @@ export default function LinkedinPaginaView({ data, seguidores, ano, isEditMode, 
   return (
     <div style={{ display:'flex', flexDirection:'column', gap:16 }}>
 
+      {/* Resumo anual */}
+      <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(150px, 1fr))', gap:12 }}>
+        {/* Seguidores — editável */}
+        <div className="card" style={{ padding:'16px 18px', position:'relative' }}>
+          <p style={{ color:'#8A9BB0', fontSize:11, fontWeight:600, textTransform:'uppercase', letterSpacing:'0.04em', marginBottom:8 }}>Seguidores</p>
+          {editSeg ? (
+            <div style={{ display:'flex', flexDirection:'column', gap:6 }}>
+              <input autoFocus type="text" inputMode="numeric" value={segForm}
+                onChange={e => setSegForm(e.target.value)}
+                onKeyDown={e => { if(e.key==='Enter') handleSaveSeg(); if(e.key==='Escape') setEditSeg(false) }}
+                placeholder="Ex: 216.560"
+                style={{ border:'1.5px solid #0A66C2', borderRadius:8, padding:'5px 9px', fontSize:14, fontFamily:'DM Sans, sans-serif', outline:'none', width:'100%', boxSizing:'border-box' }}/>
+              <div style={{ display:'flex', gap:6 }}>
+                <button onClick={handleSaveSeg} style={{ flex:1, background:'#1C252E', color:'#C3EBF7', border:'none', borderRadius:7, padding:'6px', cursor:'pointer', display:'flex', justifyContent:'center' }}><Check size={13}/></button>
+                <button onClick={() => setEditSeg(false)} style={{ flex:1, background:'#F4F6F8', border:'none', borderRadius:7, padding:'6px', cursor:'pointer', display:'flex', justifyContent:'center' }}><X size={13} color="#8A9BB0"/></button>
+              </div>
+            </div>
+          ) : (
+            <>
+              <p style={{ color:'#1C252E', fontSize:22, fontWeight:800 }}>{fmtN(seguidores)}</p>
+              <p style={{ color:'#B0BEC5', fontSize:11, marginTop:4 }}>total atual</p>
+            </>
+          )}
+          {isEditMode && !editSeg && (
+            <button onClick={() => { setSegForm(seguidores ?? ''); setEditSeg(true) }}
+              style={{ position:'absolute', top:12, right:12, background:'none', border:'none', cursor:'pointer', padding:2, display:'flex', color:'#C0CEDA' }}>
+              <Edit2 size={12}/>
+            </button>
+          )}
+        </div>
+        {/* Totais anuais */}
+        {FIELDS.map(f => {
+          const allMesKeys = Array.from({length:12},(_,i)=>`${String(i+1).padStart(2,'0')}/${ano}`)
+          const soma = allMesKeys.reduce((s, k) => s + (Number(data[k]?.[f.key]) || 0), 0)
+          return (
+            <div key={f.key} className="card" style={{ padding:'16px 18px' }}>
+              <p style={{ color:'#8A9BB0', fontSize:11, fontWeight:600, textTransform:'uppercase', letterSpacing:'0.04em', marginBottom:8 }}>{f.label}</p>
+              <p style={{ color: f.color, fontSize:22, fontWeight:800 }}>{fmtN(soma) === '—' ? '—' : fmtN(soma)}</p>
+              <p style={{ color:'#B0BEC5', fontSize:11, marginTop:4 }}>total {ano}</p>
+            </div>
+          )
+        })}
+      </div>
+
       {/* Seletor de mês + botão editar */}
       <div style={{ display:'flex', gap:6, flexWrap:'wrap', alignItems:'center', justifyContent:'space-between' }}>
         <div style={{ display:'flex', gap:6, flexWrap:'wrap' }}>
@@ -120,34 +164,6 @@ export default function LinkedinPaginaView({ data, seguidores, ano, isEditMode, 
 
       {/* KPIs mensais com delta */}
       <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(160px, 1fr))', gap:12 }}>
-
-        {/* Seguidores — primeiro card, editável inline */}
-        <div className="card" style={{ padding:'16px 18px' }}>
-          <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:8 }}>
-            <p style={{ color:'#8A9BB0', fontSize:11, fontWeight:600, textTransform:'uppercase', letterSpacing:'0.04em' }}>Seguidores</p>
-            {isEditMode && !editSeg && (
-              <button onClick={() => { setSegForm(seguidores ?? ''); setEditSeg(true) }}
-                style={{ background:'none', border:'none', cursor:'pointer', padding:2, display:'flex', color:'#C0CEDA' }}>
-                <Edit2 size={12}/>
-              </button>
-            )}
-          </div>
-          {editSeg ? (
-            <div style={{ display:'flex', flexDirection:'column', gap:6 }}>
-              <input autoFocus type="text" inputMode="numeric" value={segForm}
-                onChange={e => setSegForm(e.target.value)}
-                onKeyDown={e => e.key === 'Enter' && handleSaveSeg()}
-                placeholder="Ex: 216.560"
-                style={{ border:'1.5px solid #0A66C2', borderRadius:8, padding:'5px 9px', fontSize:13, fontFamily:'DM Sans, sans-serif', outline:'none', width:'100%', boxSizing:'border-box' }}/>
-              <div style={{ display:'flex', gap:6 }}>
-                <button onClick={handleSaveSeg} style={{ flex:1, background:'#1C252E', color:'#C3EBF7', border:'none', borderRadius:7, padding:'6px', cursor:'pointer', display:'flex', justifyContent:'center' }}><Check size={13}/></button>
-                <button onClick={() => setEditSeg(false)} style={{ flex:1, background:'#F4F6F8', border:'none', borderRadius:7, padding:'6px', cursor:'pointer', display:'flex', justifyContent:'center' }}><X size={13} color="#8A9BB0"/></button>
-              </div>
-            </div>
-          ) : (
-            <p style={{ color:'#1C252E', fontSize:22, fontWeight:800 }}>{fmtN(seguidores)}</p>
-          )}
-        </div>
 
         {FIELDS.map(f => {
           const curr = mesData[f.key]
