@@ -106,7 +106,7 @@ export default function LinkedinPaginaView({ data, seguidores, ano, isEditMode, 
   const fs   = mobile ? 20 : 24
 
   return (
-    <div style={{ display:'flex', flexDirection:'column', gap:14 }}>
+    <div style={{ display:'flex', flexDirection:'column', gap:20 }}>
 
       {/* KPIs anuais — mesma grade da Visão Anual */}
       <div style={{ display:'grid', gridTemplateColumns: mobile ? 'repeat(2,1fr)' : 'repeat(4,1fr)', gap: mobile ? 8 : 12 }}>
@@ -168,7 +168,21 @@ export default function LinkedinPaginaView({ data, seguidores, ano, isEditMode, 
       </div>
 
       {/* Seletor de mês */}
-      <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', gap:8, flexWrap:'wrap' }}>
+      <div className="card" style={{ padding: mobile ? '12px 14px' : '16px 20px' }}>
+        <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom: 12 }}>
+          <p style={{ color:'#1C252E', fontSize:13, fontWeight:700 }}>
+            {MESES_FULL[mesIdx]} {ano}
+          </p>
+          {isEditMode && (
+            <button onClick={openEdit} title={`Editar ${MESES_FULL[mesIdx]}`} style={{
+              display:'flex', alignItems:'center', justifyContent:'center',
+              background:'#F0F4F8', border:'1.5px solid #EDEFF2',
+              borderRadius:8, padding:'6px', cursor:'pointer', color:'#8A9BB0',
+            }}>
+              <Edit2 size={14}/>
+            </button>
+          )}
+        </div>
         <div style={{ display:'flex', gap:6, flexWrap:'wrap' }}>
           {MESES_LABEL.map((label, i) => {
             const mm = String(i+1).padStart(2,'0')
@@ -183,19 +197,10 @@ export default function LinkedinPaginaView({ data, seguidores, ano, isEditMode, 
             )
           })}
         </div>
-        {isEditMode && (
-          <button onClick={openEdit} style={{
-            display:'flex', alignItems:'center', gap:6, background:'#F0F4F8',
-            border:'1.5px solid #EDEFF2', borderRadius:10, padding:'7px 12px',
-            fontSize:13, fontWeight:600, cursor:'pointer', color:'#1C252E', whiteSpace:'nowrap',
-          }}>
-            <Edit2 size={13}/> Editar {MESES_FULL[mesIdx]}
-          </button>
-        )}
       </div>
 
       {/* KPIs mensais com delta */}
-      <div style={{ display:'grid', gridTemplateColumns: mobile ? 'repeat(2,1fr)' : 'repeat(auto-fill, minmax(160px,1fr))', gap: mobile ? 8 : 12 }}>
+      <div style={{ display:'grid', gridTemplateColumns: mobile ? 'repeat(2,1fr)' : 'repeat(3,1fr)', gap: mobile ? 8 : 12 }}>
         {FIELDS.map(f => {
           const curr = mesData[f.key]
           const prev = prevData[f.key]
