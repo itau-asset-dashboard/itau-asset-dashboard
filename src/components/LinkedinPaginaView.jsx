@@ -168,21 +168,7 @@ export default function LinkedinPaginaView({ data, seguidores, ano, isEditMode, 
       </div>
 
       {/* Seletor de mês */}
-      <div className="card" style={{ padding: mobile ? '12px 14px' : '16px 20px' }}>
-        <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom: 12 }}>
-          <p style={{ color:'#1C252E', fontSize:13, fontWeight:700 }}>
-            {MESES_FULL[mesIdx]} {ano}
-          </p>
-          {isEditMode && (
-            <button onClick={openEdit} title={`Editar ${MESES_FULL[mesIdx]}`} style={{
-              display:'flex', alignItems:'center', justifyContent:'center',
-              background:'#F0F4F8', border:'1.5px solid #EDEFF2',
-              borderRadius:8, padding:'6px', cursor:'pointer', color:'#8A9BB0',
-            }}>
-              <Edit2 size={14}/>
-            </button>
-          )}
-        </div>
+      <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', gap:8 }}>
         <div style={{ display:'flex', gap:6, flexWrap:'wrap' }}>
           {MESES_LABEL.map((label, i) => {
             const mm = String(i+1).padStart(2,'0')
@@ -197,6 +183,15 @@ export default function LinkedinPaginaView({ data, seguidores, ano, isEditMode, 
             )
           })}
         </div>
+        {isEditMode && (
+          <button onClick={openEdit} title={`Editar ${MESES_FULL[mesIdx]}`} style={{
+            display:'flex', alignItems:'center', justifyContent:'center',
+            background:'#F0F4F8', border:'1.5px solid #EDEFF2',
+            borderRadius:8, padding:'6px', cursor:'pointer', color:'#8A9BB0', flexShrink:0,
+          }}>
+            <Edit2 size={14}/>
+          </button>
+        )}
       </div>
 
       {/* KPIs mensais com delta */}
