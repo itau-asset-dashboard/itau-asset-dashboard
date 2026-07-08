@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react'
 import { Edit2, Check, X, ArrowUp, ArrowDown } from 'lucide-react'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts'
+import { useIsMobile } from '../utils/useIsMobile'
 
 const MESES_LABEL = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez']
 const MESES_FULL  = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro']
@@ -21,16 +22,16 @@ function fmtN(n) {
   return Math.round(n).toLocaleString('pt-BR')
 }
 
-function delta(curr, prev) {
-  if (!curr || !prev) return null
-  return ((curr - prev) / prev) * 100
-}
-
 function parseInput(v) {
   if (v === '' || v == null) return null
   const clean = String(v).replace(/\./g, '').replace(/\s/g, '').replace(',', '.')
   const n = Number(clean)
   return isNaN(n) ? null : n
+}
+
+function delta(curr, prev) {
+  if (!curr || !prev) return null
+  return ((curr - prev) / prev) * 100
 }
 
 function DeltaBadge({ pct }) {
@@ -46,6 +47,7 @@ function DeltaBadge({ pct }) {
 }
 
 export default function LinkedinPaginaView({ data, seguidores, ano, isEditMode, onSave, onSaveSeguidores }) {
+  const mobile = useIsMobile()
   const mesAtual = String(new Date().getMonth() + 1).padStart(2, '0')
   const [mes, setMes]           = useState(mesAtual)
   const [editOpen, setEditOpen] = useState(false)
@@ -53,24 +55,27 @@ export default function LinkedinPaginaView({ data, seguidores, ano, isEditMode, 
   const [editSeg, setEditSeg]   = useState(false)
   const [segForm, setSegForm]   = useState('')
 
-  const chave  = `${mes}/${ano}`
-  const mesIdx = parseInt(mes, 10) - 1
-  const prevMes = String(mesIdx).padStart(2, '0')
-  const mesData  = data[chave] || {}
-  const prevData = data[`${prevMes}/${ano}`] || {}
+  const mesIdx  = parseInt(mes, 10) - 1
+  const chave   = `${mes}/${ano}`
+  const prevKey = `${String(mesIdx).padStart(2,'0')}/${ano}`
+  const mesData  = data[chave]   || {}
+  const prevData = data[prevKey] || {}
 
-  const chartData = useMemo(() => {
-    return MESES_LABEL.map((label, i) => {
-      const mm = String(i + 1).padStart(2, '0')
-      const d = data[`${mm}/${ano}`] || {}
-      return {
-        label,
-        impressoes:          Number(d.impressoes)          || 0,
-        usuarios_alcancados: Number(d.usuarios_alcancados) || 0,
-        novos_seguidores:    Number(d.novos_seguidores)    || 0,
-      }
-    })
+  // Totais anuais
+  const totais = useMemo(() => {
+    const keys = Array.from({length:12}, (_,i) => `${String(i+1).padStart(2,'0')}/${ano}`)
+    return Object.fromEntries(FIELDS.map(f => [
+      f.key,
+      keys.reduce((s, k) => s + (Number(data[k]?.[f.key]) || 0), 0)
+    ]))
   }, [data, ano])
+
+  // Chart data
+  const chartData = useMemo(() => MESES_LABEL.map((label, i) => {
+    const mm = String(i+1).padStart(2,'0')
+    const d  = data[`${mm}/${ano}`] || {}
+    return { label, impressoes: Number(d.impressoes)||0, usuarios_alcancados: Number(d.usuarios_alcancados)||0, novos_seguidores: Number(d.novos_seguidores)||0 }
+  }), [data, ano])
 
   function openEdit() {
     setForm(Object.fromEntries(FIELDS.map(f => [f.key, mesData[f.key] ?? ''])))
@@ -88,14 +93,19 @@ export default function LinkedinPaginaView({ data, seguidores, ano, isEditMode, 
     setEditSeg(false)
   }
 
-  return (
-    <div style={{ display:'flex', flexDirection:'column', gap:16 }}>
+  const cols = mobile ? 'repeat(2,1fr)' : 'repeat(4,1fr)'
+  const pad  = mobile ? '12px 14px' : '16px 20px'
+  const fs   = mobile ? 20 : 24
 
-      {/* Resumo anual */}
-      <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(150px, 1fr))', gap:12 }}>
+  return (
+    <div style={{ display:'flex', flexDirection:'column', gap:14 }}>
+
+      {/* KPIs anuais — mesma grade da Visão Anual */}
+      <div style={{ display:'grid', gridTemplateColumns: mobile ? 'repeat(2,1fr)' : 'repeat(4,1fr)', gap: mobile ? 8 : 12 }}>
+
         {/* Seguidores — editável */}
-        <div className="card" style={{ padding:'16px 18px', position:'relative' }}>
-          <p style={{ color:'#8A9BB0', fontSize:11, fontWeight:600, textTransform:'uppercase', letterSpacing:'0.04em', marginBottom:8 }}>Seguidores</p>
+        <div className="card" style={{ padding: pad, position:'relative' }}>
+          <p style={{ color:'#8A9BB0', fontSize: mobile ? 9 : 10, fontWeight:600, textTransform:'uppercase', letterSpacing:'0.05em', marginBottom:8 }}>Seguidores</p>
           {editSeg ? (
             <div style={{ display:'flex', flexDirection:'column', gap:6 }}>
               <input autoFocus type="text" inputMode="numeric" value={segForm}
@@ -110,36 +120,50 @@ export default function LinkedinPaginaView({ data, seguidores, ano, isEditMode, 
             </div>
           ) : (
             <>
-              <p style={{ color:'#1C252E', fontSize:22, fontWeight:800 }}>{fmtN(seguidores)}</p>
-              <p style={{ color:'#B0BEC5', fontSize:11, marginTop:4 }}>total atual</p>
+              <p style={{ color:'#1C252E', fontSize: fs, fontWeight:800, lineHeight:1, marginBottom:4 }}>{fmtN(seguidores)}</p>
+              <p style={{ color:'#A8B5C0', fontSize: mobile ? 9 : 11 }}>total atual</p>
             </>
           )}
           {isEditMode && !editSeg && (
             <button onClick={() => { setSegForm(seguidores ?? ''); setEditSeg(true) }}
-              style={{ position:'absolute', top:12, right:12, background:'none', border:'none', cursor:'pointer', padding:2, display:'flex', color:'#C0CEDA' }}>
+              style={{ position:'absolute', top:10, right:10, background:'none', border:'none', cursor:'pointer', padding:2, display:'flex', color:'#C0CEDA' }}>
               <Edit2 size={12}/>
             </button>
           )}
         </div>
-        {/* Totais anuais */}
-        {FIELDS.map(f => {
-          const allMesKeys = Array.from({length:12},(_,i)=>`${String(i+1).padStart(2,'0')}/${ano}`)
-          const soma = allMesKeys.reduce((s, k) => s + (Number(data[k]?.[f.key]) || 0), 0)
+
+        {/* Impressões, Usuários alcançados, Novos seguidores */}
+        {['impressoes','usuarios_alcancados','novos_seguidores'].map(key => {
+          const f = FIELDS.find(f => f.key === key)
           return (
-            <div key={f.key} className="card" style={{ padding:'16px 18px' }}>
-              <p style={{ color:'#8A9BB0', fontSize:11, fontWeight:600, textTransform:'uppercase', letterSpacing:'0.04em', marginBottom:8 }}>{f.label}</p>
-              <p style={{ color: f.color, fontSize:22, fontWeight:800 }}>{fmtN(soma) === '—' ? '—' : fmtN(soma)}</p>
-              <p style={{ color:'#B0BEC5', fontSize:11, marginTop:4 }}>total {ano}</p>
+            <div key={key} className="card" style={{ padding: pad }}>
+              <p style={{ color:'#8A9BB0', fontSize: mobile ? 9 : 10, fontWeight:600, textTransform:'uppercase', letterSpacing:'0.05em', marginBottom:8 }}>{f.label}</p>
+              <p style={{ color:'#1C252E', fontSize: fs, fontWeight:800, lineHeight:1, marginBottom:4 }}>{fmtN(totais[key])}</p>
+              <p style={{ color:'#A8B5C0', fontSize: mobile ? 9 : 11 }}>total {ano}</p>
             </div>
           )
         })}
       </div>
 
-      {/* Seletor de mês + botão editar */}
-      <div style={{ display:'flex', gap:6, flexWrap:'wrap', alignItems:'center', justifyContent:'space-between' }}>
+      {/* Segunda linha: Reações, Comentários, Compartilhamentos */}
+      <div style={{ display:'grid', gridTemplateColumns: mobile ? 'repeat(2,1fr)' : 'repeat(3,1fr)', gap: mobile ? 8 : 12 }}>
+        {['reacoes','comentarios','compartilhamentos'].map(key => {
+          const f = FIELDS.find(f => f.key === key)
+          return (
+            <div key={key} className="card" style={{ padding: pad }}>
+              <p style={{ color:'#8A9BB0', fontSize: mobile ? 9 : 10, fontWeight:600, textTransform:'uppercase', letterSpacing:'0.05em', marginBottom:8 }}>{f.label}</p>
+              <p style={{ color:'#1C252E', fontSize: fs, fontWeight:800, lineHeight:1, marginBottom:4 }}>{fmtN(totais[key])}</p>
+              <p style={{ color:'#A8B5C0', fontSize: mobile ? 9 : 11 }}>total {ano}</p>
+            </div>
+          )
+        })}
+      </div>
+
+      {/* Seletor de mês */}
+      <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', gap:8, flexWrap:'wrap' }}>
         <div style={{ display:'flex', gap:6, flexWrap:'wrap' }}>
           {MESES_LABEL.map((label, i) => {
-            const mm = String(i + 1).padStart(2, '0')
+            const mm = String(i+1).padStart(2,'0')
             const ativo = mes === mm
             return (
               <button key={mm} onClick={() => setMes(mm)} style={{
@@ -153,9 +177,9 @@ export default function LinkedinPaginaView({ data, seguidores, ano, isEditMode, 
         </div>
         {isEditMode && (
           <button onClick={openEdit} style={{
-            display:'flex', alignItems:'center', gap:6,
-            background:'#F0F4F8', border:'1.5px solid #EDEFF2', borderRadius:10,
-            padding:'7px 12px', fontSize:13, fontWeight:600, cursor:'pointer', color:'#1C252E',
+            display:'flex', alignItems:'center', gap:6, background:'#F0F4F8',
+            border:'1.5px solid #EDEFF2', borderRadius:10, padding:'7px 12px',
+            fontSize:13, fontWeight:600, cursor:'pointer', color:'#1C252E', whiteSpace:'nowrap',
           }}>
             <Edit2 size={13}/> Editar {MESES_FULL[mesIdx]}
           </button>
@@ -163,31 +187,29 @@ export default function LinkedinPaginaView({ data, seguidores, ano, isEditMode, 
       </div>
 
       {/* KPIs mensais com delta */}
-      <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(160px, 1fr))', gap:12 }}>
-
+      <div style={{ display:'grid', gridTemplateColumns: mobile ? 'repeat(2,1fr)' : 'repeat(auto-fill, minmax(160px,1fr))', gap: mobile ? 8 : 12 }}>
         {FIELDS.map(f => {
           const curr = mesData[f.key]
           const prev = prevData[f.key]
-          const pct  = delta(curr, prev)
           return (
-            <div key={f.key} className="card" style={{ padding:'16px 18px' }}>
-              <p style={{ color:'#8A9BB0', fontSize:11, fontWeight:600, textTransform:'uppercase', letterSpacing:'0.04em', marginBottom:8 }}>{f.label}</p>
-              <p style={{ color: f.color, fontSize:22, fontWeight:800 }}>{fmtN(curr)}</p>
-              <DeltaBadge pct={pct}/>
+            <div key={f.key} className="card" style={{ padding: pad }}>
+              <p style={{ color:'#8A9BB0', fontSize: mobile ? 9 : 10, fontWeight:600, textTransform:'uppercase', letterSpacing:'0.05em', marginBottom:8 }}>{f.label}</p>
+              <p style={{ color: f.color, fontSize: mobile ? 20 : 22, fontWeight:800, lineHeight:1 }}>{fmtN(curr)}</p>
+              <DeltaBadge pct={delta(curr, prev)}/>
             </div>
           )
         })}
       </div>
 
-      {/* Gráfico anual */}
-      <div className="card" style={{ padding:'20px' }}>
-        <h3 style={{ color:'#1C252E', fontSize:14, fontWeight:700, marginBottom:4 }}>Evolução anual — {ano}</h3>
+      {/* Gráfico evolução anual */}
+      <div className="card" style={{ padding: mobile ? 14 : 20 }}>
+        <p style={{ color:'#1C252E', fontSize:14, fontWeight:700, marginBottom:4 }}>Evolução anual — {ano}</p>
         <p style={{ color:'#8A9BB0', fontSize:12, marginBottom:16 }}>Impressões, usuários alcançados e novos seguidores por mês</p>
-        <ResponsiveContainer width="100%" height={220}>
-          <BarChart data={chartData} barCategoryGap="30%">
+        <ResponsiveContainer width="100%" height={mobile ? 140 : 200}>
+          <BarChart data={chartData} barCategoryGap="30%" margin={{ top:8, right:4, left:0, bottom:0 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#F0F4F8" vertical={false}/>
             <XAxis dataKey="label" tick={{ fontSize:11, fill:'#9AAAB8' }} axisLine={false} tickLine={false}/>
-            <YAxis tick={{ fontSize:11, fill:'#9AAAB8' }} axisLine={false} tickLine={false} tickFormatter={v => v >= 1000 ? (v/1000).toFixed(0)+'K' : v}/>
+            <YAxis tick={{ fontSize:11, fill:'#9AAAB8' }} axisLine={false} tickLine={false} tickFormatter={v => v >= 1000 ? (v/1000).toFixed(0)+'K' : v} width={44}/>
             <Tooltip formatter={(v, name) => [fmtN(v), FIELDS.find(f=>f.key===name)?.label || name]} labelStyle={{ color:'#1C252E', fontWeight:700 }} contentStyle={{ borderRadius:10, border:'1px solid #F0F4F8', fontSize:12 }}/>
             <Bar dataKey="impressoes"          fill="#0A66C2" radius={[4,4,0,0]}/>
             <Bar dataKey="usuarios_alcancados" fill="#FF6200" radius={[4,4,0,0]}/>
@@ -204,7 +226,7 @@ export default function LinkedinPaginaView({ data, seguidores, ano, isEditMode, 
         </div>
       </div>
 
-      {/* Modal de edição mensal */}
+      {/* Modal edição mensal */}
       {editOpen && (
         <div style={{ position:'fixed', inset:0, background:'rgba(28,37,46,0.65)', zIndex:1000, display:'flex', alignItems:'center', justifyContent:'center', padding:16 }}
           onClick={e => e.target === e.currentTarget && setEditOpen(false)}>
