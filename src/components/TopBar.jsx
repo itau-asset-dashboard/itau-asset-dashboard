@@ -13,17 +13,22 @@ const MESES = Array.from({ length: 12 }, (_, i) => ({
 }))
 
 const TITLES = {
-  'visao-anual':  { title: 'Visão Anual',        sub: 'Performance consolidada do ano' },
-  'visao-geral':  { title: 'Visão Mensal',       sub: 'Métricas de alcance do mês filtrado' },
-  'posts':        { title: 'Todos os Posts',     sub: 'Histórico completo de publicações' },
-  'stories':      { title: 'Stories',            sub: 'Análise separada das metas de alcance' },
-  'insights':     { title: 'Insights',           sub: 'Análise inteligente de performance' },
-  'upload':       { title: 'Upload',             sub: 'Adicionar post com extração automática' },
-  'glossario':    { title: 'Glossário',          sub: 'Definições oficiais do Instagram' },
-  'linkedin-geral':       { title: 'Visão Anual',    sub: 'Performance consolidada do ano no LinkedIn' },
-  'linkedin-posts':       { title: 'Posts',          sub: 'Biblioteca completa de publicações LinkedIn' },
-  'linkedin-performance': { title: 'Visão Mensal',   sub: 'Métricas e performance por formato no mês' },
-  'linkedin-pilula':      { title: 'Pílula de ETFs', sub: 'Evolução e termômetro de performance das newsletters' },
+  // Instagram
+  'visao-anual':  { title: 'Visão Anual',    sub: 'Performance consolidada do ano · Instagram' },
+  'visao-geral':  { title: 'Visão Mensal',   sub: 'Métricas de alcance do mês filtrado · Instagram' },
+  'posts':        { title: 'Posts',          sub: 'Histórico completo de publicações · Instagram' },
+  'stories':      { title: 'Stories',        sub: 'Análise de alcance dos stories · Instagram' },
+  'etfs':         { title: 'Pílula de ETFs', sub: 'Evolução e termômetro de performance das newsletters · Instagram' },
+  'insights':     { title: 'Insights',       sub: 'Análise inteligente de performance' },
+  'upload':       { title: 'Upload',         sub: 'Adicionar post com extração automática' },
+  'glossario':    { title: 'Glossário',      sub: 'Definições e métricas oficiais do Instagram' },
+  'oliver':       { title: 'Dados Oliver',   sub: 'Dados e histórico do assistente Oliver' },
+  // LinkedIn
+  'linkedin-pagina':      { title: 'Visão da Página',  sub: 'Métricas mensais da página · LinkedIn' },
+  'linkedin-geral':       { title: 'Visão Anual',      sub: 'Performance consolidada do ano · LinkedIn' },
+  'linkedin-performance': { title: 'Visão Mensal',     sub: 'Métricas e performance por formato no mês · LinkedIn' },
+  'linkedin-posts':       { title: 'Posts',            sub: 'Biblioteca completa de publicações · LinkedIn' },
+  'linkedin-pilula':      { title: 'Pílula de ETFs',   sub: 'Evolução e termômetro de performance das newsletters · LinkedIn' },
 }
 
 const EDIT_PASSWORD = import.meta.env.VITE_EDIT_PASSWORD || 'itauasset2026'

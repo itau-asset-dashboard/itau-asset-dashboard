@@ -121,7 +121,7 @@ export default function LinkedinPaginaView({ data, seguidores, ano, isEditMode, 
           ) : (
             <>
               <p style={{ color:'#1C252E', fontSize: fs, fontWeight:800, lineHeight:1, marginBottom:4 }}>{fmtN(seguidores)}</p>
-              <p style={{ color:'#A8B5C0', fontSize: mobile ? 9 : 11 }}>total atual</p>
+              <p style={{ color:'#A8B5C0', fontSize: mobile ? 9 : 11 }}>seguidores atuais</p>
             </>
           )}
           {isEditMode && !editSeg && (
@@ -139,7 +139,7 @@ export default function LinkedinPaginaView({ data, seguidores, ano, isEditMode, 
             <div key={key} className="card" style={{ padding: pad }}>
               <p style={{ color:'#8A9BB0', fontSize: mobile ? 9 : 10, fontWeight:600, textTransform:'uppercase', letterSpacing:'0.05em', marginBottom:8 }}>{f.label}</p>
               <p style={{ color:'#1C252E', fontSize: fs, fontWeight:800, lineHeight:1, marginBottom:4 }}>{fmtN(totais[key])}</p>
-              <p style={{ color:'#A8B5C0', fontSize: mobile ? 9 : 11 }}>total {ano}</p>
+              <p style={{ color:'#A8B5C0', fontSize: mobile ? 9 : 11 }}>em {ano}</p>
             </div>
           )
         })}
@@ -153,7 +153,7 @@ export default function LinkedinPaginaView({ data, seguidores, ano, isEditMode, 
             <div key={key} className="card" style={{ padding: pad }}>
               <p style={{ color:'#8A9BB0', fontSize: mobile ? 9 : 10, fontWeight:600, textTransform:'uppercase', letterSpacing:'0.05em', marginBottom:8 }}>{f.label}</p>
               <p style={{ color:'#1C252E', fontSize: fs, fontWeight:800, lineHeight:1, marginBottom:4 }}>{fmtN(totais[key])}</p>
-              <p style={{ color:'#A8B5C0', fontSize: mobile ? 9 : 11 }}>total {ano}</p>
+              <p style={{ color:'#A8B5C0', fontSize: mobile ? 9 : 11 }}>em {ano}</p>
             </div>
           )
         })}
