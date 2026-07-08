@@ -102,46 +102,57 @@ export default function LinkedinPilula({ posts, ano, isEditMode, onEditPost }) {
         ))}
       </div>
 
-      {/* Evolução mensal — Visualizações + Impressões */}
-      <div className="card" style={{ padding: 20 }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16, flexWrap: 'wrap', gap: 8 }}>
-          <p style={{ color: '#1C252E', fontSize: 14, fontWeight: 700 }}>Evolução mensal</p>
-          <div style={{ display: 'flex', gap: 14 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-              <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#0A66C2' }}/>
-              <span style={{ color: '#6B7A8D', fontSize: 11 }}>Visualizações</span>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-              <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#C3EBF7' }}/>
-              <span style={{ color: '#6B7A8D', fontSize: 11 }}>Impressões</span>
-            </div>
-          </div>
+      {/* Evolução mensal — dois gráficos separados */}
+      <div style={{ display: 'grid', gridTemplateColumns: mobile ? '1fr' : '1fr 1fr', gap: mobile ? 8 : 12 }}>
+        <div className="card" style={{ padding: 20 }}>
+          <p style={{ color: '#1C252E', fontSize: 13, fontWeight: 700, marginBottom: 16 }}>Visualizações por mês</p>
+          <ResponsiveContainer width="100%" height={mobile ? 120 : 160}>
+            <BarChart data={byMonth} barSize={mobile ? 12 : 18} margin={{ top: 4, right: 4, left: 0, bottom: 0 }}>
+              <XAxis dataKey="mes" tick={{ fill: '#9AAAB8', fontSize: mobile ? 9 : 11 }} axisLine={false} tickLine={false}/>
+              <YAxis tick={{ fill: '#9AAAB8', fontSize: 10 }} axisLine={false} tickLine={false}
+                tickFormatter={v => v === 0 ? '' : fmtN(v)} width={mobile ? 36 : 44}/>
+              <Tooltip content={({ active, payload }) => {
+                if (!active || !payload?.length) return null
+                const d = payload[0]?.payload
+                return (
+                  <div style={{ background: '#fff', border: '1px solid #EAECF0', borderRadius: 10, padding: '8px 12px', fontSize: 12 }}>
+                    <p style={{ fontWeight: 700, color: '#1C252E', marginBottom: 2 }}>{d.mesFull}</p>
+                    <p style={{ color: '#0A66C2', fontWeight: 700 }}>{fmtN(d.visualizacoes)} visualizações</p>
+                    {d.count > 0 && <p style={{ color: '#9AAAB8', marginTop: 2 }}>{d.count} pílula{d.count > 1 ? 's' : ''}</p>}
+                  </div>
+                )
+              }} cursor={{ fill: 'rgba(0,0,0,0.02)' }}/>
+              <Bar dataKey="visualizacoes" radius={[4,4,0,0]}>
+                {byMonth.map((e, i) => <Cell key={i} fill={e.visualizacoes === 0 ? '#F0F2F5' : '#0A66C2'}/>)}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
         </div>
-        <ResponsiveContainer width="100%" height={mobile ? 140 : 190}>
-          <BarChart data={byMonth} barSize={mobile ? 10 : 16} barGap={3} margin={{ top: 4, right: 4, left: 0, bottom: 0 }}>
-            <XAxis dataKey="mes" tick={{ fill: '#9AAAB8', fontSize: mobile ? 9 : 11 }} axisLine={false} tickLine={false}/>
-            <YAxis tick={{ fill: '#9AAAB8', fontSize: 10 }} axisLine={false} tickLine={false}
-              tickFormatter={v => v === 0 ? '' : fmtN(v)} width={mobile ? 36 : 44}/>
-            <Tooltip content={({ active, payload }) => {
-              if (!active || !payload?.length) return null
-              const d = payload[0]?.payload
-              return (
-                <div style={{ background: '#fff', border: '1px solid #EAECF0', borderRadius: 10, padding: '8px 12px', fontSize: 12 }}>
-                  <p style={{ fontWeight: 700, color: '#1C252E', marginBottom: 4 }}>{d.mesFull}</p>
-                  <p style={{ color: '#0A66C2', fontWeight: 700 }}>{fmtN(d.visualizacoes)} visualizações</p>
-                  <p style={{ color: '#5A7A8A' }}>{fmtN(d.impressoes)} impressões</p>
-                  {d.count > 0 && <p style={{ color: '#9AAAB8', marginTop: 2 }}>{d.count} pílula{d.count > 1 ? 's' : ''}</p>}
-                </div>
-              )
-            }} cursor={{ fill: 'rgba(0,0,0,0.02)' }}/>
-            <Bar dataKey="impressoes" radius={[3,3,0,0]}>
-              {byMonth.map((e, i) => <Cell key={i} fill={e.impressoes === 0 ? '#F0F2F5' : '#C3EBF7'}/>)}
-            </Bar>
-            <Bar dataKey="visualizacoes" radius={[3,3,0,0]}>
-              {byMonth.map((e, i) => <Cell key={i} fill={e.visualizacoes === 0 ? '#F0F2F5' : '#0A66C2'}/>)}
-            </Bar>
-          </BarChart>
-        </ResponsiveContainer>
+
+        <div className="card" style={{ padding: 20 }}>
+          <p style={{ color: '#1C252E', fontSize: 13, fontWeight: 700, marginBottom: 16 }}>Impressões por mês</p>
+          <ResponsiveContainer width="100%" height={mobile ? 120 : 160}>
+            <BarChart data={byMonth} barSize={mobile ? 12 : 18} margin={{ top: 4, right: 4, left: 0, bottom: 0 }}>
+              <XAxis dataKey="mes" tick={{ fill: '#9AAAB8', fontSize: mobile ? 9 : 11 }} axisLine={false} tickLine={false}/>
+              <YAxis tick={{ fill: '#9AAAB8', fontSize: 10 }} axisLine={false} tickLine={false}
+                tickFormatter={v => v === 0 ? '' : fmtN(v)} width={mobile ? 36 : 44}/>
+              <Tooltip content={({ active, payload }) => {
+                if (!active || !payload?.length) return null
+                const d = payload[0]?.payload
+                return (
+                  <div style={{ background: '#fff', border: '1px solid #EAECF0', borderRadius: 10, padding: '8px 12px', fontSize: 12 }}>
+                    <p style={{ fontWeight: 700, color: '#1C252E', marginBottom: 2 }}>{d.mesFull}</p>
+                    <p style={{ color: '#C3EBF7', fontWeight: 700 }}>{fmtN(d.impressoes)} impressões</p>
+                    {d.count > 0 && <p style={{ color: '#9AAAB8', marginTop: 2 }}>{d.count} pílula{d.count > 1 ? 's' : ''}</p>}
+                  </div>
+                )
+              }} cursor={{ fill: 'rgba(0,0,0,0.02)' }}/>
+              <Bar dataKey="impressoes" radius={[4,4,0,0]}>
+                {byMonth.map((e, i) => <Cell key={i} fill={e.impressoes === 0 ? '#F0F2F5' : '#C3EBF7'}/>)}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
       </div>
 
       {/* Termômetro de performance */}
