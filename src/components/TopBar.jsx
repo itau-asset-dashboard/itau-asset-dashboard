@@ -23,6 +23,7 @@ const TITLES = {
   'upload':       { title: 'Upload',         sub: 'Adicionar post com extração automática' },
   'glossario':    { title: 'Glossário',      sub: 'Definições e métricas oficiais do Instagram' },
   'oliver':       { title: 'Dados Oliver',   sub: 'Dados e histórico do assistente Oliver' },
+  'navarro':      { title: 'Navarro',        sub: 'Acompanhamento da parceria e links parametrizados' },
   // LinkedIn
   'linkedin-pagina':      { title: 'Visão da Página',  sub: 'Métricas mensais da página · LinkedIn' },
   'linkedin-geral':       { title: 'Visão Anual',      sub: 'Visão anual dos posts · LinkedIn' },

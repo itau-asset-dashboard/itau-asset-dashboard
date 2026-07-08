@@ -16,6 +16,7 @@ import AnnualView from './components/AnnualView'
 import TopPostsMes from './components/TopPostsMes'
 import ETFsView from './components/ETFsView'
 import OliverView from './components/OliverView'
+import NavarroView from './components/NavarroView'
 import Glossario from './components/Glossario'
 import StoriesView from './components/StoriesView'
 import MetaMensalBanner from './components/MetaMensalBanner'
@@ -59,7 +60,7 @@ import LinkedinPaginaView from './components/LinkedinPaginaView'
 })()
 
 export default function App() {
-  const { activeSection, syncFromCloud, hasSynced, linkedinPageData, setLinkedinPageData, linkedinSeguidores, setLinkedinSeguidores, isEditMode } = useStore()
+  const { activeSection, syncFromCloud, hasSynced, linkedinPageData, setLinkedinPageData, linkedinSeguidores, setLinkedinSeguidores, isEditMode, navarroLinks, saveNavarroLink, deleteNavarroLink } = useStore()
 
   // Mantém hash sincronizado com a seção ativa (persiste no refresh)
   useEffect(() => {
@@ -118,6 +119,7 @@ export default function App() {
           {activeSection === 'upload'      && <UploadSection />}
           {activeSection === 'insights'    && <Insights />}
           {activeSection === 'oliver'      && <OliverView />}
+          {activeSection === 'navarro'     && <NavarroView links={navarroLinks} isEditMode={isEditMode} onSaveLink={saveNavarroLink} onDeleteLink={deleteNavarroLink}/>}
           {activeSection === 'posts'       && <PostsRanking />}
           {activeSection === 'etfs'        && <ETFsView />}
           {activeSection === 'glossario'   && <Glossario />}

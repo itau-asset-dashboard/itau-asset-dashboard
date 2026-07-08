@@ -27,6 +27,7 @@ export const useStore = create(
       linkedinPosts: [],
       linkedinPageData: {}, // { 'MM/YYYY': { impressoes, usuarios_alcancados, ... } }
       linkedinSeguidores: null,
+      navarroLinks: [], // [{ id, nome, url, acessos }]
       linkedinAction: null, // 'upload' | 'import' | null — trigger modal from TopBar
       linkedinAnoFiltro: String(new Date().getFullYear()),
       linkedinMesBiblioteca: `${String(new Date().getMonth()+1).padStart(2,'0')}/${new Date().getFullYear()}`,
@@ -35,7 +36,7 @@ export const useStore = create(
       mesFiltro: '01/2026',
       oliverData: {}, // { 'MM/YYYY': { alcance_oliver: number, meta_oliver: number } }
       activeSection: (() => {
-        const VALID = ['visao-geral','visao-anual','insights','oliver','posts','etfs','glossario','stories','upload']
+        const VALID = ['visao-geral','visao-anual','insights','oliver','posts','etfs','glossario','stories','upload','navarro']
         const hash = typeof window !== 'undefined' ? window.location.hash.replace('#','') : ''
         return VALID.includes(hash) ? hash : 'visao-anual'
       })(),
@@ -51,7 +52,7 @@ export const useStore = create(
       syncFromCloud: async () => {
         set({ syncing: true, syncError: null })
         try {
-          const [cloudPosts, metaMensal, metaAnual, oliverRaw, evidenciasRaw, cloudStoriesRaw, insightsRaw, cloudLinkedin, linkedinPageRaw, linkedinSegRaw] = await Promise.all([
+          const [cloudPosts, metaMensal, metaAnual, oliverRaw, evidenciasRaw, cloudStoriesRaw, insightsRaw, cloudLinkedin, linkedinPageRaw, linkedinSegRaw, navarroRaw] = await Promise.all([
             fetchPosts(),
             fetchSetting('meta_mensal'),
             fetchSetting('meta_anual'),
@@ -62,6 +63,7 @@ export const useStore = create(
             fetchLinkedinPosts().catch(() => []),
             fetchSetting('linkedin_page_data').catch(() => null),
             fetchSetting('linkedin_seguidores').catch(() => null),
+            fetchSetting('navarro_links').catch(() => null),
           ])
           const localPosts = get().posts
 
@@ -161,6 +163,7 @@ export const useStore = create(
             linkedinPosts: linkedinNorm.length > 0 ? linkedinNorm : get().linkedinPosts,
             linkedinPageData,
             linkedinSeguidores,
+            navarroLinks: navarroRaw ? (() => { try { return JSON.parse(navarroRaw) } catch (_) { return get().navarroLinks } })() : get().navarroLinks,
             metaMensal: metaMensal ? Number(metaMensal) : get().metaMensal,
             metaAnual:  metaAnual  ? Number(metaAnual)  : get().metaAnual,
             oliverData: newOliver,
@@ -365,6 +368,21 @@ export const useStore = create(
         await Promise.allSettled(ids.map(id => removeLinkedinPost(id).catch(() => {})))
       },
 
+      // ── Navarro ────────────────────────────────────────
+      saveNavarroLink: async (link) => {
+        const links = get().navarroLinks
+        const exists = links.find(l => l.id === link.id)
+        const updated = exists ? links.map(l => l.id === link.id ? link : l) : [...links, link]
+        set({ navarroLinks: updated })
+        saveSetting('navarro_links', JSON.stringify(updated)).catch(e => console.error('[navarro save]', e))
+      },
+
+      deleteNavarroLink: async (id) => {
+        const updated = get().navarroLinks.filter(l => l.id !== id)
+        set({ navarroLinks: updated })
+        saveSetting('navarro_links', JSON.stringify(updated)).catch(e => console.error('[navarro delete]', e))
+      },
+
       importLinkedinPosts: async (posts) => {
         const novos = posts.map(p => ({ ...p, id: p.id || crypto.randomUUID() }))
         set(s => ({ linkedinPosts: [...s.linkedinPosts, ...novos] }))
@@ -513,6 +531,7 @@ export const useStore = create(
         linkedinPosts:  s.linkedinPosts,
         linkedinPageData: s.linkedinPageData,
         linkedinSeguidores: s.linkedinSeguidores,
+        navarroLinks:   s.navarroLinks,
         metaMensal:     s.metaMensal,
         metaAnual:      s.metaAnual,
         mesFiltro:      s.mesFiltro,
