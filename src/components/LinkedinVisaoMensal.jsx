@@ -63,14 +63,7 @@ function FormatoCard({ cfg, posts, mobile }) {
   const ps = posts.filter(p => p.tipo === cfg.id)
   const [sel, setSel] = useState(cfg.metricas[0].key)
 
-  if (ps.length === 0) {
-    return (
-      <div className="card" style={{ padding: '18px 20px', opacity: 0.35, borderLeft: `3px solid #EAECF0` }}>
-        <p style={{ color: '#1C252E', fontSize: 13, fontWeight: 700 }}>{cfg.label}</p>
-        <p style={{ color: '#C0CEDA', fontSize: 12, marginTop: 4 }}>Sem posts neste mês</p>
-      </div>
-    )
-  }
+  if (ps.length === 0) return null
 
   const totals = {}
   cfg.metricas.forEach(m => {

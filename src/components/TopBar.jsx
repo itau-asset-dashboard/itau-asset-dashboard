@@ -25,8 +25,8 @@ const TITLES = {
   'oliver':       { title: 'Dados Oliver',   sub: 'Dados e histórico do assistente Oliver' },
   // LinkedIn
   'linkedin-pagina':      { title: 'Visão da Página',  sub: 'Métricas mensais da página · LinkedIn' },
-  'linkedin-geral':       { title: 'Visão Anual',      sub: 'Performance consolidada do ano · LinkedIn' },
-  'linkedin-performance': { title: 'Visão Mensal',     sub: 'Métricas e performance por formato no mês · LinkedIn' },
+  'linkedin-geral':       { title: 'Visão Anual',      sub: 'Visão anual dos posts · LinkedIn' },
+  'linkedin-performance': { title: 'Visão Mensal',     sub: 'Visão mensal dos posts por formato · LinkedIn' },
   'linkedin-posts':       { title: 'Posts',            sub: 'Biblioteca completa de publicações · LinkedIn' },
   'linkedin-pilula':      { title: 'Pílula de ETFs',   sub: 'Evolução e termômetro de performance das newsletters · LinkedIn' },
 }
