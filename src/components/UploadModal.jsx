@@ -3,6 +3,7 @@ import { X, Upload, Check, Sparkles, Trash2, ChevronRight } from 'lucide-react'
 import { extractPostFromImage } from '../utils/anthropic'
 import { useStore } from '../store/useStore'
 import ImageLightbox from './ImageLightbox'
+import { useIsMobile } from '../utils/useIsMobile'
 
 const TIPOS = ['Reels', 'Carrossel', 'Foto estática']
 
@@ -130,6 +131,7 @@ const SinglePostModal = forwardRef(function SinglePostModal({ initialPost, initi
     return base
   })
 
+  const mobile = useIsMobile()
   const isUpdate = !!initialPost?.id
 
   // Expose snapshot so MultiUploadModal can save state before navigating
@@ -369,7 +371,7 @@ const SinglePostModal = forwardRef(function SinglePostModal({ initialPost, initi
       </div>
 
       {/* Data + Tipo */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: mobile ? '1fr' : '1fr 1fr', gap: 12 }}>
         <div>
           <label style={{ color: '#6B7A8D', fontSize: 12, fontWeight: 600, display: 'block', marginBottom: 4 }}>Data</label>
           <input value={form.data_post || ''} onChange={e => set('data_post', e.target.value)}
@@ -389,7 +391,7 @@ const SinglePostModal = forwardRef(function SinglePostModal({ initialPost, initi
         <p style={{ color: '#6B7A8D', fontSize: 12, fontWeight: 600, marginBottom: 8 }}>
           Métricas
         </p>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: mobile ? '1fr' : '1fr 1fr', gap: 10 }}>
           {NUM_FIELDS.map(({ key, label, highlight, tooltip }) => (
             <div key={key} style={highlight ? { gridColumn: '1 / -1' } : {}}>
               <label style={{

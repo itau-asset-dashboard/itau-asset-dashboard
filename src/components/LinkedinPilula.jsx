@@ -20,10 +20,11 @@ function parseDate(d) {
 }
 
 // Termômetro: retorna nível de performance relativo à média
+// Destaque: >= 20% acima | Na média: ±20% | A melhorar: > 20% abaixo
 function getPerf(val, media) {
   if (val == null || val === 0) return { nivel: 'sem', label: 'Sem dados', color: '#E8EDF2', bg: '#F5F7FA', score: 0 }
   const ratio = val / (media || 1)
-  if (ratio >= 1.4)  return { nivel: 'top',   label: 'Destaque',   color: '#16a34a', bg: 'rgba(22,163,74,0.08)', score: ratio }
+  if (ratio >= 1.15) return { nivel: 'top',   label: 'Destaque',   color: '#16a34a', bg: 'rgba(22,163,74,0.08)', score: ratio }
   if (ratio >= 0.8)  return { nivel: 'medio', label: 'Na média',   color: '#0A66C2', bg: 'rgba(10,102,194,0.08)', score: ratio }
   return               { nivel: 'baixo',  label: 'A melhorar', color: '#e11d48', bg: 'rgba(225,29,72,0.07)',  score: ratio }
 }
