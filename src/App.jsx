@@ -80,10 +80,10 @@ export default function App() {
     function onPageShow(e) {
       if (e.persisted) syncFromCloud()
     }
-    // Refresh automático a cada 60s para garantir sincronia entre dispositivos
+    // Refresh automático a cada 15s para garantir sincronia entre dispositivos
     const interval = setInterval(() => {
       if (document.visibilityState === 'visible') syncFromCloud()
-    }, 60_000)
+    }, 15_000)
 
     document.addEventListener('visibilitychange', onVisible)
     window.addEventListener('pageshow', onPageShow)

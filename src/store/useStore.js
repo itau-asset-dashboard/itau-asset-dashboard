@@ -349,17 +349,27 @@ export const useStore = create(
         const novo = { ...post, id: post.id || String(Date.now()) }
         pendingLinkedinUpdates.set(novo.id, novo)
         set(s => ({ linkedinPosts: [...s.linkedinPosts, novo] }))
-        upsertLinkedinPost(novo)
-          .then(() => pendingLinkedinUpdates.delete(novo.id))
-          .catch(e => { console.error('[linkedin add]', e); pendingLinkedinUpdates.delete(novo.id) })
+        try {
+          await upsertLinkedinPost(novo)
+        } catch (e) {
+          console.error('[linkedin add]', e)
+          throw e // repassa o erro para o modal mostrar ao usuário
+        } finally {
+          pendingLinkedinUpdates.delete(novo.id)
+        }
       },
 
       updateLinkedinPost: async (post) => {
         pendingLinkedinUpdates.set(post.id, post)
         set(s => ({ linkedinPosts: s.linkedinPosts.map(p => p.id !== post.id ? p : { ...p, ...post }) }))
-        upsertLinkedinPost(post)
-          .then(() => pendingLinkedinUpdates.delete(post.id))
-          .catch(e => { console.error('[linkedin update]', e); pendingLinkedinUpdates.delete(post.id) })
+        try {
+          await upsertLinkedinPost(post)
+        } catch (e) {
+          console.error('[linkedin update]', e)
+          throw e // repassa o erro para o modal mostrar ao usuário
+        } finally {
+          pendingLinkedinUpdates.delete(post.id)
+        }
       },
 
       deleteLinkedinPost: async (id) => {
