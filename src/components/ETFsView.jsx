@@ -167,16 +167,16 @@ export default function ETFsView() {
       {viewMode === 'mensal' && (
         <div className="etf-month-grid" style={{
           display:'grid', gridTemplateColumns:'repeat(12, 1fr)',
-          gap:4, borderRadius:12, padding:'4px 0', borderBottom:'1px solid #F0F2F5',
+          gap:4, background:'#F4F6F8', borderRadius:12, padding:4,
         }}>
           {MESES_LABEL.map((m, i) => (
             <button key={i} onClick={() => setMesSel(i)}
               style={{
                 padding:'8px 4px', borderRadius:8, border:'none', cursor:'pointer',
-                fontSize:12, fontWeight: mesSel===i ? 700 : 400,
-                background: 'transparent',
-                color: mesSel===i ? '#FF6200' : '#9AAAB8',
-                borderBottom: mesSel===i ? '2px solid #FF6200' : '2px solid transparent',
+                fontSize:12, fontWeight: mesSel===i ? 700 : 500,
+                background: mesSel===i ? '#fff' : 'transparent',
+                color: mesSel===i ? '#FF6200' : '#6B7B8D',
+                boxShadow: mesSel===i ? '0 1px 4px rgba(0,0,0,0.10)' : 'none',
                 transition:'all 0.15s', textAlign:'center',
               }}>
               {m}
@@ -229,33 +229,7 @@ export default function ETFsView() {
 
         </div>
         </>
-      ) : (
-        /* Modo mensal: cards por formato */
-        <div style={{ display:'grid', gridTemplateColumns: mobile ? '1fr' : 'repeat(3, 1fr)', gap:12 }}>
-          {porTipo.map(t => (
-            <div key={t.tipo} className="card" style={{ padding: mobile ? '14px 16px' : '18px 20px' }}>
-              <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:10 }}>
-                <div style={{ width:10, height:10, borderRadius:3, background: TIPO_COLOR[t.tipo]||'#C3EBF7', flexShrink:0 }}/>
-                <span style={{ color:'#9AAAB8', fontSize:11, fontWeight:600, textTransform:'uppercase', letterSpacing:'0.04em' }}>{t.tipo}</span>
-              </div>
-              <p style={{ color:'#1C252E', fontSize: mobile ? 22 : 26, fontWeight:800, lineHeight:1, marginBottom:4 }}>
-                {t.total > 0 ? fmt(t.total) : '—'}
-              </p>
-              <p style={{ color:'#9AAAB8', fontSize:11, marginBottom:10 }}>
-                {t.count} post{t.count !== 1 ? 's' : ''} · média {fmt(t.media)}
-              </p>
-              <div style={{ background:'#F0F2F5', borderRadius:6, height:4, overflow:'hidden' }}>
-                <div style={{
-                  height:'100%', borderRadius:6,
-                  background: t.total > 0 ? (TIPO_COLOR[t.tipo]||'#C3EBF7') : 'transparent',
-                  width:`${maxTipo > 0 ? (t.total/maxTipo)*100 : 0}%`,
-                  transition:'width 0.6s'
-                }}/>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
+      ) : null}
 
       {/* Top posts + Performance por formato */}
       <div style={{ display:'grid', gridTemplateColumns: mobile ? '1fr' : '2fr 1fr', gap:16, alignItems:'start' }} className="annual-grid">
@@ -285,29 +259,25 @@ export default function ETFsView() {
 
         {/* Card lateral: Por formato (só anual) + ETFs vs outros temas */}
         <div className="card" style={{ padding: mobile ? '14px' : '22px' }}>
-          {viewMode === 'anual' && (
-            <>
-              <p style={{ color:'#1C252E', fontSize:15, fontWeight:700, marginBottom:4 }}>Por formato</p>
-              <p style={{ color:'#9AAAB8', fontSize:12, marginBottom:18 }}>Dentro do tema ETFs</p>
-              <div style={{ display:'flex', flexDirection:'column' }}>
-                {porTipo.map((t,i) => (
-                  <div key={t.tipo} style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'10px 0', borderBottom: i < porTipo.length-1 ? '1px solid #F0F2F5' : 'none' }}>
-                    <div style={{ display:'flex', alignItems:'center', gap:7 }}>
-                      <div style={{ width:8, height:8, borderRadius:2, flexShrink:0, background: TIPO_COLOR[t.tipo] || '#C3EBF7' }}/>
-                      <span style={{ color:'#1C252E', fontSize: i===0?14:13, fontWeight:500 }}>{t.tipo}</span>
-                    </div>
-                    <div style={{ textAlign:'right' }}>
-                      <span style={{ color: i===0?'#FF6200':'#1C252E', fontSize: i===0?15:13, fontWeight:500 }}>{fmt(t.total)}</span>
-                      <span style={{ color:'#9AAAB8', fontSize:11, marginLeft:5 }}>{t.count} posts</span>
-                    </div>
-                  </div>
-                ))}
+          <p style={{ color:'#1C252E', fontSize:15, fontWeight:700, marginBottom:4 }}>Por formato</p>
+          <p style={{ color:'#9AAAB8', fontSize:12, marginBottom:18 }}>Dentro do tema ETFs</p>
+          <div style={{ display:'flex', flexDirection:'column' }}>
+            {porTipo.map((t,i) => (
+              <div key={t.tipo} style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'10px 0', borderBottom: i < porTipo.length-1 ? '1px solid #F0F2F5' : 'none' }}>
+                <div style={{ display:'flex', alignItems:'center', gap:7 }}>
+                  <div style={{ width:8, height:8, borderRadius:2, flexShrink:0, background: TIPO_COLOR[t.tipo] || '#C3EBF7' }}/>
+                  <span style={{ color:'#1C252E', fontSize: i===0?14:13, fontWeight:500 }}>{t.tipo}</span>
+                </div>
+                <div style={{ textAlign:'right' }}>
+                  <span style={{ color: i===0?'#FF6200':'#1C252E', fontSize: i===0?15:13, fontWeight:500 }}>{fmt(t.total)}</span>
+                  <span style={{ color:'#9AAAB8', fontSize:11, marginLeft:5 }}>{t.count} posts</span>
+                </div>
               </div>
-              <div style={{ height:1, background:'#F0F4F8', margin:'20px 0' }}/>
-            </>
-          )}
+            ))}
+          </div>
+          <div style={{ height:1, background:'#F0F4F8', margin:'20px 0' }}/>
 
-          <p style={{ color:'#1C252E', fontSize: viewMode==='mensal' ? 15 : 13, fontWeight:700, marginBottom:14 }}>ETFs vs outros temas</p>
+          <p style={{ color:'#1C252E', fontSize:13, fontWeight:700, marginBottom:14 }}>ETFs vs outros temas</p>
           <div style={{ display:'flex', flexDirection:'column' }}>
             {temaRank.slice(0,5).map(([tema,val], i) => {
               const isEtf = ETF_TEMAS.includes(tema)
