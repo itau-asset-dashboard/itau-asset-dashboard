@@ -210,7 +210,8 @@ export default function ETFsView() {
 
       {/* Gráfico — anual mostra barras mensais; mensal mostra barras por formato */}
       {viewMode === 'anual' ? (
-        <div style={{ display:'grid', gridTemplateColumns: mobile ? '1fr' : '1fr 1fr 1fr', gap: mobile ? 8 : 12 }}>
+        <>
+        <div style={{ display:'grid', gridTemplateColumns: mobile ? '1fr' : '1fr 1fr', gap: mobile ? 8 : 12 }}>
           <div className="card" style={{ padding: mobile ? '14px' : '20px' }}>
             <p style={{ color:'#1C252E', fontSize:13, fontWeight:700, marginBottom:16 }}>Alcance por mês</p>
             <div className="chart-wrapper"><ResponsiveContainer width="100%" height={mobile ? 140 : 180}>
@@ -249,25 +250,26 @@ export default function ETFsView() {
             </ResponsiveContainer></div>
           </div>
 
-          <div className="card" style={{ padding: mobile ? '14px' : '20px' }}>
-            <p style={{ color:'#1C252E', fontSize:13, fontWeight:700, marginBottom:16 }}>Nº de posts por mês</p>
-            <div className="chart-wrapper"><ResponsiveContainer width="100%" height={mobile ? 140 : 180}>
-              <BarChart data={byMonth} margin={{top:4, right:4, left:0, bottom:0}}>
-                <XAxis dataKey="mes" tick={{ fill:'#9AAAB8', fontSize: mobile ? 9 : 11 }} axisLine={false} tickLine={false}/>
-                <YAxis tick={{ fill:'#9AAAB8', fontSize:10 }} axisLine={false} tickLine={false}
-                  allowDecimals={false} width={24}/>
-                <Tooltip
-                  formatter={v => [v,'Posts']}
-                  labelFormatter={(_,p) => p?.[0]?.payload?.mesFull || ''}
-                  contentStyle={{ borderRadius:10, border:'1px solid #EAECF0', fontSize:12 }}
-                />
-                <Bar dataKey="posts" radius={[6,6,0,0]} barSize={mobile ? 16 : 22}>
-                  {byMonth.map((e,i) => <Cell key={i} fill={e.posts>0?'#C3EBF7':'#F0F2F5'}/>)}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer></div>
-          </div>
         </div>
+        <div className="card" style={{ padding: mobile ? '14px' : '20px' }}>
+          <p style={{ color:'#1C252E', fontSize:13, fontWeight:700, marginBottom:16 }}>Nº de posts por mês</p>
+          <div className="chart-wrapper"><ResponsiveContainer width="100%" height={mobile ? 100 : 120}>
+            <BarChart data={byMonth} margin={{top:4, right:4, left:0, bottom:0}}>
+              <XAxis dataKey="mes" tick={{ fill:'#9AAAB8', fontSize: mobile ? 9 : 11 }} axisLine={false} tickLine={false}/>
+              <YAxis tick={{ fill:'#9AAAB8', fontSize:10 }} axisLine={false} tickLine={false}
+                allowDecimals={false} width={24}/>
+              <Tooltip
+                formatter={v => [v,'Posts']}
+                labelFormatter={(_,p) => p?.[0]?.payload?.mesFull || ''}
+                contentStyle={{ borderRadius:10, border:'1px solid #EAECF0', fontSize:12 }}
+              />
+              <Bar dataKey="posts" radius={[6,6,0,0]} barSize={mobile ? 16 : 28}>
+                {byMonth.map((e,i) => <Cell key={i} fill={e.posts>0?'#C3EBF7':'#F0F2F5'}/>)}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer></div>
+        </div>
+        </>
       ) : (
         /* Modo mensal: cards por formato */
         <div style={{ display:'grid', gridTemplateColumns: mobile ? '1fr' : 'repeat(3, 1fr)', gap:12 }}>
