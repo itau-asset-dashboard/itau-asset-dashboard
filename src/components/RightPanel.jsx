@@ -61,9 +61,7 @@ export default function RightPanel() {
   const atingiu  = pctReal >= 100
   const superou  = pctReal > 100
 
-  // Anel SVG
-  const R = 44, CIRC = 2 * Math.PI * R
-  const dash = (pctMensal / 100) * CIRC
+  const barWidth = Math.min(pctReal, 100)
   const ringColor = atingiu ? '#16a34a' : '#FF6200'
 
   return (
