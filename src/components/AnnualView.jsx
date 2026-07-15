@@ -165,11 +165,11 @@ export default function AnnualView() {
               <p style={{ color:'#1C252E', fontSize:22, fontWeight:800, marginBottom:2 }}>{pct.toFixed(1)}%</p>
               <p style={{ color:'#9AAAB8', fontSize:12 }}>atingido</p>
               <div style={{ marginTop:16, display:'flex', flexDirection:'column', gap:8 }}>
-                <div style={{ background:'#F8FAFC', borderRadius:10, display:'flex', justifyContent:'space-between', alignItems:'center', padding:'12px 14px' }}>
+                <div style={{ background:'#EEF1F5', borderRadius:10, display:'flex', justifyContent:'space-between', alignItems:'center', padding:'12px 14px' }}>
                   <span style={{ color:'#9AAAB8', fontSize:12 }}>Faltam para a meta</span>
                   <span style={{ color:'#1C252E', fontSize:14, fontWeight:700 }}>{fmt(restante)}</span>
                 </div>
-                <div style={{ background:'#F8FAFC', borderRadius:10, display:'flex', justifyContent:'space-between', alignItems:'center', padding:'12px 14px' }}>
+                <div style={{ background:'#EEF1F5', borderRadius:10, display:'flex', justifyContent:'space-between', alignItems:'center', padding:'12px 14px' }}>
                   <span style={{ color:'#9AAAB8', fontSize:12 }}>Meta mensal</span>
                   <div style={{ display:'flex', alignItems:'center', gap:5 }}>
                     <span style={{ color:'#FF6200', fontSize:14, fontWeight:700 }}>{fmt(metaMesAtualizada)}</span>
