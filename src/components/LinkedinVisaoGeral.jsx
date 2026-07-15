@@ -146,29 +146,6 @@ export default function LinkedinVisaoGeral({ posts, ano, isEditMode, onEditPost 
         </div>
       </div>
 
-      {/* Publicações por mês */}
-      <div className="card" style={{ padding: 20 }}>
-        <p style={{ color: '#1C252E', fontSize: 14, fontWeight: 700, marginBottom: 16 }}>Publicações por mês</p>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(12, 1fr)', gap: 6 }}>
-          {byMonth.map((m, i) => {
-            const maxCount = Math.max(...byMonth.map(b => b.count), 1)
-            const isTop = m.count === maxCount && m.count > 0
-            return (
-              <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
-                <span style={{
-                  fontSize: m.count > 0 ? (isTop ? 18 : 15) : 13,
-                  fontWeight: m.count > 0 ? (isTop ? 800 : 600) : 400,
-                  color: m.count === 0 ? '#D0D8E4' : isTop ? '#FF6200' : '#1C252E',
-                  lineHeight: 1,
-                }}>
-                  {m.count > 0 ? m.count : '—'}
-                </span>
-                <span style={{ fontSize: 10, color: '#9AAAB8', fontWeight: 500 }}>{m.mes}</span>
-              </div>
-            )
-          })}
-        </div>
-      </div>
 
       {/* Ranking de posts */}
       <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
