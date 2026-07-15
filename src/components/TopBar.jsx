@@ -22,7 +22,7 @@ const TITLES = {
   'insights':     { title: 'Insights',       sub: 'Análise inteligente de performance' },
   'upload':       { title: 'Upload',         sub: 'Adicionar post com extração automática' },
   'glossario':    { title: 'Glossário',      sub: 'Definições e métricas oficiais do Instagram' },
-  'oliver':       { title: 'Dados Oliver',   sub: 'Dados e histórico do assistente Oliver' },
+  'oliver':       { title: 'Dados Oliver',   sub: 'Dados e histórico' },
   'navarro':      { title: 'Navarro',        sub: 'Acompanhamento da parceria e links parametrizados' },
   // LinkedIn
   'linkedin-pagina':      { title: 'Visão da Página',  sub: 'Métricas mensais da página · LinkedIn' },
