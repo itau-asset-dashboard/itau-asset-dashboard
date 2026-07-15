@@ -153,19 +153,6 @@ export default function LinkedinPaginaView({ data, seguidores, ano, isEditMode, 
         })}
       </div>
 
-      {/* Segunda linha: Reações, Comentários, Compartilhamentos */}
-      <div style={{ display:'grid', gridTemplateColumns: mobile ? 'repeat(2,1fr)' : 'repeat(3,1fr)', gap: mobile ? 8 : 12 }}>
-        {['reacoes','comentarios','compartilhamentos'].map(key => {
-          const f = FIELDS.find(f => f.key === key)
-          return (
-            <div key={key} className="card" style={{ padding: pad }}>
-              <p style={{ color:'#8A9BB0', fontSize: mobile ? 9 : 10, fontWeight:600, textTransform:'uppercase', letterSpacing:'0.05em', marginBottom:8 }}>{f.label}</p>
-              <p style={{ color:'#1C252E', fontSize: fs, fontWeight:800, lineHeight:1, marginBottom:4 }}>{fmtN(totais[key])}</p>
-              <p style={{ color:'#A8B5C0', fontSize: mobile ? 9 : 11 }}>em {ano}</p>
-            </div>
-          )
-        })}
-      </div>
 
       {/* Seletor de mês */}
       <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', gap:8 }}>
