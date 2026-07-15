@@ -39,7 +39,7 @@ export const useStore = create(
       mesFiltro: '01/2026',
       oliverData: {}, // { 'MM/YYYY': { alcance_oliver: number, meta_oliver: number } }
       activeSection: (() => {
-        const VALID = ['visao-geral','visao-anual','insights','oliver','posts','etfs','glossario','stories','upload','navarro']
+        const VALID = ['visao-geral','visao-anual','insights','oliver','posts','etfs','glossario','stories','upload','navarro','linkedin-pagina','linkedin-geral','linkedin-performance','linkedin-posts','linkedin-pilula']
         const hash = typeof window !== 'undefined' ? window.location.hash.replace('#','') : ''
         return VALID.includes(hash) ? hash : 'visao-anual'
       })(),
@@ -211,7 +211,7 @@ export const useStore = create(
 
       // ── Setters simples ────────────────────────────────
       setApiKey:          (key) => set({ apiKey: key }),
-      setActiveSection:   (s)   => set({ activeSection: s }),
+      setActiveSection:   (s)   => { set({ activeSection: s }); if (typeof window !== 'undefined') window.location.hash = s },
       setEditMode: (v) => set({ isEditMode: v }),
       setInsights: (ins) => {
         set({ insights: ins })
