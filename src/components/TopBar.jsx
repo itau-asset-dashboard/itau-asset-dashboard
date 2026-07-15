@@ -18,7 +18,7 @@ const TITLES = {
   'visao-geral':  { title: 'Visão Mensal',   sub: 'Métricas de alcance do mês filtrado · Instagram' },
   'posts':        { title: 'Posts',          sub: 'Histórico completo de publicações · Instagram' },
   'stories':      { title: 'Stories',        sub: 'Análise de alcance dos stories · Instagram' },
-  'etfs':         { title: 'Pílula de ETFs', sub: 'Evolução e termômetro de performance das newsletters · Instagram' },
+  'etfs':         { title: 'ETFs', sub: 'Performance e evolução do tema ETFs · Instagram' },
   'insights':     { title: 'Insights',       sub: 'Análise inteligente de performance' },
   'upload':       { title: 'Upload',         sub: 'Adicionar post com extração automática' },
   'glossario':    { title: 'Glossário',      sub: 'Definições e métricas oficiais do Instagram' },

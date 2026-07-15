@@ -71,7 +71,7 @@ export default function ETFsView() {
   // ── Top posts ──────────────────────────────────────
   const topPosts = [...etfPosts]
     .sort((a,b) => (b.contas_alcancadas||0)-(a.contas_alcancadas||0))
-    .slice(0, 8)
+    .slice(0, 5)
   const maxAlc = topPosts[0]?.contas_alcancadas || 1
 
   // ── Por formato ────────────────────────────────────
@@ -254,7 +254,7 @@ export default function ETFsView() {
         <div className="card" style={{ padding: mobile ? '14px' : '20px' }}>
           <p style={{ color:'#1C252E', fontSize:13, fontWeight:700, marginBottom:16 }}>Nº de posts por mês</p>
           <div className="chart-wrapper"><ResponsiveContainer width="100%" height={mobile ? 100 : 120}>
-            <BarChart data={byMonth} margin={{top:4, right:4, left:0, bottom:0}}>
+            <BarChart data={byMonth.filter(m => m.posts > 0)} margin={{top:4, right:4, left:0, bottom:0}}>
               <XAxis dataKey="mes" tick={{ fill:'#9AAAB8', fontSize: mobile ? 9 : 11 }} axisLine={false} tickLine={false}/>
               <YAxis tick={{ fill:'#9AAAB8', fontSize:10 }} axisLine={false} tickLine={false}
                 allowDecimals={false} width={24}/>
@@ -263,9 +263,7 @@ export default function ETFsView() {
                 labelFormatter={(_,p) => p?.[0]?.payload?.mesFull || ''}
                 contentStyle={{ borderRadius:10, border:'1px solid #EAECF0', fontSize:12 }}
               />
-              <Bar dataKey="posts" radius={[6,6,0,0]} barSize={mobile ? 16 : 28}>
-                {byMonth.map((e,i) => <Cell key={i} fill={e.posts>0?'#C3EBF7':'#F0F2F5'}/>)}
-              </Bar>
+              <Bar dataKey="posts" radius={[6,6,0,0]} barSize={mobile ? 20 : 36} fill="#C3EBF7"/>
             </BarChart>
           </ResponsiveContainer></div>
         </div>
@@ -347,21 +345,13 @@ export default function ETFsView() {
           {/* Comparação vs outros temas */}
           <div style={{ marginTop:24, paddingTop:20, borderTop:'1px solid #F0F4F8' }}>
             <p style={{ color:'#1C252E', fontSize:13, fontWeight:700, marginBottom:14 }}>ETFs vs outros temas</p>
-            <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
-              {temaRank.slice(0,5).map(([tema,val]) => {
+            <div style={{ display:'flex', flexDirection:'column' }}>
+              {temaRank.slice(0,5).map(([tema,val], i) => {
                 const isEtf = ETF_TEMAS.includes(tema)
                 return (
-                  <div key={tema}>
-                    <div style={{ display:'flex', justifyContent:'space-between', marginBottom:4 }}>
-                      <span style={{ color: isEtf?'#1C252E':'#1C252E', fontSize:12,
-                        fontWeight: isEtf?700:400 }}>{tema}</span>
-                      <span style={{ color:'#9AAAB8', fontSize:11 }}>{fmt(val)}</span>
-                    </div>
-                    <div style={{ background:'#F0F2F5', borderRadius:3, height:6, overflow:'hidden' }}>
-                      <div style={{ height:'100%', borderRadius:3,
-                        background: isEtf?'#1C252E':'#D0D8E0',
-                        width:`${(val/maxTema)*100}%`, transition:'width 0.5s' }}/>
-                    </div>
+                  <div key={tema} style={{ display:'flex', justifyContent:'space-between', alignItems:'center', padding:'8px 0', borderBottom: i < 4 ? '1px solid #F0F2F5' : 'none' }}>
+                    <span style={{ color:'#1C252E', fontSize: isEtf?14:12, fontWeight: isEtf?500:400 }}>{tema}</span>
+                    <span style={{ color: isEtf?'#FF6200':'#1C252E', fontSize: isEtf?14:12, fontWeight:500 }}>{fmt(val)}</span>
                   </div>
                 )
               })}
