@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts'
 import { ArrowDown, ArrowUp, ArrowUpDown } from 'lucide-react'
 import { useIsMobile } from '../utils/useIsMobile'
+import { stripEmoji } from '../utils/temas'
 
 const MESES_LABEL = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez']
 const MESES_FULL  = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro']
@@ -233,7 +234,7 @@ export default function LinkedinVisaoGeral({ posts, ano, isEditMode, onEditPost 
                     </span>
                   </td>
                   <td style={{ padding: '10px 14px', maxWidth: mobile ? 160 : 200 }}>
-                    <p style={{ color: '#1C252E', fontSize: mobile ? 12 : 13, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.nome || '—'}</p>
+                    <p style={{ color: '#1C252E', fontSize: mobile ? 12 : 13, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{stripEmoji(p.nome) || '—'}</p>
                     {mobile && p.tipo && (
                       <span style={{ background: '#F0F4F8', color: '#4A6272', borderRadius: 5, padding: '1px 6px', fontSize: 10, fontWeight: 600 }}>{p.tipo}</span>
                     )}

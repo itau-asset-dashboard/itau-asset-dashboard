@@ -84,3 +84,7 @@ export function temasLabel(post) {
 export function normalizeTema(raw) {
   return getTemas({ tema: raw })
 }
+
+export function stripEmoji(str) {
+  return (str || '').replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE00}-\u{FEFF}]/gu, '').trim()
+}

@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, LineChart, Line, CartesianGrid } from 'recharts'
 import { useIsMobile } from '../utils/useIsMobile'
+import { stripEmoji } from '../utils/temas'
 
 const MESES_LABEL = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez']
 const MESES_FULL  = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro']
@@ -230,7 +231,7 @@ export default function LinkedinPilula({ posts, ano, isEditMode, onEditPost }) {
                         color: '#1C252E', fontSize: 13, fontWeight: 600,
                         overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: mobile ? 160 : 360,
                       }}>
-                        {p.nome || '—'}
+                        {stripEmoji(p.nome) || '—'}
                       </span>
                       <span style={{
                         background: perf.bg, color: perf.color,

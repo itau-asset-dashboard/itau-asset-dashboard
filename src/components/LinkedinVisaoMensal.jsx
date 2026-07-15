@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react'
 import { ChevronDown, ChevronUp } from 'lucide-react'
 import { useIsMobile } from '../utils/useIsMobile'
+import { stripEmoji } from '../utils/temas'
 
 const MESES_FULL = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro']
 
@@ -130,7 +131,7 @@ function FormatoCard({ cfg, posts, mobile, isEditMode, onEditPost }) {
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
                 <span style={{ color: i === 0 ? cor : '#C0CEDA', fontSize: 12, fontWeight: 700, flexShrink: 0 }}>{i + 1}</span>
                 <span style={{ color: '#1C252E', fontSize: 12, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                  {p.nome || '—'}
+                  {stripEmoji(p.nome) || '—'}
                 </span>
               </div>
               <div style={{ display: 'flex', gap: 12, flexShrink: 0 }}>

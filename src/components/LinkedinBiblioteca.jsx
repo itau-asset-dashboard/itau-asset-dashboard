@@ -1,6 +1,7 @@
 import { useState, useMemo, useCallback } from 'react'
 import { ArrowDown, ArrowUp, ArrowUpDown, Search, X, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useIsMobile } from '../utils/useIsMobile'
+import { stripEmoji } from '../utils/temas'
 import LinkedinUploadModal from './LinkedinUploadModal'
 
 const PAGE_SIZE = 10
@@ -169,7 +170,7 @@ export default function LinkedinBiblioteca({ allPosts, mesFiltro, isEditMode, on
                     <td style={{ padding: '12px 14px', overflow: 'hidden' }}>
                       <p style={{ color: '#1C252E', fontSize: mobile ? 12 : 13, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: mobile ? 160 : 260 }}>
                         {isTop && <span style={{ marginRight: 4 }}>⭐</span>}
-                        {p.nome || '—'}
+                        {stripEmoji(p.nome) || '—'}
                       </p>
                       {mobile
                         ? tc && <span style={{ background: tc.bg, color: tc.color, borderRadius: 5, padding: '1px 6px', fontSize: 10, fontWeight: 600 }}>{p.tipo}</span>
