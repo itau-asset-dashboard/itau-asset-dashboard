@@ -34,12 +34,6 @@ export default function KPICards() {
       accent: '#C3EBF7', iconBg: 'rgba(195,235,247,0.3)', icon: TrendingUp, highlight: false,
     },
     {
-      label: mobile ? 'Melhor' : 'Melhor post',
-      value: fmt(melhor?.contas_alcancadas),
-      sub: (melhor?.nome||melhor?.tema||'—').slice(0, mobile ? 16 : 24),
-      accent: '#1C252E', iconBg: 'rgba(195,235,247,0.3)', icon: Award, highlight: false,
-    },
-    {
       label: 'Posts',
       value: String(posts.length),
       sub: `${posts.filter(p=>p.status==='parcial').length} parciais`,
