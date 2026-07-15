@@ -171,41 +171,44 @@ export default function LinkedinVisaoGeral({ posts, ano, isEditMode, onEditPost 
 
       {/* Ranking de posts */}
       <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
-        <div style={{ padding: '16px 20px 12px', borderBottom: '1px solid #F0F4F8' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap', marginBottom: tiposDisponiveis.length > 1 ? 10 : 0 }}>
-            <p style={{ color: '#1C252E', fontSize: 14, fontWeight: 700 }}>Ranking de posts</p>
-            <div style={{ display:'inline-flex', background:'#F0F2F5', borderRadius:10, padding:3, gap:2 }}>
-              {['impressoes', 'cliques', 'reacoes'].map(k => (
-                <button key={k} onClick={() => toggleRank(k)} style={{
-                  padding: '5px 12px', borderRadius: 8, border: 'none', cursor: 'pointer',
-                  fontSize: 12, fontWeight: rankKey === k ? 600 : 400,
-                  background: rankKey === k ? '#fff' : 'transparent',
-                  color: rankKey === k ? '#1C252E' : '#8A9BB0',
-                  boxShadow: rankKey === k ? '0 1px 3px rgba(0,0,0,0.10)' : 'none',
-                  transition: 'all 0.15s',
-                }}>
-                  {k === 'impressoes' ? 'Impressões' : k === 'cliques' ? 'Cliques' : 'Reações'}
-                </button>
-              ))}
-            </div>
+        <div style={{ padding: '14px 20px', borderBottom: '1px solid #F0F4F8', display:'flex', alignItems:'center', gap:12, flexWrap:'wrap' }}>
+          <p style={{ color: '#1C252E', fontSize: 14, fontWeight: 700, marginRight: 4 }}>Ranking de posts</p>
+
+          {/* Métrica */}
+          <div style={{ display:'inline-flex', background:'#F0F2F5', borderRadius:10, padding:3, gap:2 }}>
+            {['impressoes', 'cliques', 'reacoes'].map(k => (
+              <button key={k} onClick={() => toggleRank(k)} style={{
+                padding: '5px 12px', borderRadius: 8, border: 'none', cursor: 'pointer',
+                fontSize: 12, fontWeight: rankKey === k ? 600 : 400,
+                background: rankKey === k ? '#fff' : 'transparent',
+                color: rankKey === k ? '#1C252E' : '#8A9BB0',
+                boxShadow: rankKey === k ? '0 1px 3px rgba(0,0,0,0.10)' : 'none',
+                transition: 'all 0.15s',
+              }}>
+                {k === 'impressoes' ? 'Impressões' : k === 'cliques' ? 'Cliques' : 'Reações'}
+              </button>
+            ))}
           </div>
+
           {/* Filtro de formato */}
           {tiposDisponiveis.length > 1 && (
-            <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap', marginTop: 10 }}>
+            <div style={{ display:'inline-flex', background:'#F0F2F5', borderRadius:10, padding:3, gap:2 }}>
               <button onClick={() => setTipoFiltro(null)} style={{
-                padding: '4px 12px', borderRadius: 8, fontSize: 11, cursor: 'pointer',
-                fontFamily: 'DM Sans, sans-serif', fontWeight: !tipoFiltro ? 600 : 400,
-                background: !tipoFiltro ? '#1C252E' : '#F0F2F5',
-                color: !tipoFiltro ? '#fff' : '#6B7B8D',
-                border: 'none',
+                padding: '5px 12px', borderRadius: 8, border: 'none', cursor: 'pointer',
+                fontSize: 12, fontWeight: !tipoFiltro ? 600 : 400,
+                background: !tipoFiltro ? '#fff' : 'transparent',
+                color: !tipoFiltro ? '#1C252E' : '#8A9BB0',
+                boxShadow: !tipoFiltro ? '0 1px 3px rgba(0,0,0,0.10)' : 'none',
+                transition: 'all 0.15s',
               }}>Todos</button>
               {tiposDisponiveis.map(t => (
                 <button key={t} onClick={() => setTipoFiltro(tipoFiltro === t ? null : t)} style={{
-                  padding: '4px 12px', borderRadius: 8, fontSize: 11, cursor: 'pointer',
-                  fontFamily: 'DM Sans, sans-serif', fontWeight: tipoFiltro === t ? 600 : 400,
-                  background: tipoFiltro === t ? '#1C252E' : '#F0F2F5',
-                  color: tipoFiltro === t ? '#fff' : '#6B7B8D',
-                  border: 'none',
+                  padding: '5px 12px', borderRadius: 8, border: 'none', cursor: 'pointer',
+                  fontSize: 12, fontWeight: tipoFiltro === t ? 600 : 400,
+                  background: tipoFiltro === t ? '#fff' : 'transparent',
+                  color: tipoFiltro === t ? '#1C252E' : '#8A9BB0',
+                  boxShadow: tipoFiltro === t ? '0 1px 3px rgba(0,0,0,0.10)' : 'none',
+                  transition: 'all 0.15s',
                 }}>{t}</button>
               ))}
             </div>
