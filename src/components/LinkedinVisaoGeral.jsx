@@ -150,7 +150,7 @@ export default function LinkedinVisaoGeral({ posts, ano, isEditMode, onEditPost 
       <div className="card" style={{ padding: 20 }}>
         <p style={{ color: '#1C252E', fontSize: 14, fontWeight: 700, marginBottom: 12 }}>Publicações por mês</p>
         <ResponsiveContainer width="100%" height={mobile ? 90 : 120}>
-          <BarChart data={byMonth} barSize={mobile ? 14 : 22} margin={{ top: 4, right: 4, left: 0, bottom: 0 }}>
+          <BarChart data={byMonth.filter(m => m.count > 0)} barSize={mobile ? 20 : 36} margin={{ top: 4, right: 4, left: 0, bottom: 0 }}>
             <XAxis dataKey="mes" tick={{ fill: '#9AAAB8', fontSize: mobile ? 9 : 11 }} axisLine={false} tickLine={false}/>
             <YAxis tick={{ fill: '#9AAAB8', fontSize: 10 }} axisLine={false} tickLine={false} allowDecimals={false} width={24}/>
             <Tooltip content={({ active, payload }) => {
