@@ -93,14 +93,16 @@ export default function PostsRanking() {
     setPage(0)
   }
 
+  const eng = (p) => ((p.curtidas || 0) + (p.comentarios || 0) + (p.reposts || 0) + (p.compartilhamentos || 0) + (p.salvamentos || 0))
+
   const sorted = [...posts].sort((a, b) => {
     if (sortKey === 'data_post') return sortDir * (parseDate(a.data_post) - parseDate(b.data_post))
+    if (sortKey === 'engajamento_total') return sortDir * (eng(a) - eng(b))
     return sortDir * ((a[sortKey] ?? 0) - (b[sortKey] ?? 0))
   })
 
   const pages = Math.ceil(sorted.length / PAGE_SIZE)
   const visible = sorted.slice(page * PAGE_SIZE, page * PAGE_SIZE + PAGE_SIZE)
-  const eng = (p) => ((p.curtidas || 0) + (p.comentarios || 0) + (p.reposts || 0) + (p.compartilhamentos || 0) + (p.salvamentos || 0))
 
   const SortIcon = ({ k }) => {
     if (sortKey !== k) return <ArrowUpDown size={11} color="#D0D8E0" />
@@ -207,7 +209,7 @@ export default function PostsRanking() {
               </th>
               <Th k="contas_alcancadas">Alcance</Th>
               {!mobile && <Th k="visualizacoes">Visual.</Th>}
-              {!mobile && <th style={{ padding: '11px 14px', color: '#8A9BB0', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', textAlign: 'left', background: '#FAFBFC' }}>Intera.</th>}
+              {!mobile && <Th k="engajamento_total">Intera.</Th>}
               {!mobile && <th style={{ padding: '11px 14px', color: '#8A9BB0', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', textAlign: 'left', background: '#FAFBFC' }}>Status</th>}
             </tr>
           </thead>

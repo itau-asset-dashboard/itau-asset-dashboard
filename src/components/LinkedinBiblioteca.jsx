@@ -147,7 +147,7 @@ export default function LinkedinBiblioteca({ allPosts, mesFiltro, isEditMode, on
                   {mobile ? 'Post' : 'Post / Tema'}
                 </th>
                 {!mobile && <th style={{ padding: '11px 14px', color: '#8A9BB0', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', textAlign: 'left', background: '#FAFBFC', whiteSpace: 'nowrap' }}>Tipo</th>}
-                <Th k="impressoes">Impressões</Th>
+                <Th k="impressoes">Impres.</Th>
                 {!mobile && <Th k="visualizacoes">Visual.</Th>}
                 {!mobile && <Th k="cliques">Cliques</Th>}
                 {!mobile && <Th k="ctr">CTR</Th>}
