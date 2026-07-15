@@ -1,12 +1,13 @@
-import { Users, Eye, Heart, MessageCircle, Bookmark, Share2, Clock, UserPlus, AlertCircle, CheckCircle, Play, Zap, UserCheck, Monitor, PlayCircle, FileText, MousePointerClick, Percent } from 'lucide-react'
+import { Users, Eye, Heart, MessageCircle, Bookmark, Share2, RefreshCw, Clock, UserPlus, AlertCircle, CheckCircle, Play, Zap, UserCheck, Monitor, PlayCircle, FileText, MousePointerClick, Percent } from 'lucide-react'
 
 const FEED = [
   { termo: 'Contas alcançadas',   icon: Users,         color: '#FF6200', bg: 'rgba(255,98,0,0.08)',    definicao: 'Número de contas únicas do Instagram que viram este post pelo menos uma vez. Essa métrica é estimada pelo Instagram.' },
   { termo: 'Visualizações',       icon: Eye,           color: '#1C252E', bg: 'rgba(195,235,247,0.25)',     definicao: 'Número de vezes que o post foi exibido no total — inclui a mesma conta ver mais de uma vez.' },
   { termo: 'Curtidas',            icon: Heart,         color: '#E11D48', bg: 'rgba(225,29,72,0.08)',     definicao: 'Número de contas que curtiram o post. Representado pelo ícone de coração no app mobile.' },
   { termo: 'Comentários',         icon: MessageCircle, color: '#FF6200', bg: 'rgba(28,37,46,0.06)',    definicao: 'Número de comentários feitos no post. Representado pelo ícone de balão de fala no app mobile.' },
-  { termo: 'Salvamentos',         icon: Bookmark,      color: '#1C252E', bg: 'rgba(28,37,46,0.06)',     definicao: 'Contas que salvaram o post para ver depois. Representado pelo ícone de marcador/bookmark no app mobile.' },
-  { termo: 'Compartilhamentos',   icon: Share2,        color: '#0F7EC0', bg: 'rgba(15,126,192,0.08)',    definicao: 'Inclui encaminhamentos diretos e reposts. Representado pelo ícone de avião de papel ou seta circular no app mobile.' },
+  { termo: 'Reposts',             icon: RefreshCw,     color: '#0F7EC0', bg: 'rgba(15,126,192,0.08)',   definicao: 'Vezes que o post foi repostado no feed de outros usuários. Representado pelo ícone de setas cruzadas/circulares (🔄) no app mobile.' },
+  { termo: 'Compartilhamentos',   icon: Share2,        color: '#0F7EC0', bg: 'rgba(15,126,192,0.08)',    definicao: 'Envios diretos do post para outras pessoas via DM ou fora do Instagram. Representado pelo ícone de avião de papel (✈) no app mobile.' },
+  { termo: 'Salvamentos',         icon: Bookmark,      color: '#1C252E', bg: 'rgba(28,37,46,0.06)',     definicao: 'Contas que salvaram o post para ver depois. Representado pelo ícone de bandeirinha/bookmark (🔖) no app mobile.' },
   { termo: 'Tempo médio de visualização', icon: Clock, color: '#D97706', bg: 'rgba(217,119,6,0.08)',    definicao: 'Tempo médio gasto na reprodução do reel. Calculado dividindo o tempo total de visualização pelo número de visualizações iniciais.' },
   { termo: 'Seguidores ganhos',   icon: UserPlus,      color: '#1C252E', bg: 'rgba(195,235,247,0.25)',     definicao: 'Número de contas que começaram a seguir o perfil a partir deste post.' },
   { termo: 'Dado parcial',        icon: AlertCircle,   color: '#D97706', bg: 'rgba(217,119,6,0.08)',     definicao: 'Métricas ainda em atualização — o Instagram pode levar alguns dias para estabilizar os números de alcance e visualizações.' },

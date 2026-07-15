@@ -100,7 +100,7 @@ export default function PostsRanking() {
 
   const pages = Math.ceil(sorted.length / PAGE_SIZE)
   const visible = sorted.slice(page * PAGE_SIZE, page * PAGE_SIZE + PAGE_SIZE)
-  const eng = (p) => ((p.curtidas || 0) + (p.comentarios || 0) + (p.salvamentos || 0) + (p.compartilhamentos || 0))
+  const eng = (p) => ((p.curtidas || 0) + (p.comentarios || 0) + (p.reposts || 0) + (p.compartilhamentos || 0) + (p.salvamentos || 0))
 
   const SortIcon = ({ k }) => {
     if (sortKey !== k) return <ArrowUpDown size={11} color="#D0D8E0" />
@@ -184,7 +184,7 @@ export default function PostsRanking() {
             { label: 'Posts',      value: sorted.length,                                                           color: '#1C252E' },
             { label: 'Alcance',    value: sorted.reduce((s,p)=>s+(p.contas_alcancadas||0),0),                      color: '#FF6200' },
             { label: 'Visualiz.',  value: sorted.reduce((s,p)=>s+(p.visualizacoes||0),0),                          color: '#1C252E' },
-            { label: 'Engajam.',   value: sorted.reduce((s,p)=>s+((p.curtidas||0)+(p.comentarios||0)+(p.salvamentos||0)+(p.compartilhamentos||0)),0), color: '#1C252E' },
+            { label: 'Engajam.',   value: sorted.reduce((s,p)=>s+((p.curtidas||0)+(p.comentarios||0)+(p.reposts||0)+(p.compartilhamentos||0)+(p.salvamentos||0)),0), color: '#1C252E' },
           ].map(({ label, value, color }) => (
             <div key={label}>
               <p style={{ fontSize: 10, fontWeight: 600, color: '#B0BEC5', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 3 }}>{label}</p>

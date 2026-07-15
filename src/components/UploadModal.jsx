@@ -32,13 +32,15 @@ const NUM_FIELDS = [
   { key: 'visualizacoes',     label: 'Visualizações',
     tooltip: 'Quantas vezes o post foi exibido no total (inclui a mesma conta ver mais de uma vez).' },
   { key: 'curtidas',          label: 'Curtidas',
-    tooltip: 'Ícone de coração (♡) no app mobile. Número de contas que curtiram o post.' },
+    tooltip: 'Ícone de coração (❤) no app mobile. Número de contas que curtiram o post.' },
   { key: 'comentarios',       label: 'Comentários',
-    tooltip: 'Ícone de balão de fala no app mobile. Número de comentários no post.' },
-  { key: 'salvamentos',       label: 'Salvamentos',
-    tooltip: 'Ícone de marcador/bookmark no app mobile. Contas que salvaram o post para ver depois.' },
+    tooltip: 'Ícone de balão de fala (💬) no app mobile. Número de comentários no post.' },
+  { key: 'reposts',           label: 'Reposts',
+    tooltip: 'Ícone de setas cruzadas/circulares (🔄) no app mobile. Vezes que o post foi repostado no feed de outros.' },
   { key: 'compartilhamentos', label: 'Compartilhamentos',
-    tooltip: 'Ícone de avião de papel ou seta circular no app mobile. Inclui encaminhamentos e reposts.' },
+    tooltip: 'Ícone de avião de papel (✈) no app mobile. Envios diretos para outras pessoas via DM ou fora do Instagram.' },
+  { key: 'salvamentos',       label: 'Salvamentos',
+    tooltip: 'Ícone de bandeirinha/bookmark (🔖) no app mobile. Contas que salvaram o post para ver depois.' },
 ]
 
 const inp = (highlight) => ({
@@ -108,7 +110,7 @@ async function compressImage(dataUrl, maxPx = 1400, quality = 0.90) {
 const EMPTY = {
   nome: '', link_post: '', tema: [], data_post: '', data_evidencia: '', tipo: 'Reels', descricao: '',
   contas_alcancadas: '', visualizacoes: '',
-  curtidas: '', comentarios: '', salvamentos: '', compartilhamentos: '',
+  curtidas: '', comentarios: '', reposts: '', compartilhamentos: '', salvamentos: '',
   status: 'parcial', imageData: null,
 }
 
@@ -163,11 +165,11 @@ const SinglePostModal = forwardRef(function SinglePostModal({ initialPost, initi
         tipo:              data.tipo              ?? f.tipo,
         contas_alcancadas: data.contas_alcancadas ?? f.contas_alcancadas,
         visualizacoes:     data.visualizacoes     ?? f.visualizacoes,
-        interacoes:        data.interacoes        ?? f.interacoes,
         curtidas:          data.curtidas          ?? f.curtidas,
         comentarios:       data.comentarios       ?? f.comentarios,
-        salvamentos:       data.salvamentos       ?? f.salvamentos,
+        reposts:           data.reposts           ?? f.reposts,
         compartilhamentos: data.compartilhamentos ?? f.compartilhamentos,
+        salvamentos:       data.salvamentos       ?? f.salvamentos,
       }))
     } catch (e) {
       setError('Não foi possível extrair os dados: ' + (e.message || 'erro desconhecido'))

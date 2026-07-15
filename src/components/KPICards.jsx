@@ -1,4 +1,4 @@
-import { Users, TrendingUp, Award, FileText } from 'lucide-react'
+import { Users, TrendingUp, Award, FileText, Heart } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import { useIsMobile } from '../utils/useIsMobile'
 
@@ -17,6 +17,8 @@ export default function KPICards() {
   const melhor = posts.length > 0
     ? posts.reduce((a,b) => (a.contas_alcancadas||0)>(b.contas_alcancadas||0)?a:b, posts[0])
     : null
+  const interacoes = posts.reduce((s,p) =>
+    s + (p.curtidas||0) + (p.comentarios||0) + (p.reposts||0) + (p.compartilhamentos||0) + (p.salvamentos||0), 0)
 
   const cards = [
     {
@@ -43,6 +45,12 @@ export default function KPICards() {
       sub: `${posts.filter(p=>p.status==='parcial').length} parciais`,
       accent: '#1C252E', iconBg: 'rgba(28,37,46,0.08)', icon: FileText, highlight: false,
     },
+    {
+      label: 'Interações',
+      value: fmt(interacoes),
+      sub: 'curtidas, coment., reposts, compart., salvam.',
+      accent: '#FF6200', iconBg: 'rgba(255,98,0,0.10)', icon: Heart, highlight: false,
+    },
   ]
 
   return (
@@ -50,7 +58,7 @@ export default function KPICards() {
     {/* CSS injetado — garante 2 colunas no mobile independente de qualquer cache */}
     <style>{`
       @media (max-width: 768px) {
-        .kpi-grid-js { grid-template-columns: repeat(2,1fr) !important; gap: 8px !important; }
+        .kpi-grid-js { grid-template-columns: repeat(3,1fr) !important; gap: 8px !important; }
         .kpi-card-js { padding: 10px !important; }
         .kpi-label-js { font-size: 8px !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; margin-bottom: 5px !important; }
         .kpi-number-js { font-size: 16px !important; margin-bottom: 2px !important; }
@@ -63,7 +71,7 @@ export default function KPICards() {
     `}</style>
     <div className="kpi-grid-js" style={{
       display: 'grid',
-      gridTemplateColumns: mobile ? 'repeat(2,1fr)' : 'repeat(4,1fr)',
+      gridTemplateColumns: mobile ? 'repeat(3,1fr)' : 'repeat(5,1fr)',
       gap: mobile ? 8 : 14,
       marginBottom: 14,
     }}>

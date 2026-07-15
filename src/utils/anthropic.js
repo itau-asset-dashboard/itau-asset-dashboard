@@ -44,19 +44,29 @@ FORMATO DESKTOP (painel web do Instagram/Meta Business Suite):
 
 FORMATO MOBILE — TELA DE INSIGHTS DO POST (app Instagram):
   Há duas sub-variações:
-  a) Tela de insights detalhados: mostra cards/blocos com os valores de "Contas alcançadas", "Impressões" ou "Visualizações", e seções de engajamento com os números de curtidas, comentários, salvamentos e compartilhamentos escritos por extenso ou com ícone + número.
-  b) Tela resumida abaixo do post: ícones em linha — coração (♡/❤) = curtidas, balão de fala = comentários, avião de papel ou seta = compartilhamentos, marcador/bookmark = salvamentos. Abaixo aparecem cards "Visualizações" e "Contas alcançadas".
+  a) Tela de insights detalhados: mostra cards com "Contas alcançadas", "Visualizações", e seção de engajamento com ícones + números em linha horizontal.
+  b) Tela resumida abaixo do post: ícones em linha seguidos de número.
+
+MAPEAMENTO EXATO DOS ÍCONES MOBILE (na ordem em que aparecem na tela):
+  ❤ Coração              → curtidas
+  💬 Balão de fala        → comentarios
+  🔄 Setas cruzadas/circulares (recycle arrows) → reposts
+  ✈ Avião de papel / seta diagonal → compartilhamentos
+  🔖 Bandeirinha / marcador (bookmark) → salvamentos
+
+ATENÇÃO: reposts (setas cruzadas) e compartilhamentos (avião) são campos SEPARADOS. Não some nem confunda os dois.
 
 FORMATO MOBILE — FEED/PERFIL:
-  Pode mostrar apenas o número de curtidas abaixo da imagem. Extraia o que estiver visível.
+  Pode mostrar apenas curtidas abaixo da imagem. Extraia o que estiver visível.
 
 Independente do formato, procure qualquer número associado a:
   - alcance / contas alcançadas / accounts reached
   - impressões / visualizações / views / impressions
   - curtidas / likes / ❤
   - comentários / comments
-  - salvamentos / saves / bookmarks
-  - compartilhamentos / shares / reposts
+  - reposts / reshares / setas cruzadas
+  - compartilhamentos / shares / avião
+  - salvamentos / saves / bookmarks / bandeirinha
 
 Retorne APENAS um JSON válido (sem markdown, sem texto fora do JSON):
 {
@@ -66,8 +76,9 @@ Retorne APENAS um JSON válido (sem markdown, sem texto fora do JSON):
   "visualizacoes": número inteiro ou null,
   "curtidas": número inteiro ou null,
   "comentarios": número inteiro ou null,
-  "salvamentos": número inteiro ou null,
-  "compartilhamentos": número inteiro ou null
+  "reposts": número inteiro ou null,
+  "compartilhamentos": número inteiro ou null,
+  "salvamentos": número inteiro ou null
 }
 Use null para qualquer campo não encontrado. Não invente valores.`
           }
@@ -329,7 +340,7 @@ export async function chatWithData(messages, posts, stories, metaMensal, metaAnu
   const postsMes   = posts.filter(p => mesKey(p.data_post) === mesFiltro)
   const storiesMes = stories.filter(s => mesKey(s.data)    === mesFiltro)
 
-  const engPost = p => (p.curtidas||0)+(p.comentarios||0)+(p.salvamentos||0)+(p.compartilhamentos||0)
+  const engPost = p => (p.curtidas||0)+(p.comentarios||0)+(p.reposts||0)+(p.compartilhamentos||0)+(p.salvamentos||0)
 
   // ── Resumo mensal de POSTS (pré-calculado — evita erros de soma da IA) ──
   const postsPorMesMap = {}

@@ -66,8 +66,8 @@ export default function TopBar() {
   }, [linkedinPosts])
 
   function exportCSV() {
-    const headers = ['Data','Tipo','Tema','Contas Alcançadas','Visualizações','Curtidas','Comentários','Salvamentos','Compartilhamentos','Status']
-    const rows = posts.map(p => [p.data_post,p.tipo,p.tema,p.contas_alcancadas,p.visualizacoes,p.curtidas,p.comentarios,p.salvamentos,p.compartilhamentos,p.status])
+    const headers = ['Data','Tipo','Tema','Contas Alcançadas','Visualizações','Curtidas','Comentários','Reposts','Compartilhamentos','Salvamentos','Status']
+    const rows = posts.map(p => [p.data_post,p.tipo,p.tema,p.contas_alcancadas,p.visualizacoes,p.curtidas,p.comentarios,p.reposts,p.compartilhamentos,p.salvamentos,p.status])
     const csv = [headers,...rows].map(r=>r.map(c=>`"${c??''}"`).join(',')).join('\n')
     const a = Object.assign(document.createElement('a'),{href:URL.createObjectURL(new Blob([csv],{type:'text/csv'})),download:`instagram-${mesFiltro?.replace('/','_')}.csv`})
     a.click()

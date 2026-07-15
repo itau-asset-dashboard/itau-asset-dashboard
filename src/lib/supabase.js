@@ -45,7 +45,7 @@ export async function uploadImage(postId, dataUrl) {
 // Colunas que existem na tabela posts do Supabase
 const POST_COLUMNS = [
   'id','nome','link_post','tema','data_post','tipo','descricao',
-  'contas_alcancadas','visualizacoes','curtidas','comentarios','salvamentos','compartilhamentos',
+  'contas_alcancadas','visualizacoes','curtidas','comentarios','salvamentos','reposts','compartilhamentos',
   'status','historico','atualizado_em','image_url','data_evidencia',
 ]
 
