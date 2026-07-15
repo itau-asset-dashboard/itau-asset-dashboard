@@ -95,10 +95,11 @@ export default function ETFsView() {
       return pts?.[1]===mm && pts?.[2]===ano
     })
     return {
-      mes:     MESES_LABEL[i],
-      mesFull: MESES_FULL[i],
-      alcance: mp.reduce((s,p) => s+(p.contas_alcancadas||0), 0),
-      posts:   mp.length,
+      mes:        MESES_LABEL[i],
+      mesFull:    MESES_FULL[i],
+      alcance:    mp.reduce((s,p) => s+(p.contas_alcancadas||0), 0),
+      posts:      mp.length,
+      interacoes: mp.reduce((s,p) => s+(p.curtidas||0)+(p.comentarios||0)+(p.reposts||0)+(p.compartilhamentos||0)+(p.salvamentos||0), 0),
     }
   })
 
@@ -209,7 +210,7 @@ export default function ETFsView() {
 
       {/* Gráfico — anual mostra barras mensais; mensal mostra barras por formato */}
       {viewMode === 'anual' ? (
-        <div style={{ display:'grid', gridTemplateColumns: mobile ? '1fr' : '1fr 1fr', gap: mobile ? 8 : 12 }}>
+        <div style={{ display:'grid', gridTemplateColumns: mobile ? '1fr' : '1fr 1fr 1fr', gap: mobile ? 8 : 12 }}>
           <div className="card" style={{ padding: mobile ? '14px' : '20px' }}>
             <p style={{ color:'#1C252E', fontSize:13, fontWeight:700, marginBottom:16 }}>Alcance por mês</p>
             <div className="chart-wrapper"><ResponsiveContainer width="100%" height={mobile ? 140 : 180}>
@@ -224,6 +225,25 @@ export default function ETFsView() {
                 />
                 <Bar dataKey="alcance" radius={[6,6,0,0]} barSize={mobile ? 16 : 22}>
                   {byMonth.map((e,i) => <Cell key={i} fill={e.alcance>0?'#1C252E':'#F0F2F5'}/>)}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer></div>
+          </div>
+
+          <div className="card" style={{ padding: mobile ? '14px' : '20px' }}>
+            <p style={{ color:'#1C252E', fontSize:13, fontWeight:700, marginBottom:16 }}>Interações por mês</p>
+            <div className="chart-wrapper"><ResponsiveContainer width="100%" height={mobile ? 140 : 180}>
+              <BarChart data={byMonth} margin={{top:4, right:4, left:0, bottom:0}}>
+                <XAxis dataKey="mes" tick={{ fill:'#9AAAB8', fontSize: mobile ? 9 : 11 }} axisLine={false} tickLine={false}/>
+                <YAxis tick={{ fill:'#9AAAB8', fontSize:10 }} axisLine={false} tickLine={false}
+                  tickFormatter={v=>v===0?'':fmt(v)} width={mobile ? 34 : 44}/>
+                <Tooltip
+                  formatter={v => [fmt(v),'Interações']}
+                  labelFormatter={(_,p) => p?.[0]?.payload?.mesFull || ''}
+                  contentStyle={{ borderRadius:10, border:'1px solid #EAECF0', fontSize:12 }}
+                />
+                <Bar dataKey="interacoes" radius={[6,6,0,0]} barSize={mobile ? 16 : 22}>
+                  {byMonth.map((e,i) => <Cell key={i} fill={e.interacoes>0?'#FF6200':'#F0F2F5'}/>)}
                 </Bar>
               </BarChart>
             </ResponsiveContainer></div>
