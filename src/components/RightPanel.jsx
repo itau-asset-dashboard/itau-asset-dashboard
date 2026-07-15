@@ -68,7 +68,7 @@ export default function RightPanel() {
 
   return (
     <aside className="right-panel-desktop" style={{
-      width: 272,
+      width: 252,
       height: '100%',
       background: 'linear-gradient(160deg, #ffffff 0%, #F5F8FA 60%, #EEF4F8 100%)',
       borderLeft: '1px solid #E8ECF0',
@@ -76,14 +76,14 @@ export default function RightPanel() {
       flexDirection: 'column',
       alignItems: 'center',
       justifyContent: 'center',
-      padding: '32px 20px',
+      padding: '24px 20px',
       flexShrink: 0,
-      gap: 24,
+      gap: 20,
     }}>
 
       {/* Label do mês */}
       <div style={{ textAlign: 'center' }}>
-        <p style={{ color: '#8A9BB0', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+        <p style={{ color: '#B0BEC5', fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
           Meta mensal
         </p>
         <p style={{ color: '#1C252E', fontSize: 13, fontWeight: 600, marginTop: 3 }}>{mesNome} {yyyyFiltro}</p>

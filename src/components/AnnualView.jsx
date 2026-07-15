@@ -15,7 +15,7 @@ function fmt(n) {
   return n.toLocaleString('pt-BR')
 }
 
-const TIPO_COLOR = { Carrossel:'#FF6200', Reels:'#1C252E', 'Foto estática':'#C3EBF7' }
+const TIPO_COLOR = { Carrossel:'#FF8040', Reels:'#8A9BB0', 'Foto estática':'#C3EBF7' }
 
 export default function AnnualView() {
   const { getPostsDoAno, metaAnual, mesFiltro, posts: allPosts } = useStore()

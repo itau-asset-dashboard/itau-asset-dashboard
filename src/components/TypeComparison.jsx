@@ -8,8 +8,8 @@ function fmt(n) {
 
 // Carrossel → laranja, Reels → azul escuro, Foto → azul claro
 const CONFIGS = {
-  Carrossel:      { bar:'#FF6200',  text:'#FF6200',  badge:'rgba(255,98,0,0.1)',   badgeText:'#cc4f00' },
-  Reels:          { bar:'#1C252E',  text:'#1C252E',  badge:'rgba(28,37,46,0.1)',   badgeText:'#1C252E' },
+  Carrossel:      { bar:'#FF8040',  text:'#FF8040',  badge:'rgba(255,128,64,0.1)', badgeText:'#cc5500' },
+  Reels:          { bar:'#8A9BB0',  text:'#8A9BB0',  badge:'rgba(138,155,176,0.1)',badgeText:'#5a6b80' },
   'Foto estática':{ bar:'#C3EBF7', text:'#1a7a96',  badge:'rgba(195,235,247,0.5)',badgeText:'#1a7a96' },
 }
 
@@ -30,29 +30,19 @@ export default function TypeComparison() {
   return (
     <div className="card" style={{ padding:'18px 20px', marginBottom:14 }}>
       <h2 style={{ color:'#1C252E', fontSize:14, fontWeight:700, marginBottom:14 }}>Performance por tipo</h2>
-      <div style={{ display:'flex', flexDirection:'column', gap:12 }}>
-        {stats.map(({ tipo, count, media, pct }) => {
+      <div style={{ display:'flex', flexDirection:'column' }}>
+        {stats.map(({ tipo, count, media, pct }, i) => {
           const cfg = CONFIGS[tipo]
-          const isLider = tipo===lider.tipo
+          const isFirst = i === 0
           return (
-            <div key={tipo}>
-              <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:6 }}>
-                <div style={{ display:'flex', alignItems:'center', gap:7 }}>
-                  <div style={{ width:8, height:8, borderRadius:2, background:cfg.bar, border: tipo==='Foto estática'?'1px solid #1a7a96':'none' }} />
-                  <span style={{ fontSize:13, color:'#1C252E', fontWeight:isLider?600:400 }}>{tipo}</span>
-                  {isLider && (
-                    <span style={{ fontSize:10, fontWeight:700, color:cfg.badgeText, background:cfg.badge, padding:'2px 7px', borderRadius:20 }}>
-                      Líder
-                    </span>
-                  )}
-                </div>
-                <div style={{ display:'flex', alignItems:'center', gap:10 }}>
-                  <span style={{ color:'#8A9BB0', fontSize:11 }}>{count} post{count!==1?'s':''} · {pct}%</span>
-                  <span style={{ color:cfg.text, fontSize:14, fontWeight:700, minWidth:52, textAlign:'right' }}>{fmt(media)}</span>
-                </div>
+            <div key={tipo} style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'10px 0', borderBottom: i < stats.length-1 ? '1px solid #F0F2F5' : 'none' }}>
+              <div style={{ display:'flex', alignItems:'center', gap:7 }}>
+                <div style={{ width:8, height:8, borderRadius:2, flexShrink:0, background:cfg.bar, border: tipo==='Foto estática'?'1px solid #1a7a96':'none' }} />
+                <span style={{ fontSize: isFirst?14:13, color:'#1C252E', fontWeight:500 }}>{tipo}</span>
               </div>
-              <div style={{ background:'#F0F4F8', borderRadius:999, height:6, overflow:'hidden' }}>
-                <div style={{ width:`${(media/maxMedia)*100}%`, height:'100%', background:cfg.bar, borderRadius:999, opacity:isLider?1:0.55, transition:'width 0.5s ease' }} />
+              <div style={{ display:'flex', alignItems:'center', gap:10 }}>
+                <span style={{ color:'#8A9BB0', fontSize:11 }}>{count} post{count!==1?'s':''} · {pct}%</span>
+                <span style={{ color: isFirst?'#FF6200':cfg.text, fontSize: isFirst?15:13, fontWeight:500, minWidth:52, textAlign:'right' }}>{fmt(media)}</span>
               </div>
             </div>
           )

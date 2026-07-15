@@ -12,7 +12,7 @@ function fmt(n) {
   return n
 }
 
-const COLOR = { Carrossel: '#FF6200', Reels: '#1C252E', 'Foto estática': '#C3EBF7' }
+const COLOR = { Carrossel: '#1C252E', Reels: '#1C252E', 'Foto estática': '#1C252E' }
 const BORDER_COLOR = {}
 
 const CustomTooltip = ({ active, payload }) => {
@@ -58,20 +58,7 @@ export default function PostsChart() {
     <div className="card" style={{ padding: mobile ? '16px 14px' : '22px 24px', marginBottom: 18 }}>
       {/* Header */}
       <div style={{ marginBottom: 16 }}>
-        <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between' }}>
-          <h2 style={{ color:'#0F1923', fontSize:15, fontWeight:700, margin:0, letterSpacing:'-0.02em' }}>Alcance por post</h2>
-          {/* Legenda compacta */}
-          <div style={{ display:'flex', alignItems:'center', gap: mobile ? 8 : 16, flexWrap:'wrap' }}>
-            {Object.entries(COLOR).map(([tipo, cor]) => (
-              <div key={tipo} style={{ display:'flex', alignItems:'center', gap:5 }}>
-                <div style={{ width:8, height:8, borderRadius:2, background:cor, border: BORDER_COLOR[tipo] ? `1.5px solid ${BORDER_COLOR[tipo]}` : 'none', flexShrink:0 }} />
-                <span style={{ color:'#A8B5C0', fontSize: mobile ? 10 : 11, whiteSpace:'nowrap', fontWeight:500 }}>
-                  {mobile ? tipo.replace(' estática','') : tipo}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
+        <h2 style={{ color:'#0F1923', fontSize:15, fontWeight:700, margin:0, letterSpacing:'-0.02em' }}>Alcance por post</h2>
       </div>
 
       {data.length === 0 ? (

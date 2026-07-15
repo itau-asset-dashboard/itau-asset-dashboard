@@ -13,9 +13,9 @@ function fmt(n) {
 }
 
 export const TIPO_COLOR = {
-  Carrossel: '#FF6200',
-  Reels: '#182638',
-  'Foto estática': '#0EA5E9',
+  Carrossel: '#FF8040',
+  Reels: '#8A9BB0',
+  'Foto estática': '#C3EBF7',
 }
 export const TIPO_BG = {
   Carrossel: 'rgba(255,98,0,0.09)',
@@ -78,28 +78,22 @@ export const PostRankRow = memo(function PostRankRow({ post, i, maxVal, firstCol
     >
       <PositionPill i={i} />
 
-      {/* Nome + barra */}
+      {/* Nome */}
       <div style={{ flex: 1, minWidth: 0 }}>
         <p style={{
-          color: '#182638', fontSize: 13, fontWeight: 600,
-          overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 4,
+          color: '#182638', fontSize: i === 0 ? 14 : 13, fontWeight: i === 0 ? 600 : 500,
+          overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
         }}>
           {post.nome || post.tema || '—'}
         </p>
-        <div style={{ background: '#F0F2F5', borderRadius: 3, height: 6, overflow: 'hidden' }}>
-          <div style={{
-            height: '100%', borderRadius: 3,
-            background: barColor, width: `${pct}%`, transition: 'width 0.5s ease',
-          }} />
-        </div>
+        <p style={{ color: '#A8B5C0', fontSize: 10, marginTop: 2 }}>{post.data_post}</p>
       </div>
 
-      {/* Valor + data */}
+      {/* Valor */}
       <div style={{ textAlign: 'right', flexShrink: 0 }}>
-        <p style={{ color: i === 0 ? firstColor : '#182638', fontSize: 14, fontWeight: 800 }}>
+        <p style={{ color: i === 0 ? firstColor : '#182638', fontSize: i === 0 ? 15 : 13, fontWeight: i === 0 ? 700 : 500 }}>
           {fmt(post.contas_alcancadas)}
         </p>
-        <p style={{ color: '#A8B5C0', fontSize: 10, marginTop: 1 }}>{post.data_post}</p>
       </div>
     </div>
   )

@@ -24,7 +24,7 @@ function pct(a, b) {
   return ((a/b)*100).toFixed(1)+'%'
 }
 
-const TIPO_COLOR = { Carrossel:'#FF6200', Reels:'#1C252E', 'Foto estática':'#C3EBF7' }
+const TIPO_COLOR = { Carrossel:'#FF8040', Reels:'#8A9BB0', 'Foto estática':'#C3EBF7' }
 const ETF_TEMAS  = ['ETFs']
 
 export default function ETFsView() {
