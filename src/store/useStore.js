@@ -211,7 +211,7 @@ export const useStore = create(
 
       // ── Setters simples ────────────────────────────────
       setApiKey:          (key) => set({ apiKey: key }),
-      setActiveSection:   (s)   => { set({ activeSection: s }); if (typeof window !== 'undefined') window.location.hash = s },
+      setActiveSection:   (s)   => set({ activeSection: s }),
       setEditMode: (v) => set({ isEditMode: v }),
       setInsights: (ins) => {
         set({ insights: ins })

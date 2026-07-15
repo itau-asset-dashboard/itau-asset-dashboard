@@ -18,7 +18,8 @@ export default function MetaMensalBanner() {
   const total = posts.reduce((s, p) => s + (p.contas_alcancadas || 0), 0)
   const [mm, yyyy] = (mesFiltro || '').split('/')
   const meta = calcMetaMesProgressiva({ posts: allPosts, metaAnual, mm, yyyy })
-  const pct  = meta > 0 ? Math.min((total / meta) * 100, 100) : 0
+  const pct     = meta > 0 ? (total / meta) * 100 : 0
+  const barWidth = Math.min(pct, 100)
   const mesNome = MESES_NOMES[(parseInt(mm, 10) || 1) - 1]
 
   if (!mobile) return null
@@ -37,7 +38,7 @@ export default function MetaMensalBanner() {
         <div style={{
           height: '100%', borderRadius: 6,
           background: pct >= 100 ? '#16a34a' : '#FF6200',
-          width: `${pct}%`,
+          width: `${barWidth}%`,
           transition: 'width 0.6s ease',
         }} />
       </div>
