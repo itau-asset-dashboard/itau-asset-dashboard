@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react'
 import { Plus, Eye, Zap, UserCheck, Search, X, Film, CheckSquare, Square, LayoutList, BarChart2 } from 'lucide-react'
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ReferenceLine, ResponsiveContainer, Cell } from 'recharts'
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ReferenceLine, ResponsiveContainer, Cell, LabelList } from 'recharts'
 import { useStore } from '../store/useStore'
 import StoryUploadModal from './StoryUploadModal'
 import ImageLightbox from './ImageLightbox'
@@ -141,6 +141,17 @@ function fmtY(n) {
   if (n >= 1000) return (n/1000).toFixed(0) + 'K'
   return n
 }
+function fmtAxis(v) {
+  if (v >= 1000000) return (v/1000000).toFixed(0)+'M'
+  if (v >= 1000)    return (v/1000).toFixed(0)+'K'
+  return String(v)
+}
+function fmtLabel(v) {
+  if (!v) return ''
+  if (v >= 1000000) return (v/1000000).toFixed(1).replace('.',',')+'M'
+  if (v >= 1000)    return (v/1000).toFixed(0)+'K'
+  return String(v)
+}
 
 function StoriesChartTooltip({ active, payload, metrica }) {
   if (!active || !payload?.length) return null
@@ -176,13 +187,16 @@ function MiniChart({ metrica, data, mobile }) {
           <span style={{ color: '#1C252E', fontWeight: 700 }}>{fmt(media)}</span> /mês
         </p>
       </div>
-      <ResponsiveContainer width="100%" height={mobile ? 80 : 110}>
-        <BarChart data={data} margin={{ top: 2, right: 4, left: 0, bottom: 0 }}>
+      <ResponsiveContainer width="100%" height={mobile ? 130 : 170}>
+        <BarChart data={data} margin={{ top: 22, right: 4, left: 0, bottom: 0 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#F0F2F5" vertical={false} />
           <XAxis dataKey="mes" tick={{ fontSize: mobile ? 9 : 10, fill: '#B0BEC5' }} axisLine={false} tickLine={false} />
-          <YAxis hide />
+          <YAxis tickFormatter={fmtAxis} tick={{ fontSize: 9, fill: '#C0CEDA' }} axisLine={false} tickLine={false} width={mobile ? 28 : 34} />
           <Tooltip content={<StoriesChartTooltip metrica={metrica} />} cursor={{ fill: 'rgba(0,0,0,0.03)', radius: 4 }} />
-          <Bar dataKey="valor" radius={[3, 3, 0, 0]} maxBarSize={mobile ? 20 : 36} fill={metrica.color} fillOpacity={0.9} />
+          <Bar dataKey="valor" radius={[4, 4, 0, 0]} maxBarSize={mobile ? 20 : 36} fill={metrica.color} fillOpacity={0.9}>
+            <LabelList dataKey="valor" position="top" formatter={fmtLabel}
+              style={{ fontSize: mobile ? 8 : 10, fontWeight: 700, fill: metrica.color }} />
+          </Bar>
         </BarChart>
       </ResponsiveContainer>
     </div>
