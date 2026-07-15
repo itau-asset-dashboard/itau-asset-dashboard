@@ -84,10 +84,7 @@ export default function OliverView() {
       {/* Header */}
       <div style={{ display:'flex', alignItems:'flex-start', justifyContent:'space-between', flexWrap:'wrap', gap:10 }}>
         <div>
-          <h2 style={{ color: '#1C252E', fontSize: mobile ? 16 : 20, fontWeight: 800 }}>Acompanhamento Oliver</h2>
-          <p style={{ color: '#9AAAB8', fontSize: 12, marginTop: 2 }}>
-            Comparativo Oliver vs Instagram · {ano}
-          </p>
+          <h2 style={{ color: '#1C252E', fontSize: mobile ? 16 : 20, fontWeight: 800 }}>Dados e histórico</h2>
         </div>
         <div style={{ display:'flex', background:'rgba(28,37,46,0.06)', borderRadius:12, padding:3, gap:2 }}>
           {['2025','2026'].map(a => (

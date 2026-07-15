@@ -56,10 +56,6 @@ export default function Glossario() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
       <div>
-        <h2 style={{ color: '#1C252E', fontSize: 15, fontWeight: 700 }}>Glossário de métricas</h2>
-        <p style={{ color: '#8A9BB0', fontSize: 12, marginTop: 2 }}>Definições oficiais de métricas do Instagram e LinkedIn</p>
-      </div>
-      <div>
         <p style={{ color:'#FF6200', fontSize:11, fontWeight:700, letterSpacing:'0.08em', textTransform:'uppercase', marginBottom:16 }}>Instagram</p>
         <Section title="Feed" items={FEED} />
         <div style={{ marginTop:24 }}/>
