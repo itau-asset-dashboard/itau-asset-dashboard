@@ -158,13 +158,19 @@ export default function AnnualView() {
               </div>
               <p style={{ color:'#1C252E', fontSize:22, fontWeight:800, marginBottom:2 }}>{pct.toFixed(1)}%</p>
               <p style={{ color:'#9AAAB8', fontSize:12 }}>atingido</p>
-              <div style={{ marginTop:14, display:'flex', justifyContent:'space-between', alignItems:'center' }}>
-                <span style={{ color:'#9AAAB8', fontSize:12 }}>Faltam</span>
-                <span style={{ color:'#1C252E', fontSize:14, fontWeight:700 }}>{fmt(restante)}</span>
-              </div>
-              <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginTop:8 }}>
-                <span style={{ color:'#9AAAB8', fontSize:12 }}>Meta mensal</span>
-                <span style={{ color:'#FF6200', fontSize:14, fontWeight:700 }}>{fmt(metaMesAtualizada)}</span>
+              <div style={{ marginTop:16, background:'#F8FAFC', borderRadius:10, overflow:'hidden' }}>
+                <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', padding:'11px 14px' }}>
+                  <span style={{ color:'#9AAAB8', fontSize:12 }}>Faltam para a meta</span>
+                  <span style={{ color:'#1C252E', fontSize:14, fontWeight:700 }}>{fmt(restante)}</span>
+                </div>
+                <div style={{ height:1, background:'#EEF0F3', margin:'0 14px' }}/>
+                <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', padding:'11px 14px' }}>
+                  <span style={{ color:'#9AAAB8', fontSize:12 }}>Meta mensal</span>
+                  <div style={{ display:'flex', alignItems:'center', gap:5 }}>
+                    <span style={{ color:'#FF6200', fontSize:14, fontWeight:700 }}>{fmt(metaMesAtualizada)}</span>
+                    {metaMesAtualizada !== Math.round(metaAnual/12) && <span style={{ color:'#C3BFBA', fontSize:10 }}>↻</span>}
+                  </div>
+                </div>
               </div>
             </>
           )}
