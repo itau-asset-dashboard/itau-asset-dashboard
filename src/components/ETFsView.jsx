@@ -329,32 +329,17 @@ export default function ETFsView() {
         <div className="card" style={{ padding: mobile ? '14px' : '22px' }}>
           <p style={{ color:'#1C252E', fontSize:15, fontWeight:700, marginBottom:4 }}>Por formato</p>
           <p style={{ color:'#9AAAB8', fontSize:12, marginBottom:18 }}>Dentro do tema ETFs</p>
-          <div style={{ display:'flex', flexDirection:'column', gap:18 }}>
+          <div style={{ display:'flex', flexDirection:'column' }}>
             {porTipo.map((t,i) => (
-              <div key={t.tipo}>
-                <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:7 }}>
-                  <div style={{ display:'flex', alignItems:'center', gap:7 }}>
-                    <div style={{ width:9, height:9, borderRadius:3,
-                      background: TIPO_COLOR[t.tipo] || '#C3EBF7' }}/>
-                    <span style={{ color:'#1C252E', fontSize:13, fontWeight:500 }}>{t.tipo}</span>
-                    {i===0 && t.total>0 && (
-                      <span style={{ background:'rgba(255,98,0,0.1)', color:'#FF6200',
-                        borderRadius:6, padding:'1px 7px', fontSize:10, fontWeight:700 }}>Líder</span>
-                    )}
-                  </div>
-                  <div style={{ textAlign:'right' }}>
-                    <span style={{ color:'#1C252E', fontSize:13, fontWeight:700 }}>{fmt(t.total)}</span>
-                    <span style={{ color:'#9AAAB8', fontSize:11, marginLeft:5 }}>{t.count} posts</span>
-                  </div>
+              <div key={t.tipo} style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'10px 0', borderBottom: i < porTipo.length-1 ? '1px solid #F0F2F5' : 'none' }}>
+                <div style={{ display:'flex', alignItems:'center', gap:7 }}>
+                  <div style={{ width:8, height:8, borderRadius:2, flexShrink:0, background: TIPO_COLOR[t.tipo] || '#C3EBF7' }}/>
+                  <span style={{ color:'#1C252E', fontSize: i===0?14:13, fontWeight:500 }}>{t.tipo}</span>
                 </div>
-                <div style={{ background:'#F0F2F5', borderRadius:4, height:6, overflow:'hidden', marginBottom:4 }}>
-                  <div style={{ height:'100%', borderRadius:4,
-                    background: TIPO_COLOR[t.tipo]||'#C3EBF7',
-                    width:`${maxTipo>0?(t.total/maxTipo)*100:0}%`, transition:'width 0.5s' }}/>
+                <div style={{ textAlign:'right' }}>
+                  <span style={{ color: i===0?'#FF6200':'#1C252E', fontSize: i===0?15:13, fontWeight:500 }}>{fmt(t.total)}</span>
+                  <span style={{ color:'#9AAAB8', fontSize:11, marginLeft:5 }}>{t.count} posts</span>
                 </div>
-                <p style={{ color:'#9AAAB8', fontSize:11 }}>
-                  Média: {fmt(t.media)} · {pct(t.total, totalEtf)} do total ETF
-                </p>
               </div>
             ))}
           </div>

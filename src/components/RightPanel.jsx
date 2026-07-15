@@ -62,7 +62,7 @@ export default function RightPanel() {
   const superou  = pctReal > 100
 
   // Anel SVG
-  const R = 54, CIRC = 2 * Math.PI * R
+  const R = 44, CIRC = 2 * Math.PI * R
   const dash = (pctMensal / 100) * CIRC
   const ringColor = atingiu ? '#16a34a' : '#FF6200'
 
@@ -90,31 +90,22 @@ export default function RightPanel() {
       </div>
 
       {/* Anel de progresso */}
-      <div style={{ position: 'relative', width: 140, height: 140 }}>
-        {/* Glow sutil atrás do anel */}
-        <div style={{
-          position: 'absolute', inset: 12, borderRadius: '50%',
-          background: atingiu ? 'rgba(22,163,74,0.06)' : 'rgba(255,98,0,0.06)',
-          filter: 'blur(8px)',
-        }} />
-        <svg width="140" height="140" viewBox="0 0 140 140" style={{ position: 'relative' }}>
-          {/* Trilha */}
-          <circle cx="70" cy="70" r={R} fill="none" stroke="#E8ECF0" strokeWidth="10"/>
-          {/* Progresso */}
-          <circle cx="70" cy="70" r={R} fill="none"
-            stroke={ringColor} strokeWidth="10"
+      <div style={{ position: 'relative', width: 110, height: 110 }}>
+        <svg width="110" height="110" viewBox="0 0 110 110" style={{ position: 'relative' }}>
+          <circle cx="55" cy="55" r={R} fill="none" stroke="#E8ECF0" strokeWidth="9"/>
+          <circle cx="55" cy="55" r={R} fill="none"
+            stroke={ringColor} strokeWidth="9"
             strokeLinecap="round"
             strokeDasharray={`${dash} ${CIRC - dash}`}
-            transform="rotate(-90 70 70)"
+            transform="rotate(-90 55 55)"
             style={{ transition: 'stroke-dasharray 0.7s ease, stroke 0.4s ease' }}
           />
         </svg>
-        {/* Texto central */}
         <div style={{
           position: 'absolute', inset: 0,
           display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
         }}>
-          <span style={{ color: ringColor, fontSize: 28, fontWeight: 800, lineHeight: 1 }}>
+          <span style={{ color: ringColor, fontSize: 24, fontWeight: 800, lineHeight: 1 }}>
             {pctReal.toFixed(0)}%
           </span>
           <span style={{ color: '#8A9BB0', fontSize: 10, marginTop: 3 }}>do mês</span>
@@ -122,59 +113,33 @@ export default function RightPanel() {
       </div>
 
       {/* Números */}
-      <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 10 }}>
+      <div style={{ width: '100%', display: 'flex', flexDirection: 'column' }}>
         {/* Alcançado */}
-        <div style={{
-          background: 'rgba(255,255,255,0.7)', borderRadius: 12,
-          border: '1px solid rgba(232,236,240,0.8)',
-          padding: '12px 16px',
-          display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-          backdropFilter: 'blur(4px)',
-        }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 0', borderBottom: '1px solid #EAECF0' }}>
           <span style={{ color: '#8A9BB0', fontSize: 11, fontWeight: 600 }}>Alcançado</span>
           <span style={{ color: '#FF6200', fontSize: 15, fontWeight: 800 }}>{fmt(totalMensal)}</span>
         </div>
 
         {/* Meta */}
-        <div style={{
-          background: 'rgba(255,255,255,0.7)', borderRadius: 12,
-          border: '1px solid rgba(232,236,240,0.8)',
-          padding: '12px 16px',
-          display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-          backdropFilter: 'blur(4px)',
-        }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 0', borderBottom: '1px solid #EAECF0' }}>
           <span style={{ color: '#8A9BB0', fontSize: 11, fontWeight: 600 }}>Meta</span>
           <EditableValue value={metaAjustada} color="#1C252E" onSave={setMetaMensal}/>
         </div>
 
         {/* Falta / Atingiu */}
         {!atingiu && falta > 0 && (
-          <div style={{
-            background: 'rgba(255,98,0,0.05)', borderRadius: 12,
-            border: '1px solid rgba(255,98,0,0.15)',
-            padding: '12px 16px',
-            display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-          }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 0' }}>
             <span style={{ color: '#8A9BB0', fontSize: 11, fontWeight: 600 }}>Faltam</span>
             <span style={{ color: '#C05010', fontSize: 14, fontWeight: 700 }}>{fmt(falta)}</span>
           </div>
         )}
         {atingiu && !superou && (
-          <div style={{
-            background: 'rgba(22,163,74,0.06)', borderRadius: 12,
-            border: '1px solid rgba(22,163,74,0.2)',
-            padding: '12px 16px', textAlign: 'center',
-          }}>
+          <div style={{ padding: '10px 0', textAlign: 'center' }}>
             <span style={{ color: '#16a34a', fontSize: 12, fontWeight: 700 }}>✓ Meta atingida</span>
           </div>
         )}
         {superou && (
-          <div style={{
-            background: 'rgba(22,163,74,0.06)', borderRadius: 12,
-            border: '1px solid rgba(22,163,74,0.2)',
-            padding: '12px 16px',
-            display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-          }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 0' }}>
             <span style={{ color: '#16a34a', fontSize: 12, fontWeight: 700 }}>↑ Meta superada</span>
             <span style={{ color: '#16a34a', fontSize: 13, fontWeight: 800 }}>+{fmt(excesso)}</span>
           </div>

@@ -158,14 +158,13 @@ export default function AnnualView() {
               </div>
               <p style={{ color:'#1C252E', fontSize:22, fontWeight:800, marginBottom:2 }}>{pct.toFixed(1)}%</p>
               <p style={{ color:'#9AAAB8', fontSize:12 }}>atingido</p>
-              <div style={{ marginTop:16, padding:'12px 14px', background:'#F8FAFC', borderRadius:10 }}>
-                <p style={{ color:'#9AAAB8', fontSize:11, marginBottom:4 }}>Faltam para a meta</p>
-                <p style={{ color:'#1C252E', fontSize:18, fontWeight:700 }}>{fmt(restante)}</p>
+              <div style={{ marginTop:14, display:'flex', justifyContent:'space-between', alignItems:'center' }}>
+                <span style={{ color:'#9AAAB8', fontSize:12 }}>Faltam</span>
+                <span style={{ color:'#1C252E', fontSize:14, fontWeight:700 }}>{fmt(restante)}</span>
               </div>
-              <div style={{ marginTop:10, padding:'12px 14px', background:'#FFF3ED', borderRadius:10, border:'1px solid rgba(255,98,0,0.12)' }}>
-                <p style={{ color:'#9AAAB8', fontSize:11, marginBottom:4 }}>Meta mensal atualizada</p>
-                <p style={{ color:'#FF6200', fontSize:18, fontWeight:700 }}>{fmt(metaMesAtualizada)}</p>
-                <p style={{ color:'#9AAAB8', fontSize:10, marginTop:2 }}>↻ ajustada pelo saldo acumulado</p>
+              <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginTop:8 }}>
+                <span style={{ color:'#9AAAB8', fontSize:12 }}>Meta mensal</span>
+                <span style={{ color:'#FF6200', fontSize:14, fontWeight:700 }}>{fmt(metaMesAtualizada)}</span>
               </div>
             </>
           )}
@@ -218,28 +217,16 @@ export default function AnnualView() {
         {/* Por tipo */}
         <div className="card" style={{ padding:'22px' }}>
           <p style={{ color:'#1C252E', fontSize:15, fontWeight:700, marginBottom:18 }}>Performance por tipo</p>
-          <div style={{ display:'flex', flexDirection:'column', gap:16 }}>
+          <div style={{ display:'flex', flexDirection:'column' }}>
             {porTipo.map((t,i)=>(
-              <div key={t.tipo}>
-                <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:7 }}>
-                  <div style={{ display:'flex', alignItems:'center', gap:8 }}>
-                    <div style={{ width:10, height:10, borderRadius:3, background:TIPO_COLOR[t.tipo]==='#C3EBF7'?'#7ecde8':TIPO_COLOR[t.tipo] }}/>
-                    <span style={{ color:'#1C252E', fontSize:13, fontWeight:500 }}>{t.tipo}</span>
-                    {i===0&&t.total>0&&(
-                      <span style={{ background:'rgba(255,98,0,0.1)', color:'#FF6200', borderRadius:6, padding:'1px 7px', fontSize:10, fontWeight:700 }}>Líder</span>
-                    )}
-                  </div>
-                  <div style={{ textAlign:'right' }}>
-                    <span style={{ color:'#1C252E', fontSize:14, fontWeight:700 }}>{fmt(t.total)}</span>
-                    <span style={{ color:'#9AAAB8', fontSize:11, marginLeft:6 }}>{t.count} posts</span>
-                  </div>
+              <div key={t.tipo} style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'10px 0', borderBottom: i < porTipo.length-1 ? '1px solid #F0F2F5' : 'none' }}>
+                <div style={{ display:'flex', alignItems:'center', gap:8 }}>
+                  <div style={{ width:8, height:8, borderRadius:2, flexShrink:0, background:TIPO_COLOR[t.tipo]==='#C3EBF7'?'#7ecde8':TIPO_COLOR[t.tipo] }}/>
+                  <span style={{ color:'#1C252E', fontSize: i===0?14:13, fontWeight:500 }}>{t.tipo}</span>
                 </div>
-                <div style={{ background:'#F0F2F5', borderRadius:4, height:6, overflow:'hidden' }}>
-                  <div style={{
-                    height:'100%', borderRadius:4,
-                    background: TIPO_COLOR[t.tipo]==='#C3EBF7' ? '#7ecde8' : TIPO_COLOR[t.tipo],
-                    width:`${(t.total/maxTipo)*100}%`, transition:'width 0.5s ease'
-                  }}/>
+                <div style={{ textAlign:'right' }}>
+                  <span style={{ color: i===0?'#FF6200':'#1C252E', fontSize: i===0?15:13, fontWeight:500 }}>{fmt(t.total)}</span>
+                  <span style={{ color:'#9AAAB8', fontSize:11, marginLeft:6 }}>{t.count} posts</span>
                 </div>
               </div>
             ))}
@@ -252,24 +239,13 @@ export default function AnnualView() {
           {porTema.length === 0 ? (
             <p style={{ color:'#9AAAB8', fontSize:13, textAlign:'center', marginTop:32 }}>Adicione temas aos posts para ver aqui</p>
           ) : (
-            <div style={{ display:'flex', flexDirection:'column', gap:14 }}>
-              {porTema.map(([tema,val],i)=>{
-                const maxVal = porTema[0][1]
-                return (
-                  <div key={tema}>
-                    <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:6 }}>
-                      <div style={{ display:'flex', alignItems:'center', gap:8 }}>
-                        {i===0&&<span style={{ fontSize:13 }}>🏆</span>}
-                        <span style={{ color:'#1C252E', fontSize:13, fontWeight:500 }}>{tema}</span>
-                      </div>
-                      <span style={{ color:'#1C252E', fontSize:13, fontWeight:700 }}>{fmt(val)}</span>
-                    </div>
-                    <div style={{ background:'#F0F2F5', borderRadius:4, height:6, overflow:'hidden' }}>
-                      <div style={{ height:'100%', borderRadius:4, background:'#C3EBF7', width:`${(val/maxVal)*100}%`, transition:'width 0.5s ease' }}/>
-                    </div>
-                  </div>
-                )
-              })}
+            <div style={{ display:'flex', flexDirection:'column' }}>
+              {porTema.map(([tema,val],i)=>(
+                <div key={tema} style={{ display:'flex', justifyContent:'space-between', alignItems:'center', padding:'10px 0', borderBottom: i < porTema.length-1 ? '1px solid #F0F2F5' : 'none' }}>
+                  <span style={{ color:'#1C252E', fontSize: i===0?14:13, fontWeight:500 }}>{tema}</span>
+                  <span style={{ color: i===0?'#FF6200':'#1C252E', fontSize: i===0?15:13, fontWeight:500 }}>{fmt(val)}</span>
+                </div>
+              ))}
             </div>
           )}
         </div>
