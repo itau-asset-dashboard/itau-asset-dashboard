@@ -71,7 +71,7 @@ export default function ETFsView() {
   // ── Top posts ──────────────────────────────────────
   const topPosts = [...etfPosts]
     .sort((a,b) => (b.contas_alcancadas||0)-(a.contas_alcancadas||0))
-    .slice(0, 5)
+    .slice(0, 10)
   const maxAlc = topPosts[0]?.contas_alcancadas || 1
 
   // ── Por formato ────────────────────────────────────
@@ -288,7 +288,6 @@ export default function ETFsView() {
           <p style={{ color:'#1C252E', fontSize:15, fontWeight:700, marginBottom:4 }}>
             Top posts ETF {viewMode === 'mensal' ? `· ${MESES_LABEL[mesSel]}` : ''}
           </p>
-          <p style={{ color:'#9AAAB8', fontSize:12, marginBottom:18 }}>Clique para editar</p>
           <div style={{ display:'flex', flexDirection:'column', gap:2 }}>
             {topPosts.length === 0 && (
               <p style={{ color:'#9AAAB8', fontSize:13, textAlign:'center', padding:'32px 0' }}>
