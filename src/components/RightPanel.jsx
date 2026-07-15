@@ -89,53 +89,29 @@ export default function RightPanel() {
         <p style={{ color: '#1C252E', fontSize: 13, fontWeight: 600, marginTop: 3 }}>{mesNome} {yyyyFiltro}</p>
       </div>
 
-      {/* Anel de progresso */}
-      <div style={{ position: 'relative', width: 110, height: 110 }}>
-        <svg width="110" height="110" viewBox="0 0 110 110" style={{ position: 'relative' }}>
-          <circle cx="55" cy="55" r={R} fill="none" stroke="#E8ECF0" strokeWidth="9"/>
-          <circle cx="55" cy="55" r={R} fill="none"
-            stroke={ringColor} strokeWidth="9"
-            strokeLinecap="round"
-            strokeDasharray={`${dash} ${CIRC - dash}`}
-            transform="rotate(-90 55 55)"
-            style={{ transition: 'stroke-dasharray 0.7s ease, stroke 0.4s ease' }}
-          />
-        </svg>
-        <div style={{
-          position: 'absolute', inset: 0,
-          display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-        }}>
-          <span style={{ color: ringColor, fontSize: 24, fontWeight: 800, lineHeight: 1 }}>
-            {pctReal.toFixed(0)}%
-          </span>
-          <span style={{ color: '#8A9BB0', fontSize: 10, marginTop: 3 }}>do mês</span>
-        </div>
+      {/* % grande */}
+      <div style={{ textAlign: 'center' }}>
+        <p style={{ color: ringColor, fontSize: 52, fontWeight: 800, lineHeight: 1, letterSpacing: '-0.03em' }}>
+          {pctReal.toFixed(0)}%
+        </p>
+        <p style={{ color: '#9AAAB8', fontSize: 12, marginTop: 6 }}>da meta atingida</p>
       </div>
 
-      {/* Números */}
-      <div style={{ width: '100%', background: 'rgba(0,0,0,0.03)', borderRadius: 14, overflow: 'hidden' }}>
-        {/* Alcançado — linha principal */}
-        <div style={{ padding: '16px 18px' }}>
-          <p style={{ color: '#B0BEC5', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 8 }}>Alcançado</p>
-          <p style={{ color: ringColor, fontSize: 28, fontWeight: 800, lineHeight: 1, marginBottom: 6 }}>{fmt(totalMensal)}</p>
-          {!atingiu && falta > 0 && (
-            <p style={{ color: '#9AAAB8', fontSize: 12 }}>faltam {fmt(falta)} para a meta</p>
-          )}
-          {atingiu && !superou && (
-            <p style={{ color: '#16a34a', fontSize: 12, fontWeight: 600 }}>✓ meta atingida</p>
-          )}
-          {superou && (
-            <p style={{ color: '#16a34a', fontSize: 12, fontWeight: 600 }}>+{fmt(excesso)} acima da meta</p>
-          )}
-        </div>
+      {/* Barra de progresso */}
+      <div style={{ width: '100%', background: '#E8ECF0', borderRadius: 6, height: 8, overflow: 'hidden' }}>
+        <div style={{ height: '100%', borderRadius: 6, background: ringColor, width: `${barWidth}%`, transition: 'width 0.6s ease' }}/>
+      </div>
 
-        {/* Meta */}
-        <div style={{ borderTop: '1px solid #E8ECF0', padding: '13px 18px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <span style={{ color: '#B0BEC5', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Meta</span>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            <EditableValue value={metaAjustada} color="#1C252E" onSave={setMetaMensal}/>
-            {metaAjustada !== metaMesOriginal && <span style={{ color: '#C3BFBA', fontSize: 10 }}>↻</span>}
-          </div>
+      {/* Dois cards lado a lado */}
+      <div style={{ width: '100%', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+        <div style={{ background: 'rgba(0,0,0,0.03)', borderRadius: 12, padding: '12px 14px' }}>
+          <p style={{ color: '#B0BEC5', fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>Alcançado</p>
+          <p style={{ color: ringColor, fontSize: 20, fontWeight: 800, lineHeight: 1 }}>{fmt(totalMensal)}</p>
+        </div>
+        <div style={{ background: 'rgba(0,0,0,0.03)', borderRadius: 12, padding: '12px 14px' }}>
+          <p style={{ color: '#B0BEC5', fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>Meta</p>
+          <p style={{ color: '#8A9BB0', fontSize: 20, fontWeight: 800, lineHeight: 1 }}>{fmt(metaAjustada)}</p>
+          {metaAjustada !== metaMesOriginal && <p style={{ color: '#C0CEDA', fontSize: 10, marginTop: 4 }}>↻ ajustada</p>}
         </div>
       </div>
 
