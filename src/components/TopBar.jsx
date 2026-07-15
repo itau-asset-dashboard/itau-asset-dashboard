@@ -99,15 +99,6 @@ return (
           <h1 className="topbar-title" style={{ color: '#0F1923', fontSize: 17, fontWeight: 700, lineHeight: 1.2, letterSpacing: '-0.025em', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{section.title}</h1>
           <p className="topbar-sub" style={{ color: '#B0BEC5', fontSize: 11.5, marginTop: 2, letterSpacing: '0.01em' }}>{section.sub}</p>
         </div>
-        {/* Badge de modo */}
-        {!isEditMode && (
-          <span style={{
-            display: 'inline-flex', alignItems: 'center',
-            color: '#B0C4CE', opacity: 0.7,
-          }}>
-            <Eye size={13} />
-          </span>
-        )}
       </div>
 
       <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
@@ -166,6 +157,18 @@ return (
           </button>
         )}
 
+
+        {/* Badge modo visualização */}
+        {!isEditMode && (
+          <span style={{
+            display: 'inline-flex', alignItems: 'center', gap: 4,
+            background: 'rgba(195,235,247,0.3)', color: '#1a7a96',
+            border: '1px solid rgba(195,235,247,0.8)',
+            borderRadius: 10, padding: '7px 9px', fontSize: 11,
+          }}>
+            <Eye size={14} />
+          </span>
+        )}
 
         {/* Botão cadeado */}
         <div style={{ position: 'relative' }}>
