@@ -306,7 +306,7 @@ export default function ETFsView() {
           </div>
         </div>
 
-        {/* Performance por formato + comparação temas */}
+        {/* Por formato */}
         <div className="card" style={{ padding: mobile ? '14px' : '22px' }}>
           <p style={{ color:'#1C252E', fontSize:15, fontWeight:700, marginBottom:4 }}>Por formato</p>
           <p style={{ color:'#9AAAB8', fontSize:12, marginBottom:18 }}>Dentro do tema ETFs</p>
@@ -324,22 +324,22 @@ export default function ETFsView() {
               </div>
             ))}
           </div>
+        </div>
+      </div>
 
-          {/* Comparação vs outros temas */}
-          <div style={{ marginTop:24, paddingTop:20, borderTop:'1px solid #F0F4F8' }}>
-            <p style={{ color:'#1C252E', fontSize:13, fontWeight:700, marginBottom:14 }}>ETFs vs outros temas</p>
-            <div style={{ display:'flex', flexDirection:'column' }}>
-              {temaRank.slice(0,5).map(([tema,val], i) => {
-                const isEtf = ETF_TEMAS.includes(tema)
-                return (
-                  <div key={tema} style={{ display:'flex', justifyContent:'space-between', alignItems:'center', padding:'8px 0', borderBottom: i < 4 ? '1px solid #F0F2F5' : 'none' }}>
-                    <span style={{ color:'#1C252E', fontSize: isEtf?14:12, fontWeight: isEtf?500:400 }}>{tema}</span>
-                    <span style={{ color: isEtf?'#FF6200':'#1C252E', fontSize: isEtf?14:12, fontWeight:500 }}>{fmt(val)}</span>
-                  </div>
-                )
-              })}
-            </div>
-          </div>
+      {/* ETFs vs outros temas — full width */}
+      <div className="card" style={{ padding: mobile ? '14px' : '22px' }}>
+        <p style={{ color:'#1C252E', fontSize:15, fontWeight:700, marginBottom:18 }}>ETFs vs outros temas</p>
+        <div style={{ display:'grid', gridTemplateColumns: mobile ? '1fr' : 'repeat(5,1fr)', gap: mobile ? 0 : 0 }}>
+          {temaRank.slice(0,5).map(([tema,val], i) => {
+            const isEtf = ETF_TEMAS.includes(tema)
+            return (
+              <div key={tema} style={{ display:'flex', justifyContent:'space-between', alignItems:'center', padding:'10px 0', borderBottom: mobile || i < 4 ? '1px solid #F0F2F5' : 'none', ...(mobile ? {} : { flexDirection:'column', alignItems:'flex-start', padding:'0 20px', borderBottom:'none', borderRight: i < 4 ? '1px solid #F0F2F5' : 'none' }) }}>
+                <span style={{ color: isEtf?'#1C252E':'#8A9BB0', fontSize:12, fontWeight: isEtf?600:400, marginBottom: mobile?0:6 }}>{tema}</span>
+                <span style={{ color: isEtf?'#FF6200':'#1C252E', fontSize: isEtf?16:14, fontWeight:600 }}>{fmt(val)}</span>
+              </div>
+            )
+          })}
         </div>
       </div>
 
