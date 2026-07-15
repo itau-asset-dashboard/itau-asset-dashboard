@@ -71,7 +71,7 @@ export default function ETFsView() {
   // ── Top posts ──────────────────────────────────────
   const topPosts = [...etfPosts]
     .sort((a,b) => (b.contas_alcancadas||0)-(a.contas_alcancadas||0))
-    .slice(0, 10)
+    .slice(0, 5)
   const maxAlc = topPosts[0]?.contas_alcancadas || 1
 
   // ── Por formato ────────────────────────────────────
@@ -281,7 +281,7 @@ export default function ETFsView() {
       )}
 
       {/* Top posts + Performance por formato */}
-      <div style={{ display:'grid', gridTemplateColumns: mobile ? '1fr' : '2fr 1fr', gap:16 }} className="annual-grid">
+      <div style={{ display:'grid', gridTemplateColumns: mobile ? '1fr' : '2fr 1fr', gap:16, alignItems:'stretch' }} className="annual-grid">
 
         {/* Top posts */}
         <div className="card" style={{ padding: mobile ? '14px' : '22px' }}>
