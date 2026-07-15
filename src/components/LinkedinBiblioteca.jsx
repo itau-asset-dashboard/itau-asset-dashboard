@@ -152,6 +152,7 @@ export default function LinkedinBiblioteca({ allPosts, mesFiltro, isEditMode, on
                 {!mobile && <Th k="cliques">Cliques</Th>}
                 {!mobile && <Th k="ctr">CTR</Th>}
                 {!mobile && <Th k="reacoes">Reações</Th>}
+                {!mobile && <th style={{ padding: '11px 14px', color: '#8A9BB0', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', textAlign: 'left', background: '#FAFBFC', whiteSpace: 'nowrap' }}>Status</th>}
               </tr>
             </thead>
             <tbody>
@@ -191,6 +192,14 @@ export default function LinkedinBiblioteca({ allPosts, mesFiltro, isEditMode, on
                     {!mobile && <td style={{ padding: '12px 14px', color: '#1C252E', fontSize: 13, whiteSpace: 'nowrap' }}>{fmtN(p.cliques)}</td>}
                     {!mobile && <td style={{ padding: '12px 14px', color: '#1C252E', fontSize: 13, whiteSpace: 'nowrap' }}>{fmtCtr(p.ctr)}</td>}
                     {!mobile && <td style={{ padding: '12px 14px', color: '#1C252E', fontSize: 13, whiteSpace: 'nowrap' }}>{fmtN(p.reacoes)}</td>}
+                    {!mobile && (
+                      <td style={{ padding: '12px 14px' }}>
+                        {p.status === 'parcial'
+                          ? <span style={{ background: 'rgba(245,158,11,0.12)', color: '#f59e0b', borderRadius: 6, padding: '2px 7px', fontSize: 11, fontWeight: 600 }}>Parcial</span>
+                          : <span style={{ background: 'rgba(34,197,94,0.1)', color: '#16a34a', borderRadius: 6, padding: '2px 7px', fontSize: 11, fontWeight: 600 }}>Final</span>
+                        }
+                      </td>
+                    )}
                   </tr>
                 )
               })}
