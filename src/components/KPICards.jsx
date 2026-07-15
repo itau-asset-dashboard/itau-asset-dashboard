@@ -48,7 +48,7 @@ export default function KPICards() {
     {
       label: 'Interações',
       value: fmt(interacoes),
-      sub: 'curtidas, coment., reposts, compart., salvam.',
+      sub: '',
       accent: '#FF6200', iconBg: 'rgba(255,98,0,0.10)', icon: Heart, highlight: false,
     },
   ]
