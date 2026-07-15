@@ -31,7 +31,7 @@ export default function TopPostsMes() {
         <p style={{ color: '#A8B5C0', fontSize: 12, marginTop: 2 }}>{mesNome} · por contas alcançadas</p>
       </div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
         {top5.map((p, i) => (
           <PostRankRow
             key={p.id}

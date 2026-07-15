@@ -64,6 +64,7 @@ export const PostRankRow = memo(function PostRankRow({ post, i, maxVal, firstCol
         cursor: onClick ? 'pointer' : 'default',
         padding: '8px 10px', borderRadius: 10,
         transition: 'background 0.1s',
+        borderTop: i > 0 ? '1px solid #F4F6F8' : 'none',
       }}
       onMouseEnter={e => { if (onClick) e.currentTarget.style.background = '#F8FAFC' }}
       onMouseLeave={e => { if (onClick) e.currentTarget.style.background = 'transparent' }}

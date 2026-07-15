@@ -135,7 +135,6 @@ export default function App() {
               <KPICards />
               <MetaMensalBanner />
               <TopPostsMes />
-              <PostsChart />
               <TypeComparison />
               <ThemeAnalysis />
             </>
