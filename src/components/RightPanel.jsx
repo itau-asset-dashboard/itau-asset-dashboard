@@ -100,16 +100,18 @@ export default function RightPanel() {
         <div style={{ height: '100%', borderRadius: 6, background: ringColor, width: `${barWidth}%`, transition: 'width 0.6s ease' }}/>
       </div>
 
-      {/* Dois cards lado a lado */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-        <div style={{ background: 'rgba(0,0,0,0.03)', borderRadius: 12, padding: '12px 14px' }}>
-          <p style={{ color: '#B0BEC5', fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>Alcançado</p>
-          <p style={{ color: ringColor, fontSize: 20, fontWeight: 800, lineHeight: 1 }}>{fmt(totalMensal)}</p>
+      {/* Linhas alcançado / meta */}
+      <div style={{ background: 'rgba(0,0,0,0.03)', borderRadius: 12, padding: '12px 14px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <p style={{ color: '#B0BEC5', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Alcançado</p>
+          <p style={{ color: ringColor, fontSize: 16, fontWeight: 800 }}>{fmt(totalMensal)}</p>
         </div>
-        <div style={{ background: 'rgba(0,0,0,0.03)', borderRadius: 12, padding: '12px 14px' }}>
-          <p style={{ color: '#B0BEC5', fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>Meta</p>
-          <p style={{ color: '#8A9BB0', fontSize: 20, fontWeight: 800, lineHeight: 1 }}>{fmt(metaAjustada)}</p>
-          {metaAjustada !== metaMesOriginal && <p style={{ color: '#C0CEDA', fontSize: 10, marginTop: 4 }}>↻ ajustada</p>}
+        <div style={{ height: 1, background: '#E8ECF0' }} />
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <p style={{ color: '#B0BEC5', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+            Meta{metaAjustada !== metaMesOriginal ? <span style={{ color: '#C0CEDA', fontSize: 9, fontWeight: 400, marginLeft: 4 }}>↻</span> : null}
+          </p>
+          <p style={{ color: '#8A9BB0', fontSize: 16, fontWeight: 800 }}>{fmt(metaAjustada)}</p>
         </div>
       </div>
 
