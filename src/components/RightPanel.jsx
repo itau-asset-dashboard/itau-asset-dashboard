@@ -80,7 +80,7 @@ export default function RightPanel() {
     }}>
 
       {/* Label do mês */}
-      <div style={{ textAlign: 'center', alignSelf: 'center' }}>
+      <div style={{ textAlign: 'center' }}>
         <p style={{ color: '#B0BEC5', fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
           Meta mensal
         </p>
@@ -88,7 +88,7 @@ export default function RightPanel() {
       </div>
 
       {/* % grande */}
-      <div style={{ textAlign: 'center', alignSelf: 'center' }}>
+      <div style={{ textAlign: 'center' }}>
         <p style={{ color: ringColor, fontSize: 44, fontWeight: 800, lineHeight: 1, letterSpacing: '-0.03em' }}>
           {pctReal.toFixed(0)}%
         </p>
@@ -115,7 +115,7 @@ export default function RightPanel() {
 
       {/* Rodapé */}
       {dias != null && (
-        <p style={{ color: '#B0BEC5', fontSize: 10, textAlign: 'center', alignSelf: 'center' }}>
+        <p style={{ color: '#B0BEC5', fontSize: 10, textAlign: 'center' }}>
           {dias === 0 ? 'Último dia do mês' : `${dias} dia${dias !== 1 ? 's' : ''} restante${dias !== 1 ? 's' : ''}`}
         </p>
       )}
