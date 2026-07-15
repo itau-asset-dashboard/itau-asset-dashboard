@@ -31,11 +31,11 @@ const TIPO_ICON = {
 // Pill de posição: caixinha colorida para top 5
 export function PositionPill({ i }) {
   const styles = [
-    { bg: '#FEF3C7', color: '#B45309' },
-    { bg: '#F1F5F9', color: '#64748B' },
-    { bg: '#FEF0E7', color: '#9A5C2E' },
-    { bg: '#F0F4F8', color: '#8A9BB0' },
-    { bg: '#F0F4F8', color: '#8A9BB0' },
+    { bg: '#FEF3C7', color: '#B45309' },  // 1º ouro
+    { bg: '#F1F5F9', color: '#64748B' },  // 2º prata
+    { bg: '#FEF0E7', color: '#9A5C2E' },  // 3º bronze
+    { bg: '#EDF4FF', color: '#3B6FD4' },  // 4º azul
+    { bg: '#F0FDF4', color: '#2D7A4F' },  // 5º verde
   ]
   if (i >= 5) {
     return (
