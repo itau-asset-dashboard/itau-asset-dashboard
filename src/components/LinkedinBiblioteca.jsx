@@ -180,7 +180,7 @@ export default function LinkedinBiblioteca({ allPosts, mesFiltro, isEditMode, on
                     {!mobile && (
                       <td style={{ padding: '12px 14px', whiteSpace: 'nowrap' }}>
                         {p.tipo && (
-                          <span style={{ background: tc?.bg || '#F0F4F8', color: tc?.color || '#4A6272', borderRadius: 6, padding: '2px 8px', fontSize: 11, fontWeight: 600 }}>{p.tipo}</span>
+                          <span style={{ color: '#8A9BB0', fontSize: 12, fontWeight: 500 }}>{p.tipo}</span>
                         )}
                       </td>
                     )}
