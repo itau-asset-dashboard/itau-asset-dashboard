@@ -72,7 +72,7 @@ export default function RightPanel() {
       borderLeft: '1px solid #E8ECF0',
       display: 'flex',
       flexDirection: 'column',
-      alignItems: 'center',
+      alignItems: 'stretch',
       justifyContent: 'center',
       padding: '20px 16px',
       flexShrink: 0,
@@ -80,7 +80,7 @@ export default function RightPanel() {
     }}>
 
       {/* Label do mês */}
-      <div style={{ textAlign: 'center' }}>
+      <div style={{ textAlign: 'center', alignSelf: 'center' }}>
         <p style={{ color: '#B0BEC5', fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
           Meta mensal
         </p>
@@ -88,7 +88,7 @@ export default function RightPanel() {
       </div>
 
       {/* % grande */}
-      <div style={{ textAlign: 'center' }}>
+      <div style={{ textAlign: 'center', alignSelf: 'center' }}>
         <p style={{ color: ringColor, fontSize: 44, fontWeight: 800, lineHeight: 1, letterSpacing: '-0.03em' }}>
           {pctReal.toFixed(0)}%
         </p>
@@ -96,12 +96,12 @@ export default function RightPanel() {
       </div>
 
       {/* Barra de progresso */}
-      <div style={{ alignSelf: 'stretch', background: '#E8ECF0', borderRadius: 6, height: 8, overflow: 'hidden' }}>
+      <div style={{ background: '#E8ECF0', borderRadius: 6, height: 8, overflow: 'hidden' }}>
         <div style={{ height: '100%', borderRadius: 6, background: ringColor, width: `${barWidth}%`, transition: 'width 0.6s ease' }}/>
       </div>
 
       {/* Dois cards lado a lado */}
-      <div style={{ alignSelf: 'stretch', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
         <div style={{ background: 'rgba(0,0,0,0.03)', borderRadius: 12, padding: '12px 14px' }}>
           <p style={{ color: '#B0BEC5', fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>Alcançado</p>
           <p style={{ color: ringColor, fontSize: 20, fontWeight: 800, lineHeight: 1 }}>{fmt(totalMensal)}</p>
@@ -115,7 +115,7 @@ export default function RightPanel() {
 
       {/* Rodapé */}
       {dias != null && (
-        <p style={{ color: '#B0BEC5', fontSize: 10, textAlign: 'center' }}>
+        <p style={{ color: '#B0BEC5', fontSize: 10, textAlign: 'center', alignSelf: 'center' }}>
           {dias === 0 ? 'Último dia do mês' : `${dias} dia${dias !== 1 ? 's' : ''} restante${dias !== 1 ? 's' : ''}`}
         </p>
       )}
