@@ -112,41 +112,26 @@ export default function RightPanel() {
         </div>
       </div>
 
-      {/* Números — duas colunas */}
+      {/* Números */}
       <div style={{ width: '100%', background: 'rgba(0,0,0,0.03)', borderRadius: 14, overflow: 'hidden' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
-          {/* Alcançado */}
-          <div style={{ padding: '14px 16px', borderRight: '1px solid #E8ECF0' }}>
-            <p style={{ color: '#B0BEC5', fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>Alcançado</p>
-            <p style={{ color: ringColor, fontSize: 20, fontWeight: 800, lineHeight: 1 }}>{fmt(totalMensal)}</p>
-          </div>
-
-          {/* Falta / Superou / Meta atingida */}
-          <div style={{ padding: '14px 16px' }}>
-            {!atingiu && (
-              <>
-                <p style={{ color: '#B0BEC5', fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>Faltam</p>
-                <p style={{ color: '#1C252E', fontSize: 20, fontWeight: 800, lineHeight: 1 }}>{fmt(falta)}</p>
-              </>
-            )}
-            {atingiu && !superou && (
-              <>
-                <p style={{ color: '#B0BEC5', fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>Status</p>
-                <p style={{ color: '#16a34a', fontSize: 13, fontWeight: 700, lineHeight: 1.3 }}>✓ Meta atingida</p>
-              </>
-            )}
-            {superou && (
-              <>
-                <p style={{ color: '#B0BEC5', fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>Superou</p>
-                <p style={{ color: '#16a34a', fontSize: 20, fontWeight: 800, lineHeight: 1 }}>+{fmt(excesso)}</p>
-              </>
-            )}
-          </div>
+        {/* Alcançado — linha principal */}
+        <div style={{ padding: '16px 18px' }}>
+          <p style={{ color: '#B0BEC5', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 8 }}>Alcançado</p>
+          <p style={{ color: ringColor, fontSize: 28, fontWeight: 800, lineHeight: 1, marginBottom: 6 }}>{fmt(totalMensal)}</p>
+          {!atingiu && falta > 0 && (
+            <p style={{ color: '#9AAAB8', fontSize: 12 }}>faltam {fmt(falta)} para a meta</p>
+          )}
+          {atingiu && !superou && (
+            <p style={{ color: '#16a34a', fontSize: 12, fontWeight: 600 }}>✓ meta atingida</p>
+          )}
+          {superou && (
+            <p style={{ color: '#16a34a', fontSize: 12, fontWeight: 600 }}>+{fmt(excesso)} acima da meta</p>
+          )}
         </div>
 
-        {/* Meta (linha abaixo) */}
-        <div style={{ borderTop: '1px solid #E8ECF0', padding: '11px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <span style={{ color: '#B0BEC5', fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Meta</span>
+        {/* Meta */}
+        <div style={{ borderTop: '1px solid #E8ECF0', padding: '13px 18px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <span style={{ color: '#B0BEC5', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Meta</span>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
             <EditableValue value={metaAjustada} color="#1C252E" onSave={setMetaMensal}/>
             {metaAjustada !== metaMesOriginal && <span style={{ color: '#C3BFBA', fontSize: 10 }}>↻</span>}
