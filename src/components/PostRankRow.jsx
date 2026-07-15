@@ -37,17 +37,7 @@ export function PositionPill({ i }) {
     { bg: '#EDF4FF', color: '#3B6FD4' },  // 4º azul
     { bg: '#F0FDF4', color: '#2D7A4F' },  // 5º verde
   ]
-  if (i >= 5) {
-    return (
-      <span style={{
-        width: 26, textAlign: 'center', flexShrink: 0,
-        color: '#B0BEC5', fontSize: 11, fontWeight: 700,
-      }}>
-        {i + 1}º
-      </span>
-    )
-  }
-  const { bg, color } = styles[i]
+  const { bg, color } = styles[i] || { bg: '#F4F6F8', color: '#8A9BB0' }
   return (
     <span style={{
       width: 28, height: 22, borderRadius: 6,
