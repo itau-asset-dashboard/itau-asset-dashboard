@@ -96,12 +96,12 @@ export default function RightPanel() {
       </div>
 
       {/* Barra de progresso */}
-      <div style={{ width: '100%', background: '#E8ECF0', borderRadius: 6, height: 8, overflow: 'hidden' }}>
+      <div style={{ alignSelf: 'stretch', background: '#E8ECF0', borderRadius: 6, height: 8, overflow: 'hidden' }}>
         <div style={{ height: '100%', borderRadius: 6, background: ringColor, width: `${barWidth}%`, transition: 'width 0.6s ease' }}/>
       </div>
 
       {/* Dois cards lado a lado */}
-      <div style={{ width: '100%', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+      <div style={{ alignSelf: 'stretch', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
         <div style={{ background: 'rgba(0,0,0,0.03)', borderRadius: 12, padding: '12px 14px' }}>
           <p style={{ color: '#B0BEC5', fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>Alcançado</p>
           <p style={{ color: ringColor, fontSize: 20, fontWeight: 800, lineHeight: 1 }}>{fmt(totalMensal)}</p>
