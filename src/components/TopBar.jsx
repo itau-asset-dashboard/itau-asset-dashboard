@@ -1,8 +1,9 @@
 import { useState, useMemo } from 'react'
-import { Key, Plus, Lock, Unlock, Eye, Upload } from 'lucide-react'
+import { Key, Plus, Lock, Unlock, Eye, Upload, RefreshCw } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import UploadModal from './UploadModal'
 import { useIsMobile } from '../utils/useIsMobile'
+import { extractPostFromImage } from '../utils/anthropic'
 
 
 const MESES_NOMES = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro']
@@ -46,6 +47,8 @@ export default function TopBar() {
   const [showLock, setShowLock]       = useState(false)
   const [pwInput, setPwInput]         = useState('')
   const [pwError, setPwError]         = useState(false)
+  const [reextracting, setReextracting] = useState(false)
+  const [reextractProgress, setReextractProgress] = useState('')
 
   const posts = getPostsDoMes()
   const section = TITLES[activeSection] || TITLES['visao-anual']
@@ -90,6 +93,48 @@ export default function TopBar() {
     setShowLock(false)
   }
 
+  async function handleReextractAll() {
+    if (!apiKey) { alert('Configure a chave da API primeiro.'); return }
+    const { posts: allPosts, updatePost } = useStore.getState()
+    const comImagem = allPosts.filter(p => p.imageUrl || p.imageData)
+    if (!comImagem.length) { alert('Nenhum post com imagem para reprocessar.'); return }
+    setReextracting(true)
+    let ok = 0, fail = 0
+    for (const p of comImagem) {
+      setReextractProgress(`${ok + fail + 1}/${comImagem.length}`)
+      try {
+        const src = p.imageUrl || p.imageData
+        let base64, mediaType
+        if (src.startsWith('data:')) {
+          const [hdr, b64] = src.split(',')
+          mediaType = hdr.match(/:(.*?);/)?.[1] || 'image/jpeg'
+          base64 = b64
+        } else {
+          const res = await fetch(src)
+          const blob = await res.blob()
+          mediaType = blob.type || 'image/jpeg'
+          base64 = await new Promise(resolve => {
+            const r = new FileReader()
+            r.onload = e => resolve(e.target.result.split(',')[1])
+            r.readAsDataURL(blob)
+          })
+        }
+        const data = await extractPostFromImage(base64, mediaType, apiKey)
+        await updatePost(p.id, {
+          curtidas:          data.curtidas          ?? p.curtidas,
+          comentarios:       data.comentarios       ?? p.comentarios,
+          reposts:           data.reposts           ?? p.reposts,
+          compartilhamentos: data.compartilhamentos ?? p.compartilhamentos,
+          salvamentos:       data.salvamentos       ?? p.salvamentos,
+        })
+        ok++
+      } catch { fail++ }
+    }
+    setReextracting(false)
+    setReextractProgress('')
+    alert(`Concluído! ${ok} posts atualizados${fail ? `, ${fail} com erro` : ''}.`)
+  }
+
   return (
     <div className="topbar-root" style={{
       display: 'flex', alignItems: 'center', justifyContent: 'space-between',
@@ -125,13 +170,24 @@ export default function TopBar() {
           </select>
         )}
         {isEditMode && activeSection !== 'stories' && !isLinkedin && (
-          <button onClick={() => setUploadOpen(true)} style={{
-            background: '#FF6200', color: '#fff', border: 'none', borderRadius: 10,
-            padding: '8px 12px', fontSize: 13, fontWeight: 600, cursor: 'pointer',
-            display: 'flex', alignItems: 'center', gap: 5, fontFamily: 'DM Sans, sans-serif', whiteSpace: 'nowrap',
-          }}>
-            <Plus size={15} /> <span className="hide-mobile">Novo post</span>
-          </button>
+          <>
+            <button onClick={handleReextractAll} disabled={reextracting} title="Re-extrair métricas de todos os posts com imagem" style={{
+              background: '#F0F4F8', color: '#1C252E', border: '1.5px solid #EDEFF2', borderRadius: 10,
+              padding: '8px 12px', fontSize: 13, fontWeight: 600, cursor: reextracting ? 'wait' : 'pointer',
+              display: 'flex', alignItems: 'center', gap: 5, fontFamily: 'DM Sans, sans-serif', whiteSpace: 'nowrap',
+              opacity: reextracting ? 0.7 : 1,
+            }}>
+              <RefreshCw size={14} style={{ animation: reextracting ? 'spin 1s linear infinite' : 'none' }} />
+              {reextracting ? reextractProgress : <span className="hide-mobile">Re-extrair todos</span>}
+            </button>
+            <button onClick={() => setUploadOpen(true)} style={{
+              background: '#FF6200', color: '#fff', border: 'none', borderRadius: 10,
+              padding: '8px 12px', fontSize: 13, fontWeight: 600, cursor: 'pointer',
+              display: 'flex', alignItems: 'center', gap: 5, fontFamily: 'DM Sans, sans-serif', whiteSpace: 'nowrap',
+            }}>
+              <Plus size={15} /> <span className="hide-mobile">Novo post</span>
+            </button>
+          </>
         )}
 
         {/* ── Controles LinkedIn ── */}
