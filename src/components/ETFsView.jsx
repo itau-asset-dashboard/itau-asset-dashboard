@@ -130,31 +130,32 @@ export default function ETFsView() {
   return (
     <div style={{ display:'flex', flexDirection:'column', gap:16 }}>
 
-      {/* Controles + KPIs numa linha só */}
-      <div style={{ display:'flex', alignItems:'stretch', gap: mobile ? 8 : 14 }} className="kpi-grid-etf">
-
-        {/* Toggle */}
+      {/* Toggle anual/mensal */}
+      <div style={{ display:'flex', justifyContent:'flex-end' }}>
         <div style={{
-          display:'flex', background:'rgba(28,37,46,0.06)', borderRadius:12,
-          padding:3, gap:2, alignSelf:'center', flexShrink:0,
+          display:'inline-flex', background:'#F0F2F5', borderRadius:10,
+          padding:3, gap:2,
         }}>
           {['anual','mensal'].map(mode => (
             <button key={mode} onClick={() => setViewMode(mode)}
               style={{
-                padding: mobile ? '5px 10px' : '6px 14px', borderRadius:10, border:'none', cursor:'pointer',
-                fontSize: mobile ? 12 : 13, fontWeight: viewMode===mode ? 700 : 400,
-                background: viewMode===mode ? '#1C252E' : 'transparent',
-                color: viewMode===mode ? '#C3EBF7' : '#5A7080',
+                padding: mobile ? '5px 14px' : '6px 18px', borderRadius:8, border:'none', cursor:'pointer',
+                fontSize: 13, fontWeight: viewMode===mode ? 600 : 400,
+                background: viewMode===mode ? '#fff' : 'transparent',
+                color: viewMode===mode ? '#1C252E' : '#8A9BB0',
+                boxShadow: viewMode===mode ? '0 1px 3px rgba(0,0,0,0.10)' : 'none',
                 transition:'all 0.15s', whiteSpace:'nowrap',
               }}>
               {mode === 'anual' ? 'Anual' : 'Mensal'}
             </button>
           ))}
         </div>
+      </div>
 
-        {/* KPIs */}
+      {/* KPIs */}
+      <div className="kpi-grid">
         {KPIS.map(({label,value,sub}) => (
-          <div key={label} className="card" style={{ padding: mobile ? '12px 14px' : '18px 20px', flex:1, minWidth:0 }}>
+          <div key={label} className="card" style={{ padding: mobile ? '12px 14px' : '18px 20px' }}>
             <p style={{ color:'#9AAAB8', fontSize: mobile ? 9 : 11, fontWeight:600, textTransform:'uppercase', letterSpacing:'0.05em', marginBottom: mobile ? 4 : 5 }}>{label}</p>
             <p style={{ color:'#1C252E', fontSize: mobile ? 18 : 24, fontWeight:800, lineHeight:1.1, marginBottom: mobile ? 2 : 3 }}>{value}</p>
             <p style={{ color:'#9AAAB8', fontSize: mobile ? 10 : 12, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{sub}</p>
