@@ -148,25 +148,26 @@ export default function LinkedinVisaoGeral({ posts, ano, isEditMode, onEditPost 
 
       {/* Publicações por mês */}
       <div className="card" style={{ padding: 20 }}>
-        <p style={{ color: '#1C252E', fontSize: 14, fontWeight: 700, marginBottom: 12 }}>Publicações por mês</p>
-        <ResponsiveContainer width="100%" height={mobile ? 90 : 120}>
-          <BarChart data={byMonth.filter(m => m.count > 0)} barSize={mobile ? 20 : 36} margin={{ top: 4, right: 4, left: 0, bottom: 0 }}>
-            <XAxis dataKey="mes" tick={{ fill: '#9AAAB8', fontSize: mobile ? 9 : 11 }} axisLine={false} tickLine={false}/>
-            <YAxis tick={{ fill: '#9AAAB8', fontSize: 10 }} axisLine={false} tickLine={false} allowDecimals={false} width={24}/>
-            <Tooltip content={({ active, payload }) => {
-              if (!active || !payload?.length) return null
-              const d = payload[0].payload
-              return (
-                <div style={{ background: '#fff', border: '1px solid #EAECF0', borderRadius: 10, padding: '8px 12px', fontSize: 12 }}>
-                  <p style={{ fontWeight: 700, color: '#1C252E' }}>{d.mesFull}: {d.count} post{d.count !== 1 ? 's' : ''}</p>
-                </div>
-              )
-            }} cursor={{ fill: 'rgba(0,0,0,0.03)' }}/>
-            <Bar dataKey="count" radius={[5,5,0,0]}>
-              {byMonth.map((e, i) => <Cell key={i} fill={e.count === 0 ? '#F0F2F5' : '#C3EBF7'}/>)}
-            </Bar>
-          </BarChart>
-        </ResponsiveContainer>
+        <p style={{ color: '#1C252E', fontSize: 14, fontWeight: 700, marginBottom: 16 }}>Publicações por mês</p>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(12, 1fr)', gap: 6 }}>
+          {byMonth.map((m, i) => {
+            const maxCount = Math.max(...byMonth.map(b => b.count), 1)
+            const isTop = m.count === maxCount && m.count > 0
+            return (
+              <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
+                <span style={{
+                  fontSize: m.count > 0 ? (isTop ? 18 : 15) : 13,
+                  fontWeight: m.count > 0 ? (isTop ? 800 : 600) : 400,
+                  color: m.count === 0 ? '#D0D8E4' : isTop ? '#FF6200' : '#1C252E',
+                  lineHeight: 1,
+                }}>
+                  {m.count > 0 ? m.count : '—'}
+                </span>
+                <span style={{ fontSize: 10, color: '#9AAAB8', fontWeight: 500 }}>{m.mes}</span>
+              </div>
+            )
+          })}
+        </div>
       </div>
 
       {/* Ranking de posts */}
