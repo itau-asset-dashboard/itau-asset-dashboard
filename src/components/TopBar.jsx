@@ -102,13 +102,10 @@ return (
         {/* Badge de modo */}
         {!isEditMode && (
           <span style={{
-            display: 'inline-flex', alignItems: 'center', gap: 4,
-            background: 'rgba(195,235,247,0.3)', color: '#1a7a96',
-            border: '1px solid rgba(195,235,247,0.8)',
-            borderRadius: 20, padding: '3px 10px', fontSize: 11, fontWeight: 600,
-            whiteSpace: 'nowrap',
+            display: 'inline-flex', alignItems: 'center',
+            color: '#B0C4CE', opacity: 0.7,
           }}>
-            <Eye size={11} /> <span className="hide-mobile">Visualização</span>
+            <Eye size={13} />
           </span>
         )}
       </div>
