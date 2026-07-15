@@ -156,7 +156,7 @@ return (
             padding: '8px 12px', fontSize: 13, fontWeight: 600, cursor: 'pointer',
             display: 'flex', alignItems: 'center', gap: 5, whiteSpace: 'nowrap', fontFamily: 'DM Sans, sans-serif',
           }}>
-            <Upload size={15}/> <span className="hide-mobile">Importar XLS</span>
+            <Upload size={15}/>
           </button>
         )}
         {isEditMode && isLinkedin && activeSection !== 'linkedin-pagina' && (
