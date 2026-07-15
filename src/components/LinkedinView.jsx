@@ -61,17 +61,21 @@ export default function LinkedinView({ tab = 'geral' }) {
             })}
           </select>
         ) : (
-          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+          <div style={{
+            display:'grid', gridTemplateColumns:'repeat(12, 1fr)',
+            gap:4, background:'#F4F6F8', borderRadius:12, padding:4,
+          }}>
             {MESES_LABEL.map((label, i) => {
               const mm = String(i + 1).padStart(2, '0')
               const ativo = mes === mm
               return (
                 <button key={mm} onClick={() => setMes(mm)} style={{
-                  padding: '5px 12px', borderRadius: 20, border: 'none', cursor: 'pointer',
-                  fontSize: 12, fontWeight: ativo ? 700 : 400,
-                  background: ativo ? '#1C252E' : '#F0F4F8',
-                  color: ativo ? '#C3EBF7' : '#6B7A8D',
-                  transition: 'all 0.12s',
+                  padding:'8px 4px', borderRadius:8, border:'none', cursor:'pointer',
+                  fontSize:12, fontWeight: ativo ? 700 : 500, textAlign:'center',
+                  background: ativo ? '#fff' : 'transparent',
+                  color: ativo ? '#FF6200' : '#6B7B8D',
+                  boxShadow: ativo ? '0 1px 4px rgba(0,0,0,0.10)' : 'none',
+                  transition:'all 0.15s',
                 }}>
                   {label}
                 </button>
