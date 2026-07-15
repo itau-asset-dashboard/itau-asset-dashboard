@@ -15,6 +15,12 @@ function fmt(n) {
   return n.toLocaleString('pt-BR')
 }
 
+function fmtAxis(v) {
+  if (v >= 1000000) return (v/1000000).toFixed(0)+'M'
+  if (v >= 1000)    return (v/1000).toFixed(0)+'K'
+  return String(v)
+}
+
 const TIPO_COLOR = { Carrossel:'#FF8040', Reels:'#8A9BB0', 'Foto estática':'#C3EBF7' }
 
 export default function AnnualView() {
@@ -182,7 +188,7 @@ export default function AnnualView() {
             <BarChart data={byMonth} barSize={mobile ? 16 : 28} margin={{top: mobile ? 4 : 24, right:8, left:0, bottom:0}}>
               <XAxis dataKey="mes" tick={{ fill:'#9AAAB8', fontSize: mobile ? 9 : 11 }} axisLine={false} tickLine={false}/>
               <YAxis tick={{ fill:'#9AAAB8', fontSize:10 }} axisLine={false} tickLine={false}
-                tickFormatter={v=>v===0?'':fmt(v)} width={mobile ? 36 : 44}/>
+                tickFormatter={fmtAxis} width={mobile ? 36 : 44}/>
               <Tooltip
                 content={({ active, payload }) => {
                   if (!active || !payload?.length) return null

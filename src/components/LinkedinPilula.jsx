@@ -13,6 +13,11 @@ function fmtN(n) {
   if (n >= 1000)    return (n/1000).toFixed(1).replace('.',',') + 'K'
   return Math.round(n).toLocaleString('pt-BR')
 }
+function fmtAxis(v) {
+  if (v >= 1000000) return (v/1000000).toFixed(0)+'M'
+  if (v >= 1000)    return (v/1000).toFixed(0)+'K'
+  return String(v)
+}
 
 function parseDate(d) {
   if (!d) return 0
@@ -112,7 +117,7 @@ export default function LinkedinPilula({ posts, ano, isEditMode, onEditPost }) {
             <BarChart data={byMonth} barSize={mobile ? 12 : 18} margin={{ top: 4, right: 4, left: 0, bottom: 0 }}>
               <XAxis dataKey="mes" tick={{ fill: '#9AAAB8', fontSize: mobile ? 9 : 11 }} axisLine={false} tickLine={false}/>
               <YAxis tick={{ fill: '#9AAAB8', fontSize: 10 }} axisLine={false} tickLine={false}
-                tickFormatter={v => v === 0 ? '' : fmtN(v)} width={mobile ? 36 : 44}/>
+                tickFormatter={fmtAxis} width={mobile ? 36 : 44}/>
               <Tooltip content={({ active, payload }) => {
                 if (!active || !payload?.length) return null
                 const d = payload[0]?.payload
@@ -137,7 +142,7 @@ export default function LinkedinPilula({ posts, ano, isEditMode, onEditPost }) {
             <BarChart data={byMonth} barSize={mobile ? 12 : 18} margin={{ top: 4, right: 4, left: 0, bottom: 0 }}>
               <XAxis dataKey="mes" tick={{ fill: '#9AAAB8', fontSize: mobile ? 9 : 11 }} axisLine={false} tickLine={false}/>
               <YAxis tick={{ fill: '#9AAAB8', fontSize: 10 }} axisLine={false} tickLine={false}
-                tickFormatter={v => v === 0 ? '' : fmtN(v)} width={mobile ? 36 : 44}/>
+                tickFormatter={fmtAxis} width={mobile ? 36 : 44}/>
               <Tooltip content={({ active, payload }) => {
                 if (!active || !payload?.length) return null
                 const d = payload[0]?.payload

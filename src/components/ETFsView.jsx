@@ -17,6 +17,11 @@ function fmt(n) {
   if (n >= 1000)    return (n/1000).toFixed(1).replace('.',',')+'K'
   return n.toLocaleString('pt-BR')
 }
+function fmtAxis(v) {
+  if (v >= 1000000) return (v/1000000).toFixed(0)+'M'
+  if (v >= 1000)    return (v/1000).toFixed(0)+'K'
+  return String(v)
+}
 
 
 function pct(a, b) {
@@ -195,7 +200,7 @@ export default function ETFsView() {
               <BarChart data={byMonth} margin={{top:4, right:4, left:0, bottom:0}}>
                 <XAxis dataKey="mes" tick={{ fill:'#9AAAB8', fontSize: mobile ? 9 : 11 }} axisLine={false} tickLine={false}/>
                 <YAxis tick={{ fill:'#9AAAB8', fontSize:10 }} axisLine={false} tickLine={false}
-                  tickFormatter={v=>v===0?'':fmt(v)} width={mobile ? 34 : 44}/>
+                  tickFormatter={fmtAxis} width={mobile ? 34 : 44}/>
                 <Tooltip
                   formatter={v => [fmt(v),'Alcance']}
                   labelFormatter={(_,p) => p?.[0]?.payload?.mesFull || ''}
@@ -214,7 +219,7 @@ export default function ETFsView() {
               <BarChart data={byMonth} margin={{top:4, right:4, left:0, bottom:0}}>
                 <XAxis dataKey="mes" tick={{ fill:'#9AAAB8', fontSize: mobile ? 9 : 11 }} axisLine={false} tickLine={false}/>
                 <YAxis tick={{ fill:'#9AAAB8', fontSize:10 }} axisLine={false} tickLine={false}
-                  tickFormatter={v=>v===0?'':fmt(v)} width={mobile ? 34 : 44}/>
+                  tickFormatter={fmtAxis} width={mobile ? 34 : 44}/>
                 <Tooltip
                   formatter={v => [fmt(v),'Interações']}
                   labelFormatter={(_,p) => p?.[0]?.payload?.mesFull || ''}

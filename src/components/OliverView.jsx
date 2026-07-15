@@ -14,6 +14,12 @@ function fmt(n) {
   return Number(n).toLocaleString('pt-BR')
 }
 
+function fmtAxis(v) {
+  if (v >= 1000000) return (v/1000000).toFixed(0)+'M'
+  if (v >= 1000)    return (v/1000).toFixed(0)+'K'
+  return String(v)
+}
+
 // Números Oliver sempre exatos, sem abreviação
 function fmtExato(n) {
   if (n == null || n === '' || isNaN(n)) return '—'
@@ -146,7 +152,7 @@ export default function OliverView() {
             <BarChart data={chartData} margin={{ top: 8, right: 4, left: 0, bottom: 0 }} barGap={2}>
               <XAxis dataKey="mes" tick={{ fill: '#9AAAB8', fontSize: mobile ? 9 : 11 }} axisLine={false} tickLine={false} />
               <YAxis tick={{ fill: '#9AAAB8', fontSize: 9 }} axisLine={false} tickLine={false}
-                tickFormatter={v => v === 0 ? '' : fmt(v)} width={mobile ? 34 : 48} />
+                tickFormatter={fmtAxis} width={mobile ? 34 : 48} />
               <Tooltip
                 formatter={(v, name) => [name === 'alcance_oliver' ? fmtExato(v) : fmt(v), name === 'alcance_insta' ? 'Instagram' : 'Oliver']}
                 labelFormatter={(_, p) => p?.[0]?.payload?.mesFull || ''}
