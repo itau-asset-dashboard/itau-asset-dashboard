@@ -237,7 +237,7 @@ export default function ETFsView() {
         {/* Top posts */}
         <div className="card" style={{ padding: mobile ? '14px' : '22px' }}>
           <p style={{ color:'#1C252E', fontSize:15, fontWeight:700, marginBottom:4 }}>
-            Top posts ETF {viewMode === 'mensal' ? `· ${MESES_LABEL[mesSel]}` : ''}
+            Top posts ETF {viewMode === 'mensal' ? `· ${MESES_FULL[mesSel]}` : ''}
           </p>
           <div style={{ display:'flex', flexDirection:'column', gap:2 }}>
             {topPosts.length === 0 && (
