@@ -116,27 +116,26 @@ export default function LinkedinVisaoGeral({ posts, ano, isEditMode, onEditPost 
                 )
               }} cursor={{ fill: 'rgba(0,0,0,0.03)' }}/>
               <Bar dataKey="impressoes" radius={[5,5,0,0]}>
-                {byMonth.map((e, i) => <Cell key={i} fill={e.impressoes === 0 ? '#F0F2F5' : '#0A66C2'}/>)}
+                {byMonth.map((e, i) => <Cell key={i} fill={e.impressoes === 0 ? '#F0F2F5' : '#1C252E'}/>)}
               </Bar>
             </BarChart>
           </ResponsiveContainer>
         </div>
 
-        {/* Distribuição de formatos */}
+        {/* Formatos publicados — lista limpa */}
         <div className="card" style={{ padding: 20 }}>
-          <p style={{ color: '#1C252E', fontSize: 14, fontWeight: 700, marginBottom: 16 }}>Formatos publicados</p>
+          <p style={{ color: '#1C252E', fontSize: 14, fontWeight: 700, marginBottom: 18 }}>Formatos publicados</p>
           {formatoCounts.length > 0 ? (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-              {formatoCounts.map(([fmt, count]) => (
-                <div key={fmt}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
-                    <span style={{ fontSize: 12, color: '#4A5568', fontWeight: 500 }}>{fmt}</span>
-                    <span style={{ fontSize: 12, fontWeight: 700, color: FORMATO_COLORS[fmt] || '#1C252E' }}>
-                      {count} post{count > 1 ? 's' : ''} · {Math.round((count / totalPosts) * 100)}%
-                    </span>
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+              {formatoCounts.map(([tipo, count], i) => (
+                <div key={tipo} style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'10px 0', borderBottom: i < formatoCounts.length-1 ? '1px solid #F0F2F5' : 'none' }}>
+                  <div style={{ display:'flex', alignItems:'center', gap:8 }}>
+                    <div style={{ width:8, height:8, borderRadius:2, flexShrink:0, background: FORMATO_COLORS[tipo] || '#C3EBF7' }}/>
+                    <span style={{ color:'#1C252E', fontSize: i===0?14:13, fontWeight:500 }}>{tipo}</span>
                   </div>
-                  <div style={{ background: '#F0F4F8', borderRadius: 6, height: 6, overflow: 'hidden' }}>
-                    <div style={{ background: FORMATO_COLORS[fmt] || '#1C252E', borderRadius: 6, height: '100%', width: `${(count / totalPosts) * 100}%`, transition: 'width 0.4s' }}/>
+                  <div style={{ textAlign:'right' }}>
+                    <span style={{ color: i===0?'#FF6200':'#1C252E', fontSize: i===0?15:13, fontWeight:500 }}>{count} post{count>1?'s':''}</span>
+                    <span style={{ color:'#9AAAB8', fontSize:11, marginLeft:6 }}>{Math.round((count/totalPosts)*100)}%</span>
                   </div>
                 </div>
               ))}
@@ -175,13 +174,15 @@ export default function LinkedinVisaoGeral({ posts, ano, isEditMode, onEditPost 
         <div style={{ padding: '16px 20px 12px', borderBottom: '1px solid #F0F4F8' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap', marginBottom: tiposDisponiveis.length > 1 ? 10 : 0 }}>
             <p style={{ color: '#1C252E', fontSize: 14, fontWeight: 700 }}>Ranking de posts</p>
-            <div style={{ display: 'flex', gap: 6 }}>
+            <div style={{ display:'inline-flex', background:'#F0F2F5', borderRadius:10, padding:3, gap:2 }}>
               {['impressoes', 'cliques', 'reacoes'].map(k => (
                 <button key={k} onClick={() => toggleRank(k)} style={{
-                  padding: '4px 10px', borderRadius: 8, border: 'none', cursor: 'pointer',
-                  fontSize: 11, fontWeight: rankKey === k ? 700 : 400,
-                  background: rankKey === k ? '#0A66C2' : '#F0F4F8',
-                  color: rankKey === k ? '#fff' : '#6B7A8D',
+                  padding: '5px 12px', borderRadius: 8, border: 'none', cursor: 'pointer',
+                  fontSize: 12, fontWeight: rankKey === k ? 600 : 400,
+                  background: rankKey === k ? '#fff' : 'transparent',
+                  color: rankKey === k ? '#1C252E' : '#8A9BB0',
+                  boxShadow: rankKey === k ? '0 1px 3px rgba(0,0,0,0.10)' : 'none',
+                  transition: 'all 0.15s',
                 }}>
                   {k === 'impressoes' ? 'Impressões' : k === 'cliques' ? 'Cliques' : 'Reações'}
                 </button>
@@ -190,21 +191,21 @@ export default function LinkedinVisaoGeral({ posts, ano, isEditMode, onEditPost 
           </div>
           {/* Filtro de formato */}
           {tiposDisponiveis.length > 1 && (
-            <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap', marginTop: 10 }}>
               <button onClick={() => setTipoFiltro(null)} style={{
-                padding: '3px 10px', borderRadius: 20, fontSize: 11, cursor: 'pointer',
-                fontFamily: 'DM Sans, sans-serif', fontWeight: !tipoFiltro ? 700 : 400,
-                background: !tipoFiltro ? '#1C252E' : '#F0F4F8',
-                color: !tipoFiltro ? '#C3EBF7' : '#4A6272',
-                border: !tipoFiltro ? '1.5px solid #1C252E' : '1.5px solid #E0E7EF',
+                padding: '4px 12px', borderRadius: 8, fontSize: 11, cursor: 'pointer',
+                fontFamily: 'DM Sans, sans-serif', fontWeight: !tipoFiltro ? 600 : 400,
+                background: !tipoFiltro ? '#1C252E' : '#F0F2F5',
+                color: !tipoFiltro ? '#fff' : '#6B7B8D',
+                border: 'none',
               }}>Todos</button>
               {tiposDisponiveis.map(t => (
                 <button key={t} onClick={() => setTipoFiltro(tipoFiltro === t ? null : t)} style={{
-                  padding: '3px 10px', borderRadius: 20, fontSize: 11, cursor: 'pointer',
-                  fontFamily: 'DM Sans, sans-serif', fontWeight: tipoFiltro === t ? 700 : 400,
-                  background: tipoFiltro === t ? (FORMATO_COLORS[t] || '#1C252E') : '#F0F4F8',
-                  color: tipoFiltro === t ? '#fff' : '#4A6272',
-                  border: tipoFiltro === t ? `1.5px solid ${FORMATO_COLORS[t] || '#1C252E'}` : '1.5px solid #E0E7EF',
+                  padding: '4px 12px', borderRadius: 8, fontSize: 11, cursor: 'pointer',
+                  fontFamily: 'DM Sans, sans-serif', fontWeight: tipoFiltro === t ? 600 : 400,
+                  background: tipoFiltro === t ? '#1C252E' : '#F0F2F5',
+                  color: tipoFiltro === t ? '#fff' : '#6B7B8D',
+                  border: 'none',
                 }}>{t}</button>
               ))}
             </div>
