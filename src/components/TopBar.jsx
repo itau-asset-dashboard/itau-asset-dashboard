@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react'
-import { Key, Plus, Lock, Unlock, Eye, Upload } from 'lucide-react'
+import { Plus, Lock, Unlock, Eye, Upload } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import UploadModal from './UploadModal'
 import { useIsMobile } from '../utils/useIsMobile'
@@ -36,12 +36,10 @@ const EDIT_PASSWORD = import.meta.env.VITE_EDIT_PASSWORD || 'itauasset2026'
 
 export default function TopBar() {
   const {
-    mesFiltro, setMesFiltro, apiKey, setApiKey, getPostsDoMes, activeSection, addPost, isEditMode, setEditMode,
+    mesFiltro, setMesFiltro, apiKey, getPostsDoMes, activeSection, addPost, isEditMode, setEditMode,
     linkedinPosts, linkedinAnoFiltro, setLinkedinAnoFiltro, linkedinMesBiblioteca, setLinkedinMesBiblioteca, setLinkedinAction,
   } = useStore()
   const mobile = useIsMobile()
-  const [showApi, setShowApi]         = useState(false)
-  const [keyInput, setKeyInput]       = useState(apiKey)
   const [uploadOpen, setUploadOpen]   = useState(false)
   const [showLock, setShowLock]       = useState(false)
   const [pwInput, setPwInput]         = useState('')
@@ -171,39 +169,6 @@ return (
           </button>
         )}
 
-        {/* API — desktop, sempre visível (necessário para a IA funcionar) */}
-        {!mobile && (
-          <div style={{ position: 'relative' }}>
-            <button onClick={() => setShowApi(v => !v)}
-              title={apiKey ? 'API configurada' : 'Configure a chave da API para usar a IA'}
-              style={{
-                background: '#fff',
-                border: `1.5px solid ${apiKey ? '#EDEFF2' : 'rgba(239,68,68,0.3)'}`,
-                borderRadius: 10, padding: '7px 9px', cursor: 'pointer',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                color: apiKey ? '#4A5568' : '#ef4444',
-              }}>
-              <Key size={14} />
-            </button>
-            {showApi && (
-              <div style={{
-                position: 'fixed', top: 56, right: 12,
-                background: '#fff', border: '1px solid #EAECF0', borderRadius: 14,
-                padding: 16, zIndex: 300, boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
-                width: 'min(290px, calc(100vw - 24px))',
-              }}>
-                <p style={{ color: '#1C252E', fontSize: 13, fontWeight: 600, marginBottom: 8 }}>Chave da API Anthropic</p>
-                <input type="password" value={keyInput} onChange={e => setKeyInput(e.target.value)}
-                  placeholder="sk-ant-..."
-                  style={{ width: '100%', border: '1.5px solid #EAECF0', borderRadius: 8, padding: '8px 12px', fontSize: 13, outline: 'none' }} />
-                <button onClick={() => { setApiKey(keyInput); setShowApi(false) }}
-                  style={{ marginTop: 10, width: '100%', background: '#1C252E', color: '#C3EBF7', border: 'none', borderRadius: 8, padding: '9px', fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: 'DM Sans, sans-serif' }}>
-                  Salvar
-                </button>
-              </div>
-            )}
-          </div>
-        )}
 
         {/* Botão cadeado */}
         <div style={{ position: 'relative' }}>
