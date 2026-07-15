@@ -261,8 +261,8 @@ export default function LinkedinVisaoGeral({ posts, ano, isEditMode, onEditPost 
                     )}
                   </td>
                   {!mobile && (
-                    <td style={{ padding: '10px 14px', whiteSpace: 'nowrap' }}>
-                      {p.tipo && <span style={{ background: '#F0F4F8', color: '#4A6272', borderRadius: 5, padding: '2px 7px', fontSize: 11, fontWeight: 600 }}>{p.tipo}</span>}
+                    <td style={{ padding: '10px 14px', whiteSpace: 'nowrap', color: '#9AAAB8', fontSize: 12 }}>
+                      {p.tipo || '—'}
                     </td>
                   )}
                   {mobile ? (
