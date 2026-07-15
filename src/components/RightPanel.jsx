@@ -66,7 +66,7 @@ export default function RightPanel() {
 
   return (
     <aside className="right-panel-desktop" style={{
-      width: 252,
+      width: 210,
       height: '100%',
       background: 'linear-gradient(160deg, #ffffff 0%, #F5F8FA 60%, #EEF4F8 100%)',
       borderLeft: '1px solid #E8ECF0',
@@ -74,9 +74,9 @@ export default function RightPanel() {
       flexDirection: 'column',
       alignItems: 'center',
       justifyContent: 'center',
-      padding: '24px 20px',
+      padding: '20px 16px',
       flexShrink: 0,
-      gap: 20,
+      gap: 16,
     }}>
 
       {/* Label do mês */}
@@ -89,7 +89,7 @@ export default function RightPanel() {
 
       {/* % grande */}
       <div style={{ textAlign: 'center' }}>
-        <p style={{ color: ringColor, fontSize: 52, fontWeight: 800, lineHeight: 1, letterSpacing: '-0.03em' }}>
+        <p style={{ color: ringColor, fontSize: 44, fontWeight: 800, lineHeight: 1, letterSpacing: '-0.03em' }}>
           {pctReal.toFixed(0)}%
         </p>
         <p style={{ color: '#9AAAB8', fontSize: 12, marginTop: 6 }}>da meta atingida</p>

@@ -324,10 +324,6 @@ export default function StoriesView() {
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 10 }}>
         <div>
-          <h2 style={{ color: '#1C252E', fontSize: 15, fontWeight: 700 }}>Stories</h2>
-          <p style={{ color: '#8A9BB0', fontSize: 12, marginTop: 2 }}>
-            {visao === 'geral' ? 'Visão geral de todos os stories' : 'Lista por período'}
-          </p>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
           {/* Toggle Visão geral / Lista */}

@@ -143,8 +143,6 @@ export default function Insights() {
       <div>
         <div style={{ display:'flex', flexDirection: mobile ? 'column' : 'row', alignItems: mobile ? 'flex-start' : 'center', justifyContent:'space-between', gap: mobile ? 10 : 0, marginBottom:16 }}>
           <div>
-            <h2 style={{ color:'#1C252E', fontSize:15, fontWeight:700 }}>Insights automáticos</h2>
-            <p style={{ color:'#8A9BB0', fontSize:12, marginTop:2 }}>Análise inteligente via IA · baseada em todos os posts</p>
           </div>
           <button onClick={generate} disabled={loadingInsights}
             style={{
