@@ -71,7 +71,7 @@ export default function ETFsView() {
   // ── Top posts ──────────────────────────────────────
   const topPosts = [...etfPosts]
     .sort((a,b) => (b.contas_alcancadas||0)-(a.contas_alcancadas||0))
-    .slice(0, 5)
+    .slice(0, 8)
   const maxAlc = topPosts[0]?.contas_alcancadas || 1
 
   // ── Por formato ────────────────────────────────────
