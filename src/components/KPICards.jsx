@@ -22,7 +22,7 @@ export default function KPICards() {
 
   const cards = [
     {
-      label: mobile ? 'Alcançado' : 'Total alcançado',
+      label: 'Alcance',
       value: fmt(total),
       sub: 'contas alcançadas',
       accent: '#FF6200', iconBg: 'rgba(255,98,0,0.10)', icon: Users, highlight: true,
