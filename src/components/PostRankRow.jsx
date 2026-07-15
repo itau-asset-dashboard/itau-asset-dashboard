@@ -28,9 +28,16 @@ const TIPO_ICON = {
   'Foto estática': Image,
 }
 
-// Pill de posição: ouro/prata/bronze para top 3, número simples depois
+// Pill de posição: caixinha colorida para top 5
 export function PositionPill({ i }) {
-  if (i >= 3) {
+  const styles = [
+    { bg: '#FEF3C7', color: '#B45309' },
+    { bg: '#F1F5F9', color: '#64748B' },
+    { bg: '#FEF0E7', color: '#9A5C2E' },
+    { bg: '#F0F4F8', color: '#8A9BB0' },
+    { bg: '#F0F4F8', color: '#8A9BB0' },
+  ]
+  if (i >= 5) {
     return (
       <span style={{
         width: 26, textAlign: 'center', flexShrink: 0,
@@ -40,11 +47,6 @@ export function PositionPill({ i }) {
       </span>
     )
   }
-  const styles = [
-    { bg: '#FEF3C7', color: '#B45309' },
-    { bg: '#F1F5F9', color: '#64748B' },
-    { bg: '#FEF0E7', color: '#9A5C2E' },
-  ]
   const { bg, color } = styles[i]
   return (
     <span style={{
