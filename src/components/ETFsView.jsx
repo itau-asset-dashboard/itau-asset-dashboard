@@ -281,7 +281,7 @@ export default function ETFsView() {
       )}
 
       {/* Top posts + Performance por formato */}
-      <div style={{ display:'grid', gridTemplateColumns: mobile ? '1fr' : '2fr 1fr', gap:16, alignItems:'stretch' }} className="annual-grid">
+      <div style={{ display:'grid', gridTemplateColumns: mobile ? '1fr' : '2fr 1fr', gap:16, alignItems:'start' }} className="annual-grid">
 
         {/* Top posts */}
         <div className="card" style={{ padding: mobile ? '14px' : '22px' }}>
