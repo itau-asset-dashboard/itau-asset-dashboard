@@ -257,14 +257,14 @@ export default function ETFsView() {
       )}
 
       {/* Top posts + Performance por formato */}
-      <div style={{ display:'grid', gridTemplateColumns: mobile ? '1fr' : '2fr 1fr', gap:16, alignItems:'start' }} className="annual-grid">
+      <div style={{ display:'grid', gridTemplateColumns: mobile ? '1fr' : '2fr 1fr', gap:16, alignItems:'stretch' }} className="annual-grid">
 
         {/* Top posts */}
-        <div className="card" style={{ padding: mobile ? '14px' : '22px' }}>
+        <div className="card" style={{ padding: mobile ? '14px' : '22px', display:'flex', flexDirection:'column' }}>
           <p style={{ color:'#1C252E', fontSize:15, fontWeight:700, marginBottom:4 }}>
             Top posts ETF {viewMode === 'mensal' ? `· ${MESES_LABEL[mesSel]}` : ''}
           </p>
-          <div style={{ display:'flex', flexDirection:'column', gap:2 }}>
+          <div style={{ display:'flex', flexDirection:'column', flex:1, justifyContent:'space-between' }}>
             {topPosts.length === 0 && (
               <p style={{ color:'#9AAAB8', fontSize:13, textAlign:'center', padding:'32px 0' }}>
                 Nenhum post ETF encontrado
