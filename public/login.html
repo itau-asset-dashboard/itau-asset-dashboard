@@ -3,83 +3,97 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Itaú Asset · Acesso restrito</title>
+  <title>Dashboard Itaú Asset</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      background: linear-gradient(135deg, #001B36 0%, #003366 60%, #004080 100%);
+      font-family: 'DM Sans', -apple-system, sans-serif;
+      background: #F0F2F5;
       min-height: 100dvh;
       display: flex;
       align-items: center;
       justify-content: center;
       padding: 24px;
+      -webkit-font-smoothing: antialiased;
     }
 
     .card {
-      background: rgba(255,255,255,0.06);
-      border: 1px solid rgba(255,255,255,0.12);
-      backdrop-filter: blur(16px);
+      background: #fff;
+      border: 1px solid #EAECF0;
       border-radius: 20px;
-      padding: 48px 40px;
+      box-shadow: 0 4px 24px rgba(28,37,46,0.08), 0 1px 4px rgba(28,37,46,0.04);
+      padding: 44px 40px 36px;
       width: 100%;
-      max-width: 380px;
+      max-width: 360px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 32px;
+      gap: 28px;
     }
 
+    /* ── Logo ── */
     .logo {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 12px;
+      gap: 14px;
     }
 
     .logo-badge {
       width: 52px;
       height: 52px;
-      background: #F97316;
+      background: #1C252E;
       border-radius: 14px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 22px;
-      font-weight: 900;
-      color: white;
-      letter-spacing: -1px;
     }
 
+    .logo-badge svg { display: block; }
+
+    .logo-text { text-align: center; }
+
     .logo-title {
-      color: white;
-      font-size: 17px;
-      font-weight: 700;
-      letter-spacing: 0.02em;
+      color: #1C252E;
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      display: block;
     }
 
     .logo-sub {
-      color: rgba(255,255,255,0.45);
+      color: #9AAAB8;
       font-size: 12px;
       font-weight: 500;
-      letter-spacing: 0.08em;
+      letter-spacing: 0.04em;
       text-transform: uppercase;
-      margin-top: -6px;
+      display: block;
+      margin-top: 4px;
     }
 
+    /* ── Divisor ── */
+    .divider {
+      width: 100%;
+      height: 1px;
+      background: #F0F2F5;
+    }
+
+    /* ── Form ── */
     form {
       width: 100%;
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 12px;
     }
 
     label {
-      color: rgba(255,255,255,0.55);
+      color: #8A9BB0;
       font-size: 11px;
       font-weight: 600;
-      letter-spacing: 0.08em;
+      letter-spacing: 0.07em;
       text-transform: uppercase;
       display: block;
       margin-bottom: 6px;
@@ -87,25 +101,28 @@
 
     input[type="password"] {
       width: 100%;
-      background: rgba(255,255,255,0.08);
-      border: 1.5px solid rgba(255,255,255,0.15);
+      background: #F8FAFC;
+      border: 1.5px solid #E8ECF0;
       border-radius: 10px;
-      padding: 13px 16px;
-      color: white;
+      padding: 12px 14px;
+      color: #1C252E;
       font-size: 15px;
+      font-family: 'DM Sans', sans-serif;
       outline: none;
-      transition: border-color 0.2s;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    input[type="password"]::placeholder { color: #C0CEDA; }
+    input[type="password"]:focus {
+      border-color: #FF6200;
+      box-shadow: 0 0 0 3px rgba(255,98,0,0.08);
     }
 
-    input[type="password"]::placeholder { color: rgba(255,255,255,0.25); }
-    input[type="password"]:focus { border-color: #F97316; }
-
     .erro {
-      background: rgba(239,68,68,0.15);
-      border: 1px solid rgba(239,68,68,0.35);
+      background: rgba(239,68,68,0.06);
+      border: 1px solid rgba(239,68,68,0.2);
       border-radius: 8px;
       padding: 10px 14px;
-      color: #FCA5A5;
+      color: #ef4444;
       font-size: 13px;
       text-align: center;
       display: none;
@@ -114,23 +131,26 @@
 
     button[type="submit"] {
       width: 100%;
-      background: #F97316;
+      background: #FF6200;
       border: none;
       border-radius: 10px;
-      padding: 14px;
+      padding: 13px;
       color: white;
       font-size: 15px;
       font-weight: 700;
+      font-family: 'DM Sans', sans-serif;
       cursor: pointer;
       transition: background 0.2s, transform 0.1s;
       margin-top: 4px;
+      letter-spacing: -0.01em;
     }
-    button[type="submit"]:hover { background: #ea6c0f; }
+    button[type="submit"]:hover { background: #e55800; }
     button[type="submit"]:active { transform: scale(0.98); }
-    button[type="submit"]:disabled { opacity: 0.6; cursor: default; }
+    button[type="submit"]:disabled { opacity: 0.55; cursor: default; }
 
+    /* ── Footer ── */
     .footer {
-      color: rgba(255,255,255,0.2);
+      color: #C0CEDA;
       font-size: 11px;
       text-align: center;
     }
@@ -139,10 +159,21 @@
 <body>
   <div class="card">
     <div class="logo">
-      <div class="logo-badge">IA</div>
-      <span class="logo-title">Itaú Asset</span>
-      <span class="logo-sub">Instagram Dashboard</span>
+      <div class="logo-badge">
+        <svg width="32" height="32" viewBox="0 0 100 100" fill="none">
+          <rect width="100" height="100" rx="22" fill="#FF6200"/>
+          <text x="50" y="66" text-anchor="middle"
+            font-family="'DM Sans','Nunito',sans-serif"
+            font-weight="900" font-size="36" fill="#fff" letter-spacing="-1">itaú</text>
+        </svg>
+      </div>
+      <div class="logo-text">
+        <span class="logo-title">Dashboard Itaú Asset</span>
+        <span class="logo-sub">Acesso restrito</span>
+      </div>
     </div>
+
+    <div class="divider"></div>
 
     <form method="POST" action="/api/auth" id="form">
       <div>
@@ -153,15 +184,13 @@
       <button type="submit" id="btn">Entrar</button>
     </form>
 
-    <p class="footer">Acesso restrito · Itaú Asset Management</p>
+    <p class="footer">Itaú Asset Management</p>
   </div>
 
   <script>
-    // Mostra erro se redirecionado com ?erro=1
     if (location.search.includes('erro=1')) {
       document.getElementById('erro').classList.add('visivel')
     }
-
     document.getElementById('form').addEventListener('submit', function() {
       document.getElementById('btn').disabled = true
       document.getElementById('btn').textContent = 'Verificando...'
