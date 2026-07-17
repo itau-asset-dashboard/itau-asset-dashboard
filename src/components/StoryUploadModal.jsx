@@ -132,7 +132,7 @@ const SingleStoryForm = forwardRef(function SingleStoryForm(
         onDragLeave={() => setDragging(false)}
         onDrop={e => { e.preventDefault(); setDragging(false); handleFile(e.dataTransfer.files[0]) }}
         onClick={() => document.getElementById('_story_inp_single').click()}
-        style={{ border: `2px dashed ${dragging ? '#C3EBF7' : '#D8EEF6'}`, borderRadius: 12, padding: preview ? '10px 14px' : '20px 14px', cursor: 'pointer', background: dragging ? '#F0F8FF' : '#FAFCFE', transition: 'all 0.15s', display: 'flex', alignItems: 'center', gap: 12 }}
+        style={{ border: `2px dashed ${dragging ? '#C3EBF7' : '#C3EBF7'}`, borderRadius: 12, padding: preview ? '10px 14px' : '20px 14px', cursor: 'pointer', background: dragging ? '#F0F8FF' : '#FAFCFE', transition: 'all 0.15s', display: 'flex', alignItems: 'center', gap: 12 }}
       >
         <input id="_story_inp_single" type="file" accept="image/*" style={{ display: 'none' }} onChange={e => handleFile(e.target.files[0])} />
         {preview ? (
@@ -214,7 +214,7 @@ const SingleStoryForm = forwardRef(function SingleStoryForm(
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
           {NUM_FIELDS.map(({ key, label, highlight }) => (
             <div key={key} style={highlight ? { gridColumn: '1 / -1' } : {}}>
-              <label style={{ color: highlight ? '#1a7a96' : '#8A9BB0', fontSize: 11, fontWeight: highlight ? 700 : 600, display: 'block', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.04em' }}>{label}</label>
+              <label style={{ color: highlight ? '#1C252E' : '#8A9BB0', fontSize: 11, fontWeight: highlight ? 700 : 600, display: 'block', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.04em' }}>{label}</label>
               <input type="number" value={form[key] === null || form[key] === undefined ? '' : form[key]} onChange={e => set(key, e.target.value)} placeholder="—" style={{ ...inp(!!highlight), fontSize: highlight ? 15 : 13, fontWeight: highlight ? 700 : 400 }} />
             </div>
           ))}
@@ -274,7 +274,7 @@ function EditStoryModal({ story, onClose, onSave, onDelete, inQueue, isLast }) {
       <div onDragOver={e => { e.preventDefault(); setDragging(true) }} onDragLeave={() => setDragging(false)}
         onDrop={e => { e.preventDefault(); setDragging(false); handleFile(e.dataTransfer.files[0]) }}
         onClick={() => document.getElementById('_story_edit_inp').click()}
-        style={{ border: `2px dashed ${dragging ? '#C3EBF7' : '#D8EEF6'}`, borderRadius: 12, padding: preview ? '10px 14px' : '20px 14px', cursor: 'pointer', background: '#FAFCFE', display: 'flex', alignItems: 'center', gap: 12 }}>
+        style={{ border: `2px dashed ${dragging ? '#C3EBF7' : '#C3EBF7'}`, borderRadius: 12, padding: preview ? '10px 14px' : '20px 14px', cursor: 'pointer', background: '#FAFCFE', display: 'flex', alignItems: 'center', gap: 12 }}>
         <input id="_story_edit_inp" type="file" accept="image/*" style={{ display: 'none' }} onChange={e => handleFile(e.target.files[0])} />
         {preview ? (
           <>
@@ -310,7 +310,7 @@ function EditStoryModal({ story, onClose, onSave, onDelete, inQueue, isLast }) {
       <div><p style={{ color: '#8A9BB0', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 10 }}>Métricas</p>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
           {NUM_FIELDS.map(({ key, label, highlight }) => (
-            <div key={key} style={highlight ? { gridColumn: '1 / -1' } : {}}><label style={{ color: highlight ? '#1a7a96' : '#8A9BB0', fontSize: 11, fontWeight: highlight ? 700 : 600, display: 'block', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.04em' }}>{label}</label><input type="number" value={form[key] === null || form[key] === undefined ? '' : form[key]} onChange={e => set(key, e.target.value)} placeholder="—" style={{ ...inp(!!highlight), fontSize: highlight ? 15 : 13 }} /></div>
+            <div key={key} style={highlight ? { gridColumn: '1 / -1' } : {}}><label style={{ color: highlight ? '#1C252E' : '#8A9BB0', fontSize: 11, fontWeight: highlight ? 700 : 600, display: 'block', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.04em' }}>{label}</label><input type="number" value={form[key] === null || form[key] === undefined ? '' : form[key]} onChange={e => set(key, e.target.value)} placeholder="—" style={{ ...inp(!!highlight), fontSize: highlight ? 15 : 13 }} /></div>
           ))}
         </div>
       </div>
@@ -326,7 +326,7 @@ function EditStoryModal({ story, onClose, onSave, onDelete, inQueue, isLast }) {
         </div>
       ) : (
         <div style={{ background: 'rgba(195,235,247,0.15)', border: '1px solid rgba(195,235,247,0.5)', borderRadius: 9, padding: '8px 14px' }}>
-          <p style={{ color: '#1a7a96', fontSize: 12, fontWeight: 600 }}>Modo visualização — desbloqueie para editar</p>
+          <p style={{ color: '#1C252E', fontSize: 12, fontWeight: 600 }}>Modo visualização — desbloqueie para editar</p>
         </div>
       )}
       {lightbox && preview && <ImageLightbox src={preview} title={form.nome || 'Story'} onClose={() => setLightbox(false)} />}
@@ -412,7 +412,7 @@ function MultiStoryModal({ onClose, onSave }) {
               onDragOver={e => { e.preventDefault(); setDragging(true) }} onDragLeave={() => setDragging(false)}
               onDrop={e => { e.preventDefault(); setDragging(false); loadFiles(e.dataTransfer.files) }}
               onClick={() => document.getElementById('_multi_story_inp').click()}
-              style={{ border: `2px dashed ${dragging ? '#C3EBF7' : '#D8EEF6'}`, borderRadius: 14, padding: '40px 20px', cursor: 'pointer', background: dragging ? '#F0F8FF' : '#FAFCFE', textAlign: 'center' }}>
+              style={{ border: `2px dashed ${dragging ? '#C3EBF7' : '#C3EBF7'}`, borderRadius: 14, padding: '40px 20px', cursor: 'pointer', background: dragging ? '#F0F8FF' : '#FAFCFE', textAlign: 'center' }}>
               <input id="_multi_story_inp" type="file" accept="image/*" multiple style={{ display: 'none' }} onChange={e => loadFiles(e.target.files)} />
               <Upload size={28} color="#C3EBF7" style={{ margin: '0 auto 10px' }} />
               <p style={{ color: '#1C252E', fontSize: 14, fontWeight: 600, marginBottom: 4 }}>Arraste os prints ou clique para selecionar</p>

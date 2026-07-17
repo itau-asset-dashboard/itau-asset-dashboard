@@ -216,7 +216,7 @@ export default function Insights() {
                     style={{
                       background:'rgba(195,235,247,0.2)', border:'1px solid rgba(195,235,247,0.6)',
                       borderRadius:20, padding:'6px 14px', cursor:'pointer',
-                      color:'#1a7a96', fontSize:12, fontFamily:'DM Sans, sans-serif',
+                      color:'#1C252E', fontSize:12, fontFamily:'DM Sans, sans-serif',
                       transition:'all 0.15s',
                     }}
                     onMouseEnter={e => e.currentTarget.style.background='rgba(195,235,247,0.4)'}

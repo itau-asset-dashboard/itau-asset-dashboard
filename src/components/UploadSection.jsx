@@ -61,22 +61,22 @@ export default function UploadSection() {
 
       <div className="card" style={{
         padding: '48px 32px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16,
-        cursor: 'pointer', border: '2px dashed #D8EEF6', boxShadow: 'none', background: '#FAFCFE', transition: 'all 0.15s',
+        cursor: 'pointer', border: '2px dashed #C3EBF7', boxShadow: 'none', background: '#FAFCFE', transition: 'all 0.15s',
       }}
         onClick={() => setOpen(true)}
         onMouseEnter={e => { e.currentTarget.style.background = '#F0F8FF'; e.currentTarget.style.borderColor = '#C3EBF7' }}
-        onMouseLeave={e => { e.currentTarget.style.background = '#FAFCFE'; e.currentTarget.style.borderColor = '#D8EEF6' }}
+        onMouseLeave={e => { e.currentTarget.style.background = '#FAFCFE'; e.currentTarget.style.borderColor = '#C3EBF7' }}
       >
         <div style={{ width: 60, height: 60, borderRadius: 16, background: 'rgba(195,235,247,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <Upload size={26} color="#1a7a96" />
+          <Upload size={26} color="#1C252E" />
         </div>
         <div style={{ textAlign: 'center' }}>
           <p style={{ color: '#1C252E', fontSize: 16, fontWeight: 700, marginBottom: 5 }}>Arraste o print aqui</p>
           <p style={{ color: '#8A9BB0', fontSize: 13 }}>ou clique para selecionar uma imagem</p>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'rgba(195,235,247,0.35)', border: '1px solid rgba(195,235,247,0.8)', padding: '7px 14px', borderRadius: 20 }}>
-          <Sparkles size={13} color="#1a7a96" />
-          <span style={{ color: '#1a7a96', fontSize: 12, fontWeight: 600 }}>Extração automática via Claude IA</span>
+          <Sparkles size={13} color="#1C252E" />
+          <span style={{ color: '#1C252E', fontSize: 12, fontWeight: 600 }}>Extração automática via Claude IA</span>
         </div>
       </div>
 
@@ -85,7 +85,7 @@ export default function UploadSection() {
         <div className="card" style={{ padding: '16px 20px', border: '1px solid rgba(195,235,247,0.8)', background: 'rgba(195,235,247,0.08)' }}>
           <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 16 }}>
             <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
-              <CloudUpload size={16} color="#1a7a96" style={{ flexShrink: 0, marginTop: 1 }} />
+              <CloudUpload size={16} color="#1C252E" style={{ flexShrink: 0, marginTop: 1 }} />
               <div>
                 <p style={{ color: '#182638', fontSize: 13, fontWeight: 600 }}>
                   {postsParaSincronizar.length} evidência{postsParaSincronizar.length > 1 ? 's' : ''} só no seu dispositivo
@@ -100,7 +100,7 @@ export default function UploadSection() {
               disabled={syncing}
               style={{
                 flexShrink: 0,
-                background: '#1a7a96', color: '#fff',
+                background: '#1C252E', color: '#fff',
                 border: 'none', borderRadius: 8, padding: '7px 14px',
                 fontSize: 12, fontWeight: 600,
                 cursor: syncing ? 'wait' : 'pointer',
@@ -113,7 +113,7 @@ export default function UploadSection() {
             </button>
           </div>
           {syncing && (
-            <p style={{ color: '#1a7a96', fontSize: 11, marginTop: 10, marginLeft: 26 }}>
+            <p style={{ color: '#1C252E', fontSize: 11, marginTop: 10, marginLeft: 26 }}>
               Isso pode levar alguns segundos dependendo da quantidade de imagens…
             </p>
           )}

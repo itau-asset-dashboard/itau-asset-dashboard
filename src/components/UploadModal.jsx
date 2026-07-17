@@ -229,7 +229,7 @@ const SinglePostModal = forwardRef(function SinglePostModal({ initialPost, initi
         onDrop={e => { e.preventDefault(); setDragging(false); handleFile(e.dataTransfer.files[0]) }}
         onClick={() => document.getElementById('_file_inp_single').click()}
         style={{
-          border: `2px dashed ${dragging ? '#C3EBF7' : '#D8EEF6'}`,
+          border: `2px dashed ${dragging ? '#C3EBF7' : '#C3EBF7'}`,
           borderRadius: 12, padding: preview ? '10px 14px' : '20px 14px',
           cursor: 'pointer', background: dragging ? '#F0F8FF' : '#FAFCFE',
           transition: 'all 0.15s', display: 'flex', alignItems: 'center', gap: 12,
@@ -397,7 +397,7 @@ const SinglePostModal = forwardRef(function SinglePostModal({ initialPost, initi
           {NUM_FIELDS.map(({ key, label, highlight, tooltip }) => (
             <div key={key} style={highlight ? { gridColumn: '1 / -1' } : {}}>
               <label style={{
-                color: highlight ? '#1a7a96' : '#9AAAB8',
+                color: highlight ? '#1C252E' : '#9AAAB8',
                 fontSize: 11,
                 display: 'flex', alignItems: 'center', gap: 5,
                 marginBottom: 3,
@@ -567,7 +567,7 @@ function MultiUploadModal({ onClose, onSave }) {
               onDrop={e => { e.preventDefault(); setDragging(false); loadFiles(e.dataTransfer.files) }}
               onClick={() => document.getElementById('_multi_inp').click()}
               style={{
-                border: `2px dashed ${dragging ? '#C3EBF7' : '#D8EEF6'}`,
+                border: `2px dashed ${dragging ? '#C3EBF7' : '#C3EBF7'}`,
                 borderRadius: 14, padding: '40px 20px', cursor: 'pointer',
                 background: dragging ? '#F0F8FF' : '#FAFCFE', textAlign: 'center',
               }}>

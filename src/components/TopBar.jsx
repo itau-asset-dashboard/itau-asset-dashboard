@@ -162,7 +162,7 @@ return (
         {!isEditMode && (
           <span style={{
             display: 'inline-flex', alignItems: 'center', gap: 4,
-            background: 'rgba(195,235,247,0.3)', color: '#1a7a96',
+            background: 'rgba(195,235,247,0.3)', color: '#1C252E',
             border: '1px solid rgba(195,235,247,0.8)',
             borderRadius: 10, padding: '7px 9px', fontSize: 11,
           }}>

@@ -8,9 +8,9 @@ function fmt(n) {
 
 // Carrossel → laranja, Reels → azul escuro, Foto → azul claro
 const CONFIGS = {
-  Carrossel:      { bar:'#FF8040',  text:'#FF8040',  badge:'rgba(255,128,64,0.1)', badgeText:'#cc5500' },
+  Carrossel:      { bar:'#FF6200',  text:'#FF6200',  badge:'rgba(255,128,64,0.1)', badgeText:'#cc5500' },
   Reels:          { bar:'#8A9BB0',  text:'#8A9BB0',  badge:'rgba(138,155,176,0.1)',badgeText:'#5a6b80' },
-  'Foto estática':{ bar:'#C3EBF7', text:'#1a7a96',  badge:'rgba(195,235,247,0.5)',badgeText:'#1a7a96' },
+  'Foto estática':{ bar:'#C3EBF7', text:'#1C252E',  badge:'rgba(195,235,247,0.5)',badgeText:'#1C252E' },
 }
 
 export default function TypeComparison() {
@@ -37,7 +37,7 @@ export default function TypeComparison() {
           return (
             <div key={tipo} style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'10px 0', borderBottom: i < stats.length-1 ? '1px solid #F0F2F5' : 'none' }}>
               <div style={{ display:'flex', alignItems:'center', gap:7 }}>
-                <div style={{ width:8, height:8, borderRadius:2, flexShrink:0, background:cfg.bar, border: tipo==='Foto estática'?'1px solid #1a7a96':'none' }} />
+                <div style={{ width:8, height:8, borderRadius:2, flexShrink:0, background:cfg.bar, border: tipo==='Foto estática'?'1px solid #1C252E':'none' }} />
                 <span style={{ fontSize: isFirst?14:13, color:'#1C252E', fontWeight:500 }}>{tipo}</span>
               </div>
               <div style={{ display:'flex', alignItems:'center', gap:10 }}>

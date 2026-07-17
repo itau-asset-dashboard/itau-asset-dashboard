@@ -13,7 +13,7 @@ function fmt(n) {
 }
 
 export const TIPO_COLOR = {
-  Carrossel: '#FF8040',
+  Carrossel: '#FF6200',
   Reels: '#8A9BB0',
   'Foto estática': '#C3EBF7',
 }
