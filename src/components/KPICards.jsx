@@ -24,25 +24,25 @@ export default function KPICards() {
     {
       label: 'Alcance',
       value: fmt(total),
-      sub: 'contas alcançadas',
+      sub: 'contas',
       accent: '#FF6200', iconBg: 'rgba(255,98,0,0.10)', icon: Users, highlight: true,
     },
     {
-      label: mobile ? 'Média/post' : 'Média por post',
+      label: 'Média por post',
       value: fmt(media),
-      sub: 'contas por publicação',
+      sub: 'por publicação',
       accent: '#C3EBF7', iconBg: 'rgba(195,235,247,0.3)', icon: TrendingUp, highlight: false,
     },
     {
       label: 'Posts',
       value: String(posts.length),
-      sub: `${posts.filter(p=>p.status==='parcial').length} parciais`,
+      sub: 'publicações',
       accent: '#1C252E', iconBg: 'rgba(28,37,46,0.08)', icon: FileText, highlight: false,
     },
     {
       label: 'Interações',
       value: fmt(interacoes),
-      sub: 'soma do mês',
+      sub: 'engajamento',
       accent: '#FF6200', iconBg: 'rgba(255,98,0,0.10)', icon: Heart, highlight: false,
     },
   ]
@@ -52,7 +52,7 @@ export default function KPICards() {
     {/* CSS injetado — garante 2 colunas no mobile independente de qualquer cache */}
     <style>{`
       @media (max-width: 768px) {
-        .kpi-grid-js { grid-template-columns: repeat(3,1fr) !important; gap: 8px !important; }
+        .kpi-grid-js { grid-template-columns: repeat(2,1fr) !important; gap: 8px !important; }
         .kpi-card-js { padding: 10px !important; }
         .kpi-label-js { font-size: 8px !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; margin-bottom: 5px !important; }
         .kpi-number-js { font-size: 16px !important; margin-bottom: 2px !important; }
@@ -65,7 +65,7 @@ export default function KPICards() {
     `}</style>
     <div className="kpi-grid-js" style={{
       display: 'grid',
-      gridTemplateColumns: mobile ? 'repeat(3,1fr)' : 'repeat(5,1fr)',
+      gridTemplateColumns: mobile ? 'repeat(2,1fr)' : 'repeat(4,1fr)',
       gap: mobile ? 8 : 14,
       marginBottom: 14,
     }}>
