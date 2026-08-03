@@ -69,21 +69,27 @@ export default function App() {
   }, [activeSection])
 
   useEffect(() => {
+    let isSyncing = false
+    async function safeSync() {
+      if (isSyncing) return
+      isSyncing = true
+      try { await syncFromCloud() } finally { isSyncing = false }
+    }
+
     // Sync inicial
-    syncFromCloud()
+    safeSync()
 
     // Re-sync quando o usuário volta para a aba/app (mobile ou desktop)
     function onVisible() {
-      if (document.visibilityState === 'visible') syncFromCloud()
+      if (document.visibilityState === 'visible') safeSync()
     }
-    // pageshow cobre o bfcache do iOS Safari: página restaurada do cache sem recarregar
     function onPageShow(e) {
-      if (e.persisted) syncFromCloud()
+      if (e.persisted) safeSync()
     }
-    // Refresh automático a cada 15s para garantir sincronia entre dispositivos
+    // Refresh automático a cada 60s — intervalo menor causava sobrecarga em máquinas lentas
     const interval = setInterval(() => {
-      if (document.visibilityState === 'visible') syncFromCloud()
-    }, 15_000)
+      if (document.visibilityState === 'visible') safeSync()
+    }, 60_000)
 
     document.addEventListener('visibilitychange', onVisible)
     window.addEventListener('pageshow', onPageShow)
