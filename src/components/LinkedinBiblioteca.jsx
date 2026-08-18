@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback } from 'react'
-import { ArrowDown, ArrowUp, ArrowUpDown, Search, X, ChevronLeft, ChevronRight } from 'lucide-react'
+import { ArrowDown, ArrowUp, ArrowUpDown, Search, X, ChevronLeft, ChevronRight, CheckSquare, Square, Trash2 } from 'lucide-react'
 import { useIsMobile } from '../utils/useIsMobile'
 import { stripEmoji } from '../utils/temas'
 import LinkedinUploadModal from './LinkedinUploadModal'
@@ -35,6 +35,19 @@ export default function LinkedinBiblioteca({ allPosts, mesFiltro, isEditMode, on
   const [sortKey, setSortKey] = useState('data_post')
   const [sortDir, setSortDir] = useState(-1)
   const [page, setPage]       = useState(0)
+
+  const [selected, setSelected] = useState(new Set())
+
+  function toggleSelect(id) {
+    setSelected(prev => {
+      const next = new Set(prev)
+      next.has(id) ? next.delete(id) : next.add(id)
+      return next
+    })
+  }
+  function selectAll() { setSelected(new Set(visible.map(p => p.id))) }
+  function selectParciais() { setSelected(new Set(sorted.filter(p => p.status === 'parcial').map(p => p.id))) }
+  function clearSelection() { setSelected(new Set()) }
 
   const [mmF, yyyyF] = (mesFiltro || '').split('/')
   const postsMes = allPosts.filter(p => {
@@ -95,6 +108,19 @@ export default function LinkedinBiblioteca({ allPosts, mesFiltro, isEditMode, on
             {q ? `${sorted.length} resultado${sorted.length !== 1 ? 's' : ''} em todos os posts` : `${filtered.length} publicações`}
           </p>
         </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+          {isEditMode && (
+            <>
+              <button onClick={selectParciais}
+                style={{ background: 'rgba(245,158,11,0.10)', border: '1px solid rgba(245,158,11,0.3)', borderRadius: 8, padding: '6px 12px', fontSize: 12, fontWeight: 600, color: '#d97706', cursor: 'pointer' }}>
+                Selecionar parciais
+              </button>
+              <button onClick={selectAll}
+                style={{ background: '#F0F2F5', border: 'none', borderRadius: 8, padding: '6px 12px', fontSize: 12, fontWeight: 600, color: '#8A9BB0', cursor: 'pointer' }}>
+                Selecionar página
+              </button>
+            </>
+          )}
         <div style={{
           display: 'flex', alignItems: 'center', gap: 8,
           background: '#F5F7FA', borderRadius: 10,
@@ -113,6 +139,7 @@ export default function LinkedinBiblioteca({ allPosts, mesFiltro, isEditMode, on
               <X size={13} color="#A8B5C0"/>
             </button>
           )}
+        </div>
         </div>
       </div>
 
@@ -143,6 +170,7 @@ export default function LinkedinBiblioteca({ allPosts, mesFiltro, isEditMode, on
           <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: mobile ? 0 : 680 }}>
             <thead>
               <tr>
+                {isEditMode && <th style={{ padding: '11px 10px', background: '#FAFBFC', width: 36 }}/>}
                 <Th k="data_post">Data</Th>
                 <th style={{ padding: '11px 14px', color: '#8A9BB0', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', textAlign: 'left', background: '#FAFBFC', whiteSpace: 'nowrap' }}>
                   {mobile ? 'Post' : 'Post / Tema'}
@@ -162,10 +190,17 @@ export default function LinkedinBiblioteca({ allPosts, mesFiltro, isEditMode, on
                 const isTop = p.id === topId && !q
                 return (
                   <tr key={p.id}
-                    onClick={() => isEditMode && onEditPost(p)}
-                    style={{ borderTop: '1px solid #F5F7FA', cursor: isEditMode ? 'pointer' : 'default', background: 'transparent' }}
-                    onMouseEnter={e => { e.currentTarget.style.background = '#FAFBFC' }}
-                    onMouseLeave={e => { e.currentTarget.style.background = 'transparent' }}>
+                    onClick={() => isEditMode && !selected.size && onEditPost(p)}
+                    style={{ borderTop: '1px solid #F5F7FA', cursor: isEditMode ? 'pointer' : 'default', background: selected.has(p.id) ? 'rgba(255,98,0,0.04)' : 'transparent' }}
+                    onMouseEnter={e => { if (!selected.has(p.id)) e.currentTarget.style.background = '#FAFBFC' }}
+                    onMouseLeave={e => { e.currentTarget.style.background = selected.has(p.id) ? 'rgba(255,98,0,0.04)' : 'transparent' }}>
+                    {isEditMode && (
+                      <td style={{ padding: '12px 10px' }} onClick={e => { e.stopPropagation(); toggleSelect(p.id) }}>
+                        {selected.has(p.id)
+                          ? <CheckSquare size={15} color="#FF6200" />
+                          : <Square size={15} color="#D0D8E0" />}
+                      </td>
+                    )}
                     <td style={{ padding: '12px 14px', color: '#8A9BB0', fontSize: 12, whiteSpace: 'nowrap' }}>{p.data_post || '—'}</td>
                     <td style={{ padding: '12px 14px', overflow: 'hidden' }}>
                       <p style={{ color: '#1C252E', fontSize: mobile ? 12 : 13, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: mobile ? 160 : 260 }}>
@@ -223,6 +258,38 @@ export default function LinkedinBiblioteca({ allPosts, mesFiltro, isEditMode, on
               <ChevronRight size={15} color="#1C252E"/>
             </button>
           </div>
+        </div>
+      )}
+      {/* Barra flutuante de seleção */}
+      {selected.size > 0 && (
+        <div style={{
+          position: 'fixed', bottom: 80, left: '50%', transform: 'translateX(-50%)',
+          background: '#1C252E', borderRadius: 14, padding: '12px 20px',
+          display: 'flex', alignItems: 'center', gap: 14,
+          boxShadow: '0 8px 32px rgba(0,0,0,0.22)', zIndex: 500,
+          whiteSpace: 'nowrap',
+        }}>
+          <span style={{ color: '#C3EBF7', fontSize: 13, fontWeight: 600 }}>
+            {selected.size} selecionado{selected.size > 1 ? 's' : ''}
+          </span>
+          <div style={{ width: 1, height: 18, background: 'rgba(255,255,255,0.15)' }}/>
+          <button onClick={async () => {
+            if (!window.confirm(`Apagar ${selected.size} post${selected.size > 1 ? 's' : ''}?`)) return
+            await onDeleteMany([...selected])
+            clearSelection()
+          }} style={{
+            background: '#ef4444', color: '#fff', border: 'none', borderRadius: 9,
+            padding: '7px 14px', fontSize: 13, fontWeight: 700, cursor: 'pointer',
+            display: 'flex', alignItems: 'center', gap: 6,
+          }}>
+            <Trash2 size={13}/> Apagar
+          </button>
+          <button onClick={clearSelection} style={{
+            background: 'transparent', color: '#8A9BB0', border: 'none',
+            cursor: 'pointer', padding: 4, display: 'flex',
+          }}>
+            <X size={16}/>
+          </button>
         </div>
       )}
     </div>
