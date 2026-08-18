@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback } from 'react'
-import { ArrowDown, ArrowUp, ArrowUpDown, Search, X, ChevronLeft, ChevronRight, CheckSquare, Square, Trash2 } from 'lucide-react'
+import { ArrowDown, ArrowUp, ArrowUpDown, Search, X, ChevronLeft, ChevronRight, CheckSquare, Square, Trash2, SquareCheck } from 'lucide-react'
 import { useIsMobile } from '../utils/useIsMobile'
 import { stripEmoji } from '../utils/temas'
 import LinkedinUploadModal from './LinkedinUploadModal'
@@ -36,6 +36,7 @@ export default function LinkedinBiblioteca({ allPosts, mesFiltro, isEditMode, on
   const [sortDir, setSortDir] = useState(-1)
   const [page, setPage]       = useState(0)
 
+  const [selectMode, setSelectMode] = useState(false)
   const [selected, setSelected] = useState(new Set())
 
   function toggleSelect(id) {
@@ -47,7 +48,7 @@ export default function LinkedinBiblioteca({ allPosts, mesFiltro, isEditMode, on
   }
   function selectAll() { setSelected(new Set(visible.map(p => p.id))) }
   function selectParciais() { setSelected(new Set(sorted.filter(p => p.status === 'parcial').map(p => p.id))) }
-  function clearSelection() { setSelected(new Set()) }
+  function clearSelection() { setSelected(new Set()); setSelectMode(false) }
 
   const [mmF, yyyyF] = (mesFiltro || '').split('/')
   const postsMes = allPosts.filter(p => {
@@ -108,18 +109,26 @@ export default function LinkedinBiblioteca({ allPosts, mesFiltro, isEditMode, on
             {q ? `${sorted.length} resultado${sorted.length !== 1 ? 's' : ''} em todos os posts` : `${filtered.length} publicações`}
           </p>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          {isEditMode && selectMode && (
+            <button onClick={selectParciais}
+              style={{ background: 'rgba(245,158,11,0.10)', border: '1px solid rgba(245,158,11,0.3)', borderRadius: 8, padding: '6px 10px', fontSize: 11, fontWeight: 600, color: '#d97706', cursor: 'pointer', whiteSpace: 'nowrap' }}>
+              Selec. parciais
+            </button>
+          )}
           {isEditMode && (
-            <>
-              <button onClick={selectParciais}
-                style={{ background: 'rgba(245,158,11,0.10)', border: '1px solid rgba(245,158,11,0.3)', borderRadius: 8, padding: '6px 12px', fontSize: 12, fontWeight: 600, color: '#d97706', cursor: 'pointer' }}>
-                Selecionar parciais
-              </button>
-              <button onClick={selectAll}
-                style={{ background: '#F0F2F5', border: 'none', borderRadius: 8, padding: '6px 12px', fontSize: 12, fontWeight: 600, color: '#8A9BB0', cursor: 'pointer' }}>
-                Selecionar página
-              </button>
-            </>
+            <button
+              onClick={() => selectMode ? clearSelection() : setSelectMode(true)}
+              title={selectMode ? 'Cancelar seleção' : 'Selecionar posts'}
+              style={{
+                background: selectMode ? 'rgba(255,98,0,0.08)' : '#F5F7FA',
+                border: `1.5px solid ${selectMode ? 'rgba(255,98,0,0.3)' : '#EDEFF2'}`,
+                borderRadius: 10, padding: '7px 9px', cursor: 'pointer',
+                display: 'flex', alignItems: 'center',
+                color: selectMode ? '#FF6200' : '#A8B5C0',
+              }}>
+              <CheckSquare size={15} />
+            </button>
           )}
         <div style={{
           display: 'flex', alignItems: 'center', gap: 8,
@@ -170,7 +179,7 @@ export default function LinkedinBiblioteca({ allPosts, mesFiltro, isEditMode, on
           <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: mobile ? 0 : 680 }}>
             <thead>
               <tr>
-                {isEditMode && <th style={{ padding: '11px 10px', background: '#FAFBFC', width: 36 }}/>}
+                {isEditMode && selectMode && <th style={{ padding: '11px 10px', background: '#FAFBFC', width: 36 }}/>}
                 <Th k="data_post">Data</Th>
                 <th style={{ padding: '11px 14px', color: '#8A9BB0', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', textAlign: 'left', background: '#FAFBFC', whiteSpace: 'nowrap' }}>
                   {mobile ? 'Post' : 'Post / Tema'}
@@ -190,11 +199,11 @@ export default function LinkedinBiblioteca({ allPosts, mesFiltro, isEditMode, on
                 const isTop = p.id === topId && !q
                 return (
                   <tr key={p.id}
-                    onClick={() => isEditMode && !selected.size && onEditPost(p)}
+                    onClick={() => selectMode ? toggleSelect(p.id) : (isEditMode && onEditPost(p))}
                     style={{ borderTop: '1px solid #F5F7FA', cursor: isEditMode ? 'pointer' : 'default', background: selected.has(p.id) ? 'rgba(255,98,0,0.04)' : 'transparent' }}
                     onMouseEnter={e => { if (!selected.has(p.id)) e.currentTarget.style.background = '#FAFBFC' }}
                     onMouseLeave={e => { e.currentTarget.style.background = selected.has(p.id) ? 'rgba(255,98,0,0.04)' : 'transparent' }}>
-                    {isEditMode && (
+                    {isEditMode && selectMode && (
                       <td style={{ padding: '12px 10px' }} onClick={e => { e.stopPropagation(); toggleSelect(p.id) }}>
                         {selected.has(p.id)
                           ? <CheckSquare size={15} color="#FF6200" />
