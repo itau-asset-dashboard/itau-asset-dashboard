@@ -60,7 +60,7 @@ FORMATO MOBILE — FEED/PERFIL:
   Pode mostrar apenas curtidas abaixo da imagem. Extraia o que estiver visível.
 
 Independente do formato, procure qualquer número associado a:
-  - alcance / contas alcançadas / accounts reached
+  - alcance / contas alcançadas / accounts reached / visualizadores / viewers
   - impressões / visualizações / views / impressions
   - curtidas / likes / ❤
   - comentários / comments
