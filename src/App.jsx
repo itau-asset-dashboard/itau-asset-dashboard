@@ -8,7 +8,6 @@ import PostsChart from './components/PostsChart'
 import PostsRanking from './components/PostsRanking'
 import TypeComparison from './components/TypeComparison'
 import ThemeAnalysis from './components/ThemeAnalysis'
-import Insights from './components/Insights'
 import UploadSection from './components/UploadSection'
 import SyncBadge from './components/SyncBadge'
 import RightPanel from './components/RightPanel'
@@ -123,7 +122,6 @@ export default function App() {
         <TopBar />
         <div className="content-scroll scrollbar-thin">
           {activeSection === 'upload'      && <UploadSection />}
-          {activeSection === 'insights'    && <Insights />}
           {activeSection === 'oliver'      && <OliverView />}
           {activeSection === 'navarro'     && <NavarroView links={navarroLinks} isEditMode={isEditMode} onSaveLink={saveNavarroLink} onDeleteLink={deleteNavarroLink}/>}
           {activeSection === 'posts'       && <PostsRanking />}

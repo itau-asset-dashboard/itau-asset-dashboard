@@ -1,4 +1,4 @@
-import { BarChart2, Calendar, List, Lightbulb, Upload, TrendingUp, LineChart, BookOpen, PlaySquare } from 'lucide-react'
+import { BarChart2, Calendar, List, Upload, TrendingUp, LineChart, BookOpen, PlaySquare } from 'lucide-react'
 import { useStore } from '../store/useStore'
 
 const NAV_GROUPS = [
@@ -31,7 +31,6 @@ const NAV_GROUPS = [
   {
     label: 'RECURSOS',
     items: [
-      { id: 'insights',  icon: Lightbulb, label: 'Insights' },
       { id: 'oliver',    icon: LineChart,  label: 'Dados Oliver' },
       { id: 'glossario', icon: BookOpen,   label: 'Glossário' },
     ],
