@@ -106,7 +106,7 @@ export default function AnnualView() {
       trend: 'up',
     },
     {
-      label: 'Posts cadastrados',
+      label: 'Publicações',
       value: String(posts.length),
       sub: `${posts.filter(p=>p.status==='parcial').length} parciais`,
       icon: LayoutGrid,
@@ -115,7 +115,7 @@ export default function AnnualView() {
       trend: 'neutral',
     },
     {
-      label: 'Média visualizações',
+      label: 'Média visual.',
       value: fmt(mediaVis),
       sub: 'views / publicação',
       icon: TrendingUp,
