@@ -88,7 +88,7 @@ export default function AnnualView() {
       trend: pct >= 50 ? 'up' : 'neutral',
     },
     {
-      label: 'Média por post',
+      label: 'Média alcance',
       value: fmt(media),
       sub: 'contas / publicação',
       icon: TrendingUp,
