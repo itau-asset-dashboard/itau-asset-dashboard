@@ -126,7 +126,7 @@ export default function AnnualView() {
     {
       label: 'Média interações',
       value: fmt(mediaInter),
-      sub: 'curtidas + salv. + coment.',
+      sub: 'interações / post',
       icon: Award,
       color: '#FF6200',
       bg: 'rgba(255,98,0,0.06)',
