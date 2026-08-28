@@ -32,6 +32,9 @@ export default function AnnualView() {
   const total   = posts.reduce((s,p)=>s+(p.contas_alcancadas||0),0)
   const media   = posts.length > 0 ? Math.round(total/posts.length) : 0
   const melhor  = posts.length > 0 ? posts.reduce((a,b)=>(a.contas_alcancadas||0)>(b.contas_alcancadas||0)?a:b,posts[0]) : null
+  const postsComVis = posts.filter(p=>p.visualizacoes)
+  const mediaVis = postsComVis.length > 0 ? Math.round(postsComVis.reduce((s,p)=>s+(p.visualizacoes||0),0)/postsComVis.length) : 0
+  const mediaInter = posts.length > 0 ? Math.round(posts.reduce((s,p)=>s+(p.curtidas||0)+(p.comentarios||0)+(p.salvamentos||0)+(p.reposts||0)+(p.compartilhamentos||0),0)/posts.length) : 0
   const pct     = metaAnual > 0 ? Math.min((total/metaAnual)*100,100) : 0
   // Sempre usa o mês real de hoje — independente do filtro selecionado em outras abas
   const hoje = new Date()
@@ -111,6 +114,24 @@ export default function AnnualView() {
       bg: 'rgba(28,37,46,0.06)',
       trend: 'neutral',
     },
+    {
+      label: 'Média visualizações',
+      value: fmt(mediaVis),
+      sub: 'views / publicação',
+      icon: TrendingUp,
+      color: '#1C252E',
+      bg: 'rgba(195,235,247,0.25)',
+      trend: 'neutral',
+    },
+    {
+      label: 'Média interações',
+      value: fmt(mediaInter),
+      sub: 'curtidas + salv. + coment.',
+      icon: Award,
+      color: '#FF6200',
+      bg: 'rgba(255,98,0,0.06)',
+      trend: 'neutral',
+    },
   ]
 
   return (
@@ -120,13 +141,13 @@ export default function AnnualView() {
       <style>{`@media(max-width:768px){.kpi-grid-js{grid-template-columns:repeat(2,1fr)!important;gap:8px!important}.kpi-card-js{padding:10px!important}.kpi-label-js{font-size:8px!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;margin-bottom:5px!important}.kpi-number-js{font-size:16px!important;margin-bottom:2px!important}.kpi-sub-js{font-size:8px!important}.kpi-icon-js{display:none!important}}@media(max-width:390px){.kpi-number-js{font-size:14px!important}}`}</style>
       <div className="kpi-grid-js" style={{
         display:'grid',
-        gridTemplateColumns: mobile ? 'repeat(2,1fr)' : 'repeat(4,1fr)',
+        gridTemplateColumns: mobile ? 'repeat(2,1fr)' : 'repeat(6,1fr)',
         gap: mobile ? 8 : 14,
         marginBottom: 14,
       }}>
         {CARDS.map(({label,value,sub,icon:Icon,color,bg},idx)=>{
           const mLabel = mobile
-            ? ['Alcançado','Média/post','Melhor','Posts'][idx]
+            ? ['Alcançado','Média/post','Melhor','Posts','Visualiz.','Interações'][idx]
             : label
           return (
             <div key={label} className="card kpi-card kpi-card-js" style={{
