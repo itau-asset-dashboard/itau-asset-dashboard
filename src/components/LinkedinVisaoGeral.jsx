@@ -38,6 +38,10 @@ export default function LinkedinVisaoGeral({ posts, ano, isEditMode, onEditPost 
   const totalReacoes    = posts.reduce((s, p) => s + (p.reacoes    || 0), 0)
   const totalCliques    = posts.reduce((s, p) => s + (p.cliques    || 0), 0)
   const totalPosts      = posts.length
+  const mediaImpressoes = totalPosts > 0 ? Math.round(totalImpressoes / totalPosts) : 0
+  const mediaCliques    = totalPosts > 0 ? Math.round(totalCliques / totalPosts) : 0
+  const ctrsValidos     = posts.filter(p => p.ctr != null)
+  const mediaCTR        = ctrsValidos.length > 0 ? (ctrsValidos.reduce((s, p) => s + p.ctr, 0) / ctrsValidos.length).toFixed(1) : '—'
 
   const byMonth = Array.from({ length: 12 }, (_, i) => {
     const mm = String(i + 1).padStart(2, '0')
@@ -80,17 +84,19 @@ export default function LinkedinVisaoGeral({ posts, ano, isEditMode, onEditPost 
   }
 
   const KPIS = [
-    { label: 'Impressões',  value: fmtN(totalImpressoes), sub: 'total distribuição' },
-    { label: 'Reações',     value: fmtN(totalReacoes),    sub: 'curtidas e reações' },
-    { label: 'Cliques',     value: fmtN(totalCliques),    sub: 'no conteúdo' },
-    { label: 'Publicações', value: String(totalPosts),    sub: `posts em ${ano}` },
+    { label: 'Impressões',       value: fmtN(totalImpressoes),      sub: 'total distribuição' },
+    { label: 'Reações',          value: fmtN(totalReacoes),         sub: 'curtidas e reações' },
+    { label: 'Cliques',          value: fmtN(totalCliques),         sub: 'no conteúdo' },
+    { label: 'Publicações',      value: String(totalPosts),         sub: `posts em ${ano}` },
+    { label: 'Média impressões', value: fmtN(mediaImpressoes),      sub: 'por publicação' },
+    { label: 'CTR médio',        value: `${mediaCTR}%`,             sub: 'taxa de clique' },
   ]
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
 
       {/* KPI cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: mobile ? 'repeat(2,1fr)' : 'repeat(4,1fr)', gap: mobile ? 8 : 12 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: mobile ? 'repeat(2,1fr)' : 'repeat(6,1fr)', gap: mobile ? 8 : 12 }}>
         {KPIS.map(({ label, value, sub }) => (
           <div key={label} className="card" style={{ padding: mobile ? '12px 14px' : '16px 20px' }}>
             <p style={{ color: '#8A9BB0', fontSize: mobile ? 9 : 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 8 }}>{label}</p>
